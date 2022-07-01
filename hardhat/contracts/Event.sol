@@ -26,10 +26,11 @@ contract EventManager {
     Counters.Counter private _eventRecordIds;
     Counters.Counter private _groupIds;
 
-    Group[] public groups;
-    EventRecord[] public eventRecords;
+    Group[] private groups;
+    EventRecord[] private eventRecords;
 
-    mapping(address => uint256[]) public ownGroupIds;
+    mapping(address => uint256[]) private ownGroupIds;
+    mapping(uint256 => address[]) private participantAddresses;
 
     constructor() {
         console.log("init");
@@ -102,6 +103,28 @@ contract EventManager {
             _numberOfEventRecords
         );
         _eventRecords = eventRecords;
+        return _eventRecords;
+    }
+
+    function applyForParticipation(uint256 _eventRecordId) public {
+        participantAddresses[_eventRecordId].push(msg.sender);
+    }
+
+    function getParticipationEvents()
+        external
+        view
+        returns (EventRecord[] memory)
+    {
+        uint256 _numberOfEventRecords = eventRecords.length;
+        // create array of events
+        EventRecord[] memory _eventRecords = new EventRecord[](
+            _numberOfEventRecords
+        );
+        for (uint256 _i = 0; _i < _numberOfEventRecords; _i++) {
+            if (participantAddresses[_i].length > 0) {
+                _eventRecords[_i] = eventRecords[_i];
+            }
+        }
         return _eventRecords;
     }
 }

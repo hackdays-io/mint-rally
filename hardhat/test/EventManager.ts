@@ -97,3 +97,42 @@ describe("GetOwnGroups", () => {
     expect(ownGroups[0].name).to.equal("group1");
   });
 });
+
+describe("ApplyForPaticipation", () => {
+  it("Should apply", async () => {
+    const eventManagerContractFactory = await ethers.getContractFactory(
+      "EventManager"
+    );
+
+    const eventManagerContract = await eventManagerContractFactory.deploy();
+    const eventManager = await eventManagerContract.deployed();
+
+    // does not exist any groups
+    const groupsBeforeCreate = await eventManager.getGroups();
+    expect(groupsBeforeCreate.length).to.equal(0);
+
+    const txn1 = await eventManager.createGroup("group1");
+    await txn1.wait();
+
+    const groupsAfterCreate = await eventManager.getGroups();
+
+    const txn2 = await eventManager.createEventRecord(
+      groupsAfterCreate[0].groupId.toNumber(),
+      "event1",
+      "event1 description",
+      "2022-07-3O",
+      "18:00",
+      "21:00",
+      "hackdays"
+    );
+    await txn2.wait();
+    const eventRecordsAfterCreate = await eventManager.getEventRecords();
+
+    const txn3 = await eventManager.applyForParticipation(
+      eventRecordsAfterCreate[0].eventRecordId.toNumber()
+    );
+    await txn3.wait();
+    const participationEvents = await eventManager.getParticipationEvents();
+    expect(participationEvents.length).to.equal(1);
+  });
+});
