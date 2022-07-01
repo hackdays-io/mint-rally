@@ -45,5 +45,55 @@ describe("CreateEventRecord", () => {
     expect(eventRecordsAfterCreate[0].date).to.equal("2022-07-3O");
     expect(eventRecordsAfterCreate[0].startTime).to.equal("18:00");
     expect(eventRecordsAfterCreate[0].endTime).to.equal("21:00");
+
+    // cannot create event record if you are not the group owner
+    const invalidGroupId = groupsAfterCreate[0].groupId.toNumber() + 1;
+    try {
+      const txn3 = await eventManager.createEventRecord(
+        invalidGroupId,
+        "event2",
+        "event2 description",
+        "2022-08-01",
+        "18:00",
+        "21:00",
+        "hackdays"
+      );
+      await txn3.wait();
+    } catch (e) {
+      // nothing to do
+    }
+    const eventRecordsAfterCreateWithInvalidGroupId =
+      await eventManager.getEventRecords();
+    expect(eventRecordsAfterCreateWithInvalidGroupId.length).to.equal(1);
+  });
+});
+
+describe("GetOwnGroups", () => {
+  it("Should get own group", async () => {
+    const eventManagerContractFactory = await ethers.getContractFactory(
+      "EventManager"
+    );
+
+    const eventManagerContract = await eventManagerContractFactory.deploy();
+    const eventManager = await eventManagerContract.deployed();
+
+    const [address1, address2] = await ethers.getSigners();
+
+    // create group by address1
+    const txn1 = await eventManager.connect(address1).createGroup("group1");
+    await txn1.wait();
+
+    // create group by address2
+    const txn2 = await eventManager.connect(address2).createGroup("group2");
+    await txn2.wait();
+
+    // get all groups
+    const allGroups = await eventManager.getGroups();
+    expect(allGroups.length).to.equal(2);
+
+    // get group by address1
+    const ownGroups = await eventManager.getOwnGroups();
+    expect(ownGroups.length).to.equal(1);
+    expect(ownGroups[0].name).to.equal("group1");
   });
 });
