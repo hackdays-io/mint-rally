@@ -29,6 +29,8 @@ contract EventManager {
     Group[] public groups;
     EventRecord[] public eventRecords;
 
+    mapping(address => uint256[]) public ownGroupIds;
+
     constructor() {
         console.log("init");
     }
@@ -36,6 +38,7 @@ contract EventManager {
     function createGroup(string memory _name) external {
         uint256 _newGroupId = _groupIds.current();
         groups.push(Group({groupId: _newGroupId, name: _name}));
+        ownGroupIds[msg.sender].push(_newGroupId);
         _groupIds.increment();
     }
 
@@ -44,6 +47,16 @@ contract EventManager {
         // create array of groups
         Group[] memory _groups = new Group[](_numberOfGroups);
         _groups = groups;
+        return _groups;
+    }
+
+    function getOwnGroups() public view returns (Group[] memory) {
+        uint256 _numberOfGroups = ownGroupIds[msg.sender].length;
+        // create array of groups
+        Group[] memory _groups = new Group[](_numberOfGroups);
+        for (uint256 _i = 0; _i < _numberOfGroups; _i++) {
+            _groups[_i] = groups[ownGroupIds[msg.sender][_i]];
+        }
         return _groups;
     }
 
@@ -56,6 +69,14 @@ contract EventManager {
         string memory _endTime,
         string memory _secretPhrase
     ) external {
+        bool _isGroupOwner = false;
+        for (uint256 _i = 0; _i < ownGroupIds[msg.sender].length; _i++) {
+            if (ownGroupIds[msg.sender][_i] == _groupId) {
+                _isGroupOwner = true;
+            }
+        }
+        require(_isGroupOwner, "Only group owners can create event records");
+
         uint256 _newEventId = _eventRecordIds.current();
         bytes memory hexSecretPhrase = bytes(_secretPhrase);
         bytes32 encryptedSecretPhrase = keccak256(hexSecretPhrase);
