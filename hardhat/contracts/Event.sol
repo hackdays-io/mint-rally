@@ -11,7 +11,7 @@ contract EventManager {
     }
 
     struct EventRecord {
-        uint256 eventId;
+        uint256 eventRecordId;
         uint256 groupId;
         string name;
         string description;
@@ -23,7 +23,7 @@ contract EventManager {
 
     using Counters for Counters.Counter;
 
-    Counters.Counter private _eventIds;
+    Counters.Counter private _eventRecordIds;
     Counters.Counter private _groupIds;
 
     Group[] public groups;
@@ -56,12 +56,12 @@ contract EventManager {
         string memory _endTime,
         string memory _secretPhrase
     ) external {
-        uint256 _newEventId = _eventIds.current();
+        uint256 _newEventId = _eventRecordIds.current();
         bytes memory hexSecretPhrase = bytes(_secretPhrase);
         bytes32 encryptedSecretPhrase = keccak256(hexSecretPhrase);
         eventRecords.push(
             EventRecord({
-                eventId: _newEventId,
+                eventRecordId: _newEventId,
                 groupId: _groupId,
                 name: _name,
                 description: _description,
@@ -71,7 +71,7 @@ contract EventManager {
                 secretPhrase: encryptedSecretPhrase
             })
         );
-        _eventIds.increment();
+        _eventRecordIds.increment();
     }
 
     function getEventRecords() public view returns (EventRecord[] memory) {
