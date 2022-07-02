@@ -25,7 +25,7 @@ import {
   IEventGroup,
   useCreateEventRecord,
   useOwnEventGroups,
-} from "../../hooks/useEventManagerContract";
+} from "../../hooks/useEventManager";
 
 const EventCreate: NextPage = () => {
   const {

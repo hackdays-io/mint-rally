@@ -23,7 +23,7 @@ import type { NextPage } from "next";
 import { useState, useCallback, useEffect } from "react";
 import styled from "@emotion/styled";
 import { Web3Storage } from "web3.storage";
-import { useCreateEventGroup } from "../../hooks/useEventManagerContract";
+import { useCreateEventGroup } from "../../hooks/useEventManager";
 
 const ImageIcon = createIcon({
   displayName: "ImageIcon",
