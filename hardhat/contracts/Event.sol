@@ -2,9 +2,10 @@
 pragma solidity ^0.8.4;
 
 import "@openzeppelin/contracts/utils/Counters.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "hardhat/console.sol";
 
-contract EventManager {
+contract EventManager is Ownable {
     struct Group {
         uint256 groupId;
         string name;
@@ -33,7 +34,14 @@ contract EventManager {
     mapping(uint256 => address[]) private participantAddresses;
     mapping(address => uint256[]) private eventIdsByParticipant;
 
-    constructor() {
+    address internal mintNFTAddr;
+
+    function setMintNFTAddr(address _mintNftAddr) public onlyOwner {
+        mintNFTAddr = _mintNftAddr;
+    }
+
+    constructor(address _mintNftAddr) {
+        mintNFTAddr = _mintNftAddr;
         console.log("init");
     }
 
