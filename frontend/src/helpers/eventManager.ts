@@ -1,6 +1,10 @@
 import { ethers } from "ethers";
-const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_EVENT_MANAGER!;
-import contract from "../contracts/EventManager.json";
+const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_EVENT_MANAGER!
+import contract from '../contracts/EventManager.json'
+export interface IEventGroup {
+  groupId: number;
+  name: string;
+}
 
 export const getEventManagerContract = () => {
   const { ethereum } = window;
