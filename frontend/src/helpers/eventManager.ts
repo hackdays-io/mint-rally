@@ -6,6 +6,15 @@ export interface IEventGroup {
   groupId: number;
   name: string;
 }
+export interface IEventRecord {
+  eventRecordId: number;
+  groupId: number;
+  eventName: string;
+  description: string;
+  date: Date;
+  startTime: string; // "18:00"
+  endTime: string; // "21:00"
+}
 export interface ICreateEventRecordParams {
   groupId: number;
   eventName: string;
@@ -74,6 +83,10 @@ export const useOwnEventGroups = () => {
   return { groups, loading, getOwnEventGroups }
 }
 
+/**
+ * custom hook function for creating an event record
+ * @returns 
+ */
 export const useCreateEventRecord = () => {
   const [errors, setErrors] = useState<Error | null>(null)
   const [loading, setLoading] = useState(false)
@@ -86,4 +99,24 @@ export const useCreateEventRecord = () => {
     setLoading(false)
   }
   return { errors, loading, createEventRecord }
+}
+
+/**
+ * custom hook function for getting all event groups
+ * 
+ * @returns 
+ */
+export const useEventRecords = () => {
+  const [records, setRecords] = useState<IEventRecord[]>([]);
+  const [loading, setLoading] = useState(false)
+  const getEventRecords = async () => {
+    console.log("get event records");
+    const eventManager = getEventManagerContract();
+    if (!eventManager) throw "error";
+    setLoading(true)
+    const data = await eventManager.getEventRecords();
+    setLoading(false)
+    setRecords(data);
+  };
+  return { records, loading, getEventRecords }
 }

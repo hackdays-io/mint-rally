@@ -1,16 +1,35 @@
-import { Box, Flex, Link } from "@chakra-ui/react";
+import {
+  Box,
+  Flex,
+  Heading,
+  Link,
+  List,
+  ListIcon,
+  ListItem,
+  Spinner,
+} from "@chakra-ui/react";
 import { NextPage } from "next";
-import { useEventManager } from "../../hooks/useEventManager";
+import { useEffect } from "react";
+import { IEventRecord, useEventRecords } from "../../helpers/eventManager";
 
 const Events: NextPage = () => {
-  const { data, error, loading } = useEventManager();
-
+  const { records, loading, getEventRecords } = useEventRecords();
+  useEffect(() => {
+    getEventRecords();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   return (
     <>
       <Flex>
         <Link href="/events/new">Create new event</Link>
       </Flex>
-      <Box>Events</Box>
+      <Heading>Events</Heading>
+      {loading && <Spinner></Spinner>}
+      <List>
+        {records.map((item) => {
+          return <ListItem key={item.eventRecordId}>{item.eventName}</ListItem>;
+        })}
+      </List>
     </>
   );
 };
