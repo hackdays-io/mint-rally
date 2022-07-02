@@ -4,7 +4,6 @@ import { NextPage } from "next";
 import { ChangeEvent, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import {
-  FormErrorMessage,
   FormLabel,
   FormControl,
   Select,
@@ -33,6 +32,7 @@ const EventCreate: NextPage = () => {
     if (address) {
       getOwnEventGroups();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [address]);
 
   const onSubmit = (data: any) => console.log("onSubmit:", data);
