@@ -9,18 +9,18 @@ interface IEventGroup {
 }
 
 const EventGroups: NextPage = () => {
-  const [groups, setGroups] = useState([])
-  const getEventGroups = async() => {
-    console.log('get event groups')
-    const eventManager = getEventManagerContract()
-    if (!eventManager) throw 'error'
-    console.log(eventManager)
-    const data = await eventManager.getGroups()
-    setGroups(data)
-  }
+  const [groups, setGroups] = useState([]);
+  const getEventGroups = async () => {
+    console.log("get event groups");
+    const eventManager = getEventManagerContract();
+    if (!eventManager) throw "error";
+    console.log(eventManager);
+    const data = await eventManager.getGroups();
+    setGroups(data);
+  };
   useEffect(() => {
     //getEventGroups()
-  }, [])
+  }, []);
   return (
     <>
       <Flex>
@@ -31,8 +31,8 @@ const EventGroups: NextPage = () => {
         {groups}
         <Button onClick={getEventGroups}>load events</Button>
       </Box>
-    </>      
-  )
-}
+    </>
+  );
+};
 
-export default EventGroups
+export default EventGroups;

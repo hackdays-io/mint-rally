@@ -1,28 +1,27 @@
-import '../styles/globals.css'
-import type { AppProps } from 'next/app'
-import {ChakraProvider, extendTheme} from '@chakra-ui/react'
-import { ChainId, ThirdwebProvider } from '@thirdweb-dev/react';
-import Layout from '../components/layout';
+import "../styles/globals.css";
+import type { AppProps } from "next/app";
+import { ChakraProvider, extendTheme } from "@chakra-ui/react";
+import { ChainId, ThirdwebProvider } from "@thirdweb-dev/react";
+import Layout from "../components/layout";
 
 const activeChainId = ChainId.Mumbai;
 
 const theme = extendTheme({
   // デフォルトのフォント
   // https://chakra-ui.com/docs/theming/theme#typography
-  fonts: {
-  },
+  fonts: {},
   // デフォルトのカラーモード
   // https://chakra-ui.com/docs/theming/theme#config
   config: {
-    initialColorMode: 'light',
+    initialColorMode: "light",
     useSystemColorMode: false,
   },
   colors: {
     mint: {
       bg: "#56F0DE",
-      front: "#552306"
+      front: "#552306",
     },
-  }
+  },
 });
 
 function MyApp({ Component, pageProps }: AppProps) {
@@ -34,7 +33,7 @@ function MyApp({ Component, pageProps }: AppProps) {
         </Layout>
       </ChakraProvider>
     </ThirdwebProvider>
-    )
+  );
 }
 
-export default MyApp
+export default MyApp;

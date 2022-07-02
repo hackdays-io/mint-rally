@@ -1,10 +1,10 @@
-import { useRouter } from 'next/router'
+import { useRouter } from "next/router";
 
 const EventGroup = () => {
-  const router = useRouter()
-  const { eventgroupid } = router.query
+  const router = useRouter();
+  const { eventgroupid } = router.query;
 
-  return <p>Event Group: {eventgroupid}</p>
-}
+  return <p>Event Group: {eventgroupid}</p>;
+};
 
-export default EventGroup
+export default EventGroup;

@@ -4,11 +4,9 @@ import { NextPage } from "next";
 const EventCreate: NextPage = () => {
   return (
     <>
-      <Box>
-        Create a new event
-      </Box>
-    </>      
-  )
-}
+      <Box>Create a new event</Box>
+    </>
+  );
+};
 
-export default EventCreate
+export default EventCreate;

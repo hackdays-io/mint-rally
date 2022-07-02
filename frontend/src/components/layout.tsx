@@ -1,15 +1,13 @@
-import React, { ReactNode } from 'react';
-import Head from 'next/head';
-import Navbar from './navbar'
-import Footer from './footer'
+import React, { ReactNode } from "react";
+import Head from "next/head";
+import Navbar from "./navbar";
+import Footer from "./footer";
 
 type Props = {
   children: ReactNode;
   title?: string;
 };
-const Layout = ({
-  children
-}: Props) => (
+const Layout = ({ children }: Props) => (
   <>
     <Head>
       <title>Mint Rally</title>
@@ -20,5 +18,5 @@ const Layout = ({
     <main>{children}</main>
     <Footer />
   </>
-)
-export default Layout
+);
+export default Layout;
