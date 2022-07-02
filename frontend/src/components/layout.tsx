@@ -1,16 +1,14 @@
-import React, { ReactNode } from 'react';
-import Head from 'next/head';
-import Navbar from './navbar'
-import Footer from './footer'
-import { Box } from '@chakra-ui/react';
+import React, { ReactNode } from "react";
+import Head from "next/head";
+import Navbar from "./navbar";
+import Footer from "./footer";
+import { Box } from "@chakra-ui/react";
 
 type Props = {
   children: ReactNode;
   title?: string;
 };
-const Layout = ({
-  children
-}: Props) => (
+const Layout = ({ children }: Props) => (
   <>
     <Head>
       <title>Mint Rally</title>
@@ -21,5 +19,5 @@ const Layout = ({
     <Box margin={3}>{children}</Box>
     <Footer />
   </>
-)
-export default Layout
+);
+export default Layout;
