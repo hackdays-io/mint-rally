@@ -4,6 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
+    "deploy:stg": "npx hardhat run scripts/deploy.ts --network munbai",
     "compile": "npx hardhat compile",
     "test": "npx hardhat compile & npx hardhat test"
   },
