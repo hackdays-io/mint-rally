@@ -1,4 +1,5 @@
 import { ethers } from "ethers";
+import { useState } from "react";
 const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_EVENT_MANAGER!
 import contract from '../contracts/EventManager.json'
 export interface IEventGroup {
@@ -6,6 +7,9 @@ export interface IEventGroup {
   name: string;
 }
 
+/**
+ * A bridgge to the event manager contract
+*/
 export const getEventManagerContract = () => {
   const { ethereum } = window;
   if (ethereum) {
@@ -24,3 +28,18 @@ export const getEventManagerContract = () => {
   }
   return null;
 };
+
+export const useEventGroups = () => {
+  const [groups, setGroups] = useState([]);
+  const [loading, setLoading] = useState(false)
+  const getEventGroups = async () => {
+    console.log("get event groups");
+    const eventManager = getEventManagerContract();
+    if (!eventManager) throw "error";
+    setLoading(true)
+    const data = await eventManager.getGroups();
+    setLoading(false)
+    setGroups(data);
+  };
+  return { groups, loading, getEventGroups }
+}
