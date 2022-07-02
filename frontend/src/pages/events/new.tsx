@@ -1,4 +1,8 @@
 import {
+  Alert,
+  AlertDescription,
+  AlertIcon,
+  AlertTitle,
   Flex,
   FormErrorMessage,
   Heading,
@@ -37,6 +41,7 @@ const EventCreate: NextPage = () => {
   // state for loading event groups
   const { groups, loading, getOwnEventGroups } = useOwnEventGroups();
   const {
+    status,
     errors: createError,
     loading: createLoading,
     createEventRecord,
@@ -136,7 +141,14 @@ const EventCreate: NextPage = () => {
               >
                 Create
               </Button>
-              {createError && <Flex>{createError.message}</Flex>}
+              {createError && (
+                <Alert status="error">
+                  <AlertIcon />
+                  <AlertTitle>Error occurred</AlertTitle>
+                  <AlertDescription>{createError.message}</AlertDescription>
+                </Alert>
+              )}
+              {status && <Flex>Success</Flex>}
               {createLoading && <Spinner></Spinner>}
             </>
           ) : (

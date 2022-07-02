@@ -15,6 +15,10 @@ export interface IEventRecord {
   startTime: string; // "18:00"
   endTime: string; // "21:00"
 }
+export interface ICreateEventGroupParams {
+  groupName: string;
+}
+
 export interface ICreateEventRecordParams {
   groupId: number;
   eventName: string;
@@ -46,6 +50,30 @@ export const getEventManagerContract = () => {
   return null;
 };
 
+/**
+ * custom hook function for creating an event group
+ * @returns 
+ */
+export const useCreateEventGroup = () => {
+  const [errors, setErrors] = useState<Error | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [status, setStatus] = useState(false)
+  const createEventGroup = async (params: ICreateEventGroupParams) => {
+    try {
+      setErrors(null)
+      const eventManager = getEventManagerContract();
+      if (!eventManager) throw "error: contract can't found";
+      setLoading(true)
+      await eventManager.createGroup(params.groupName);
+      setLoading(false)
+      setStatus(true)
+    } catch (e: any) {
+      setErrors(e)
+      setLoading(false)
+    }
+  }
+  return { status, errors, loading, createEventGroup }
+}
 /**
  * custom hook function for getting all event groups
  * 
@@ -90,15 +118,23 @@ export const useOwnEventGroups = () => {
 export const useCreateEventRecord = () => {
   const [errors, setErrors] = useState<Error | null>(null)
   const [loading, setLoading] = useState(false)
+  const [status, setStatus] = useState(false)
   const createEventRecord = async (params: ICreateEventRecordParams) => {
-    const eventManager = getEventManagerContract();
-    if (!eventManager) throw "error: contract can't found";
-    setLoading(true)
-    const datestr = params.date.toLocaleDateString();
-    await eventManager.createEventRecord(params.groupId, params.eventName, params.description, datestr, params.startTime, params.endTime, params.secretPhrase);
-    setLoading(false)
+    setErrors(null)
+    try {
+      const eventManager = getEventManagerContract();
+      if (!eventManager) throw "error: contract can't found";
+      setLoading(true)
+      const datestr = params.date.toLocaleDateString();
+      await eventManager.createEventRecord(params.groupId, params.eventName, params.description, datestr, params.startTime, params.endTime, params.secretPhrase);
+      setLoading(false)
+      setStatus(true)
+    } catch (e: any) {
+      setErrors(e)
+      setLoading(false)
+    }
   }
-  return { errors, loading, createEventRecord }
+  return { status, errors, loading, createEventRecord }
 }
 
 /**
