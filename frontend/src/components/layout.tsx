@@ -21,4 +21,4 @@ const Layout = ({
     <Footer />
   </>
 )
-export default Layout{}
+export default Layout
