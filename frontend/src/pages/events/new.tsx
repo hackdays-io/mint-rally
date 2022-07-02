@@ -1,4 +1,10 @@
-import { Heading, Link } from "@chakra-ui/react";
+import {
+  Flex,
+  FormErrorMessage,
+  Heading,
+  Link,
+  Spinner,
+} from "@chakra-ui/react";
 import { useAddress } from "@thirdweb-dev/react";
 import { NextPage } from "next";
 import { ChangeEvent, useEffect, useState } from "react";
@@ -10,7 +16,12 @@ import {
   Input,
   Button,
 } from "@chakra-ui/react";
-import { IEventGroup, useOwnEventGroups } from "../../helpers/eventManager";
+import {
+  ICreateEventRecordParams,
+  IEventGroup,
+  useCreateEventRecord,
+  useOwnEventGroups,
+} from "../../helpers/eventManager";
 
 const EventCreate: NextPage = () => {
   const {
@@ -25,6 +36,11 @@ const EventCreate: NextPage = () => {
   const [noGroups, setNogroups] = useState(false);
   // state for loading event groups
   const { groups, loading, getOwnEventGroups } = useOwnEventGroups();
+  const {
+    errors: createError,
+    loading: createLoading,
+    createEventRecord,
+  } = useCreateEventRecord();
   // state for checking any group id is selected.
   const [groupIdSelcted, setGroupIdSelected] = useState(false);
 
@@ -35,7 +51,19 @@ const EventCreate: NextPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [address]);
 
-  const onSubmit = (data: any) => console.log("onSubmit:", data);
+  const onSubmit = (data: any) => {
+    console.log("onSubmit:", data);
+    const params: ICreateEventRecordParams = {
+      groupId: data.eventGroupId,
+      eventName: data.name,
+      description: "test data",
+      date: new Date(),
+      startTime: "19:00",
+      endTime: "21:00",
+      secretPhrase: "test secret",
+    };
+    createEventRecord(params);
+  };
   const selectGroup = (e: ChangeEvent<HTMLSelectElement>) => {
     if (e.target.value) {
       setGroupIdSelected(true);
@@ -87,6 +115,8 @@ const EventCreate: NextPage = () => {
               >
                 Create
               </Button>
+              {createError && <Flex>{createError.message}</Flex>}
+              {createLoading && <Spinner></Spinner>}
             </>
           ) : (
             <span>no event group is selected</span>
