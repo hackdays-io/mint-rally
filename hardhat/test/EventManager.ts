@@ -136,3 +136,67 @@ describe("ApplyForPaticipation", () => {
     expect(participationEvents.length).to.equal(1);
   });
 });
+
+describe("countParticipants", () => {
+  it("Should count participants", async () => {
+    const eventManagerContractFactory = await ethers.getContractFactory(
+      "EventManager"
+    );
+
+    const eventManagerContract = await eventManagerContractFactory.deploy();
+    const eventManager = await eventManagerContract.deployed();
+
+    const [address1] = await ethers.getSigners();
+
+    const txn1 = await eventManager.createGroup("group1");
+    await txn1.wait();
+
+    const groupsAfterCreate = await eventManager.getGroups();
+
+    const txn2 = await eventManager.createEventRecord(
+      groupsAfterCreate[0].groupId.toNumber(),
+      "event1",
+      "event1 description",
+      "2022-07-3O",
+      "18:00",
+      "21:00",
+      "hackdays"
+    );
+    await txn2.wait();
+    const eventRecord1 = await eventManager.getEventRecords();
+
+    const txn3 = await eventManager.applyForParticipation(
+      eventRecord1[0].eventRecordId.toNumber()
+    );
+    await txn3.wait();
+    let participationsCount = await eventManager
+      .connect(address1)
+      .countParticipationByGroup(
+        address1.address,
+        groupsAfterCreate[0].groupId.toNumber()
+      );
+    expect(participationsCount.toNumber()).to.equal(1);
+
+    const txn4 = await eventManager.createEventRecord(
+      groupsAfterCreate[0].groupId.toNumber(),
+      "event2",
+      "event2 description",
+      "2022-08-3O",
+      "18:00",
+      "21:00",
+      "hackdays"
+    );
+    await txn4.wait();
+    const eventRecord2 = await eventManager.getEventRecords();
+
+    const txn5 = await eventManager
+      .connect(address1)
+      .applyForParticipation(eventRecord2[1].eventRecordId.toNumber());
+    await txn5.wait();
+    participationsCount = await eventManager.countParticipationByGroup(
+      address1.address,
+      groupsAfterCreate[0].groupId.toNumber()
+    );
+    expect(participationsCount.toNumber()).to.equal(2);
+  });
+});
