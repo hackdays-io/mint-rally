@@ -1,8 +1,8 @@
-import { Heading, List, ListItem, Switch } from "@chakra-ui/react";
+import { Heading, Link } from "@chakra-ui/react";
 import { useAddress } from "@thirdweb-dev/react";
 import { NextPage } from "next";
 import { ChangeEvent, useEffect, useState } from "react";
-import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import {
   FormErrorMessage,
   FormLabel,
@@ -24,23 +24,29 @@ const EventCreate: NextPage = () => {
   } = useForm({
     mode: "all",
   });
-  const [groupIdSelcted, setGroupIdSelected] = useState(false);
+  // check contract address
   const address = useAddress();
+  const [noGroups, setNogroups] = useState(false);
+  // state for loading event groups
   const [groups, setGroups] = useState([]);
+  // state for checking any group id is selected.
+  const [groupIdSelcted, setGroupIdSelected] = useState(false);
+  // function for get login user's groups
   const getOwnEventGroups = async () => {
     console.log("get my event groups");
     const eventManager = getEventManagerContract();
-    console.log(eventManager);
-    if (!eventManager) throw "error";
+    if (!eventManager) throw "error: contract can't found";
     const data = await eventManager.getOwnGroups();
     console.log(data);
     setGroups(data);
   };
+
   useEffect(() => {
     if (address) {
       getOwnEventGroups();
     }
   }, [address]);
+
   const onSubmit = (data: any) => console.log("onSubmit:", data);
   const selectGroup = (e: ChangeEvent<HTMLSelectElement>) => {
     if (e.target.value) {
@@ -50,7 +56,7 @@ const EventCreate: NextPage = () => {
   return (
     <>
       <Heading>Create a new event</Heading>
-      {address ? (
+      {address && groups.length > 0 ? (
         <form onSubmit={handleSubmit(onSubmit)}>
           <FormControl>
             <FormLabel htmlFor="eventGroupId">Event group: </FormLabel>
@@ -92,14 +98,22 @@ const EventCreate: NextPage = () => {
                 isLoading={isSubmitting}
               >
                 Create
-              </Button>{" "}
+              </Button>
             </>
           ) : (
-            <span>please select event group</span>
+            <span>no event group is selected</span>
           )}
         </form>
       ) : (
-        <span>please login first</span>
+        <>
+          {address ? (
+            <Link href="/event-groups/new">
+              please create event group first
+            </Link>
+          ) : (
+            <span>please login first</span>
+          )}
+        </>
       )}
     </>
   );
