@@ -20,7 +20,7 @@ import styled from "@emotion/styled";
 import { Web3Storage } from "web3.storage";
 import { useCreateGroup } from "../../hooks/useEventManager";
 import { ethers } from "ethers";
-import { getEventManagerContract } from "../../helpers/eventManager";
+import { getEventManagerContract } from "../../hooks/useEventManagerContract";
 
 const ImageIcon = createIcon({
   displayName: "ImageIcon",
