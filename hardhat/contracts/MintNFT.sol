@@ -24,20 +24,23 @@ contract MintNFT is ERC721Enumerable {
 
     constructor() ERC721("MintRally", "MR") {}
 
-    function mintParticipateNFT(uint256 groupId, uint256 participateCount)
-        external
-    {
+    function mintParticipateNFT(
+        uint256 _groupId,
+        uint256 _eventId,
+        uint256 _participateCount
+    ) external {
         ParticipateNFTAttributes[]
-            memory groupNFTAttributes = groupsNFTAttributes[groupId];
+            memory groupNFTAttributes = groupsNFTAttributes[_groupId];
 
         bool minted = false;
         ParticipateNFTAttributes memory defaultNFT;
         for (uint256 index = 0; index < groupNFTAttributes.length; index++) {
             ParticipateNFTAttributes memory gp = groupNFTAttributes[index];
+            gp.eventId = _eventId;
             if (gp.requiredParticipateCount == 0) {
                 defaultNFT = gp;
             }
-            if (gp.requiredParticipateCount == participateCount) {
+            if (gp.requiredParticipateCount == _participateCount) {
                 attributesOfNFT[_tokenIds.current()] = gp;
                 _safeMint(msg.sender, _tokenIds.current());
                 minted = true;
@@ -75,7 +78,7 @@ contract MintNFT is ERC721Enumerable {
     function pushGroupNFTAttributes(
         uint256 groupId,
         ParticipateNFTAttributes[] memory attributes
-    ) external returns (uint256) {
+    ) external {
         for (uint256 index = 0; index < attributes.length; index++) {
             groupsNFTAttributes[groupId].push(
                 ParticipateNFTAttributes({
@@ -88,7 +91,14 @@ contract MintNFT is ERC721Enumerable {
                 })
             );
         }
-        return _tokenIds.current();
+    }
+
+    function getGroupNFTAttributes(uint256 _groupId)
+        external
+        view
+        returns (ParticipateNFTAttributes[] memory)
+    {
+        return groupsNFTAttributes[_groupId];
     }
 
     function tokenURI(uint256 _tokenId)

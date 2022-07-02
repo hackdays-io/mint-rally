@@ -6,12 +6,12 @@ const deployMintNFT = async () => {
 
   await contract.deployed();
 
-  let txn = await contract.pushParticipateNFT([
+  let txn = await contract.pushGroupNFTAttributes(1, [
     {
       name: "normalNFT",
       image: "https://i.imgur.com/TZEhCTX.png",
-      groupId: "0xbbb",
-      eventId: "0xaaa",
+      groupId: 1,
+      eventId: 1,
       requiredParticipateCount: 0,
     },
   ]);
