@@ -15,9 +15,13 @@ import {
   NumberDecrementStepper,
 } from "@chakra-ui/react";
 import type { NextPage } from "next";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import styled from "@emotion/styled";
 import { Web3Storage } from "web3.storage";
+import { useCreateGroup } from "../../hooks/useEventManager";
+import { group } from "console";
+import { ethers } from "ethers";
+import { getEventManagerContract } from "../../helpers/eventManager";
 
 const ImageIcon = createIcon({
   displayName: "ImageIcon",
@@ -155,6 +159,14 @@ const NewEventGroupPage: NextPage = () => {
     return rootCid;
   }, [image1File, name1]);
 
+  const createEventGroup = () => {
+    if (groupName) {
+      const eventManager = getEventManagerContract();
+      if (!eventManager) throw "error";
+      eventManager.createGroup(groupName);
+    }
+  };
+
   return (
     <>
       {/* @TODO: padding need to be set in Layout component */}
@@ -206,6 +218,17 @@ const NewEventGroupPage: NextPage = () => {
                 <NumberDecrementStepper />
               </NumberInputStepper>
             </NumberInput>
+          </Box>
+        </Flex>
+        <Flex>
+          <Box>
+            <Button
+              onClick={() => {
+                createEventGroup();
+              }}
+            >
+              Create group
+            </Button>
           </Box>
         </Flex>
         [Debug]
