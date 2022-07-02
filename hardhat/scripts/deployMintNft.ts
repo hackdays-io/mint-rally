@@ -6,6 +6,17 @@ const deployMintNFT = async () => {
 
   await contract.deployed();
 
+  let txn = await contract.pushParticipateNFT([
+    {
+      name: "normalNFT",
+      image: "https://i.imgur.com/TZEhCTX.png",
+      groupId: "0xbbb",
+      eventId: "0xaaa",
+      requiredParticipateCount: 0,
+    },
+  ]);
+  await txn.wait();
+
   console.log("MintNFT deployed to:", contract.address);
 };
 

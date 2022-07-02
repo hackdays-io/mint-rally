@@ -5,6 +5,7 @@ import "hardhat/console.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
+import "./lib/Base64.sol";
 
 contract MintNFT is ERC721Enumerable {
     using Counters for Counters.Counter;
@@ -12,14 +13,13 @@ contract MintNFT is ERC721Enumerable {
 
     struct ParticipateNFTAttributes {
         string name;
-        string imageURI;
+        string image;
         string groupId;
         string eventId;
         uint256 requiredParticipateCount;
     }
 
-    ParticipateNFTAttributes[] participateNFTs;
-
+    ParticipateNFTAttributes[] internal participateNFTs;
     mapping(uint256 => ParticipateNFTAttributes) public attributesOfNFT;
 
     constructor() ERC721("MintRally", "MR") {}
@@ -40,15 +40,12 @@ contract MintNFT is ERC721Enumerable {
         for (uint256 index = 0; index < participateNFTs.length; index++) {
             ParticipateNFTAttributes memory p = participateNFTs[index];
             if (keccak256(bytes(p.groupId)) == keccak256(bytes(groupId))) {
-                console.log("index", index);
                 groupNFTs[index] = p;
                 if (p.requiredParticipateCount == 0) {
                     defaultNFT = p;
                 }
             }
         }
-
-        console.log("nft names", defaultNFT.name);
 
         bool minted = false;
 
@@ -68,34 +65,23 @@ contract MintNFT is ERC721Enumerable {
         _tokenIds.increment();
     }
 
-    function checkOwnedNFTsId() external view returns (uint256[] memory) {
+    function getOwnedNFTs()
+        public
+        view
+        returns (ParticipateNFTAttributes[] memory)
+    {
         uint256 tokenCount = balanceOf(msg.sender);
         uint256[] memory tokenIds = new uint256[](tokenCount);
         for (uint256 i = 0; i < tokenCount; i++) {
             tokenIds[i] = tokenOfOwnerByIndex((msg.sender), i);
         }
-        ParticipateNFTAttributes[] memory attributes = getTokens(
-            tokenIds,
-            msg.sender
-        );
-        return tokenIds;
-    }
 
-    function getTokens(uint256[] memory tokenIds, address _owner)
-        internal
-        view
-        returns (ParticipateNFTAttributes[] memory)
-    {
-        uint256 holdingTokenCount = balanceOf(_owner);
         ParticipateNFTAttributes[]
             memory holdingNFTsAttributes = new ParticipateNFTAttributes[](
-                holdingTokenCount
+                tokenCount
             );
-
-        console.log("holding count", holdingTokenCount);
-        for (uint256 i = 0; i < holdingTokenCount; i++) {
+        for (uint256 i = 0; i < tokenCount; i++) {
             uint256 id = tokenIds[i];
-            console.log("name", attributesOfNFT[id].name);
             holdingNFTsAttributes[i] = attributesOfNFT[id];
         }
         return holdingNFTsAttributes;
@@ -109,7 +95,7 @@ contract MintNFT is ERC721Enumerable {
             participateNFTs.push(
                 ParticipateNFTAttributes({
                     name: attributes[index].name,
-                    imageURI: attributes[index].imageURI,
+                    image: attributes[index].image,
                     groupId: attributes[index].groupId,
                     eventId: attributes[index].eventId,
                     requiredParticipateCount: attributes[index]
@@ -118,5 +104,31 @@ contract MintNFT is ERC721Enumerable {
             );
         }
         return _tokenIds.current();
+    }
+
+    function tokenURI(uint256 _tokenId)
+        public
+        view
+        override
+        returns (string memory)
+    {
+        ParticipateNFTAttributes memory attributes = attributesOfNFT[_tokenId];
+
+        string memory json = Base64.encode(
+            abi.encodePacked(
+                "{'name': '",
+                attributes.name,
+                " -- NFT #: ",
+                Strings.toString(_tokenId),
+                "', 'description': 'MintRally NFT', 'image': '",
+                attributes.image,
+                "}"
+            )
+        );
+
+        string memory output = string(
+            abi.encodePacked("data:application/json;base64,", json)
+        );
+        return output;
     }
 }
