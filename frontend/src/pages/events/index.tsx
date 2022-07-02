@@ -10,10 +10,7 @@ import {
 } from "@chakra-ui/react";
 import { NextPage } from "next";
 import { useEffect } from "react";
-import {
-  IEventRecord,
-  useEventRecords,
-} from "../../hooks/useEventManagerContract";
+import { IEventRecord, useEventRecords } from "../../hooks/useEventManager";
 
 const Events: NextPage = () => {
   const { records, loading, getEventRecords } = useEventRecords();
