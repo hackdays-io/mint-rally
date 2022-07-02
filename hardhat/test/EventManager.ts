@@ -200,3 +200,45 @@ describe("countParticipants", () => {
     expect(participationsCount.toNumber()).to.equal(2);
   });
 });
+
+describe("verifySecretPhrase", () => {
+  it("Should count participants", async () => {
+    const eventManagerContractFactory = await ethers.getContractFactory(
+      "EventManager"
+    );
+
+    const eventManagerContract = await eventManagerContractFactory.deploy();
+    const eventManager = await eventManagerContract.deployed();
+
+    const txn1 = await eventManager.createGroup("group1");
+    await txn1.wait();
+
+    const groups = await eventManager.getGroups();
+
+    const txn2 = await eventManager.createEventRecord(
+      groups[0].groupId.toNumber(),
+      "event1",
+      "event1 description",
+      "2022-07-3O",
+      "18:00",
+      "21:00",
+      "hackdays"
+    );
+    await txn2.wait();
+    const eventRecord1 = await eventManager.getEventRecords();
+
+    const wrongPhrase = "wrong phrase";
+    const resultWithWrongPhrase = await eventManager.verifySecretPhrase(
+      wrongPhrase,
+      eventRecord1[0].eventRecordId.toNumber()
+    );
+    expect(resultWithWrongPhrase).to.equal(false);
+
+    const correctPhrase = "hackdays";
+    const resultWithCorrectPhrase = await eventManager.verifySecretPhrase(
+      correctPhrase,
+      eventRecord1[0].eventRecordId.toNumber()
+    );
+    expect(resultWithCorrectPhrase).to.equal(true);
+  });
+});

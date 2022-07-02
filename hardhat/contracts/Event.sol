@@ -144,4 +144,14 @@ contract EventManager {
         }
         return _numberOfParticipants;
     }
+
+    function verifySecretPhrase(
+        string memory _secretPhrase,
+        uint256 _eventRecordId
+    ) external view returns (bool) {
+        bytes memory hexSecretPhrase = bytes(_secretPhrase);
+        bytes32 encryptedSecretPhrase = keccak256(hexSecretPhrase);
+        return
+            eventRecords[_eventRecordId].secretPhrase == encryptedSecretPhrase;
+    }
 }
