@@ -1,10 +1,11 @@
 
 import { HamburgerIcon } from "@chakra-ui/icons"
 
-import { Box, Button, Drawer, DrawerBody, DrawerContent, DrawerOverlay, Flex, Heading, IconButton, Link, Spacer, useDisclosure } from "@chakra-ui/react"
+import { Box, Button, Drawer, DrawerBody, DrawerContent, DrawerOverlay, Flex, IconButton, Link, Spacer, useDisclosure } from "@chakra-ui/react"
 import { useAddress, useDisconnect, useMetamask } from '@thirdweb-dev/react';
 import router from "next/router";
-import { User } from 'react-feather';
+import Image from 'next/image'
+
 
 const Navbar = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -18,7 +19,7 @@ const Navbar = () => {
       { address ? (
       <><Flex>
           <Box marginRight="3"><button onClick={disconnectWallet}>Disconnect Wallet</button> </Box> | 
-          <Flex as="a" marginLeft="3" href={"/users/" + address}><User/></Flex>
+          <Flex as="a" marginLeft="3" href={"/users/" + address}><Image src="/user.png" alt="Loggedin" width={28} height={28} objectFit="contain"/></Flex>
         </Flex>
       </>
     ) : (
