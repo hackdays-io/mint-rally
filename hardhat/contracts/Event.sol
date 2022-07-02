@@ -5,10 +5,30 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "hardhat/console.sol";
 
+interface IMintNFT {
+    struct ParticipateNFTAttributes {
+        string name;
+        string image;
+        uint256 groupId;
+        uint256 eventId;
+        uint256 requiredParticipateCount;
+    }
+
+    function pushGroupNFTAttributes(
+        uint256 groupId,
+        ParticipateNFTAttributes[] memory
+    ) external;
+}
+
 contract EventManager is Ownable {
     struct Group {
         uint256 groupId;
         string name;
+    }
+
+    struct GroupAttributes {
+        string image;
+        uint256 requiredParticipateCount;
     }
 
     struct EventRecord {
@@ -34,7 +54,7 @@ contract EventManager is Ownable {
     mapping(uint256 => address[]) private participantAddresses;
     mapping(address => uint256[]) private eventIdsByParticipant;
 
-    address internal mintNFTAddr;
+    address private mintNFTAddr;
 
     function setMintNFTAddr(address _mintNftAddr) public onlyOwner {
         mintNFTAddr = _mintNftAddr;
@@ -43,10 +63,33 @@ contract EventManager is Ownable {
     constructor(address _mintNftAddr) {
         mintNFTAddr = _mintNftAddr;
         console.log("init");
+        _groupIds.increment();
+        _eventRecordIds.increment();
     }
 
-    function createGroup(string memory _name) external {
+    function createGroup(
+        string memory _name,
+        GroupAttributes[] memory _groupAttributes
+    ) external {
         uint256 _newGroupId = _groupIds.current();
+        IMintNFT _mintNFT = IMintNFT(mintNFTAddr);
+        uint256 _groupAttributesCount = _groupAttributes.length;
+        IMintNFT.ParticipateNFTAttributes[]
+            memory _participateNFTAttributes = new IMintNFT.ParticipateNFTAttributes[](
+                _groupAttributesCount
+            );
+
+        for (uint256 _i = 0; _i < _groupAttributesCount; _i++) {
+            _participateNFTAttributes[_i] = IMintNFT.ParticipateNFTAttributes({
+                name: _name,
+                image: _groupAttributes[_i].image,
+                groupId: _newGroupId,
+                eventId: 0,
+                requiredParticipateCount: _groupAttributes[_i]
+                    .requiredParticipateCount
+            });
+        }
+        _mintNFT.pushGroupNFTAttributes(_newGroupId, _participateNFTAttributes);
         groups.push(Group({groupId: _newGroupId, name: _name}));
         ownGroupIds[msg.sender].push(_newGroupId);
         _groupIds.increment();
@@ -61,9 +104,11 @@ contract EventManager is Ownable {
     }
 
     function getOwnGroups() public view returns (Group[] memory) {
-        uint256 _numberOfGroups = ownGroupIds[msg.sender].length;
-        // create array of groups
-        Group[] memory _groups = new Group[](_numberOfGroups);
+        uint256 _numberOfOwnGroups = ownGroupIds[msg.sender].length;
+        uint256 _numberOfGroups = groups.length;
+        // uint256 _numberOfGroups = ownGroupIds[msg.sender].length;
+        // // create array of groups
+        Group[] memory _groups = new Group[]();
         for (uint256 _i = 0; _i < _numberOfGroups; _i++) {
             _groups[_i] = groups[ownGroupIds[msg.sender][_i]];
         }
