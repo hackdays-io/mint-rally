@@ -12,10 +12,15 @@ import {
   NumberInputStepper,
   NumberIncrementStepper,
   NumberDecrementStepper,
+  Button,
 } from "@chakra-ui/react";
 import type { NextPage } from "next";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styled from "@emotion/styled";
+import { useCreateGroup } from "../../hooks/useEventManager";
+import { group } from "console";
+import { ethers } from "ethers";
+import { getEventManagerContract } from "../../helpers/eventManager";
 
 const ImageIcon = createIcon({
   displayName: "ImageIcon",
@@ -112,7 +117,14 @@ const NewEventGroupPage: NextPage = () => {
   const [image1DataUrl, setImage1DataUrl] = useState("");
   const [name1, setName1] = useState("");
   const [countThreshold1, setCountThreshold1] = useState(1);
-
+  const createEventGroup = () => {
+    if (groupName) {
+      const eventManager = getEventManagerContract()
+      if (!eventManager) throw 'error'
+      eventManager.createGroup(groupName)
+    }
+  }
+  
   return (
     <>
       {/* @TODO: padding need to be set in Layout component */}
@@ -163,6 +175,11 @@ const NewEventGroupPage: NextPage = () => {
                 <NumberDecrementStepper />
               </NumberInputStepper>
             </NumberInput>
+          </Box>
+        </Flex>
+        <Flex>
+          <Box>
+            <Button onClick={() => {createEventGroup()}}>Create</Button>
           </Box>
         </Flex>
         [Debug]
