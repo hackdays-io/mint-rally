@@ -56,13 +56,18 @@ const EventCreate: NextPage = () => {
     const params: ICreateEventRecordParams = {
       groupId: data.eventGroupId,
       eventName: data.name,
-      description: "test data",
+      description: data.description,
       date: new Date(),
       startTime: "19:00",
       endTime: "21:00",
       secretPhrase: "test secret",
     };
-    createEventRecord(params);
+    console.log("params:", params);
+    try {
+      createEventRecord(params);
+    } catch (error: any) {
+      alert(error);
+    }
   };
   const selectGroup = (e: ChangeEvent<HTMLSelectElement>) => {
     if (e.target.value) {
@@ -100,6 +105,22 @@ const EventCreate: NextPage = () => {
                 <Input
                   id="name"
                   {...register("name", {
+                    required: "This is required",
+                    minLength: {
+                      value: 4,
+                      message: "Minimum length should be 4",
+                    },
+                  })}
+                ></Input>
+                {/* なぜかエラー
+                <FormErrorMessage>{errors && errors.name && errors.name.message}</FormErrorMessage>
+                */}
+              </FormControl>
+              <FormControl>
+                <FormLabel htmlFor="description">Description</FormLabel>
+                <Input
+                  id="description"
+                  {...register("description", {
                     required: "This is required",
                     minLength: {
                       value: 4,

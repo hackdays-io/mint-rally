@@ -27,7 +27,11 @@ const Events: NextPage = () => {
       {loading && <Spinner></Spinner>}
       <List>
         {records.map((item) => {
-          return <ListItem key={item.eventRecordId}>{item.eventName}</ListItem>;
+          return (
+            <ListItem key={item.eventRecordId}>
+              <Link href={"/events/" + item.eventRecordId}>{item.name}</Link>
+            </ListItem>
+          );
         })}
       </List>
     </>
