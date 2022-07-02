@@ -5,11 +5,32 @@ import "hardhat/console.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "./lib/Base64.sol";
 
-contract MintNFT is ERC721Enumerable {
+interface IEventManager {
+    function applyForParticipation(uint256 _eventRecordId) external;
+
+    function verifySecretPhrase(
+        string memory _secretPhrase,
+        uint256 _eventRecordId
+    ) external returns (bool);
+
+    function countParticipationByGroup(
+        address _participantAddress,
+        uint256 _groupId
+    ) external returns (uint256);
+}
+
+contract MintNFT is ERC721Enumerable, Ownable {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
+
+    address private eventManagerAddr;
+
+    function setEventManagerAddr(address _eventManagerAddr) public onlyOwner {
+        eventManagerAddr = _eventManagerAddr;
+    }
 
     struct ParticipateNFTAttributes {
         string name;
@@ -27,10 +48,22 @@ contract MintNFT is ERC721Enumerable {
     function mintParticipateNFT(
         uint256 _groupId,
         uint256 _eventId,
-        uint256 _participateCount
-    ) external {
+        string memory _secretPhrase
+    ) external returns (string memory) {
         ParticipateNFTAttributes[]
             memory groupNFTAttributes = groupsNFTAttributes[_groupId];
+
+        IEventManager _eventManager = IEventManager(eventManagerAddr);
+        require(
+            _eventManager.verifySecretPhrase(_secretPhrase, _eventId),
+            "invalid secret phrase"
+        );
+        uint256 _participateCount = _eventManager.countParticipationByGroup(
+            msg.sender,
+            _groupId
+        );
+
+        console.log("participate", _participateCount);
 
         bool minted = false;
         ParticipateNFTAttributes memory defaultNFT;
@@ -50,7 +83,10 @@ contract MintNFT is ERC721Enumerable {
             attributesOfNFT[_tokenIds.current()] = defaultNFT;
             _safeMint(msg.sender, _tokenIds.current());
         }
+        _eventManager.applyForParticipation(_eventId);
+        string memory mintedTokenURI = tokenURI(_tokenIds.current());
         _tokenIds.increment();
+        return mintedTokenURI;
     }
 
     function getOwnedNFTs()
