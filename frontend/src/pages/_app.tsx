@@ -2,6 +2,7 @@ import '../styles/globals.css'
 import type { AppProps } from 'next/app'
 import {ChakraProvider, extendTheme} from '@chakra-ui/react'
 import { ChainId, ThirdwebProvider } from '@thirdweb-dev/react';
+import Layout from '../components/layout';
 
 const activeChainId = ChainId.Mumbai;
 
@@ -28,7 +29,9 @@ function MyApp({ Component, pageProps }: AppProps) {
   return (
     <ThirdwebProvider desiredChainId={activeChainId}>
       <ChakraProvider theme={theme}>
-        <Component {...pageProps} />
+        <Layout>
+          <Component {...pageProps} />
+        </Layout>
       </ChakraProvider>
     </ThirdwebProvider>
     )
