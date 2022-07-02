@@ -127,4 +127,9 @@ contract EventManager {
         }
         return _eventRecords;
     }
+
+    function testConnection() external view returns (string memory) {
+        string memory testResult = "Test connection successful";
+        return testResult;
+    }
 }

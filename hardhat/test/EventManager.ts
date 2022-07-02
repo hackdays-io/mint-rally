@@ -136,3 +136,17 @@ describe("ApplyForPaticipation", () => {
     expect(participationEvents.length).to.equal(1);
   });
 });
+
+describe("test connection", () => {
+  it("Should return true", async () => {
+    const eventManagerContractFactory = await ethers.getContractFactory(
+      "EventManager"
+    );
+
+    const eventManagerContract = await eventManagerContractFactory.deploy();
+    const eventManager = await eventManagerContract.deployed();
+
+    const result = await eventManager.testConnection();
+    expect(result).to.equal("Test connection successful");
+  });
+});
