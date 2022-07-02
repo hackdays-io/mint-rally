@@ -1,20 +1,7 @@
-import {
-  Box,
-  Button,
-  Flex,
-  Heading,
-  Link,
-  List,
-  ListItem,
-  Spinner,
-} from "@chakra-ui/react";
+import { Flex, Heading, Link, List, ListItem, Spinner } from "@chakra-ui/react";
 import { NextPage } from "next";
-import { useCallback, useEffect, useState } from "react";
-import {
-  getEventManagerContract,
-  IEventGroup,
-  useEventGroups,
-} from "../../helpers/eventManager";
+import { useEffect } from "react";
+import { IEventGroup, useEventGroups } from "../../helpers/eventManager";
 
 /**
  * /event-groups/
