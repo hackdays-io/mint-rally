@@ -11,10 +11,7 @@ import {
   Input,
   Button,
 } from "@chakra-ui/react";
-import {
-  getEventManagerContract,
-  IEventGroup,
-} from "../../helpers/eventManager";
+import { IEventGroup, useOwnEventGroups } from "../../helpers/eventManager";
 
 const EventCreate: NextPage = () => {
   const {
@@ -28,18 +25,9 @@ const EventCreate: NextPage = () => {
   const address = useAddress();
   const [noGroups, setNogroups] = useState(false);
   // state for loading event groups
-  const [groups, setGroups] = useState([]);
+  const { groups, loading, getOwnEventGroups } = useOwnEventGroups();
   // state for checking any group id is selected.
   const [groupIdSelcted, setGroupIdSelected] = useState(false);
-  // function for get login user's groups
-  const getOwnEventGroups = async () => {
-    console.log("get my event groups");
-    const eventManager = getEventManagerContract();
-    if (!eventManager) throw "error: contract can't found";
-    const data = await eventManager.getOwnGroups();
-    console.log(data);
-    setGroups(data);
-  };
 
   useEffect(() => {
     if (address) {

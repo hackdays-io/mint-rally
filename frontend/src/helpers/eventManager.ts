@@ -29,8 +29,13 @@ export const getEventManagerContract = () => {
   return null;
 };
 
+/**
+ * custom hook function for getting all event groups
+ * 
+ * @returns 
+ */
 export const useEventGroups = () => {
-  const [groups, setGroups] = useState([]);
+  const [groups, setGroups] = useState<IEventGroup[]>([]);
   const [loading, setLoading] = useState(false)
   const getEventGroups = async () => {
     console.log("get event groups");
@@ -42,4 +47,21 @@ export const useEventGroups = () => {
     setGroups(data);
   };
   return { groups, loading, getEventGroups }
+}
+
+/**
+ * custom hook function for get login user's groups
+ */
+export const useOwnEventGroups = () => {
+  const [groups, setGroups] = useState<IEventGroup[]>([])
+  const [loading, setLoading] = useState(false)
+  const getOwnEventGroups = async () => {
+    const eventManager = getEventManagerContract();
+    if (!eventManager) throw "error: contract can't found";
+    setLoading(true)
+    const data = await eventManager.getOwnGroups();
+    setLoading(false)
+    setGroups(data);
+  }
+  return { groups, loading, getOwnEventGroups }
 }
