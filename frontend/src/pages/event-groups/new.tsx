@@ -13,14 +13,17 @@ import {
   NumberInputStepper,
   NumberIncrementStepper,
   NumberDecrementStepper,
+  Spinner,
+  Alert,
+  AlertIcon,
+  AlertTitle,
+  AlertDescription,
 } from "@chakra-ui/react";
 import type { NextPage } from "next";
 import { useState, useCallback, useEffect } from "react";
 import styled from "@emotion/styled";
 import { Web3Storage } from "web3.storage";
-import { useCreateGroup } from "../../hooks/useEventManager";
-import { ethers } from "ethers";
-import { getEventManagerContract } from "../../hooks/useEventManagerContract";
+import { useCreateEventGroup } from "../../hooks/useEventManagerContract";
 
 const ImageIcon = createIcon({
   displayName: "ImageIcon",
@@ -136,6 +139,7 @@ const NewEventGroupPage: NextPage = () => {
   const [image1File, setImage1File] = useState(null as File | null);
   const [name1, setName1] = useState("");
   const [countThreshold1, setCountThreshold1] = useState(1);
+  const { errors, loading, createEventGroup } = useCreateEventGroup();
 
   const uploadImagesToIpfs = useCallback(async () => {
     if (!image1File || !name1) {
@@ -158,12 +162,8 @@ const NewEventGroupPage: NextPage = () => {
     return rootCid;
   }, [image1File, name1]);
 
-  const createEventGroup = () => {
-    if (groupName) {
-      const eventManager = getEventManagerContract();
-      if (!eventManager) throw new Error("error");
-      eventManager.createGroup(groupName);
-    }
+  const callCreateEventGroup = () => {
+    createEventGroup({ groupName: groupName });
   };
 
   return (
@@ -231,12 +231,20 @@ const NewEventGroupPage: NextPage = () => {
               if (cid) {
                 console.log("Upload completed", cid);
               }
-              createEventGroup();
+              callCreateEventGroup();
             }}
             disabled={!groupName || !image1File || !name1}
           >
             Create
           </Button>
+          {loading && <Spinner></Spinner>}
+          {errors && (
+            <Alert status="error">
+              <AlertIcon />
+              <AlertTitle>Error occurred</AlertTitle>
+              <AlertDescription>{errors.message}</AlertDescription>
+            </Alert>
+          )}
         </Box>
       </Box>
     </>
