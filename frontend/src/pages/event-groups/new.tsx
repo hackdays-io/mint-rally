@@ -1,4 +1,5 @@
 import {
+  Button,
   Input,
   Text,
   Heading,
@@ -14,8 +15,9 @@ import {
   NumberDecrementStepper,
 } from "@chakra-ui/react";
 import type { NextPage } from "next";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import styled from "@emotion/styled";
+import { Web3Storage } from "web3.storage";
 
 const ImageIcon = createIcon({
   displayName: "ImageIcon",
@@ -65,9 +67,11 @@ const FileInput = ({
 const ImageSelectorWithPreview = ({
   dataUrl,
   onChangeDataUrl,
+  onChangeFile,
 }: {
   dataUrl: string;
   onChangeDataUrl: (dataUrl: string) => void;
+  onChangeFile: (file: File) => void;
 }) => (
   <FileInput
     w="100%"
@@ -92,6 +96,8 @@ const ImageSelectorWithPreview = ({
       if (!file) return;
       const dataUrl = await getImageData(file);
       if (!dataUrl) return;
+
+      onChangeFile(file);
       onChangeDataUrl(dataUrl);
     }}
   />
@@ -107,11 +113,47 @@ const getImageData = (file: File): Promise<string | undefined> => {
   });
 };
 
+if (!process.env.NEXT_PUBLIC_WEB3_STORAGE_KEY) {
+  throw new Error("WEB3_STORAGE_KEY is required");
+}
+
+const ipfsClient = new Web3Storage({
+  token: process.env.NEXT_PUBLIC_WEB3_STORAGE_KEY,
+  endpoint: new URL("https://api.web3.storage"),
+});
+
+const renameFile = (file: File, newFilename: string) => {
+  const { type, lastModified } = file;
+  return new File([file], newFilename, { type, lastModified });
+};
+
 const NewEventGroupPage: NextPage = () => {
   const [groupName, setGroupName] = useState("");
   const [image1DataUrl, setImage1DataUrl] = useState("");
+  const [image1File, setImage1File] = useState(null as File | null);
   const [name1, setName1] = useState("");
   const [countThreshold1, setCountThreshold1] = useState(1);
+
+  const uploadImagesToIpfs = useCallback(async () => {
+    if (!image1File || !name1) {
+      console.error("You must specify image and name");
+      return;
+    }
+    console.log("Starting to upload images to IPFS...");
+    const renamedFile = renameFile(image1File, "1.png");
+    const rootCid = await ipfsClient.put([renamedFile], {
+      name: `test ${new Date().toISOString()}`,
+      maxRetries: 3,
+      wrapWithDirectory: true,
+      onRootCidReady: (rootCid) => {
+        console.log("rood cid:", rootCid);
+      },
+      onStoredChunk: (size) => {
+        console.log(`stored chunk of ${size} bytes`);
+      },
+    });
+    return rootCid;
+  }, [image1File, name1]);
 
   return (
     <>
@@ -135,6 +177,7 @@ const NewEventGroupPage: NextPage = () => {
             <ImageSelectorWithPreview
               dataUrl={image1DataUrl}
               onChangeDataUrl={setImage1DataUrl}
+              onChangeFile={setImage1File}
             />
           </Box>
           <Box flexBasis="1" flexGrow="1" m={2}>
@@ -170,6 +213,16 @@ const NewEventGroupPage: NextPage = () => {
         <p>
           NFT1: {name1} / {countThreshold1}
         </p>
+        <Box mt={8} mb={4}>
+          <Button
+            onClick={async () => {
+              const cid = await uploadImagesToIpfs();
+              console.log("Upload completed", cid);
+            }}
+          >
+            Create
+          </Button>
+        </Box>
       </Box>
     </>
   );
