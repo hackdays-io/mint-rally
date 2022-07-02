@@ -1,10 +1,18 @@
-import { Box, Button, Flex, Link } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Flex,
+  Heading,
+  Link,
+  List,
+  ListItem,
+} from "@chakra-ui/react";
 import { NextPage } from "next";
 import { useEffect, useState } from "react";
 import { getEventManagerContract } from "../../helpers/eventManager";
 
 interface IEventGroup {
-  id: number;
+  groupId: number;
   name: string;
 }
 
@@ -16,21 +24,27 @@ const EventGroups: NextPage = () => {
     if (!eventManager) throw "error";
     console.log(eventManager);
     const data = await eventManager.getGroups();
+    console.log(data);
     setGroups(data);
   };
   useEffect(() => {
-    //getEventGroups()
+    getEventGroups();
   }, []);
   return (
     <>
       <Flex>
         <Link href="/event-groups/new">Create new EventGroup</Link>
       </Flex>
-      <Box>
-        Event Groups
-        {groups}
-        <Button onClick={getEventGroups}>load events</Button>
-      </Box>
+      <Heading>Event Groups</Heading>
+      <List spacing={3}>
+        {groups.map((item: IEventGroup) => {
+          return (
+            <ListItem key={item.groupId}>
+              <Link href={"/event-groups/" + item.groupId}>{item.name}</Link>
+            </ListItem>
+          );
+        })}
+      </List>
     </>
   );
 };
