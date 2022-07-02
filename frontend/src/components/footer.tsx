@@ -1,4 +1,4 @@
-import { Flex } from "@chakra-ui/react"
+import { Flex } from "@chakra-ui/react";
 
 const Footer = () => (
   <>
@@ -8,7 +8,9 @@ const Footer = () => (
       align="center"
       color="mint.front"
       justify="space-between"
-    >footer</Flex>
+    >
+      footer
+    </Flex>
   </>
-)
-export default Footer
+);
+export default Footer;
