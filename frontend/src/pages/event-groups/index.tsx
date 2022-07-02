@@ -9,24 +9,19 @@ import {
 } from "@chakra-ui/react";
 import { NextPage } from "next";
 import { useEffect, useState } from "react";
-import { getEventManagerContract } from "../../helpers/eventManager";
+import { getEventManagerContract, IEventGroup } from "../../helpers/eventManager";
 
-interface IEventGroup {
-  groupId: number;
-  name: string;
-}
 
 const EventGroups: NextPage = () => {
-  const [groups, setGroups] = useState([]);
-  const getEventGroups = async () => {
-    console.log("get event groups");
-    const eventManager = getEventManagerContract();
-    if (!eventManager) throw "error";
-    console.log(eventManager);
-    const data = await eventManager.getGroups();
-    console.log(data);
-    setGroups(data);
-  };
+  const [groups, setGroups] = useState([])
+  const getEventGroups = async() => {
+    console.log('get event groups')
+    const eventManager = getEventManagerContract()
+    if (!eventManager) throw 'error'
+    const data = await eventManager.getGroups()
+    console.log(data)
+    setGroups(data)
+  }
   useEffect(() => {
     getEventGroups();
   }, []);
