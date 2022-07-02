@@ -11,26 +11,33 @@ describe("MintNFT", function () {
     let txn = await mintNFT.pushParticipateNFT([
       {
         name: "normalNFT",
-        groupAddress: "0xbbb",
-        eventAddress: "0xaaa",
+        imageURI: "https://i.imgur.com/TZEhCTX.png",
+        groupId: "0xbbb",
+        eventId: "0xaaa",
+        requiredParticipateCount: 0,
       },
       {
         name: "specialNFT",
-        groupAddress: "0xbbb",
-        eventAddress: "0xaab",
+        imageURI: "https://i.imgur.com/TZEhCTX.png",
+        groupId: "0xbbb",
+        eventId: "0xaaa",
+        requiredParticipateCount: 3,
+      },
+      {
+        name: "normalNFT",
+        imageURI: "https://i.imgur.com/TZEhCTX.png",
+        groupId: "0xbbb",
+        eventId: "0xaab",
+        requiredParticipateCount: 0,
       },
     ]);
     await txn.wait();
 
-    txn = await mintNFT.connect(owner1).mintParticipateNFT("0xaaa");
-    txn = await mintNFT.connect(owner1).mintParticipateNFT("0xaab");
-    await txn.wait();
-    txn = await mintNFT.connect(owner2).mintParticipateNFT("0xaaa");
+    txn = await mintNFT.connect(owner1).mintParticipateNFT("0xbbb", "");
     await txn.wait();
 
     let currentNum = await mintNFT.connect(owner1).checkOwnedNFTsId();
-    let currentNum2 = await mintNFT.connect(owner2).checkOwnedNFTsId();
 
-    console.log(currentNum, currentNum2);
+    console.log(currentNum);
   });
 });
