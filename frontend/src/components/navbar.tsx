@@ -1,7 +1,7 @@
 
 import { HamburgerIcon } from "@chakra-ui/icons"
 
-import { Box, Button, Drawer, DrawerBody, DrawerContent, DrawerOverlay, Flex, Heading, IconButton, Link, useDisclosure } from "@chakra-ui/react"
+import { Box, Button, Drawer, DrawerBody, DrawerContent, DrawerOverlay, Flex, Heading, IconButton, Link, Spacer, useDisclosure } from "@chakra-ui/react"
 
 const Navbar = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -29,7 +29,10 @@ const Navbar = () => {
           <Box pr={4}>
             <Link>Events</Link>
           </Box>
-          <Link>Login</Link>
+          <Spacer/>
+          <Box pr={4}>
+            <Link>Login</Link>
+          </Box>
         </Flex>
         <IconButton
           aria-label="Menu"
