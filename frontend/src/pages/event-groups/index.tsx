@@ -1,29 +1,19 @@
-import {
-  Box,
-  Button,
-  Flex,
-  Heading,
-  Link,
-  List,
-  ListItem,
-} from "@chakra-ui/react";
+import { Flex, Heading, Link, List, ListItem, Spinner } from "@chakra-ui/react";
 import { NextPage } from "next";
-import { useEffect, useState } from "react";
-import { getEventManagerContract, IEventGroup } from "../../helpers/eventManager";
+import { useEffect } from "react";
+import {
+  IEventGroup,
+  useEventGroups,
+} from "../../hooks/useEventManagerContract";
 
-
+/**
+ * /event-groups/
+ */
 const EventGroups: NextPage = () => {
-  const [groups, setGroups] = useState([])
-  const getEventGroups = async() => {
-    console.log('get event groups')
-    const eventManager = getEventManagerContract()
-    if (!eventManager) throw 'error'
-    const data = await eventManager.getGroups()
-    console.log(data)
-    setGroups(data)
-  }
+  const { groups, loading, getEventGroups } = useEventGroups();
   useEffect(() => {
     getEventGroups();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
     <>
@@ -31,15 +21,23 @@ const EventGroups: NextPage = () => {
         <Link href="/event-groups/new">Create new EventGroup</Link>
       </Flex>
       <Heading>Event Groups</Heading>
-      <List spacing={3}>
-        {groups.map((item: IEventGroup) => {
-          return (
-            <ListItem key={item.groupId}>
-              <Link href={"/event-groups/" + item.groupId}>{item.name}</Link>
-            </ListItem>
-          );
-        })}
-      </List>
+      {loading ? (
+        <Spinner></Spinner>
+      ) : (
+        <List spacing={3}>
+          <>
+            {groups.map((item: IEventGroup) => {
+              return (
+                <ListItem key={item.groupId}>
+                  <Link href={"/event-groups/" + item.groupId}>
+                    {item.name}
+                  </Link>
+                </ListItem>
+              );
+            })}
+          </>
+        </List>
+      )}
     </>
   );
 };

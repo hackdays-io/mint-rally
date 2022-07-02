@@ -1,10 +1,15 @@
-import { Heading, Link } from "@chakra-ui/react";
+import {
+  Flex,
+  FormErrorMessage,
+  Heading,
+  Link,
+  Spinner,
+} from "@chakra-ui/react";
 import { useAddress } from "@thirdweb-dev/react";
 import { NextPage } from "next";
 import { ChangeEvent, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import {
-  FormErrorMessage,
   FormLabel,
   FormControl,
   Select,
@@ -12,9 +17,11 @@ import {
   Button,
 } from "@chakra-ui/react";
 import {
-  getEventManagerContract,
+  ICreateEventRecordParams,
   IEventGroup,
-} from "../../helpers/eventManager";
+  useCreateEventRecord,
+  useOwnEventGroups,
+} from "../../hooks/useEventManagerContract";
 
 const EventCreate: NextPage = () => {
   const {
@@ -28,26 +35,40 @@ const EventCreate: NextPage = () => {
   const address = useAddress();
   const [noGroups, setNogroups] = useState(false);
   // state for loading event groups
-  const [groups, setGroups] = useState([]);
+  const { groups, loading, getOwnEventGroups } = useOwnEventGroups();
+  const {
+    errors: createError,
+    loading: createLoading,
+    createEventRecord,
+  } = useCreateEventRecord();
   // state for checking any group id is selected.
   const [groupIdSelcted, setGroupIdSelected] = useState(false);
-  // function for get login user's groups
-  const getOwnEventGroups = async () => {
-    console.log("get my event groups");
-    const eventManager = getEventManagerContract();
-    if (!eventManager) throw "error: contract can't found";
-    const data = await eventManager.getOwnGroups();
-    console.log(data);
-    setGroups(data);
-  };
 
   useEffect(() => {
     if (address) {
       getOwnEventGroups();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [address]);
 
-  const onSubmit = (data: any) => console.log("onSubmit:", data);
+  const onSubmit = (data: any) => {
+    console.log("onSubmit:", data);
+    const params: ICreateEventRecordParams = {
+      groupId: data.eventGroupId,
+      eventName: data.name,
+      description: data.description,
+      date: new Date(),
+      startTime: "19:00",
+      endTime: "21:00",
+      secretPhrase: "test secret",
+    };
+    console.log("params:", params);
+    try {
+      createEventRecord(params);
+    } catch (error: any) {
+      alert(error);
+    }
+  };
   const selectGroup = (e: ChangeEvent<HTMLSelectElement>) => {
     if (e.target.value) {
       setGroupIdSelected(true);
@@ -91,6 +112,22 @@ const EventCreate: NextPage = () => {
                     },
                   })}
                 ></Input>
+                {/* なぜかエラー
+                <FormErrorMessage>{errors && errors.name && errors.name.message}</FormErrorMessage>
+                */}
+              </FormControl>
+              <FormControl>
+                <FormLabel htmlFor="description">Description</FormLabel>
+                <Input
+                  id="description"
+                  {...register("description", {
+                    required: "This is required",
+                    minLength: {
+                      value: 4,
+                      message: "Minimum length should be 4",
+                    },
+                  })}
+                ></Input>
               </FormControl>
               <Button
                 type="submit"
@@ -99,6 +136,8 @@ const EventCreate: NextPage = () => {
               >
                 Create
               </Button>
+              {createError && <Flex>{createError.message}</Flex>}
+              {createLoading && <Spinner></Spinner>}
             </>
           ) : (
             <span>no event group is selected</span>
