@@ -14,48 +14,33 @@ contract MintNFT is ERC721Enumerable {
     struct ParticipateNFTAttributes {
         string name;
         string image;
-        string groupId;
-        string eventId;
+        uint256 groupId;
+        uint256 eventId;
         uint256 requiredParticipateCount;
     }
 
-    ParticipateNFTAttributes[] internal participateNFTs;
     mapping(uint256 => ParticipateNFTAttributes) public attributesOfNFT;
+    mapping(uint256 => ParticipateNFTAttributes[]) private groupsNFTAttributes;
 
     constructor() ERC721("MintRally", "MR") {}
 
-    function mintParticipateNFT(
-        string memory groupId,
-        string memory secretPhrase
-    ) external {
-        require(1 == 1, "invalid secretPhrase");
-
-        uint256 participateCount = 0;
-
+    function mintParticipateNFT(uint256 groupId, uint256 participateCount)
+        external
+    {
         ParticipateNFTAttributes[]
-            memory groupNFTs = new ParticipateNFTAttributes[](
-                participateNFTs.length
-            );
-        ParticipateNFTAttributes memory defaultNFT;
-        for (uint256 index = 0; index < participateNFTs.length; index++) {
-            ParticipateNFTAttributes memory p = participateNFTs[index];
-            if (keccak256(bytes(p.groupId)) == keccak256(bytes(groupId))) {
-                groupNFTs[index] = p;
-                if (p.requiredParticipateCount == 0) {
-                    defaultNFT = p;
-                }
-            }
-        }
+            memory groupNFTAttributes = groupsNFTAttributes[groupId];
 
         bool minted = false;
-
-        for (uint256 index = 0; index < groupNFTs.length; index++) {
-            ParticipateNFTAttributes memory gp = groupNFTs[index];
+        ParticipateNFTAttributes memory defaultNFT;
+        for (uint256 index = 0; index < groupNFTAttributes.length; index++) {
+            ParticipateNFTAttributes memory gp = groupNFTAttributes[index];
+            if (gp.requiredParticipateCount == 0) {
+                defaultNFT = gp;
+            }
             if (gp.requiredParticipateCount == participateCount) {
                 attributesOfNFT[_tokenIds.current()] = gp;
                 _safeMint(msg.sender, _tokenIds.current());
                 minted = true;
-                break;
             }
         }
         if (!minted) {
@@ -87,12 +72,12 @@ contract MintNFT is ERC721Enumerable {
         return holdingNFTsAttributes;
     }
 
-    function pushParticipateNFT(ParticipateNFTAttributes[] memory attributes)
-        external
-        returns (uint256)
-    {
+    function pushGroupNFTAttributes(
+        uint256 groupId,
+        ParticipateNFTAttributes[] memory attributes
+    ) external returns (uint256) {
         for (uint256 index = 0; index < attributes.length; index++) {
-            participateNFTs.push(
+            groupsNFTAttributes[groupId].push(
                 ParticipateNFTAttributes({
                     name: attributes[index].name,
                     image: attributes[index].image,
