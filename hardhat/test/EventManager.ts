@@ -99,7 +99,9 @@ describe("EventManager", () => {
         "EventManager"
       );
 
-      const eventManagerContract = await eventManagerContractFactory.deploy(mintNFT.address);
+      const eventManagerContract = await eventManagerContractFactory.deploy(
+        mintNFT.address
+      );
       const eventManager = await eventManagerContract.deployed();
 
       const [address1, address2] = await ethers.getSigners();
@@ -133,7 +135,9 @@ describe("EventManager", () => {
         "EventManager"
       );
 
-      const eventManagerContract = await eventManagerContractFactory.deploy(mintNFT.address);
+      const eventManagerContract = await eventManagerContractFactory.deploy(
+        mintNFT.address
+      );
       const eventManager = await eventManagerContract.deployed();
 
       // does not exist any groups
@@ -172,7 +176,9 @@ describe("EventManager", () => {
         "EventManager"
       );
 
-      const eventManagerContract = await eventManagerContractFactory.deploy(mintNFT.address);
+      const eventManagerContract = await eventManagerContractFactory.deploy(
+        mintNFT.address
+      );
       const eventManager = await eventManagerContract.deployed();
 
       const [address1] = await ethers.getSigners();
@@ -235,7 +241,9 @@ describe("EventManager", () => {
         "EventManager"
       );
 
-      const eventManagerContract = await eventManagerContractFactory.deploy(mintNFT.address);
+      const eventManagerContract = await eventManagerContractFactory.deploy(
+        mintNFT.address
+      );
       const eventManager = await eventManagerContract.deployed();
 
       const txn1 = await eventManager.createGroup("group1", images);
@@ -277,7 +285,9 @@ describe("EventManager", () => {
         "EventManager"
       );
 
-      const eventManagerContract = await eventManagerContractFactory.deploy(mintNFT.address);
+      const eventManagerContract = await eventManagerContractFactory.deploy(
+        mintNFT.address
+      );
       const eventManager = await eventManagerContract.deployed();
 
       const result = await eventManager.testConnection();
