@@ -9,7 +9,7 @@ export interface IEventGroup {
 export interface IEventRecord {
   eventRecordId: number;
   groupId: number;
-  eventName: string;
+  name: string;
   description: string;
   date: Date;
   startTime: string; // "18:00"
@@ -115,6 +115,7 @@ export const useEventRecords = () => {
     if (!eventManager) throw "error";
     setLoading(true)
     const data = await eventManager.getEventRecords();
+    console.log("retrieved:", data)
     setLoading(false)
     setRecords(data);
   };
