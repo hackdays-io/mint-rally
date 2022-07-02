@@ -1,3 +1,4 @@
+import { expect } from "chai";
 import { ethers } from "hardhat";
 
 describe("MintNFT", function () {
@@ -12,33 +13,36 @@ describe("MintNFT", function () {
       {
         name: "normalNFT",
         image: "https://i.imgur.com/TZEhCTX.png",
-        groupId: "0xbbb",
-        eventId: "0xaaa",
+        groupId: 1,
+        eventId: 0,
         requiredParticipateCount: 0,
       },
       {
         name: "specialNFT",
         image: "https://i.imgur.com/TZEhCTX.png",
-        groupId: "0xbbb",
-        eventId: "0xaaa",
-        requiredParticipateCount: 3,
+        groupId: 1,
+        eventId: 0,
+        requiredParticipateCount: 5,
       },
       {
-        name: "normalNFT",
+        name: "awesomeNFT",
         image: "https://i.imgur.com/TZEhCTX.png",
-        groupId: "0xbbb",
-        eventId: "0xaab",
-        requiredParticipateCount: 0,
+        groupId: 1,
+        eventId: 0,
+        requiredParticipateCount: 10,
       },
     ]);
     await txn.wait();
 
-    txn = await mintNFT.connect(owner1).mintParticipateNFT("0xbbb", 0);
+    txn = await mintNFT.connect(owner1).mintParticipateNFT(1, 1, 0);
     await txn.wait();
-    txn = await mintNFT.connect(owner1).mintParticipateNFT("0xbbb", 0);
-    await txn.wait();
-
     let holdingNFTs = await mintNFT.connect(owner1).getOwnedNFTs();
-    console.log(holdingNFTs);
+    expect(holdingNFTs[0].eventId).equal(1);
+
+    txn = await mintNFT.connect(owner1).mintParticipateNFT(1, 2, 5);
+    await txn.wait();
+    holdingNFTs = await mintNFT.connect(owner1).getOwnedNFTs();
+    expect(holdingNFTs[1].eventId).equal(2);
+    expect(holdingNFTs[1].name).equal("specialNFT");
   });
 });
