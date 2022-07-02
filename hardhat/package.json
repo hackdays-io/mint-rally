@@ -5,6 +5,7 @@
   "license": "MIT",
   "scripts": {
     "deploy:stg": "npx hardhat run scripts/deploy.ts --network munbai",
+    "deploy:mintNFT": "npx hardhat run scripts/deployMintNft.ts --network munbai",
     "compile": "npx hardhat compile",
     "test": "npx hardhat compile & npx hardhat test"
   },
