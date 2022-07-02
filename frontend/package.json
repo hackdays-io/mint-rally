@@ -9,7 +9,11 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@chakra-ui/react": "^2.2.1",
+    "@emotion/react": "^11",
+    "@emotion/styled": "^11",
     "ethers": "^5.6.9",
+    "framer-motion": "^6",
     "next": "12.2.0",
     "react": "18.2.0",
     "react-dom": "18.2.0"
@@ -21,6 +25,7 @@
     "dotenv": "^16.0.1",
     "eslint": "8.18.0",
     "eslint-config-next": "12.2.0",
+    "prettier": "^2.7.1",
     "typescript": "4.7.4"
   }
 }
