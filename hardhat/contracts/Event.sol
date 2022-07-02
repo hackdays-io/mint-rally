@@ -154,4 +154,9 @@ contract EventManager {
         return
             eventRecords[_eventRecordId].secretPhrase == encryptedSecretPhrase;
     }
+
+    function testConnection() external pure returns (string memory) {
+        string memory testResult = "Test connection successful";
+        return testResult;
+    }
 }
