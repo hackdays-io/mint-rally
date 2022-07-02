@@ -8,7 +8,7 @@ describe("MintNFT", function () {
     const mintNFT = await MintNFT.deploy();
     await mintNFT.deployed();
 
-    let txn = await mintNFT.pushParticipateNFT([
+    let txn = await mintNFT.pushGroupNFTAttributes(1, [
       {
         name: "normalNFT",
         image: "https://i.imgur.com/TZEhCTX.png",
@@ -33,9 +33,9 @@ describe("MintNFT", function () {
     ]);
     await txn.wait();
 
-    txn = await mintNFT.connect(owner1).mintParticipateNFT("0xbbb", "");
+    txn = await mintNFT.connect(owner1).mintParticipateNFT("0xbbb", 0);
     await txn.wait();
-    txn = await mintNFT.connect(owner1).mintParticipateNFT("0xbbb", "");
+    txn = await mintNFT.connect(owner1).mintParticipateNFT("0xbbb", 0);
     await txn.wait();
 
     let holdingNFTs = await mintNFT.connect(owner1).getOwnedNFTs();
