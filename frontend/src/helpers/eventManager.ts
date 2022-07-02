@@ -6,7 +6,15 @@ export interface IEventGroup {
   groupId: number;
   name: string;
 }
-
+export interface ICreateEventRecordParams {
+  groupId: number;
+  eventName: string;
+  description: string;
+  date: Date;
+  startTime: string; // "18:00"
+  endTime: string; // "21:00"
+  secretPhrase: string;
+}
 /**
  * A bridgge to the event manager contract
 */
@@ -64,4 +72,18 @@ export const useOwnEventGroups = () => {
     setGroups(data);
   }
   return { groups, loading, getOwnEventGroups }
+}
+
+export const useCreateEventRecord = () => {
+  const [errors, setErrors] = useState<Error | null>(null)
+  const [loading, setLoading] = useState(false)
+  const createEventRecord = async (params: ICreateEventRecordParams) => {
+    const eventManager = getEventManagerContract();
+    if (!eventManager) throw "error: contract can't found";
+    setLoading(true)
+    const datestr = params.date.toLocaleDateString();
+    await eventManager.createEventRecord(params.groupId, params.eventName, params.description, datestr, params.startTime, params.endTime, params.secretPhrase);
+    setLoading(false)
+  }
+  return { errors, loading, createEventRecord }
 }
