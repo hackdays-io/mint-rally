@@ -7,7 +7,7 @@
     "deploy:stg": "npx hardhat run scripts/deploy.ts --network munbai",
     "deploy:mintNFT": "npx hardhat run scripts/deployMintNft.ts --network",
     "compile": "npx hardhat compile",
-    "test": "npx hardhat compile & npx hardhat test"
+    "test": "npx hardhat compile && npx hardhat test"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.0",

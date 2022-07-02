@@ -5,10 +5,31 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "hardhat/console.sol";
 
+interface IMintNFT {
+    struct ParticipateNFTAttributes {
+        string name;
+        string image;
+        uint256 groupId;
+        uint256 eventId;
+        uint256 requiredParticipateCount;
+    }
+
+    function pushGroupNFTAttributes(
+        uint256 groupId,
+        ParticipateNFTAttributes[] memory
+    ) external;
+}
+
 contract EventManager is Ownable {
     struct Group {
         uint256 groupId;
+        address ownerAddress;
         string name;
+    }
+
+    struct GroupAttributes {
+        string image;
+        uint256 requiredParticipateCount;
     }
 
     struct EventRecord {
@@ -32,9 +53,12 @@ contract EventManager is Ownable {
 
     mapping(address => uint256[]) private ownGroupIds;
     mapping(uint256 => address[]) private participantAddresses;
+    mapping(address => uint256[]) private participantGroupIds;
     mapping(address => uint256[]) private eventIdsByParticipant;
+    mapping(uint256 => uint256[]) private eventIdsByGroupId;
+    mapping(uint256 => uint256) private groupIdByEventId;
 
-    address internal mintNFTAddr;
+    address private mintNFTAddr;
 
     function setMintNFTAddr(address _mintNftAddr) public onlyOwner {
         mintNFTAddr = _mintNftAddr;
@@ -43,11 +67,36 @@ contract EventManager is Ownable {
     constructor(address _mintNftAddr) {
         mintNFTAddr = _mintNftAddr;
         console.log("init");
+        _groupIds.increment();
+        _eventRecordIds.increment();
     }
 
-    function createGroup(string memory _name) external {
+    function createGroup(
+        string memory _name,
+        GroupAttributes[] memory _groupAttributes
+    ) external {
         uint256 _newGroupId = _groupIds.current();
-        groups.push(Group({groupId: _newGroupId, name: _name}));
+        IMintNFT _mintNFT = IMintNFT(mintNFTAddr);
+        uint256 _groupAttributesCount = _groupAttributes.length;
+        IMintNFT.ParticipateNFTAttributes[]
+            memory _participateNFTAttributes = new IMintNFT.ParticipateNFTAttributes[](
+                _groupAttributesCount
+            );
+
+        for (uint256 _i = 0; _i < _groupAttributesCount; _i++) {
+            _participateNFTAttributes[_i] = IMintNFT.ParticipateNFTAttributes({
+                name: _name,
+                image: _groupAttributes[_i].image,
+                groupId: _newGroupId,
+                eventId: 0,
+                requiredParticipateCount: _groupAttributes[_i]
+                    .requiredParticipateCount
+            });
+        }
+        _mintNFT.pushGroupNFTAttributes(_newGroupId, _participateNFTAttributes);
+        groups.push(
+            Group({groupId: _newGroupId, ownerAddress: msg.sender, name: _name})
+        );
         ownGroupIds[msg.sender].push(_newGroupId);
         _groupIds.increment();
     }
@@ -62,10 +111,11 @@ contract EventManager is Ownable {
 
     function getOwnGroups() public view returns (Group[] memory) {
         uint256 _numberOfGroups = ownGroupIds[msg.sender].length;
-        // create array of groups
         Group[] memory _groups = new Group[](_numberOfGroups);
         for (uint256 _i = 0; _i < _numberOfGroups; _i++) {
-            _groups[_i] = groups[ownGroupIds[msg.sender][_i]];
+            if (groups[_i].ownerAddress == msg.sender) {
+                _groups[_i] = groups[_i];
+            }
         }
         return _groups;
     }
@@ -102,6 +152,8 @@ contract EventManager is Ownable {
                 secretPhrase: encryptedSecretPhrase
             })
         );
+        eventIdsByGroupId[_groupId].push(_newEventId);
+        groupIdByEventId[_newEventId] = _groupId;
         _eventRecordIds.increment();
     }
 
@@ -118,6 +170,8 @@ contract EventManager is Ownable {
     function applyForParticipation(uint256 _eventRecordId) external {
         participantAddresses[_eventRecordId].push(msg.sender);
         eventIdsByParticipant[msg.sender].push(_eventRecordId);
+        uint256 _groupId = groupIdByEventId[_eventRecordId];
+        participantGroupIds[msg.sender].push(_groupId);
     }
 
     function getParticipationEvents()
@@ -142,15 +196,15 @@ contract EventManager is Ownable {
         address _participantAddress,
         uint256 _groupId
     ) public view returns (uint256) {
-        uint256[] memory _eventIds = eventIdsByParticipant[_participantAddress];
-        uint256 _numberOfEvents = _eventIds.length;
-        uint256 _numberOfParticipants = 0;
-        for (uint256 _i = 0; _i < _numberOfEvents; _i++) {
-            if (eventRecords[_eventIds[_i]].groupId == _groupId) {
-                _numberOfParticipants++;
+        uint256 _numberOfGroupIds = participantGroupIds[_participantAddress]
+            .length;
+        uint256 _numberOfParticipations = 0;
+        for (uint256 _i = 0; _i < _numberOfGroupIds; _i++) {
+            if (participantGroupIds[_participantAddress][_i] == _groupId) {
+                _numberOfParticipations++;
             }
         }
-        return _numberOfParticipants;
+        return _numberOfParticipations;
     }
 
     function verifySecretPhrase(
@@ -159,8 +213,10 @@ contract EventManager is Ownable {
     ) external view returns (bool) {
         bytes memory hexSecretPhrase = bytes(_secretPhrase);
         bytes32 encryptedSecretPhrase = keccak256(hexSecretPhrase);
-        return
-            eventRecords[_eventRecordId].secretPhrase == encryptedSecretPhrase;
+        uint256 _indexOfEventRecord = _eventRecordId - 1;
+        bool result = eventRecords[_indexOfEventRecord].secretPhrase ==
+            encryptedSecretPhrase;
+        return result;
     }
 
     function testConnection() external pure returns (string memory) {
