@@ -31,6 +31,7 @@ contract EventManager {
 
     mapping(address => uint256[]) private ownGroupIds;
     mapping(uint256 => address[]) private participantAddresses;
+    mapping(address => uint256[]) private eventIdsByParticipant;
 
     constructor() {
         console.log("init");
@@ -106,8 +107,9 @@ contract EventManager {
         return _eventRecords;
     }
 
-    function applyForParticipation(uint256 _eventRecordId) public {
+    function applyForParticipation(uint256 _eventRecordId) external {
         participantAddresses[_eventRecordId].push(msg.sender);
+        eventIdsByParticipant[msg.sender].push(_eventRecordId);
     }
 
     function getParticipationEvents()
@@ -128,7 +130,32 @@ contract EventManager {
         return _eventRecords;
     }
 
-    function testConnection() external view returns (string memory) {
+    function countParticipationByGroup(
+        address _participantAddress,
+        uint256 _groupId
+    ) public view returns (uint256) {
+        uint256[] memory _eventIds = eventIdsByParticipant[_participantAddress];
+        uint256 _numberOfEvents = _eventIds.length;
+        uint256 _numberOfParticipants = 0;
+        for (uint256 _i = 0; _i < _numberOfEvents; _i++) {
+            if (eventRecords[_eventIds[_i]].groupId == _groupId) {
+                _numberOfParticipants++;
+            }
+        }
+        return _numberOfParticipants;
+    }
+
+    function verifySecretPhrase(
+        string memory _secretPhrase,
+        uint256 _eventRecordId
+    ) external view returns (bool) {
+        bytes memory hexSecretPhrase = bytes(_secretPhrase);
+        bytes32 encryptedSecretPhrase = keccak256(hexSecretPhrase);
+        return
+            eventRecords[_eventRecordId].secretPhrase == encryptedSecretPhrase;
+    }
+
+    function testConnection() external pure returns (string memory) {
         string memory testResult = "Test connection successful";
         return testResult;
     }
