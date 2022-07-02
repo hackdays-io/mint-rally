@@ -19,7 +19,6 @@ import { useState, useCallback, useEffect } from "react";
 import styled from "@emotion/styled";
 import { Web3Storage } from "web3.storage";
 import { useCreateGroup } from "../../hooks/useEventManager";
-import { group } from "console";
 import { ethers } from "ethers";
 import { getEventManagerContract } from "../../helpers/eventManager";
 
@@ -153,7 +152,7 @@ const NewEventGroupPage: NextPage = () => {
         console.log("rood cid:", rootCid);
       },
       onStoredChunk: (size) => {
-        console.log(`stored chunk of ${size} bytes`);
+        // console.log(`stored chunk of ${size} bytes`);
       },
     });
     return rootCid;
@@ -162,7 +161,7 @@ const NewEventGroupPage: NextPage = () => {
   const createEventGroup = () => {
     if (groupName) {
       const eventManager = getEventManagerContract();
-      if (!eventManager) throw "error";
+      if (!eventManager) throw new Error("error");
       eventManager.createGroup(groupName);
     }
   };
@@ -220,17 +219,6 @@ const NewEventGroupPage: NextPage = () => {
             </NumberInput>
           </Box>
         </Flex>
-        <Flex>
-          <Box>
-            <Button
-              onClick={() => {
-                createEventGroup();
-              }}
-            >
-              Create group
-            </Button>
-          </Box>
-        </Flex>
         [Debug]
         <p>Group name: {groupName}</p>
         <p>
@@ -240,8 +228,12 @@ const NewEventGroupPage: NextPage = () => {
           <Button
             onClick={async () => {
               const cid = await uploadImagesToIpfs();
-              console.log("Upload completed", cid);
+              if (cid) {
+                console.log("Upload completed", cid);
+              }
+              createEventGroup();
             }}
+            disabled={!groupName || !image1File || !name1}
           >
             Create
           </Button>
