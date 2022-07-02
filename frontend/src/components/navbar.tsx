@@ -2,9 +2,28 @@
 import { HamburgerIcon } from "@chakra-ui/icons"
 
 import { Box, Button, Drawer, DrawerBody, DrawerContent, DrawerOverlay, Flex, Heading, IconButton, Link, Spacer, useDisclosure } from "@chakra-ui/react"
+import { useAddress, useDisconnect, useMetamask } from '@thirdweb-dev/react';
 
 const Navbar = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const address = useAddress();
+  const connectWithMetamask = useMetamask();
+  const disconnectWallet = useDisconnect();
+
+  const MetamaskLogin = () => {
+    return (
+    <>
+      { address ? (
+      <>
+        <button onClick={disconnectWallet}>Disconnect Wallet</button>
+        <p>Your address: {address}</p>
+      </>
+    ) : (
+      <button onClick={connectWithMetamask}>Connect Wallet</button>
+    )}
+    </>
+  )}
+
   return (
   <>
     <Flex
@@ -31,7 +50,7 @@ const Navbar = () => {
           </Box>
           <Spacer/>
           <Box pr={4}>
-            <Link>Login</Link>
+            <MetamaskLogin></MetamaskLogin>
           </Box>
         </Flex>
         <IconButton
@@ -49,7 +68,7 @@ const Navbar = () => {
             <DrawerBody p={0} bg="gray.100">
               <Button w="100%">Top</Button>
               <Button w="100%">Events</Button>
-              <Button w="100%">Login</Button>
+              <MetamaskLogin></MetamaskLogin>
             </DrawerBody>
           </DrawerContent>
         </DrawerOverlay>
