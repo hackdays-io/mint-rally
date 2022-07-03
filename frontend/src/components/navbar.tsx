@@ -1,4 +1,9 @@
-import { CalendarIcon, EmailIcon, HamburgerIcon, SettingsIcon } from "@chakra-ui/icons";
+import {
+  CalendarIcon,
+  EmailIcon,
+  HamburgerIcon,
+  SettingsIcon,
+} from "@chakra-ui/icons";
 
 import {
   Box,
@@ -29,11 +34,25 @@ const Navbar = () => {
         <Flex alignItems="center">
           <Box marginRight="3">
             {address ? (
-              <Button bg="mint.subtle" color="mint.font" borderRadius={'16px'} variant='solid' onClick={disconnectWallet} size="lg">
+              <Button
+                bg="mint.subtle"
+                color="mint.font"
+                borderRadius={"16px"}
+                variant="solid"
+                onClick={disconnectWallet}
+                size="lg"
+              >
                 Sign out
               </Button>
             ) : (
-              <Button bg="mint.subtle" color="mint.font" borderRadius={'16px'} variant='solid' onClick={connectWithMetamask} size="lg">
+              <Button
+                bg="mint.subtle"
+                color="mint.font"
+                borderRadius={"16px"}
+                variant="solid"
+                onClick={connectWithMetamask}
+                size="lg"
+              >
                 Sign in
               </Button>
             )}
@@ -72,7 +91,7 @@ const Navbar = () => {
         align="center"
         color="mint.front"
         justify="space-between"
-        height={'120px'}
+        height={"120px"}
         padding={{ base: 3, md: 5 }}
       >
         <Flex
@@ -83,7 +102,7 @@ const Navbar = () => {
           _hover={{ cursor: "pointer" }}
         >
           <Image
-            src={'/images/logo.svg'}
+            src={"/images/logo.svg"}
             height={110}
             width={295}
             objectFit="contain"
@@ -98,14 +117,28 @@ const Navbar = () => {
         >
           <Box mr={8}>
             <Link href="/event-groups">
-              <Button leftIcon={<SettingsIcon />} bg="mint.white" color="mint.font" borderRadius={'16px'} variant='solid' disabled={!address} size="lg">
+              <Button
+                leftIcon={<SettingsIcon />}
+                bg="mint.white"
+                color="mint.font"
+                borderRadius={"16px"}
+                variant="solid"
+                size="lg"
+              >
                 EventGroups
               </Button>
             </Link>
           </Box>
           <Box>
             <Link href="/events">
-              <Button leftIcon={<CalendarIcon />} bg="mint.white" color="mint.font" borderRadius={'16px'} variant='solid' size="lg">
+              <Button
+                leftIcon={<CalendarIcon />}
+                bg="mint.white"
+                color="mint.font"
+                borderRadius={"16px"}
+                variant="solid"
+                size="lg"
+              >
                 Events
               </Button>
             </Link>
