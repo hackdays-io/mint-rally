@@ -39,14 +39,16 @@ const Navbar = () => {
             )}
           </Box>{" "}
           {address ? (
-            <Flex as="a" marginLeft="3" href={"/users/" + address}>
-              <Image
-                src="/user.png"
-                alt="Loggedin"
-                width={65.78}
-                height={65.78}
-                objectFit="contain"
-              />
+            <Flex as="a" marginLeft="3">
+              <Link href={"/users/" + address}>
+                <Image
+                  src="/user.png"
+                  alt="Loggedin"
+                  width={65.78}
+                  height={65.78}
+                  objectFit="contain"
+                />
+              </Link>
             </Flex>
           ) : (
             <Flex marginLeft="3">
@@ -77,18 +79,18 @@ const Navbar = () => {
       >
         <Flex
           align="center"
-          as="a"
-          href="/"
           me={8}
           _hover={{ cursor: "pointer" }}
         >
-          <Image
-            src={'/images/logo.svg'}
-            height={110}
-            width={295}
-            objectFit="contain"
-            alt="Mint Rally Logo"
-          />
+          <Link href="/">
+            <Image
+              src={'/images/logo.svg'}
+              height={110}
+              width={295}
+              objectFit="contain"
+              alt="Mint Rally Logo"
+            />
+          </Link>
         </Flex>
         <Flex
           align="center"
