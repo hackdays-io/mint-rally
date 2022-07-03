@@ -35,12 +35,12 @@ const User = () => {
   }, [router.query]);
 
   useEffect(() => {
-    if (!myAddress || ownedNFTs.length > 0 || loading) {
+    if (!myAddress) {
       return;
     }
     getOwnedNFTs();
     getEventGroups();
-  }, [myAddress, getOwnedNFTs, ownedNFTs, loading, getEventGroups]);
+  }, [myAddress]);
 
   const nftCollectionsByGroup = () => {
     const grouped = ownedNFTs.reduce<Record<number, IOwnedNFT[]>>(
@@ -100,7 +100,7 @@ const User = () => {
       <Flex justifyContent="flex-start" flexDirection="column" width="100%">
         <Box mt={16}>
           <Heading as="h1" size="2xl" color="#552306" fontWeight={400}>
-            Your NFTs
+            User NFT Collection
           </Heading>
         </Box>
         {loading && <Spinner></Spinner>}
