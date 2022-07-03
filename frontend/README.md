@@ -39,3 +39,4 @@ You must set the following API keys via `.env` etc.
 
 - `NEXT_PUBLIC_WEB3_STORAGE_KEY` - retrieved from https://web3.storage/tokens/
 - `NEXT_PUBLIC_CONTRACT_EVENT_MANAGER` - retrieved from your deployed contract
+- `NEXT_PUBLIC_CONTRACT_MINT_NFT_MANAGER` - retrieved from your deployed contract
