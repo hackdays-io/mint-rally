@@ -71,6 +71,14 @@ describe("EventManager", () => {
       expect(eventRecordsAfterCreate[0].startTime).to.equal("18:00");
       expect(eventRecordsAfterCreate[0].endTime).to.equal("21:00");
 
+      const eventRecord = await eventManager.getEventById(
+        eventRecordsAfterCreate[0].eventRecordId.toNumber()
+      );
+      expect(eventRecord.eventRecordId).to.equal(
+        eventRecordsAfterCreate[0].eventRecordId.toNumber()
+      );
+      expect(eventRecord.name).to.equal(eventRecordsAfterCreate[0].name);
+
       // cannot create event record if you are not the group owner
       const invalidGroupId = groupsAfterCreate[0].groupId.toNumber() + 1;
       try {
