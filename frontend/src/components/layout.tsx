@@ -15,9 +15,10 @@ const Layout = ({ children }: Props) => (
       <meta charSet="utf-8" />
       <meta name="viewport" content="initial-scale=1.0, width=device-width" />
     </Head>
-    <Navbar />
-    <Box margin={3}>{children}</Box>
-    <Footer />
+    <Box minHeight="100vh">
+      <Navbar />
+      <Box margin={3}>{children}</Box>
+    </Box>
   </>
 );
 export default Layout;
