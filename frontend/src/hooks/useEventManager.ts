@@ -39,7 +39,7 @@ export interface ICreateEventRecordParams {
 }
 
 export interface IApplyForParticipation {
-  evendId: number;
+  eventId: number;
 }
 
 /**
@@ -107,7 +107,7 @@ export const useEventGroups = () => {
     if (!eventManager) throw "error";
     setLoading(true);
     const data = await eventManager.getGroups();
-    console.log(data)
+    console.log(data);
     setLoading(false);
     setGroups(data);
   };
@@ -127,6 +127,7 @@ export const useOwnEventGroups = () => {
     const data = await eventManager.getOwnGroups();
     setLoading(false);
     setGroups(data);
+    console.log(data);
   };
   return { groups, loading, getOwnEventGroups };
 };
@@ -201,7 +202,7 @@ export const useGetEventById = () => {
     if (!eventManager) throw "error";
     setLoading(true);
     const data = await eventManager.getEventById(eventId);
-    console.log("retrieved:", data);
+    console.log("retrieved: ", data);
     setLoading(false);
     setEvent(data);
   };
@@ -214,9 +215,9 @@ export const useGetEventById = () => {
  * @returns
  */
 export const useGetParticipationEventIds = () => {
-  const [eventIds, setEventIds] = useState<IEventRecord[]>([]);
+  const [eventIds, setEventIds] = useState<number[]>([]);
   const [loading, setLoading] = useState(false);
-  const getParticipationEventIds = async ({ eventId }: IGetEventById) => {
+  const getParticipationEventIds = async () => {
     console.log("get event records that you have applied for participation");
     const eventManager = getEventManagerContract();
     if (!eventManager) throw "error";
@@ -224,7 +225,9 @@ export const useGetParticipationEventIds = () => {
     const data = await eventManager.getParticipationEventIds();
     console.log("retrieved:", data);
     setLoading(false);
-    setEventIds(data);
+    const _data = data.map((d: any) => d.toNumber());
+    setEventIds(_data);
+    return _data;
   };
   return { eventIds, loading, getParticipationEventIds };
 };
@@ -243,7 +246,7 @@ export const useApplyForParticipation = () => {
       const eventManager = getEventManagerContract();
       if (!eventManager) throw "error: contract can't found";
       setLoading(true);
-      const tx = await eventManager.applyForParticipation(params.evendId);
+      const tx = await eventManager.applyForParticipation(params.eventId);
       await tx.wait();
       setLoading(false);
       setStatus(true);
