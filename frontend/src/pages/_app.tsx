@@ -1,13 +1,23 @@
 import "../styles/globals.css";
 import type { AppProps } from "next/app";
-import { ChakraProvider, extendTheme } from "@chakra-ui/react";
+import { ChakraProvider, ColorModeScript, extendTheme } from "@chakra-ui/react";
 import { ChainId, ThirdwebProvider } from "@thirdweb-dev/react";
 import Layout from "../components/layout";
 
 const activeChainId = ChainId.Mumbai;
 
+const colors = {
+  mint: {
+    bg: "#56F0DE",
+    primary: "#552306",
+    subtle1: "#A25020",
+    subtle2: "#C68762",
+    white: "#FFFFFF",
+    subtle: "#E3FFFC",
+  },
+};
+
 const theme = extendTheme({
-  // デフォルトのフォント
   // https://chakra-ui.com/docs/theming/theme#typography
   fonts: {},
   // デフォルトのカラーモード
@@ -16,12 +26,13 @@ const theme = extendTheme({
     initialColorMode: "light",
     useSystemColorMode: false,
   },
-  colors: {
-    mint: {
-      bg: "#56F0DE",
-      front: "#552306",
-      white: '#FFFFFF',
-      subtle: '#E3FFFC'
+  colors: colors,
+  // デフォルトのフォント
+  styles: {
+    global: {
+      body: {
+        color: colors.mint.primary,
+      },
     },
   },
 });
