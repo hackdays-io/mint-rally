@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "deploy:stg": "npx hardhat run scripts/deploy.ts --network munbai",
+    "deploy:stg": "npx hardhat run scripts/deploy.ts --network mumbai",
     "deploy:mintNFT": "npx hardhat run scripts/deployMintNft.ts --network",
     "compile": "npx hardhat compile",
     "test": "npx hardhat compile && npx hardhat test"

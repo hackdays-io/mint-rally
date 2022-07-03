@@ -167,6 +167,8 @@ contract EventManager is Ownable {
         return _eventRecords;
     }
 
+    //申込みはregisterを別で作って管理したほうがいいかも。
+    //これだと、applyしただけの人になってしまうので。
     function applyForParticipation(uint256 _eventRecordId) external {
         participantAddresses[_eventRecordId].push(msg.sender);
         eventIdsByParticipant[msg.sender].push(_eventRecordId);
