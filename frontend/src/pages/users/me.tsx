@@ -27,20 +27,9 @@ const User = () => {
   const [myAddress, setMyAddress] = useState("");
 
   useEffect(() => {
-    const { userid } = router.query;
-    if (userid) {
-      const address = Array.isArray(userid) ? userid[0] : userid;
-      setMyAddress(address);
-    }
-  }, [router.query]);
-
-  useEffect(() => {
-    if (!myAddress) {
-      return;
-    }
     getOwnedNFTs();
     getEventGroups();
-  }, [myAddress]);
+  }, []);
 
   const nftCollectionsByGroup = () => {
     const grouped = ownedNFTs.reduce<Record<number, IOwnedNFT[]>>(
