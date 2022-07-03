@@ -9,6 +9,14 @@ export interface IMintParticipateNFTParams {
   secretPhrase: string;
 }
 
+export interface IOwnedNFT {
+  name: string;
+  image: string;
+  groupId: number;
+  eventId: number;
+  requiredParticipateCount: number;
+}
+
 /**
  * A bridgge to the mint nft manager contract
  */
@@ -61,4 +69,21 @@ export const useMintParticipateNFT = () => {
     }
   };
   return { status, errors, loading, mintParticipateNFT };
+};
+
+export const useGetOwnedNFTs = () => {
+  const [ownedNFTs, setOwnedNFTs] = useState<IOwnedNFT[]>([]);
+  const [loading, setLoading] = useState(false);
+  const getOwnedNFTs = async () => {
+    const mintNFTManager = getMintNFTManagerContract();
+    if (!mintNFTManager) throw new Error("Cannot find mintNFTManager contract");
+
+    setLoading(true);
+    const data = await mintNFTManager.getOwnedNFTs();
+    console.log("retrieved owned nfts:", data);
+    setLoading(false);
+    setOwnedNFTs(data);
+    return data;
+  };
+  return { ownedNFTs, loading, getOwnedNFTs };
 };
