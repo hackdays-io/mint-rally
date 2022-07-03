@@ -10,6 +10,7 @@ import {
   Link,
   SimpleGrid,
   Spinner,
+  theme,
 } from "@chakra-ui/react";
 import { useAddress } from "@thirdweb-dev/react";
 import { NextPage } from "next";
@@ -268,6 +269,10 @@ const EventCreate: NextPage = () => {
                 </Flex>
                 <FormControl>
                   <FormLabel htmlFor="secret">Secret phrase to mint</FormLabel>
+                  <span>
+                    Please do not forget this phrase. you can't get this phrase
+                    after submitting
+                  </span>
                   <Controller
                     control={control}
                     name="secret"
