@@ -25,6 +25,21 @@ import styled from "@emotion/styled";
 import { Web3Storage } from "web3.storage";
 import { useCreateEventGroup } from "../../hooks/useEventManager";
 
+const TEST_IMAGES = [
+  {
+    image: "https://i.imgur.com/TZEhCTX.png",
+    requiredParticipateCount: 0,
+  },
+  {
+    image: "https://i.imgur.com/TZEhCTX.png",
+    requiredParticipateCount: 3,
+  },
+  {
+    image: "https://i.imgur.com/TZEhCTX.png",
+    requiredParticipateCount: 0,
+  },
+];
+
 const ImageIcon = createIcon({
   displayName: "ImageIcon",
   viewBox: "0 0 24 24",
@@ -163,7 +178,7 @@ const NewEventGroupPage: NextPage = () => {
   }, [image1File, name1]);
 
   const callCreateEventGroup = () => {
-    createEventGroup({ groupName: groupName });
+    createEventGroup({ groupName: groupName, images: TEST_IMAGES });
   };
 
   return (
