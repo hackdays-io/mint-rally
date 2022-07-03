@@ -12,7 +12,7 @@ import {
 import { useAddress } from "@thirdweb-dev/react";
 import { NextPage } from "next";
 import { ChangeEvent, useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import {
   FormLabel,
   FormControl,
@@ -27,13 +27,25 @@ import {
   useOwnEventGroups,
 } from "../../hooks/useEventManager";
 
+type FormData = {
+  eventGroupId: string;
+  eventName: string;
+  description: string;
+};
+
 const EventCreate: NextPage = () => {
   const {
+    control,
     handleSubmit,
-    register,
     formState: { errors, isSubmitting },
+    watch,
   } = useForm({
     mode: "all",
+    defaultValues: {
+      eventGroupdId: "",
+      eventName: "",
+      description: "",
+    },
   });
   // check contract address
   const address = useAddress();
@@ -56,6 +68,12 @@ const EventCreate: NextPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [address]);
 
+  useEffect(() => {
+    if (watch("eventGroupdId")) {
+      setGroupIdSelected(true);
+    }
+  }, [watch("eventGroupdId")]);
+
   const onSubmit = (data: any) => {
     console.log("onSubmit:", data);
     const params: ICreateEventRecordParams = {
@@ -74,11 +92,7 @@ const EventCreate: NextPage = () => {
       alert(error);
     }
   };
-  const selectGroup = (e: ChangeEvent<HTMLSelectElement>) => {
-    if (e.target.value) {
-      setGroupIdSelected(true);
-    }
-  };
+
   return (
     <>
       <Heading>Create a new event</Heading>
@@ -86,53 +100,86 @@ const EventCreate: NextPage = () => {
         <form onSubmit={handleSubmit(onSubmit)}>
           <FormControl>
             <FormLabel htmlFor="eventGroupId">Event group: </FormLabel>
-            <Select
-              id="eventGroupId"
-              placeholder="Please select event group"
-              {...register("eventGroupId", {
-                required: "This is required",
-              })}
-              onChange={selectGroup}
-            >
-              {groups.map((item: IEventGroup) => {
-                return (
-                  <option value={item.groupId} key={item.groupId}>
-                    {item.name}
+            <Controller
+              control={control}
+              name="eventGroupdId"
+              render={({ field: { onChange, value } }) => (
+                <Select
+                  id="eventGroupId"
+                  placeholder="Please select event group"
+                  value={value}
+                  onChange={onChange}
+                >
+                  {/* {groups.map((item: IEventGroup) => {
+                    return (
+                      <option value={item.groupId} key={item.groupId}>
+                        {item.name}
+                      </option>
+                    );
+                  })} */}
+                  <option value={1} key={1}>
+                    test
                   </option>
-                );
-              })}
-            </Select>
+                </Select>
+              )}
+            />
           </FormControl>
+
           {groupIdSelcted ? (
             <>
               <FormControl>
                 <FormLabel htmlFor="name">Event Name</FormLabel>
-                <Input
-                  id="name"
-                  {...register("name", {
+                <Controller
+                  control={control}
+                  name="eventName"
+                  rules={{
                     required: "This is required",
                     minLength: {
                       value: 4,
                       message: "Minimum length should be 4",
                     },
-                  })}
-                ></Input>
-                {/* なぜかエラー
-                <FormErrorMessage>{errors && errors.name && errors.name.message}</FormErrorMessage>
-                */}
+                  }}
+                  render={({
+                    field: { onChange, value },
+                    formState: { errors },
+                  }) => (
+                    <>
+                      <Input id="name" onChange={onChange} value={value} />
+                      <FormErrorMessage>
+                        {errors.eventName?.message}
+                      </FormErrorMessage>
+                    </>
+                  )}
+                />
               </FormControl>
               <FormControl>
                 <FormLabel htmlFor="description">Description</FormLabel>
-                <Input
-                  id="description"
-                  {...register("description", {
+                <Controller
+                  control={control}
+                  name="description"
+                  rules={{
                     required: "This is required",
                     minLength: {
                       value: 4,
                       message: "Minimum length should be 4",
                     },
-                  })}
-                ></Input>
+                  }}
+                  render={({
+                    field: { onChange, value },
+                    formState: { errors },
+                  }) => (
+                    <>
+                      <Input
+                        id="description"
+                        onChange={onChange}
+                        value={value}
+                      />
+                      <FormErrorMessage>
+                        {errors.description?.message}
+                      </FormErrorMessage>
+                    </>
+                  )}
+                />
               </FormControl>
               <Button
                 type="submit"
