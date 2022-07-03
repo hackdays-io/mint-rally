@@ -10,7 +10,7 @@ const images = [
   },
   {
     image: "https://i.imgur.com/TZEhCTXaaa.png",
-    requiredParticipateCount: 2,
+    requiredParticipateCount: 1,
   },
   {
     image: "https://i.imgur.com/TZEhCTXaaaaa.png",
