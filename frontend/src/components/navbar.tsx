@@ -59,7 +59,7 @@ const Navbar = () => {
           </Box>
           {address ? (
             <Flex as="a" marginLeft="3">
-              <Link href={"/users/" + address}>
+              <Link href={"/users/super-awesome-user-demo"}>
                 <Image
                   src="/user.png"
                   alt="Loggedin"
