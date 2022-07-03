@@ -192,7 +192,7 @@ export const useEventRecords = () => {
  * @returns
  */
 export const useGetEventById = () => {
-  const [event, setEvent] = useState<IEventRecord[]>([]);
+  const [event, setEvent] = useState<IEventRecord | null>(null);
   const [loading, setLoading] = useState(false);
   const getEventById = async ({ eventId }: IGetEventById) => {
     console.log("get an even record by id");
