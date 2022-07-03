@@ -185,6 +185,16 @@ contract EventManager is Ownable {
         return _eventIds;
     }
 
+    function getEventById(uint256 _eventId)
+        external
+        view
+        returns (EventRecord memory)
+    {
+        uint256 _eventRecordIndex = _eventId - 1;
+        EventRecord memory _eventRecord = eventRecords[_eventRecordIndex];
+        return _eventRecord;
+    }
+
     function countParticipationByGroup(
         address _participantAddress,
         uint256 _groupId
