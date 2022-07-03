@@ -108,8 +108,8 @@ export const useEventGroups = () => {
     setLoading(true);
     const data = await eventManager.getGroups();
     console.log(data);
-    setLoading(false);
     setGroups(data);
+    setLoading(false);
   };
   return { groups, loading, getEventGroups };
 };
