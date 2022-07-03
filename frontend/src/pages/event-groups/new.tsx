@@ -19,7 +19,7 @@ import {
 import type { NextPage } from "next";
 import { useState, useCallback } from "react";
 import { Web3Storage } from "web3.storage";
-import { useCreateEventGroup } from "../../hooks/useEventManager";
+import { useCreateEventGroup, INFTImage } from "../../hooks/useEventManager";
 import ImageSelectorWithPreview from "../../components/ImageSelectorWithPreview";
 
 const TEST_IMAGES = [
@@ -84,26 +84,31 @@ const NewEventGroupPage: NextPage = () => {
     }
     console.log("Starting to upload images to IPFS...");
     const renamedFiles = nftRecords.map(
-      ({ fileObject, requiredParticipateCount }) =>
-        renameFile(fileObject!, `${requiredParticipateCount}.png`)
+      ({ fileObject, requiredParticipateCount }) => ({
+        fileObject: renameFile(fileObject!, `${requiredParticipateCount}.png`),
+        requiredParticipateCount,
+      })
     );
 
-    const rootCid = await ipfsClient.put(renamedFiles, {
-      name: `test ${new Date().toISOString()}`,
-      maxRetries: 3,
-      wrapWithDirectory: true,
-      onRootCidReady: (rootCid) => {
-        console.log("rood cid:", rootCid);
-      },
-      onStoredChunk: (size) => {
-        // console.log(`stored chunk of ${size} bytes`);
-      },
-    });
-    return rootCid;
+    const rootCid = await ipfsClient.put(
+      renamedFiles.map((f) => f.fileObject),
+      {
+        name: `test ${new Date().toISOString()}`,
+        maxRetries: 3,
+        wrapWithDirectory: true,
+        onRootCidReady: (rootCid) => {
+          console.log("rood cid:", rootCid);
+        },
+        onStoredChunk: (size) => {
+          // console.log(`stored chunk of ${size} bytes`);
+        },
+      }
+    );
+    return { rootCid, renamedFiles };
   }, [nftRecords, isAllInputed]);
 
-  const callCreateEventGroup = () => {
-    createEventGroup({ groupName: groupName, images: TEST_IMAGES });
+  const callCreateEventGroup = (nftImages: INFTImage[]) => {
+    createEventGroup({ groupName: groupName, images: nftImages });
   };
 
   return (
@@ -192,11 +197,20 @@ const NewEventGroupPage: NextPage = () => {
         <Box mt={8} mb={4}>
           <Button
             onClick={async () => {
-              const cid = await uploadImagesToIpfs();
-              if (cid) {
-                console.log("Upload completed", cid);
+              const uploadResult = await uploadImagesToIpfs();
+              if (!uploadResult) {
+                console.error("uploading error");
+                // @TODO: display error alert
+                return;
               }
-              callCreateEventGroup();
+              const { rootCid, renamedFiles } = uploadResult;
+              const nftImages: INFTImage[] = renamedFiles.map(
+                ({ fileObject, requiredParticipateCount }) => ({
+                  image: `ipfs://${rootCid}/${fileObject.name}`,
+                  requiredParticipateCount,
+                })
+              );
+              callCreateEventGroup(nftImages);
             }}
             disabled={!groupName || !isAllInputed()}
           >
