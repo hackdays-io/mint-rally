@@ -8,31 +8,87 @@ import {
   AlertIcon,
   AlertTitle,
   AlertDescription,
+  Input,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   useGetEventById,
   useApplyForParticipation,
+  useGetParticipationEventIds,
 } from "../../hooks/useEventManager";
+import { useMintParticipateNFT } from "../../hooks/useMintNFTManager";
 
 const Event = () => {
   const router = useRouter();
-  const { eventid } = router.query;
   const { event, loading: loadingFetch, getEventById } = useGetEventById();
-  useEffect(() => {
-    if (eventid) {
-      const id = Array.isArray(eventid) ? eventid[0] : eventid;
-      getEventById({ eventId: Number.parseInt(id, 10) });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+
+  const [eventIdNumber, setEventIdNumber] = useState<number | null>(null);
+
+  const [participationCheckTimer, setParticipationCheckTimer] =
+    useState<NodeJS.Timer | null>(null);
+
+  const [showMintButton, setShowMintButton] = useState(false);
 
   const {
+    status: applyStatus,
     errors: applyErrors,
     loading: applyLoading,
     applyForParticipation,
   } = useApplyForParticipation();
+
+  const { getParticipationEventIds } = useGetParticipationEventIds();
+
+  const {
+    status: mintStatus,
+    errors: mintErrors,
+    loading: mintLoading,
+    mintParticipateNFT,
+  } = useMintParticipateNFT();
+
+  const [enteredSecretPhrase, setEnteredSecretPhrase] = useState("");
+
+  useEffect(() => {
+    const { eventid } = router.query;
+    if (eventid) {
+      const id = Array.isArray(eventid) ? eventid[0] : eventid;
+      setEventIdNumber(Number.parseInt(id, 10));
+    }
+  }, [router.query]);
+
+  const check = useCallback(
+    async function () {
+      if (!eventIdNumber) return;
+      console.log("getting participation evend ids...");
+      const ids = await getParticipationEventIds();
+      if (ids.includes(eventIdNumber)) {
+        setShowMintButton(true);
+        setParticipationCheckTimer(null);
+        console.log("got");
+        return;
+      }
+      const timer = setTimeout(check, 5000);
+      setParticipationCheckTimer(timer);
+    },
+    [eventIdNumber, getParticipationEventIds]
+  );
+
+  useEffect(() => {
+    if (event || !eventIdNumber || loadingFetch) {
+      return;
+    }
+
+    getEventById({ eventId: eventIdNumber });
+    const timer = setTimeout(check, 1000);
+    setParticipationCheckTimer(timer);
+  }, [
+    eventIdNumber,
+    getEventById,
+    event,
+    loadingFetch,
+    getParticipationEventIds,
+    check,
+  ]);
 
   return (
     <>
@@ -43,22 +99,68 @@ const Event = () => {
           <Text>Event name: {event.name}</Text>
           <Text>Event description: {event.description}</Text>
           <Box mt={8} textAlign="center">
-            <Button
-              isLoading={applyLoading}
-              onClick={() => {
-                applyForParticipation({
-                  evendId: event.eventRecordId,
-                });
-              }}
-            >
-              Apply
-            </Button>
-            {applyErrors && (
-              <Alert status="error" mt={2}>
-                <AlertIcon />
-                <AlertTitle>Error occurred</AlertTitle>
-                <AlertDescription>{applyErrors.message}</AlertDescription>
-              </Alert>
+            {!showMintButton ? (
+              <>
+                <Button
+                  isLoading={applyLoading}
+                  onClick={async () => {
+                    await applyForParticipation({
+                      eventId: event.eventRecordId,
+                    });
+                  }}
+                >
+                  Apply
+                </Button>
+                {applyErrors && (
+                  <Alert status="error" mt={2} mx={4}>
+                    <AlertIcon />
+                    <AlertTitle>Error occurred</AlertTitle>
+                    <AlertDescription>{applyErrors.message}</AlertDescription>
+                  </Alert>
+                )}
+                {applyStatus && (
+                  <Alert status="success" mt={2} mx={4}>
+                    <AlertIcon />
+                    <AlertTitle>You have applied!</AlertTitle>
+                  </Alert>
+                )}
+              </>
+            ) : (
+              <>
+                <Text>Enter secret phrase:</Text>
+                <Input
+                  variant="outline"
+                  type="password"
+                  mb={4}
+                  value={enteredSecretPhrase}
+                  onChange={(e) => setEnteredSecretPhrase(e.target.value)}
+                />
+                <Button
+                  isLoading={mintLoading}
+                  onClick={async () => {
+                    await mintParticipateNFT({
+                      groupId: event.groupId,
+                      eventId: (event.eventRecordId as any).toNumber(),
+                      secretPhrase: enteredSecretPhrase,
+                    });
+                  }}
+                >
+                  Claim NFT!
+                </Button>
+                {mintErrors && (
+                  <Alert status="error" mt={2} mx={4}>
+                    <AlertIcon />
+                    <AlertTitle>Error occurred</AlertTitle>
+                    <AlertDescription>{mintErrors.message}</AlertDescription>
+                  </Alert>
+                )}
+                {mintStatus && (
+                  <Alert status="success" mt={2} mx={4}>
+                    <AlertIcon />
+                    <AlertTitle>You have claimed NFT!</AlertTitle>
+                  </Alert>
+                )}
+              </>
             )}
           </Box>
         </Box>
