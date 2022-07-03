@@ -42,15 +42,19 @@ const EventGroup = () => {
                       <Heading>{item.name}</Heading>
                       {eventLoading && <Spinner></Spinner>}
                       <List>
-                        {records.map((record) => {
-                          return (
-                            <ListItem key={record.eventRecordId}>
-                              <Link href={"/events/" + record.eventRecordId}>
-                                {record.name}
-                              </Link>
-                            </ListItem>
-                          );
-                        })}
+                        {records
+                          .filter(
+                            (item) => item.groupId.toString() == eventgroupid
+                          )
+                          .map((record) => {
+                            return (
+                              <ListItem key={record.eventRecordId}>
+                                <Link href={"/events/" + record.eventRecordId}>
+                                  {record.name}
+                                </Link>
+                              </ListItem>
+                            );
+                          })}
                       </List>
                     </Box>
                   </>
