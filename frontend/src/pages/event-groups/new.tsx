@@ -4,10 +4,7 @@ import {
   Text,
   Heading,
   Box,
-  createIcon,
-  Image,
   Flex,
-  HTMLChakraProps,
   NumberInput,
   NumberInputField,
   NumberInputStepper,
@@ -20,104 +17,10 @@ import {
   AlertDescription,
 } from "@chakra-ui/react";
 import type { NextPage } from "next";
-import { useState, useCallback, useEffect } from "react";
-import styled from "@emotion/styled";
+import { useState, useCallback } from "react";
 import { Web3Storage } from "web3.storage";
 import { useCreateEventGroup } from "../../hooks/useEventManager";
-
-const ImageIcon = createIcon({
-  displayName: "ImageIcon",
-  viewBox: "0 0 24 24",
-  path: (
-    <path
-      fill="currentColor"
-      d="M22,16V4A2,2 0 0,0 20,2H8A2,2 0 0,0 6,4V16A2,2 0 0,0 8,18H20A2,2 0 0,0 22,16M11,12L13.03,14.71L16,11L20,16H8M2,6V20A2,2 0 0,0 4,22H18V20H4V6"
-    />
-  ),
-});
-
-const LabelForStyledInput = styled.label`
-  display: block;
-  width: 100%;
-  height: 100%;
-  &:hover {
-    cursor: pointer;
-  }
-`;
-
-const noop = () => {};
-
-const FileInput = ({
-  previewElements,
-  onFileChange = noop,
-  ...rest
-}: {
-  previewElements: JSX.Element;
-  onFileChange: (file: File | undefined | null) => void;
-} & HTMLChakraProps<"div">) => (
-  <Box {...rest}>
-    <LabelForStyledInput>
-      {previewElements}
-      <input
-        style={{ display: "none" }}
-        type="file"
-        accept="image/*"
-        onChange={(e) => {
-          onFileChange(e.target.files?.item(0));
-        }}
-      />
-    </LabelForStyledInput>
-  </Box>
-);
-
-const ImageSelectorWithPreview = ({
-  dataUrl,
-  onChangeDataUrl,
-  onChangeFile,
-}: {
-  dataUrl: string;
-  onChangeDataUrl: (dataUrl: string) => void;
-  onChangeFile: (file: File) => void;
-}) => (
-  <FileInput
-    w="100%"
-    h="100%"
-    bgColor="gray.300"
-    previewElements={
-      <Flex w="100%" h="100%" align="center" justify="center">
-        {dataUrl ? (
-          <Image
-            src={dataUrl}
-            alt="image"
-            fit="contain"
-            maxW="100%"
-            maxH="100%"
-          />
-        ) : (
-          <ImageIcon boxSize={16} color="gray.600" mx="auto" />
-        )}
-      </Flex>
-    }
-    onFileChange={async (file) => {
-      if (!file) return;
-      const dataUrl = await getImageData(file);
-      if (!dataUrl) return;
-
-      onChangeFile(file);
-      onChangeDataUrl(dataUrl);
-    }}
-  />
-);
-
-const getImageData = (file: File): Promise<string | undefined> => {
-  const fileReader = new FileReader();
-  return new Promise((resolve, _reject) => {
-    fileReader.readAsDataURL(file);
-    fileReader.addEventListener("load", (ev) => {
-      resolve(fileReader.result?.toString());
-    });
-  });
-};
+import ImageSelectorWithPreview from "../../components/ImageSelectorWithPreview";
 
 if (!process.env.NEXT_PUBLIC_WEB3_STORAGE_KEY) {
   throw new Error("WEB3_STORAGE_KEY is required");
