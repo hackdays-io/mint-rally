@@ -46,12 +46,11 @@ const EventGroups: NextPage = () => {
             <>
               {groups.map((item: IEventGroup) => {
                 return (
-                  <Box key={item.groupId} width={400} height={300}>
-                    <Card
-                      href={"/event-groups/" + item.groupId}
-                      title={item.name}
-                    ></Card>
-                  </Box>
+                  <Card
+                    key={item.groupId}
+                    href={"/event-groups/" + item.groupId}
+                    title={item.name}
+                  ></Card>
                 );
               })}
             </>
