@@ -15,12 +15,10 @@ const getImageData = (file: File): Promise<string | undefined> => {
 
 const ImageSelectorWithPreview = ({
   dataUrl,
-  onChangeDataUrl,
-  onChangeFile,
+  onChangeData,
 }: {
   dataUrl: string;
-  onChangeDataUrl: (dataUrl: string) => void;
-  onChangeFile: (file: File) => void;
+  onChangeData: (dataUrl: string, file: File) => void;
 }) => (
   <StyledFileInput
     w="100%"
@@ -45,9 +43,7 @@ const ImageSelectorWithPreview = ({
       if (!file) return;
       const dataUrl = await getImageData(file);
       if (!dataUrl) return;
-
-      onChangeFile(file);
-      onChangeDataUrl(dataUrl);
+      onChangeData(dataUrl, file);
     }}
   />
 );
