@@ -42,7 +42,7 @@ const EventCreate: NextPage = () => {
   } = useForm({
     mode: "all",
     defaultValues: {
-      eventGroupdId: "",
+      eventGroupId: "",
       eventName: "",
       description: "",
     },
@@ -69,16 +69,17 @@ const EventCreate: NextPage = () => {
   }, [address]);
 
   useEffect(() => {
-    if (watch("eventGroupdId")) {
+    if (watch("eventGroupId")) {
       setGroupIdSelected(true);
     }
-  }, [watch("eventGroupdId")]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [watch("eventGroupId")]);
 
   const onSubmit = (data: any) => {
     console.log("onSubmit:", data);
     const params: ICreateEventRecordParams = {
       groupId: data.eventGroupId,
-      eventName: data.name,
+      eventName: data.eventName,
       description: data.description,
       date: new Date(),
       startTime: "19:00",
@@ -102,7 +103,7 @@ const EventCreate: NextPage = () => {
             <FormLabel htmlFor="eventGroupId">Event group: </FormLabel>
             <Controller
               control={control}
-              name="eventGroupdId"
+              name="eventGroupId"
               render={({ field: { onChange, value } }) => (
                 <Select
                   id="eventGroupId"
@@ -110,16 +111,13 @@ const EventCreate: NextPage = () => {
                   value={value}
                   onChange={onChange}
                 >
-                  {/* {groups.map((item: IEventGroup) => {
+                  {groups.map((item: IEventGroup) => {
                     return (
                       <option value={item.groupId} key={item.groupId}>
                         {item.name}
                       </option>
                     );
-                  })} */}
-                  <option value={1} key={1}>
-                    test
-                  </option>
+                  })}
                 </Select>
               )}
             />

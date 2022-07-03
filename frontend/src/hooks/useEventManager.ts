@@ -74,10 +74,10 @@ export const useCreateEventGroup = () => {
   const [status, setStatus] = useState(false);
   const createEventGroup = async (params: ICreateEventGroupParams) => {
     try {
+      setLoading(true);
       setErrors(null);
       const eventManager = getEventManagerContract();
       if (!eventManager) throw "error: contract can't found";
-      setLoading(true);
       console.log(params);
       const tx = await eventManager.createGroup(
         params.groupName,
@@ -107,6 +107,7 @@ export const useEventGroups = () => {
     if (!eventManager) throw "error";
     setLoading(true);
     const data = await eventManager.getGroups();
+    console.log(data)
     setLoading(false);
     setGroups(data);
   };
