@@ -19,6 +19,10 @@ export interface INFTImage {
   image: string;
   requiredParticipateCount: number;
 }
+
+export interface IGetEventById {
+  eventId: number;
+}
 export interface ICreateEventGroupParams {
   groupName: string;
   images: INFTImage[];
@@ -162,7 +166,7 @@ export const useCreateEventRecord = () => {
 };
 
 /**
- * custom hook function for getting all event groups
+ * custom hook function for getting all event records
  *
  * @returns
  */
@@ -180,6 +184,27 @@ export const useEventRecords = () => {
     setRecords(data);
   };
   return { records, loading, getEventRecords };
+};
+
+/**
+ * custom hook function for getting an event record by id
+ *
+ * @returns
+ */
+export const useGetEventById = () => {
+  const [event, setEvent] = useState<IEventRecord[]>([]);
+  const [loading, setLoading] = useState(false);
+  const getEventById = async ({ eventId }: IGetEventById) => {
+    console.log("get an even record by id");
+    const eventManager = getEventManagerContract();
+    if (!eventManager) throw "error";
+    setLoading(true);
+    const data = await eventManager.getEventById(eventId);
+    console.log("retrieved:", data);
+    setLoading(false);
+    setEvent(data);
+  };
+  return { event, loading, getEventById };
 };
 
 /**
