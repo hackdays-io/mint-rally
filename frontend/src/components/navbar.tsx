@@ -1,4 +1,4 @@
-import { HamburgerIcon } from "@chakra-ui/icons";
+import { CalendarIcon, EmailIcon, HamburgerIcon, SettingsIcon } from "@chakra-ui/icons";
 
 import {
   Box,
@@ -9,13 +9,13 @@ import {
   DrawerOverlay,
   Flex,
   IconButton,
-  Link,
   Spacer,
   useDisclosure,
 } from "@chakra-ui/react";
 import { useAddress, useDisconnect, useMetamask } from "@thirdweb-dev/react";
 import router from "next/router";
 import Image from "next/image";
+import Link from "next/link";
 
 const Navbar = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -26,27 +26,40 @@ const Navbar = () => {
   const MetamaskLogin = () => {
     return (
       <>
-        {address ? (
-          <>
-            <Flex>
-              <Box marginRight="3">
-                <button onClick={disconnectWallet}>Disconnect Wallet</button>{" "}
-              </Box>{" "}
-              |
-              <Flex as="a" marginLeft="3" href={"/users/" + address}>
-                <Image
-                  src="/user.png"
-                  alt="Loggedin"
-                  width={28}
-                  height={28}
-                  objectFit="contain"
-                />
-              </Flex>
+        <Flex alignItems="center">
+          <Box marginRight="3">
+            {address ? (
+              <Button bg="mint.subtle" color="mint.font" borderRadius={'16px'} variant='solid' onClick={disconnectWallet} size="lg">
+                Sign out
+              </Button>
+            ) : (
+              <Button bg="mint.subtle" color="mint.font" borderRadius={'16px'} variant='solid' onClick={connectWithMetamask} size="lg">
+                Sign in
+              </Button>
+            )}
+          </Box>{" "}
+          {address ? (
+            <Flex as="a" marginLeft="3" href={"/users/" + address}>
+              <Image
+                src="/user.png"
+                alt="Loggedin"
+                width={65.78}
+                height={65.78}
+                objectFit="contain"
+              />
             </Flex>
-          </>
-        ) : (
-          <button onClick={connectWithMetamask}>Connect Wallet</button>
-        )}
+          ) : (
+            <Flex marginLeft="3">
+              <Image
+                src="/images/guest.svg"
+                alt="guest"
+                width={65.78}
+                height={65.78}
+                objectFit="contain"
+              />
+            </Flex>
+          )}
+        </Flex>
       </>
     );
   };
@@ -59,6 +72,7 @@ const Navbar = () => {
         align="center"
         color="mint.front"
         justify="space-between"
+        height={'120px'}
         padding={{ base: 3, md: 5 }}
       >
         <Flex
@@ -68,7 +82,13 @@ const Navbar = () => {
           me={8}
           _hover={{ cursor: "pointer" }}
         >
-          Mint Rally
+          <Image
+            src={'/images/logo.svg'}
+            height={110}
+            width={295}
+            objectFit="contain"
+            alt="Mint Rally Logo"
+          />
         </Flex>
         <Flex
           align="center"
@@ -76,11 +96,19 @@ const Navbar = () => {
           flexGrow={2}
           display={{ base: "none", md: "flex" }}
         >
-          <Box pr={4}>
-            <Link href="/event-groups/">EventGroups</Link>
+          <Box mr={8}>
+            <Link href="/event-groups">
+              <Button leftIcon={<SettingsIcon />} bg="mint.white" color="mint.font" borderRadius={'16px'} variant='solid' disabled={!address} size="lg">
+                EventGroups
+              </Button>
+            </Link>
           </Box>
-          <Box pr={4}>
-            <Link href="/events/">Events</Link>
+          <Box>
+            <Link href="/events">
+              <Button leftIcon={<CalendarIcon />} bg="mint.white" color="mint.font" borderRadius={'16px'} variant='solid' size="lg">
+                Events
+              </Button>
+            </Link>
           </Box>
           <Spacer />
           <Box pr={4}>

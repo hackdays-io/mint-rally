@@ -20,6 +20,8 @@ const theme = extendTheme({
     mint: {
       bg: "#56F0DE",
       front: "#552306",
+      white: '#FFFFFF',
+      subtle: '#E3FFFC'
     },
   },
 });
