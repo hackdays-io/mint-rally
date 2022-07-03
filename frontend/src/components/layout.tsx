@@ -17,7 +17,7 @@ const Layout = ({ children }: Props) => (
     </Head>
     <Box minHeight="100vh">
       <Navbar />
-      <Box margin={3}>{children}</Box>
+      <Box>{children}</Box>
     </Box>
   </>
 );
