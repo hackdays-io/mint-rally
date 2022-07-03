@@ -15,11 +15,6 @@ interface IEventManager {
         string memory _secretPhrase,
         uint256 _eventRecordId
     ) external returns (bool);
-
-    function countParticipationByGroup(
-        address _participantAddress,
-        uint256 _groupId
-    ) external returns (uint256);
 }
 
 contract MintNFT is ERC721Enumerable, Ownable {
@@ -58,12 +53,17 @@ contract MintNFT is ERC721Enumerable, Ownable {
             _eventManager.verifySecretPhrase(_secretPhrase, _eventId),
             "invalid secret phrase"
         );
-        uint256 _participateCount = _eventManager.countParticipationByGroup(
-            msg.sender,
-            _groupId
-        );
 
-        console.log("participate", _participateCount);
+        ParticipateNFTAttributes[] memory ownedNFTs = listNFTsByAddress(
+            msg.sender
+        );
+        uint256 countOwnedGroupNFTs = 0;
+        for (uint256 index = 0; index < ownedNFTs.length; index++) {
+            ParticipateNFTAttributes memory nft = ownedNFTs[index];
+            if (nft.groupId == _groupId) {
+                countOwnedGroupNFTs++;
+            }
+        }
 
         bool minted = false;
         ParticipateNFTAttributes memory defaultNFT;
@@ -73,7 +73,7 @@ contract MintNFT is ERC721Enumerable, Ownable {
             if (gp.requiredParticipateCount == 0) {
                 defaultNFT = gp;
             }
-            if (gp.requiredParticipateCount == _participateCount) {
+            if (gp.requiredParticipateCount == countOwnedGroupNFTs) {
                 attributesOfNFT[_tokenIds.current()] = gp;
                 _safeMint(msg.sender, _tokenIds.current());
                 minted = true;
@@ -89,15 +89,15 @@ contract MintNFT is ERC721Enumerable, Ownable {
         return mintedTokenURI;
     }
 
-    function getOwnedNFTs()
-        public
+    function listNFTsByAddress(address _address)
+        internal
         view
         returns (ParticipateNFTAttributes[] memory)
     {
-        uint256 tokenCount = balanceOf(msg.sender);
+        uint256 tokenCount = balanceOf(_address);
         uint256[] memory tokenIds = new uint256[](tokenCount);
         for (uint256 i = 0; i < tokenCount; i++) {
-            tokenIds[i] = tokenOfOwnerByIndex((msg.sender), i);
+            tokenIds[i] = tokenOfOwnerByIndex((_address), i);
         }
 
         ParticipateNFTAttributes[]
@@ -108,6 +108,16 @@ contract MintNFT is ERC721Enumerable, Ownable {
             uint256 id = tokenIds[i];
             holdingNFTsAttributes[i] = attributesOfNFT[id];
         }
+        return holdingNFTsAttributes;
+    }
+
+    function getOwnedNFTs()
+        public
+        view
+        returns (ParticipateNFTAttributes[] memory)
+    {
+        ParticipateNFTAttributes[]
+            memory holdingNFTsAttributes = listNFTsByAddress(msg.sender);
         return holdingNFTsAttributes;
     }
 
