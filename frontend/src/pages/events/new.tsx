@@ -8,6 +8,7 @@ import {
   FormErrorMessage,
   Heading,
   Link,
+  SimpleGrid,
   Spinner,
 } from "@chakra-ui/react";
 import { useAddress } from "@thirdweb-dev/react";
@@ -32,6 +33,10 @@ type FormData = {
   eventGroupId: string;
   eventName: string;
   description: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  secret: string;
 };
 
 const EventCreate: NextPage = () => {
@@ -46,6 +51,10 @@ const EventCreate: NextPage = () => {
       eventGroupId: "",
       eventName: "",
       description: "",
+      date: "",
+      startTime: "",
+      endTime: "",
+      secret: "",
     },
   });
   // check contract address
@@ -71,21 +80,22 @@ const EventCreate: NextPage = () => {
 
   useEffect(() => {
     if (watch("eventGroupId")) {
+      console.log("selected");
       setGroupIdSelected(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [watch("eventGroupId")]);
 
-  const onSubmit = (data: any) => {
+  const onSubmit = (data: FormData) => {
     console.log("onSubmit:", data);
     const params: ICreateEventRecordParams = {
       groupId: data.eventGroupId,
       eventName: data.eventName,
       description: data.description,
       date: new Date(),
-      startTime: "19:00",
-      endTime: "21:00",
-      secretPhrase: "test secret",
+      startTime: data.startTime,
+      endTime: data.endTime,
+      secretPhrase: data.secret,
     };
     console.log("params:", params);
     try {
@@ -181,7 +191,108 @@ const EventCreate: NextPage = () => {
                     )}
                   />
                 </FormControl>
+                <Flex>
+                  <FormControl>
+                    <FormLabel htmlFor="date">Date: </FormLabel>
+                    <Controller
+                      control={control}
+                      name="date"
+                      rules={{
+                        required: "This is required",
+                      }}
+                      render={({
+                        field: { onChange, value },
+                        formState: { errors },
+                      }) => (
+                        <>
+                          <Input id="date" onChange={onChange} value={value} />
+                          <FormErrorMessage>
+                            {errors.date?.message}
+                          </FormErrorMessage>
+                        </>
+                      )}
+                    />
+                  </FormControl>
+                  <FormControl>
+                    <FormLabel htmlFor="startTime">
+                      Start time(HH:MM):{" "}
+                    </FormLabel>
+                    <Controller
+                      control={control}
+                      name="startTime"
+                      rules={{
+                        required: "This is required",
+                      }}
+                      render={({
+                        field: { onChange, value },
+                        formState: { errors },
+                      }) => (
+                        <>
+                          <Input
+                            id="startTime"
+                            onChange={onChange}
+                            value={value}
+                          />
+                          <FormErrorMessage>
+                            {errors.date?.message}
+                          </FormErrorMessage>
+                        </>
+                      )}
+                    />
+                  </FormControl>
+                  <FormControl>
+                    <FormLabel htmlFor="endTime">End time(HH:MM): </FormLabel>
+                    <Controller
+                      control={control}
+                      name="endTime"
+                      rules={{
+                        required: "This is required",
+                      }}
+                      render={({
+                        field: { onChange, value },
+                        formState: { errors },
+                      }) => (
+                        <>
+                          <Input
+                            id="endTime"
+                            onChange={onChange}
+                            value={value}
+                          />
+                          <FormErrorMessage>
+                            {errors.date?.message}
+                          </FormErrorMessage>
+                        </>
+                      )}
+                    />
+                  </FormControl>
+                </Flex>
+                <FormControl>
+                  <FormLabel htmlFor="secret">Secret phrase to mint</FormLabel>
+                  <Controller
+                    control={control}
+                    name="secret"
+                    rules={{
+                      required: "This is required",
+                      minLength: {
+                        value: 4,
+                        message: "Minimum length should be 4",
+                      },
+                    }}
+                    render={({
+                      field: { onChange, value },
+                      formState: { errors },
+                    }) => (
+                      <>
+                        <Input id="secret" onChange={onChange} value={value} />
+                        <FormErrorMessage>
+                          {errors.description?.message}
+                        </FormErrorMessage>
+                      </>
+                    )}
+                  />
+                </FormControl>
                 <Button
+                  mt={4}
                   type="submit"
                   //disabled={!errors?.name}
                   isLoading={isSubmitting}

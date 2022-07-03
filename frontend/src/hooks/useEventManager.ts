@@ -29,7 +29,7 @@ export interface ICreateEventGroupParams {
 }
 
 export interface ICreateEventRecordParams {
-  groupId: number;
+  groupId: string;
   eventName: string;
   description: string;
   date: Date;
