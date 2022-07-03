@@ -3,6 +3,7 @@ import {
   AlertDescription,
   AlertIcon,
   AlertTitle,
+  Container,
   Flex,
   FormErrorMessage,
   Heading,
@@ -96,121 +97,123 @@ const EventCreate: NextPage = () => {
 
   return (
     <>
-      <Heading>Create a new event</Heading>
-      {address && groups.length > 0 ? (
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <FormControl>
-            <FormLabel htmlFor="eventGroupId">Event group: </FormLabel>
-            <Controller
-              control={control}
-              name="eventGroupId"
-              render={({ field: { onChange, value } }) => (
-                <Select
-                  id="eventGroupId"
-                  placeholder="Please select event group"
-                  value={value}
-                  onChange={onChange}
-                >
-                  {groups.map((item: IEventGroup) => {
-                    return (
-                      <option value={item.groupId} key={item.groupId}>
-                        {item.name}
-                      </option>
-                    );
-                  })}
-                </Select>
-              )}
-            />
-          </FormControl>
+      <Container maxW={800} paddingTop={6}>
+        <Heading>Create a new event</Heading>
+        {address && groups.length > 0 ? (
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <FormControl>
+              <FormLabel htmlFor="eventGroupId">Event group: </FormLabel>
+              <Controller
+                control={control}
+                name="eventGroupId"
+                render={({ field: { onChange, value } }) => (
+                  <Select
+                    id="eventGroupId"
+                    placeholder="Please select event group"
+                    value={value}
+                    onChange={onChange}
+                  >
+                    {groups.map((item: IEventGroup) => {
+                      return (
+                        <option value={item.groupId} key={item.groupId}>
+                          {item.name}
+                        </option>
+                      );
+                    })}
+                  </Select>
+                )}
+              />
+            </FormControl>
 
-          {groupIdSelcted ? (
-            <>
-              <FormControl>
-                <FormLabel htmlFor="name">Event Name</FormLabel>
-                <Controller
-                  control={control}
-                  name="eventName"
-                  rules={{
-                    required: "This is required",
-                    minLength: {
-                      value: 4,
-                      message: "Minimum length should be 4",
-                    },
-                  }}
-                  render={({
-                    field: { onChange, value },
-                    formState: { errors },
-                  }) => (
-                    <>
-                      <Input id="name" onChange={onChange} value={value} />
-                      <FormErrorMessage>
-                        {errors.eventName?.message}
-                      </FormErrorMessage>
-                    </>
-                  )}
-                />
-              </FormControl>
-              <FormControl>
-                <FormLabel htmlFor="description">Description</FormLabel>
-                <Controller
-                  control={control}
-                  name="description"
-                  rules={{
-                    required: "This is required",
-                    minLength: {
-                      value: 4,
-                      message: "Minimum length should be 4",
-                    },
-                  }}
-                  render={({
-                    field: { onChange, value },
-                    formState: { errors },
-                  }) => (
-                    <>
-                      <Input
-                        id="description"
-                        onChange={onChange}
-                        value={value}
-                      />
-                      <FormErrorMessage>
-                        {errors.description?.message}
-                      </FormErrorMessage>
-                    </>
-                  )}
-                />
-              </FormControl>
-              <Button
-                type="submit"
-                //disabled={!errors?.name}
-                isLoading={isSubmitting}
-              >
-                Create
-              </Button>
-              {createError && (
-                <Alert status="error">
-                  <AlertIcon />
-                  <AlertTitle>Error occurred</AlertTitle>
-                  <AlertDescription>{createError.message}</AlertDescription>
-                </Alert>
-              )}
-              {status && <Flex>Success</Flex>}
-              {createLoading && <Spinner></Spinner>}
-            </>
-          ) : (
-            <span>no event group is selected</span>
-          )}
-        </form>
-      ) : (
-        <>
-          {address ? (
-            <Link href="/event-groups/new">
-              please create event group first
-            </Link>
-          ) : (
-            <span>please login first</span>
-          )}
-        </>
-      )}
+            {groupIdSelcted ? (
+              <>
+                <FormControl>
+                  <FormLabel htmlFor="name">Event Name</FormLabel>
+                  <Controller
+                    control={control}
+                    name="eventName"
+                    rules={{
+                      required: "This is required",
+                      minLength: {
+                        value: 4,
+                        message: "Minimum length should be 4",
+                      },
+                    }}
+                    render={({
+                      field: { onChange, value },
+                      formState: { errors },
+                    }) => (
+                      <>
+                        <Input id="name" onChange={onChange} value={value} />
+                        <FormErrorMessage>
+                          {errors.eventName?.message}
+                        </FormErrorMessage>
+                      </>
+                    )}
+                  />
+                </FormControl>
+                <FormControl>
+                  <FormLabel htmlFor="description">Description</FormLabel>
+                  <Controller
+                    control={control}
+                    name="description"
+                    rules={{
+                      required: "This is required",
+                      minLength: {
+                        value: 4,
+                        message: "Minimum length should be 4",
+                      },
+                    }}
+                    render={({
+                      field: { onChange, value },
+                      formState: { errors },
+                    }) => (
+                      <>
+                        <Input
+                          id="description"
+                          onChange={onChange}
+                          value={value}
+                        />
+                        <FormErrorMessage>
+                          {errors.description?.message}
+                        </FormErrorMessage>
+                      </>
+                    )}
+                  />
+                </FormControl>
+                <Button
+                  type="submit"
+                  //disabled={!errors?.name}
+                  isLoading={isSubmitting}
+                >
+                  Create
+                </Button>
+                {createError && (
+                  <Alert status="error">
+                    <AlertIcon />
+                    <AlertTitle>Error occurred</AlertTitle>
+                    <AlertDescription>{createError.message}</AlertDescription>
+                  </Alert>
+                )}
+                {status && <Flex>Success</Flex>}
+                {createLoading && <Spinner></Spinner>}
+              </>
+            ) : (
+              <span>no event group is selected</span>
+            )}
+          </form>
+        ) : (
+          <>
+            {address ? (
+              <Link href="/event-groups/new">
+                please create event group first
+              </Link>
+            ) : (
+              <span>please sign in first</span>
+            )}
+          </>
+        )}
+      </Container>
     </>
   );
 };
