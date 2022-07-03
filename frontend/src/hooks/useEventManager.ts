@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
 import { useState } from "react";
-const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_EVENT_MANAGER!
-import contract from '../contracts/EventManager.json'
+const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_EVENT_MANAGER!;
+import contract from "../contracts/EventManager.json";
 export interface IEventGroup {
   groupId: number;
   name: string;
@@ -21,7 +21,7 @@ export interface INFTImage {
 }
 export interface ICreateEventGroupParams {
   groupName: string;
-  images: INFTImage[]
+  images: INFTImage[];
 }
 
 export interface ICreateEventRecordParams {
@@ -35,7 +35,7 @@ export interface ICreateEventRecordParams {
 }
 /**
  * A bridgge to the event manager contract
-*/
+ */
 export const getEventManagerContract = () => {
   const { ethereum } = window;
   if (ethereum) {
@@ -57,111 +57,122 @@ export const getEventManagerContract = () => {
 
 /**
  * custom hook function for creating an event group
- * @returns 
+ * @returns
  */
 export const useCreateEventGroup = () => {
-  const [errors, setErrors] = useState<Error | null>(null)
-  const [loading, setLoading] = useState(false)
-  const [status, setStatus] = useState(false)
+  const [errors, setErrors] = useState<Error | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState(false);
   const createEventGroup = async (params: ICreateEventGroupParams) => {
     try {
-      setErrors(null)
+      setErrors(null);
       const eventManager = getEventManagerContract();
       if (!eventManager) throw "error: contract can't found";
-      setLoading(true)
-      console.log(params)
-      const tx = await eventManager.createGroup(params.groupName, params.images);
-      await tx.wait()
-      setLoading(false)
-      setStatus(true)
+      setLoading(true);
+      console.log(params);
+      const tx = await eventManager.createGroup(
+        params.groupName,
+        params.images
+      );
+      await tx.wait();
+      setLoading(false);
+      setStatus(true);
     } catch (e: any) {
-      setErrors(e)
-      setLoading(false)
+      setErrors(e);
+      setLoading(false);
     }
-  }
-  return { status, errors, loading, createEventGroup }
-}
+  };
+  return { status, errors, loading, createEventGroup };
+};
 /**
  * custom hook function for getting all event groups
- * 
- * @returns 
+ *
+ * @returns
  */
 export const useEventGroups = () => {
   const [groups, setGroups] = useState<IEventGroup[]>([]);
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
   const getEventGroups = async () => {
     console.log("get event groups");
     const eventManager = getEventManagerContract();
     if (!eventManager) throw "error";
-    setLoading(true)
+    setLoading(true);
     const data = await eventManager.getGroups();
-    setLoading(false)
+    setLoading(false);
     setGroups(data);
   };
-  return { groups, loading, getEventGroups }
-}
+  return { groups, loading, getEventGroups };
+};
 
 /**
  * custom hook function for get login user's groups
  */
 export const useOwnEventGroups = () => {
-  const [groups, setGroups] = useState<IEventGroup[]>([])
-  const [loading, setLoading] = useState(false)
+  const [groups, setGroups] = useState<IEventGroup[]>([]);
+  const [loading, setLoading] = useState(false);
   const getOwnEventGroups = async () => {
     const eventManager = getEventManagerContract();
     if (!eventManager) throw "error: contract can't found";
-    setLoading(true)
+    setLoading(true);
     const data = await eventManager.getOwnGroups();
-    setLoading(false)
+    setLoading(false);
     setGroups(data);
-  }
-  return { groups, loading, getOwnEventGroups }
-}
+  };
+  return { groups, loading, getOwnEventGroups };
+};
 
 /**
  * custom hook function for creating an event record
- * @returns 
+ * @returns
  */
 export const useCreateEventRecord = () => {
-  const [errors, setErrors] = useState<Error | null>(null)
-  const [loading, setLoading] = useState(false)
-  const [status, setStatus] = useState(false)
+  const [errors, setErrors] = useState<Error | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState(false);
   const createEventRecord = async (params: ICreateEventRecordParams) => {
-    setErrors(null)
+    setErrors(null);
     try {
       const eventManager = getEventManagerContract();
       if (!eventManager) throw "error: contract can't found";
-      setLoading(true)
+      setLoading(true);
       const datestr = params.date.toLocaleDateString();
-      const tx = await eventManager.createEventRecord(params.groupId, params.eventName, params.description, datestr, params.startTime, params.endTime, params.secretPhrase);
-      await tx.wait()
-      setLoading(false)
-      setStatus(true)
+      const tx = await eventManager.createEventRecord(
+        params.groupId,
+        params.eventName,
+        params.description,
+        datestr,
+        params.startTime,
+        params.endTime,
+        params.secretPhrase
+      );
+      await tx.wait();
+      setLoading(false);
+      setStatus(true);
     } catch (e: any) {
-      setErrors(e)
-      setLoading(false)
+      setErrors(e);
+      setLoading(false);
     }
-  }
-  return { status, errors, loading, createEventRecord }
-}
+  };
+  return { status, errors, loading, createEventRecord };
+};
 
 /**
  * custom hook function for getting all event groups
- * 
- * @returns 
+ *
+ * @returns
  */
 export const useEventRecords = () => {
   const [records, setRecords] = useState<IEventRecord[]>([]);
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
   const getEventRecords = async () => {
     console.log("get event records");
     const eventManager = getEventManagerContract();
     if (!eventManager) throw "error";
-    setLoading(true)
+    setLoading(true);
     const data = await eventManager.getEventRecords();
-    console.log("retrieved:", data)
-    setLoading(false)
+    console.log("retrieved:", data);
+    setLoading(false);
     setRecords(data);
   };
-  return { records, loading, getEventRecords }
-}
+  return { records, loading, getEventRecords };
+};

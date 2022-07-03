@@ -38,6 +38,7 @@ const EventCreate: NextPage = () => {
     control,
     handleSubmit,
     formState: { errors, isSubmitting },
+    watch,
   } = useForm({
     mode: "all",
     defaultValues: {
@@ -66,6 +67,12 @@ const EventCreate: NextPage = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [address]);
+
+  useEffect(() => {
+    if (watch("eventGroupdId")) {
+      setGroupIdSelected(true);
+    }
+  }, [watch("eventGroupdId")]);
 
   const onSubmit = (data: any) => {
     console.log("onSubmit:", data);
@@ -96,19 +103,23 @@ const EventCreate: NextPage = () => {
             <Controller
               control={control}
               name="eventGroupdId"
-              render={({ field: { onChange } }) => (
+              render={({ field: { onChange, value } }) => (
                 <Select
                   id="eventGroupId"
                   placeholder="Please select event group"
+                  value={value}
                   onChange={onChange}
                 >
-                  {groups.map((item: IEventGroup) => {
+                  {/* {groups.map((item: IEventGroup) => {
                     return (
                       <option value={item.groupId} key={item.groupId}>
                         {item.name}
                       </option>
                     );
-                  })}
+                  })} */}
+                  <option value={1} key={1}>
+                    test
+                  </option>
                 </Select>
               )}
             />
@@ -128,9 +139,12 @@ const EventCreate: NextPage = () => {
                       message: "Minimum length should be 4",
                     },
                   }}
-                  render={({ field: { onChange }, formState: { errors } }) => (
+                  render={({
+                    field: { onChange, value },
+                    formState: { errors },
+                  }) => (
                     <>
-                      <Input id="name" onChange={onChange} />
+                      <Input id="name" onChange={onChange} value={value} />
                       <FormErrorMessage>
                         {errors.eventName?.message}
                       </FormErrorMessage>
@@ -150,9 +164,16 @@ const EventCreate: NextPage = () => {
                       message: "Minimum length should be 4",
                     },
                   }}
-                  render={({ field: { onChange }, formState: { errors } }) => (
+                  render={({
+                    field: { onChange, value },
+                    formState: { errors },
+                  }) => (
                     <>
-                      <Input id="description" onChange={onChange} />
+                      <Input
+                        id="description"
+                        onChange={onChange}
+                        value={value}
+                      />
                       <FormErrorMessage>
                         {errors.description?.message}
                       </FormErrorMessage>
