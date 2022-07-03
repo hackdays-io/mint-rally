@@ -208,6 +208,27 @@ export const useGetEventById = () => {
 };
 
 /**
+ * custom hook function for getting the event records that the sender has applied for participation
+ *
+ * @returns
+ */
+export const useGetParticipationEventIds = () => {
+  const [eventIds, setEventIds] = useState<IEventRecord[]>([]);
+  const [loading, setLoading] = useState(false);
+  const getParticipationEventIds = async ({ eventId }: IGetEventById) => {
+    console.log("get event records that you have applied for participation");
+    const eventManager = getEventManagerContract();
+    if (!eventManager) throw "error";
+    setLoading(true);
+    const data = await eventManager.getParticipationEventIds();
+    console.log("retrieved:", data);
+    setLoading(false);
+    setEventIds(data);
+  };
+  return { eventIds, loading, getParticipationEventIds };
+};
+
+/**
  * custom hook function for applying for participation
  * @returns
  */
