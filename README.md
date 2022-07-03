@@ -2,7 +2,7 @@
 ![mainImg](https://user-images.githubusercontent.com/35390466/177026194-28ace142-0ba0-4360-8a48-6fd614fed91f.png)
 
 
-## About out project
+## About our project
 **Proof of participation NFT you'll want to keep joining**
 - Organizers can easily organize events that can grant evolving NFTs.
 - Organizers can easily generate nice NFT images on the screen
