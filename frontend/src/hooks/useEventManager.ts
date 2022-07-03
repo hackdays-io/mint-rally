@@ -19,6 +19,10 @@ export interface INFTImage {
   image: string;
   requiredParticipateCount: number;
 }
+
+export interface IGetEventById {
+  eventId: number;
+}
 export interface ICreateEventGroupParams {
   groupName: string;
   images: INFTImage[];
@@ -33,6 +37,11 @@ export interface ICreateEventRecordParams {
   endTime: string; // "21:00"
   secretPhrase: string;
 }
+
+export interface IApplyForParticipation {
+  eventId: number;
+}
+
 /**
  * A bridgge to the event manager contract
  */
@@ -98,7 +107,7 @@ export const useEventGroups = () => {
     if (!eventManager) throw "error";
     setLoading(true);
     const data = await eventManager.getGroups();
-    console.log(data)
+    console.log(data);
     setLoading(false);
     setGroups(data);
   };
@@ -118,6 +127,7 @@ export const useOwnEventGroups = () => {
     const data = await eventManager.getOwnGroups();
     setLoading(false);
     setGroups(data);
+    console.log(data);
   };
   return { groups, loading, getOwnEventGroups };
 };
@@ -158,7 +168,7 @@ export const useCreateEventRecord = () => {
 };
 
 /**
- * custom hook function for getting all event groups
+ * custom hook function for getting all event records
  *
  * @returns
  */
@@ -176,4 +186,74 @@ export const useEventRecords = () => {
     setRecords(data);
   };
   return { records, loading, getEventRecords };
+};
+
+/**
+ * custom hook function for getting an event record by id
+ *
+ * @returns
+ */
+export const useGetEventById = () => {
+  const [event, setEvent] = useState<IEventRecord | null>(null);
+  const [loading, setLoading] = useState(false);
+  const getEventById = async ({ eventId }: IGetEventById) => {
+    console.log("get an even record by id");
+    const eventManager = getEventManagerContract();
+    if (!eventManager) throw "error";
+    setLoading(true);
+    const data = await eventManager.getEventById(eventId);
+    console.log("retrieved: ", data);
+    setLoading(false);
+    setEvent(data);
+  };
+  return { event, loading, getEventById };
+};
+
+/**
+ * custom hook function for getting the event records that the sender has applied for participation
+ *
+ * @returns
+ */
+export const useGetParticipationEventIds = () => {
+  const [eventIds, setEventIds] = useState<number[]>([]);
+  const [loading, setLoading] = useState(false);
+  const getParticipationEventIds = async () => {
+    console.log("get event records that you have applied for participation");
+    const eventManager = getEventManagerContract();
+    if (!eventManager) throw "error";
+    setLoading(true);
+    const data = await eventManager.getParticipationEventIds();
+    console.log("retrieved:", data);
+    setLoading(false);
+    const _data = data.map((d: any) => d.toNumber());
+    setEventIds(_data);
+    return _data;
+  };
+  return { eventIds, loading, getParticipationEventIds };
+};
+
+/**
+ * custom hook function for applying for participation
+ * @returns
+ */
+export const useApplyForParticipation = () => {
+  const [errors, setErrors] = useState<Error | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState(false);
+  const applyForParticipation = async (params: IApplyForParticipation) => {
+    setErrors(null);
+    try {
+      const eventManager = getEventManagerContract();
+      if (!eventManager) throw "error: contract can't found";
+      setLoading(true);
+      const tx = await eventManager.applyForParticipation(params.eventId);
+      await tx.wait();
+      setLoading(false);
+      setStatus(true);
+    } catch (e: any) {
+      setErrors(e);
+      setLoading(false);
+    }
+  };
+  return { status, errors, loading, applyForParticipation };
 };
