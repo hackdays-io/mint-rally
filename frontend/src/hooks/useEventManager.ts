@@ -70,7 +70,8 @@ export const useCreateEventGroup = () => {
       if (!eventManager) throw "error: contract can't found";
       setLoading(true)
       console.log(params)
-      await eventManager.createGroup(params.groupName, params.images);
+      const tx = await eventManager.createGroup(params.groupName, params.images);
+      await tx.wait()
       setLoading(false)
       setStatus(true)
     } catch (e: any) {
@@ -132,7 +133,8 @@ export const useCreateEventRecord = () => {
       if (!eventManager) throw "error: contract can't found";
       setLoading(true)
       const datestr = params.date.toLocaleDateString();
-      await eventManager.createEventRecord(params.groupId, params.eventName, params.description, datestr, params.startTime, params.endTime, params.secretPhrase);
+      const tx = await eventManager.createEventRecord(params.groupId, params.eventName, params.description, datestr, params.startTime, params.endTime, params.secretPhrase);
+      await tx.wait()
       setLoading(false)
       setStatus(true)
     } catch (e: any) {
