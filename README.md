@@ -18,6 +18,8 @@ Solves the problem of organizers struggling with event retention rates.
 - image: IPFS, Web3.storage
 
 ## Polygon Scan URL
+- mintNFT: https://mumbai.polygonscan.com/address/0x3e6178a5419F100dfd5F9FA58997B0A47CB49660
+- eventManager: https://mumbai.polygonscan.com/address/0x23c9839e65E69bc87c198AB06aa0cd6f240DF4D1
 
 ## Challenges Faced
 ### Solved
