@@ -33,6 +33,11 @@ export interface ICreateEventRecordParams {
   endTime: string; // "21:00"
   secretPhrase: string;
 }
+
+export interface IApplyForParticipation {
+  evendId: number;
+}
+
 /**
  * A bridgge to the event manager contract
  */
@@ -175,4 +180,30 @@ export const useEventRecords = () => {
     setRecords(data);
   };
   return { records, loading, getEventRecords };
+};
+
+/**
+ * custom hook function for applying for participation
+ * @returns
+ */
+export const useApplyForParticipation = () => {
+  const [errors, setErrors] = useState<Error | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState(false);
+  const applyForParticipation = async (params: IApplyForParticipation) => {
+    setErrors(null);
+    try {
+      const eventManager = getEventManagerContract();
+      if (!eventManager) throw "error: contract can't found";
+      setLoading(true);
+      const tx = await eventManager.applyForParticipation(params.evendId);
+      await tx.wait();
+      setLoading(false);
+      setStatus(true);
+    } catch (e: any) {
+      setErrors(e);
+      setLoading(false);
+    }
+  };
+  return { status, errors, loading, applyForParticipation };
 };
