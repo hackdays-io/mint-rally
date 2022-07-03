@@ -1,15 +1,20 @@
 import {
   Box,
+  Button,
+  Container,
   Flex,
   Heading,
   Link,
   List,
   ListIcon,
   ListItem,
+  SimpleGrid,
+  Spacer,
   Spinner,
 } from "@chakra-ui/react";
 import { NextPage } from "next";
 import { useEffect } from "react";
+import { Card } from "../../components/card";
 import { IEventRecord, useEventRecords } from "../../hooks/useEventManager";
 
 const Events: NextPage = () => {
@@ -20,20 +25,37 @@ const Events: NextPage = () => {
   }, []);
   return (
     <>
-      <Flex>
-        <Link href="/events/new">Create new event</Link>
-      </Flex>
-      <Heading>Events</Heading>
-      {loading && <Spinner></Spinner>}
-      <List>
-        {records.map((item) => {
-          return (
-            <ListItem key={item.eventRecordId}>
-              <Link href={"/events/" + item.eventRecordId}>{item.name}</Link>
-            </ListItem>
-          );
-        })}
-      </List>
+      <Container maxW={800} paddingTop={6}>
+        <Flex alignItems="bottom" paddingBottom={6}>
+          <Heading>Events</Heading>
+          <Spacer></Spacer>
+          <Button
+            onClick={() => {
+              window.location.href = "/events/new";
+            }}
+          >
+            Create new event
+          </Button>
+        </Flex>
+        {loading ? (
+          <Spinner></Spinner>
+        ) : (
+          <SimpleGrid columns={3} spacing={5}>
+            <>
+              {records.map((item) => {
+                return (
+                  <Box key={item.eventRecordId} width={400} height={300}>
+                    <Card
+                      href={"/events/" + item.eventRecordId}
+                      title={item.name}
+                    ></Card>
+                  </Box>
+                );
+              })}
+            </>
+          </SimpleGrid>
+        )}
+      </Container>
     </>
   );
 };
