@@ -23,21 +23,6 @@ import { useAddress } from "@thirdweb-dev/react";
 import { useCreateEventGroup, INFTImage } from "../../hooks/useEventManager";
 import ImageSelectorWithPreview from "../../components/ImageSelectorWithPreview";
 
-const TEST_IMAGES = [
-  {
-    image: "https://i.imgur.com/TZEhCTX.png",
-    requiredParticipateCount: 0,
-  },
-  {
-    image: "https://i.imgur.com/TZEhCTX.png",
-    requiredParticipateCount: 3,
-  },
-  {
-    image: "https://i.imgur.com/TZEhCTX.png",
-    requiredParticipateCount: 0,
-  },
-];
-
 if (!process.env.NEXT_PUBLIC_WEB3_STORAGE_KEY) {
   throw new Error("WEB3_STORAGE_KEY is required");
 }
@@ -239,12 +224,6 @@ const NewEventGroupPage: NextPage = () => {
             )}
           </>
         )}
-
-        {/* [Debug]
-        <p>Group name: {groupName}</p>
-        <p>
-          NFT1: {name1} / {countThreshold1}
-        </p> */}
       </Box>
     </>
   );
