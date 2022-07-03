@@ -1,6 +1,19 @@
-import { Flex, Heading, Link, List, ListItem, Spinner } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Container,
+  Flex,
+  Heading,
+  Link,
+  List,
+  ListItem,
+  SimpleGrid,
+  Spacer,
+  Spinner,
+} from "@chakra-ui/react";
 import { NextPage } from "next";
 import { useEffect } from "react";
+import { Card } from "../../components/card";
 import { IEventGroup, useEventGroups } from "../../hooks/useEventManager";
 
 /**
@@ -14,27 +27,37 @@ const EventGroups: NextPage = () => {
   }, []);
   return (
     <>
-      <Flex>
-        <Link href="/event-groups/new">Create new EventGroup</Link>
-      </Flex>
-      <Heading>Event Groups</Heading>
-      {loading ? (
-        <Spinner></Spinner>
-      ) : (
-        <List spacing={3}>
-          <>
-            {groups.map((item: IEventGroup) => {
-              return (
-                <ListItem key={item.groupId}>
-                  <Link href={"/event-groups/" + item.groupId}>
-                    {item.name}
-                  </Link>
-                </ListItem>
-              );
-            })}
-          </>
-        </List>
-      )}
+      <Container maxW={800} paddingTop={6}>
+        <Flex alignItems="bottom" paddingBottom={6}>
+          <Heading>Event Groups</Heading>
+          <Spacer></Spacer>
+          <Button
+            onClick={() => {
+              window.location.href = "/event-groups/new";
+            }}
+          >
+            Create new event group
+          </Button>
+        </Flex>
+        {loading ? (
+          <Spinner></Spinner>
+        ) : (
+          <SimpleGrid columns={3} spacing={5}>
+            <>
+              {groups.map((item: IEventGroup) => {
+                return (
+                  <Box key={item.groupId} width={400} height={300}>
+                    <Card
+                      href={"/event-groups/" + item.groupId}
+                      title={item.name}
+                    ></Card>
+                  </Box>
+                );
+              })}
+            </>
+          </SimpleGrid>
+        )}
+      </Container>
     </>
   );
 };
