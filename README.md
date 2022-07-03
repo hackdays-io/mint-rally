@@ -30,3 +30,5 @@ Solves the problem of organizers struggling with event retention rates.
 - Image Editor.
 - Making the NFT generative.
 - Meta-transaction to eliminate the burden of gas costs for participants
+- Issue uncool NFTs to absentees.
+
