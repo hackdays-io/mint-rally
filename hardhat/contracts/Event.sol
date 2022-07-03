@@ -176,22 +176,13 @@ contract EventManager is Ownable {
         participantGroupIds[msg.sender].push(_groupId);
     }
 
-    function getParticipationEvents()
+    function getParticipationEventIds()
         external
         view
-        returns (EventRecord[] memory)
+        returns (uint256[] memory)
     {
-        uint256 _numberOfEventRecords = eventRecords.length;
-        // create array of events
-        EventRecord[] memory _eventRecords = new EventRecord[](
-            _numberOfEventRecords
-        );
-        for (uint256 _i = 0; _i < _numberOfEventRecords; _i++) {
-            if (participantAddresses[_i].length > 0) {
-                _eventRecords[_i] = eventRecords[_i];
-            }
-        }
-        return _eventRecords;
+        uint256[] memory _eventIds = eventIdsByParticipant[msg.sender];
+        return _eventIds;
     }
 
     function countParticipationByGroup(

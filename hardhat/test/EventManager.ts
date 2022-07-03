@@ -165,8 +165,30 @@ describe("EventManager", () => {
         eventRecordsAfterCreate[0].eventRecordId.toNumber()
       );
       await txn3.wait();
-      const participationEvents = await eventManager.getParticipationEvents();
+      const participationEvents = await eventManager.getParticipationEventIds();
       expect(participationEvents.length).to.equal(1);
+
+      const txn4 = await eventManager.createEventRecord(
+        groupsAfterCreate[0].groupId.toNumber(),
+        "event1",
+        "event1 description",
+        "2022-08-3O",
+        "18:00",
+        "21:00",
+        "hackdays"
+      );
+      await txn4.wait();
+      const participationEvents2 = await eventManager.getParticipationEventIds();
+      expect(participationEvents2.length).to.equal(1);
+
+      const eventRecordsAfterCreate2 = await eventManager.getEventRecords();
+      const txn5 = await eventManager.applyForParticipation(
+        eventRecordsAfterCreate2[0].eventRecordId.toNumber()
+      );
+      await txn5.wait();
+
+      const participationEvents3 = await eventManager.getParticipationEventIds();
+      expect(participationEvents3.length).to.equal(2);
     });
   });
 
