@@ -10,6 +10,87 @@ const User = () => {
 
   const { ownedNFTs, loading, getOwnedNFTs } = useGetOwnedNFTs();
 
+  const hackDaysCollectionData = [
+    {
+      image: "/images/collection_example/00-00.png",
+      name: "Event day 1",
+      date: "2020-01-01",
+    },
+    {
+      image: "/images/collection_example/00-00.png",
+      name: "Event day 2",
+      date: "2020-02-01",
+    },
+    {
+      image: "/images/collection_example/00-00.png",
+      name: "Event day 3",
+      date: "2020-03-01",
+    },
+    {
+      image: "/images/collection_example/00-00.png",
+      name: "Event day 4",
+      date: "2020-04-01",
+    },
+    {
+      image: "/images/collection_example/00-01.png",
+      name: "Event day 5",
+      date: "2020-05-01",
+    },
+    {
+      image: "/images/collection_example/00-00.png",
+      name: "Event day 6",
+      date: "2020-06-01",
+    },
+    {
+      image: "/images/collection_example/00-00.png",
+      name: "Event day 7",
+      date: "2020-07-01",
+    },
+    {
+      image: "/images/collection_example/00-00.png",
+      name: "Event day 8",
+      date: "2020-08-01",
+    },
+    {
+      image: "/images/collection_example/00-00.png",
+      name: "Event day 9",
+      date: "2020-09-01",
+    },
+    {
+      image: "/images/collection_example/02-03.png",
+      name: "Event day 10",
+      date: "2020-10-01",
+    },
+  ];
+
+  const summitCollectionData = [
+    {
+      image: "/images/collection_example/Summit-04.png",
+      name: "Event day 1",
+      date: "2020-01-01",
+    },
+    {
+      image: "/images/collection_example/Summit-04.png",
+      name: "Event day 2",
+      date: "2020-02-01",
+    },
+    {
+      image: "/images/collection_example/Summit-04.png",
+      name: "Event day 3",
+      date: "2020-03-01",
+    },
+    {
+      image: "/images/collection_example/Summit-04.png",
+      name: "Event day 4",
+      date: "2020-04-01",
+    },
+    {
+      image: "/images/collection_example/Summit-02.png",
+      name: "Event day 5",
+      date: "2020-05-01",
+    },
+  ];
+
   const ImageBadge = ({ image, name }: { image: string; name: string }) => (
     <Flex justifyContent="center" alignItems="center" flexDirection="column">
       <Box>
