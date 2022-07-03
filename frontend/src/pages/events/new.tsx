@@ -270,8 +270,8 @@ const EventCreate: NextPage = () => {
                 <FormControl>
                   <FormLabel htmlFor="secret">Secret phrase to mint</FormLabel>
                   <span>
-                    Please do not forget this phrase. you can't get this phrase
-                    after submitting
+                    Please do not forget this phrase. you can&apos;t get this
+                    phrase after submitting
                   </span>
                   <Controller
                     control={control}
