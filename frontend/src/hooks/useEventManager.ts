@@ -15,8 +15,13 @@ export interface IEventRecord {
   startTime: string; // "18:00"
   endTime: string; // "21:00"
 }
+export interface INFTImage {
+  image: string;
+  requiredParticipateCount: number;
+}
 export interface ICreateEventGroupParams {
   groupName: string;
+  images: INFTImage[]
 }
 
 export interface ICreateEventRecordParams {
@@ -64,7 +69,8 @@ export const useCreateEventGroup = () => {
       const eventManager = getEventManagerContract();
       if (!eventManager) throw "error: contract can't found";
       setLoading(true)
-      await eventManager.createGroup(params.groupName);
+      console.log(params)
+      await eventManager.createGroup(params.groupName, params.images);
       setLoading(false)
       setStatus(true)
     } catch (e: any) {
