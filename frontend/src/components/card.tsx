@@ -1,4 +1,4 @@
-import { Box, Heading } from "@chakra-ui/react";
+import { Box, Flex, Heading } from "@chakra-ui/react";
 
 export const Card = ({ title, href }: { title: string; href: string }) => {
   return (
@@ -16,9 +16,11 @@ export const Card = ({ title, href }: { title: string; href: string }) => {
       textAlign="center"
       verticalAlign="center"
     >
-      <Heading size="l" justifyContent="center">
-        {title}
-      </Heading>
+      <Flex h="100%" justify="center" align="center">
+        <Heading size="l" justifyContent="center">
+          {title}
+        </Heading>
+      </Flex>
     </Box>
   );
 };
