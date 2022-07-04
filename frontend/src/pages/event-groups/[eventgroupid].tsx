@@ -39,32 +39,30 @@ const EventGroup = () => {
         {loading ? (
           <Spinner></Spinner>
         ) : (
-          <List spacing={3}>
-            <>
-              {findgroup && (
-                <Box key={findgroup.groupId}>
-                  <Heading mb={6}>{findgroup.name}</Heading>
-                  {eventLoading && <Spinner></Spinner>}
-                  <SimpleGrid columns={3} spacing={5}>
-                    {records
-                      .filter(
-                        (findgroup) =>
-                          findgroup.groupId.toString() == eventgroupid
-                      )
-                      .map((record) => {
-                        return (
-                          <Card
-                            key={record.eventRecordId}
-                            title={record.name}
-                            href={"/events/" + record.eventRecordId}
-                          ></Card>
-                        );
-                      })}
-                  </SimpleGrid>
-                </Box>
-              )}
-            </>
-          </List>
+          <>
+            {findgroup && (
+              <>
+                <Heading mb={6}>{findgroup.name}</Heading>
+                {eventLoading && <Spinner></Spinner>}
+                <SimpleGrid columns={3} spacing={5}>
+                  {records
+                    .filter(
+                      (findgroup) =>
+                        findgroup.groupId.toString() == eventgroupid
+                    )
+                    .map((record) => {
+                      return (
+                        <Card
+                          key={record.eventRecordId}
+                          title={record.name}
+                          href={"/events/" + record.eventRecordId}
+                        ></Card>
+                      );
+                    })}
+                </SimpleGrid>
+              </>
+            )}
+          </>
         )}
       </Container>
     </>
