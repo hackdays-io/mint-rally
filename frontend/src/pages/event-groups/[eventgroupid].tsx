@@ -5,10 +5,12 @@ import {
   Link,
   List,
   ListItem,
+  SimpleGrid,
   Spinner,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
+import { Card } from "../../components/card";
 import {
   IEventGroup,
   useEventGroups,
@@ -20,6 +22,11 @@ const EventGroup = () => {
   const { eventgroupid } = router.query;
   const { groups, loading, getEventGroups } = useEventGroups();
   const { records, loading: eventLoading, getEventRecords } = useEventRecords();
+
+  const findgroup = useMemo(() => {
+    return groups.find((item) => item.groupId.toString() == eventgroupid);
+  }, [groups]);
+
   useEffect(() => {
     getEventGroups();
     getEventRecords();
@@ -28,41 +35,36 @@ const EventGroup = () => {
 
   return (
     <>
-      {loading ? (
-        <Spinner></Spinner>
-      ) : (
-        <List spacing={3}>
+      <Container maxW={800} paddingTop={6}>
+        {loading ? (
+          <Spinner></Spinner>
+        ) : (
           <>
-            {groups
-              .filter((item) => item.groupId.toString() == eventgroupid)
-              .map((item: IEventGroup) => {
-                return (
-                  <>
-                    <Box key={item.groupId}>
-                      <Heading>{item.name}</Heading>
-                      {eventLoading && <Spinner></Spinner>}
-                      <List>
-                        {records
-                          .filter(
-                            (item) => item.groupId.toString() == eventgroupid
-                          )
-                          .map((record) => {
-                            return (
-                              <ListItem key={record.eventRecordId}>
-                                <Link href={"/events/" + record.eventRecordId}>
-                                  {record.name}
-                                </Link>
-                              </ListItem>
-                            );
-                          })}
-                      </List>
-                    </Box>
-                  </>
-                );
-              })}
+            {findgroup && (
+              <>
+                <Heading mb={6}>{findgroup.name}</Heading>
+                {eventLoading && <Spinner></Spinner>}
+                <SimpleGrid columns={3} spacing={5}>
+                  {records
+                    .filter(
+                      (findgroup) =>
+                        findgroup.groupId.toString() == eventgroupid
+                    )
+                    .map((record) => {
+                      return (
+                        <Card
+                          key={record.eventRecordId}
+                          title={record.name}
+                          href={"/events/" + record.eventRecordId}
+                        ></Card>
+                      );
+                    })}
+                </SimpleGrid>
+              </>
+            )}
           </>
-        </List>
-      )}
+        )}
+      </Container>
     </>
   );
 };
