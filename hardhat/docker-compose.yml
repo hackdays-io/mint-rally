@@ -1,0 +1,11 @@
+version: "3"
+services:
+  mintrally_localchain:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    container_name: mintrally_localchain
+    ports:
+      - 8545:8545
+    volumes:
+      - ./:/usr/src/app
