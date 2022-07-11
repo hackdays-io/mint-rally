@@ -7,7 +7,9 @@
     "deploy:stg": "npx hardhat run scripts/deploy.ts --network mumbai",
     "deploy:mintNFT": "npx hardhat run scripts/deployMintNft.ts --network",
     "compile": "npx hardhat compile",
-    "test": "npx hardhat compile && npx hardhat test"
+    "test": "npx hardhat compile && npx hardhat test",
+    "localchain": "npx hardhat node",
+    "slither": "slither . --solc-remaps '@openzeppelin=node_modules/@openzeppelin' --exclude naming-convention,external-function,low-level-calls"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.0",

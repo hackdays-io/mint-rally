@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "./lib/Base64.sol";
+import "@openzeppelin/contracts/utils/Base64.sol";
 
 interface IEventManager {
     function applyForParticipation(uint256 _eventRecordId) external;
@@ -24,6 +24,10 @@ contract MintNFT is ERC721Enumerable, Ownable {
     address private eventManagerAddr;
 
     function setEventManagerAddr(address _eventManagerAddr) public onlyOwner {
+        require(
+            _eventManagerAddr != address(0),
+            "event manager address is blank"
+        );
         eventManagerAddr = _eventManagerAddr;
     }
 
