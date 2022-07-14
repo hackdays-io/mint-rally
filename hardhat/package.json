@@ -5,9 +5,11 @@
   "license": "MIT",
   "scripts": {
     "deploy:stg": "npx hardhat run scripts/deploy.ts --network mumbai",
+    "deploy:local": "npx hardhat run scripts/deploy.ts --network local",
     "deploy:mintNFT": "npx hardhat run scripts/deployMintNft.ts --network",
     "compile": "npx hardhat compile",
-    "test": "npx hardhat compile && npx hardhat test"
+    "test": "npx hardhat compile && npx hardhat test",
+    "localchain": "npx hardhat node"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.0",
