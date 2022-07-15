@@ -15,6 +15,11 @@ interface IEventManager {
         string memory _secretPhrase,
         uint256 _eventRecordId
     ) external returns (bool);
+
+    function isAlreadyMintedNFT(
+        address participant,
+        uint256 eventId
+    ) external view returns (bool);
 }
 
 contract MintNFT is ERC721Enumerable, Ownable {
@@ -53,6 +58,11 @@ contract MintNFT is ERC721Enumerable, Ownable {
             _eventManager.verifySecretPhrase(_secretPhrase, _eventId),
             "invalid secret phrase"
         );
+        require(
+            _eventManager.isAlreadyMintedNFT(msg.sender, _eventId),
+            "already minted NFT on event"
+        );
+        
 
         ParticipateNFTAttributes[] memory ownedNFTs = listNFTsByAddress(
             msg.sender
