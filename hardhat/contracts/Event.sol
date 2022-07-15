@@ -64,6 +64,17 @@ contract EventManager is Ownable {
         mintNFTAddr = _mintNftAddr;
     }
 
+    function isAlreadyMintedNFT (address participant, uint256 eventId) external view returns (bool) {
+        bool result = false;
+        for (uint256 _i = 0; _i < eventIdsByParticipant[participant].length; _i++) {
+            if (eventIdsByParticipant[participant][_i] == eventId) {
+                result = true;
+                break;
+            }
+        }
+        return result;
+    }
+
     constructor(address _mintNftAddr) {
         mintNFTAddr = _mintNftAddr;
         console.log("init");
