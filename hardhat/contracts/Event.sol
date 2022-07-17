@@ -9,6 +9,7 @@ interface IMintNFT {
     struct ParticipateNFTAttributes {
         string name;
         string image;
+        string description;
         uint256 groupId;
         uint256 eventId;
         uint256 requiredParticipateCount;
@@ -64,9 +65,7 @@ contract EventManager is Ownable {
         mintNFTAddr = _mintNftAddr;
     }
 
-    constructor(address _mintNftAddr) {
-        mintNFTAddr = _mintNftAddr;
-        console.log("init");
+    constructor() {
         _groupIds.increment();
         _eventRecordIds.increment();
     }
@@ -87,6 +86,7 @@ contract EventManager is Ownable {
             _participateNFTAttributes[_i] = IMintNFT.ParticipateNFTAttributes({
                 name: _name,
                 image: _groupAttributes[_i].image,
+                description: "",
                 groupId: _newGroupId,
                 eventId: 0,
                 requiredParticipateCount: _groupAttributes[_i]
