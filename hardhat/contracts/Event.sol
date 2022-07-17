@@ -110,11 +110,15 @@ contract EventManager is Ownable {
     }
 
     function getOwnGroups() public view returns (Group[] memory) {
-        uint256 _numberOfGroups = ownGroupIds[msg.sender].length;
-        Group[] memory _groups = new Group[](_numberOfGroups);
-        for (uint256 _i = 0; _i < _numberOfGroups; _i++) {
+        uint256 _numberOfOwnGroups = ownGroupIds[msg.sender].length;
+        uint256 _numberOfAllGroups = groups.length;
+
+        Group[] memory _groups = new Group[](_numberOfOwnGroups);
+        uint256 _count = 0;
+        for (uint256 _i = 0; _i < _numberOfAllGroups; _i++) {
             if (groups[_i].ownerAddress == msg.sender) {
-                _groups[_i] = groups[_i];
+                _groups[_count] = groups[_i];
+                _count++;
             }
         }
         return _groups;
