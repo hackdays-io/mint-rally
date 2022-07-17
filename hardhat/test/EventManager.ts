@@ -134,6 +134,17 @@ describe("EventManager", () => {
       const ownGroups = await eventManager.connect(address1).getOwnGroups();
       expect(ownGroups.length).to.equal(1);
       expect(ownGroups[0].name).to.equal("group1");
+
+      // create group by address1
+      const txn3 = await eventManager
+        .connect(address1)
+        .createGroup("group3", images);
+      await txn3.wait();
+
+      const ownGroups2 = await eventManager.connect(address1).getOwnGroups();
+      expect(ownGroups2.length).to.equal(2);
+      expect(ownGroups2[0].name).to.equal("group1");
+      expect(ownGroups2[1].name).to.equal("group3");
     });
   });
 
