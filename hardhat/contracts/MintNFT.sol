@@ -16,10 +16,10 @@ interface IEventManager {
         uint256 _eventRecordId
     ) external returns (bool);
 
-    function isAlreadyMintedNFT(
-        address participant,
-        uint256 eventId
-    ) external view returns (bool);
+    // function isAlreadyMintedNFT(
+    //     address participant,
+    //     uint256 eventId
+    // ) external view returns (bool);
 }
 
 contract MintNFT is ERC721Enumerable, Ownable {
@@ -58,22 +58,31 @@ contract MintNFT is ERC721Enumerable, Ownable {
             _eventManager.verifySecretPhrase(_secretPhrase, _eventId),
             "invalid secret phrase"
         );
-        require(
-            _eventManager.isAlreadyMintedNFT(msg.sender, _eventId),
-            "already minted NFT on event"
-        );
+        // require(
+        //     _eventManager.isAlreadyMintedNFT(msg.sender, _eventId),
+        //     "already minted NFT on event"
+        // );
         
 
         ParticipateNFTAttributes[] memory ownedNFTs = listNFTsByAddress(
             msg.sender
         );
+        bool firstMintOnEvent = true;
         uint256 countOwnedGroupNFTs = 0;
         for (uint256 index = 0; index < ownedNFTs.length; index++) {
             ParticipateNFTAttributes memory nft = ownedNFTs[index];
+            if (nft.groupId == _groupId && nft.eventId == _eventId) {
+                firstMintOnEvent = false;
+                break;
+            }
             if (nft.groupId == _groupId) {
                 countOwnedGroupNFTs++;
             }
         }
+        require(
+            firstMintOnEvent,
+            "already minted NFT on event"
+        );
 
         bool minted = false;
         ParticipateNFTAttributes memory defaultNFT;
