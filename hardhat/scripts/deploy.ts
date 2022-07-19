@@ -13,9 +13,10 @@ async function main() {
   mintNFT = await MintNFT.deploy();
   await mintNFT.deployed();
   const EventManager = await ethers.getContractFactory("EventManager");
-  eventManager = await EventManager.deploy(mintNFT.address);
+  eventManager = await EventManager.deploy();
   await eventManager.deployed();
-  mintNFT.setEventManagerAddr(eventManager.address);
+  await mintNFT.setEventManagerAddr(eventManager.address);
+  await eventManager.setMintNFTAddr(mintNFT.address);
 
   console.log("mintNFT address:", mintNFT.address);
   console.log("eventManager address:", eventManager.address);

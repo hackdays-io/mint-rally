@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./lib/Base64.sol";
+import "./lib/Concat.sol";
 
 interface IEventManager {
     function applyForParticipation(uint256 _eventRecordId) external;
@@ -16,10 +17,21 @@ interface IEventManager {
         uint256 _eventRecordId
     ) external returns (bool);
 
-    // function isAlreadyMintedNFT(
-    //     address participant,
-    //     uint256 eventId
-    // ) external view returns (bool);
+    struct EventRecord {
+        uint256 eventRecordId;
+        uint256 groupId;
+        string name;
+        string description;
+        string date;
+        string startTime;
+        string endTime;
+        bytes32 secretPhrase;
+    }
+
+    function getEventById(uint256 _eventId)
+        external
+        view
+        returns (EventRecord memory);
 }
 
 contract MintNFT is ERC721Enumerable, Ownable {
@@ -35,6 +47,7 @@ contract MintNFT is ERC721Enumerable, Ownable {
     struct ParticipateNFTAttributes {
         string name;
         string image;
+        string description;
         uint256 groupId;
         uint256 eventId;
         uint256 requiredParticipateCount;
@@ -64,6 +77,10 @@ contract MintNFT is ERC721Enumerable, Ownable {
         // );
         
 
+        IEventManager.EventRecord memory _event = _eventManager.getEventById(
+            _eventId
+        );
+
         ParticipateNFTAttributes[] memory ownedNFTs = listNFTsByAddress(
             msg.sender
         );
@@ -89,6 +106,9 @@ contract MintNFT is ERC721Enumerable, Ownable {
         for (uint256 index = 0; index < groupNFTAttributes.length; index++) {
             ParticipateNFTAttributes memory gp = groupNFTAttributes[index];
             gp.eventId = _eventId;
+            gp.name = Concat.concatString(gp.name, ": ", _event.name);
+            gp.description = _event.description;
+
             if (gp.requiredParticipateCount == 0) {
                 defaultNFT = gp;
             }
@@ -149,6 +169,7 @@ contract MintNFT is ERC721Enumerable, Ownable {
                 ParticipateNFTAttributes({
                     name: attributes[index].name,
                     image: attributes[index].image,
+                    description: "",
                     groupId: attributes[index].groupId,
                     eventId: attributes[index].eventId,
                     requiredParticipateCount: attributes[index]
@@ -176,12 +197,14 @@ contract MintNFT is ERC721Enumerable, Ownable {
 
         string memory json = Base64.encode(
             abi.encodePacked(
-                "{'name': '",
+                '{"name": "',
                 attributes.name,
-                " -- NFT #: ",
-                Strings.toString(_tokenId),
-                "', 'description': 'MintRally NFT', 'image': '",
+                '", "description": "',
+                attributes.description,
+                '", "image": "',
                 attributes.image,
+                '", "id": ',
+                Strings.toString(_tokenId),
                 "}"
             )
         );

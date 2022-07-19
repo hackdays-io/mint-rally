@@ -9,6 +9,7 @@ interface IMintNFT {
     struct ParticipateNFTAttributes {
         string name;
         string image;
+        string description;
         uint256 groupId;
         uint256 eventId;
         uint256 requiredParticipateCount;
@@ -64,20 +65,7 @@ contract EventManager is Ownable {
         mintNFTAddr = _mintNftAddr;
     }
 
-    // function isAlreadyMintedNFT (address participant, uint256 eventId) external view returns (bool) {
-    //     bool result = false;
-    //     for (uint256 _i = 0; _i < eventIdsByParticipant[participant].length; _i++) {
-    //         if (eventIdsByParticipant[participant][_i] == eventId) {
-    //             result = true;
-    //             break;
-    //         }
-    //     }
-    //     return result;
-    // }
-
-    constructor(address _mintNftAddr) {
-        mintNFTAddr = _mintNftAddr;
-        console.log("init");
+    constructor() {
         _groupIds.increment();
         _eventRecordIds.increment();
     }
@@ -98,6 +86,7 @@ contract EventManager is Ownable {
             _participateNFTAttributes[_i] = IMintNFT.ParticipateNFTAttributes({
                 name: _name,
                 image: _groupAttributes[_i].image,
+                description: "",
                 groupId: _newGroupId,
                 eventId: 0,
                 requiredParticipateCount: _groupAttributes[_i]
@@ -121,11 +110,15 @@ contract EventManager is Ownable {
     }
 
     function getOwnGroups() public view returns (Group[] memory) {
-        uint256 _numberOfGroups = ownGroupIds[msg.sender].length;
-        Group[] memory _groups = new Group[](_numberOfGroups);
-        for (uint256 _i = 0; _i < _numberOfGroups; _i++) {
+        uint256 _numberOfOwnGroups = ownGroupIds[msg.sender].length;
+        uint256 _numberOfAllGroups = groups.length;
+
+        Group[] memory _groups = new Group[](_numberOfOwnGroups);
+        uint256 _count = 0;
+        for (uint256 _i = 0; _i < _numberOfAllGroups; _i++) {
             if (groups[_i].ownerAddress == msg.sender) {
-                _groups[_i] = groups[_i];
+                _groups[_count] = groups[_i];
+                _count++;
             }
         }
         return _groups;

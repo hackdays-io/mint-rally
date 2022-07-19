@@ -30,10 +30,10 @@ describe("EventManager", () => {
       const eventManagerContractFactory = await ethers.getContractFactory(
         "EventManager"
       );
-      const eventManagerContract = await eventManagerContractFactory.deploy(
-        mintNFT.address
-      );
+      const eventManagerContract = await eventManagerContractFactory.deploy();
       const eventManager = await eventManagerContract.deployed();
+      await eventManager.setMintNFTAddr(mintNFT.address);
+      await mintNFT.setEventManagerAddr(eventManager.address);
 
       // does not exist any groups
       const groupsBeforeCreate = await eventManager.getGroups();
@@ -107,10 +107,10 @@ describe("EventManager", () => {
         "EventManager"
       );
 
-      const eventManagerContract = await eventManagerContractFactory.deploy(
-        mintNFT.address
-      );
+      const eventManagerContract = await eventManagerContractFactory.deploy();
       const eventManager = await eventManagerContract.deployed();
+      await eventManager.setMintNFTAddr(mintNFT.address);
+      await mintNFT.setEventManagerAddr(eventManager.address);
 
       const [address1, address2] = await ethers.getSigners();
 
@@ -134,6 +134,17 @@ describe("EventManager", () => {
       const ownGroups = await eventManager.connect(address1).getOwnGroups();
       expect(ownGroups.length).to.equal(1);
       expect(ownGroups[0].name).to.equal("group1");
+
+      // create group by address1
+      const txn3 = await eventManager
+        .connect(address1)
+        .createGroup("group3", images);
+      await txn3.wait();
+
+      const ownGroups2 = await eventManager.connect(address1).getOwnGroups();
+      expect(ownGroups2.length).to.equal(2);
+      expect(ownGroups2[0].name).to.equal("group1");
+      expect(ownGroups2[1].name).to.equal("group3");
     });
   });
 
@@ -143,10 +154,10 @@ describe("EventManager", () => {
         "EventManager"
       );
 
-      const eventManagerContract = await eventManagerContractFactory.deploy(
-        mintNFT.address
-      );
+      const eventManagerContract = await eventManagerContractFactory.deploy();
       const eventManager = await eventManagerContract.deployed();
+      await eventManager.setMintNFTAddr(mintNFT.address);
+      await mintNFT.setEventManagerAddr(eventManager.address);
 
       // does not exist any groups
       const groupsBeforeCreate = await eventManager.getGroups();
@@ -186,7 +197,8 @@ describe("EventManager", () => {
         "hackdays"
       );
       await txn4.wait();
-      const participationEvents2 = await eventManager.getParticipationEventIds();
+      const participationEvents2 =
+        await eventManager.getParticipationEventIds();
       expect(participationEvents2.length).to.equal(1);
 
       const eventRecordsAfterCreate2 = await eventManager.getEventRecords();
@@ -195,7 +207,8 @@ describe("EventManager", () => {
       );
       await txn5.wait();
 
-      const participationEvents3 = await eventManager.getParticipationEventIds();
+      const participationEvents3 =
+        await eventManager.getParticipationEventIds();
       expect(participationEvents3.length).to.equal(2);
     });
   });
@@ -206,10 +219,10 @@ describe("EventManager", () => {
         "EventManager"
       );
 
-      const eventManagerContract = await eventManagerContractFactory.deploy(
-        mintNFT.address
-      );
+      const eventManagerContract = await eventManagerContractFactory.deploy();
       const eventManager = await eventManagerContract.deployed();
+      await eventManager.setMintNFTAddr(mintNFT.address);
+      await mintNFT.setEventManagerAddr(eventManager.address);
 
       const [address1] = await ethers.getSigners();
 
@@ -271,10 +284,10 @@ describe("EventManager", () => {
         "EventManager"
       );
 
-      const eventManagerContract = await eventManagerContractFactory.deploy(
-        mintNFT.address
-      );
+      const eventManagerContract = await eventManagerContractFactory.deploy();
       const eventManager = await eventManagerContract.deployed();
+      await eventManager.setMintNFTAddr(mintNFT.address);
+      await mintNFT.setEventManagerAddr(eventManager.address);
 
       const txn1 = await eventManager.createGroup("group1", images);
       await txn1.wait();
@@ -315,10 +328,10 @@ describe("EventManager", () => {
         "EventManager"
       );
 
-      const eventManagerContract = await eventManagerContractFactory.deploy(
-        mintNFT.address
-      );
+      const eventManagerContract = await eventManagerContractFactory.deploy();
       const eventManager = await eventManagerContract.deployed();
+      await eventManager.setMintNFTAddr(mintNFT.address);
+      await mintNFT.setEventManagerAddr(eventManager.address);
 
       const result = await eventManager.testConnection();
       expect(result).to.equal("Test connection successful");
