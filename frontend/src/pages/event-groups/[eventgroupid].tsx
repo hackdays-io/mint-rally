@@ -1,21 +1,9 @@
-import {
-  Box,
-  Container,
-  Heading,
-  Link,
-  List,
-  ListItem,
-  SimpleGrid,
-  Spinner,
-} from "@chakra-ui/react";
+import { Container, Heading, SimpleGrid, Spinner } from "@chakra-ui/react";
+import Link from "next/link";
 import { useRouter } from "next/router";
-import { useEffect, useMemo } from "react";
-import { Card } from "../../components/card";
-import {
-  IEventGroup,
-  useEventGroups,
-  useEventRecords,
-} from "../../hooks/useEventManager";
+import { useMemo } from "react";
+import EventCard from "../../components/atoms/events/EventCard";
+import { useEventGroups, useEventRecords } from "../../hooks/useEventManager";
 
 const EventGroup = () => {
   const router = useRouter();
@@ -36,7 +24,7 @@ const EventGroup = () => {
           <>
             {findgroup && (
               <>
-                <Heading mb={6}>{findgroup.name}</Heading>
+                <Heading mb={6}>Events of {findgroup.name}</Heading>
                 {eventLoading && <Spinner></Spinner>}
                 <SimpleGrid columns={3} spacing={5}>
                   {records
@@ -46,11 +34,17 @@ const EventGroup = () => {
                     )
                     .map((record) => {
                       return (
-                        <Card
-                          key={record.eventRecordId}
-                          title={record.name}
+                        <Link
                           href={"/events/" + record.eventRecordId}
-                        ></Card>
+                          key={record.eventRecordId}
+                        >
+                          <a>
+                            <EventCard
+                              title={record.name}
+                              description={record.description}
+                            ></EventCard>
+                          </a>
+                        </Link>
                       );
                     })}
                 </SimpleGrid>
