@@ -8,7 +8,8 @@ import {
   Spinner,
 } from "@chakra-ui/react";
 import { NextPage } from "next";
-import { Card } from "../../components/card";
+import Link from "next/link";
+import EventGroupCard from "../../components/atoms/events/GroupCard";
 import { IEventGroup, useEventGroups } from "../../hooks/useEventManager";
 
 /**
@@ -38,11 +39,14 @@ const EventGroups: NextPage = () => {
             <>
               {groups.map((item: IEventGroup) => {
                 return (
-                  <Card
+                  <Link
                     key={item.groupId}
                     href={"/event-groups/" + item.groupId}
-                    title={item.name}
-                  ></Card>
+                  >
+                    <a>
+                      <EventGroupCard title={item.name} />
+                    </a>
+                  </Link>
                 );
               })}
             </>

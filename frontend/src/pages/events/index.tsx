@@ -10,7 +10,7 @@ import {
 } from "@chakra-ui/react";
 import { NextPage } from "next";
 import Link from "next/link";
-import { Card } from "../../components/card";
+import EventCard from "../../components/atoms/events/EventCard";
 import { useEventRecords } from "../../hooks/useEventManager";
 
 const Events: NextPage = () => {
@@ -33,12 +33,17 @@ const Events: NextPage = () => {
             <>
               {records.map((item) => {
                 return (
-                  <Box key={item.eventRecordId} width={400} height={300}>
-                    <Card
-                      href={"/events/" + item.eventRecordId}
-                      title={item.name}
-                    ></Card>
-                  </Box>
+                  <Link
+                    href={"/events/" + item.eventRecordId}
+                    key={item.eventRecordId}
+                  >
+                    <a>
+                      <EventCard
+                        title={item.name}
+                        description={item.description}
+                      ></EventCard>
+                    </a>
+                  </Link>
                 );
               })}
             </>
