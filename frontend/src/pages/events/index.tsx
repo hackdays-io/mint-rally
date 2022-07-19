@@ -4,38 +4,27 @@ import {
   Container,
   Flex,
   Heading,
-  Link,
-  List,
-  ListIcon,
-  ListItem,
   SimpleGrid,
   Spacer,
   Spinner,
 } from "@chakra-ui/react";
 import { NextPage } from "next";
-import { useEffect } from "react";
+import Link from "next/link";
 import { Card } from "../../components/card";
-import { IEventRecord, useEventRecords } from "../../hooks/useEventManager";
+import { useEventRecords } from "../../hooks/useEventManager";
 
 const Events: NextPage = () => {
-  const { records, loading, getEventRecords } = useEventRecords();
-  useEffect(() => {
-    getEventRecords();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const { records, loading } = useEventRecords();
+
   return (
     <>
       <Container maxW={800} paddingTop={6}>
         <Flex alignItems="bottom" paddingBottom={6}>
           <Heading>Events</Heading>
           <Spacer></Spacer>
-          <Button
-            onClick={() => {
-              window.location.href = "/events/new";
-            }}
-          >
-            Create new event
-          </Button>
+          <Link href="/events/new">
+            <Button>Create new event</Button>
+          </Link>
         </Flex>
         {loading ? (
           <Spinner></Spinner>

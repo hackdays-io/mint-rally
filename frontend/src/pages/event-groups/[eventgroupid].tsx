@@ -20,18 +20,12 @@ import {
 const EventGroup = () => {
   const router = useRouter();
   const { eventgroupid } = router.query;
-  const { groups, loading, getEventGroups } = useEventGroups();
-  const { records, loading: eventLoading, getEventRecords } = useEventRecords();
+  const { groups, loading } = useEventGroups();
+  const { records, loading: eventLoading } = useEventRecords();
 
   const findgroup = useMemo(() => {
     return groups.find((item) => item.groupId.toString() == eventgroupid);
   }, [groups]);
-
-  useEffect(() => {
-    getEventGroups();
-    getEventRecords();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   return (
     <>

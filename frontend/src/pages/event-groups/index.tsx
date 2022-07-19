@@ -1,18 +1,13 @@
 import {
-  Box,
   Button,
   Container,
   Flex,
   Heading,
-  Link,
-  List,
-  ListItem,
   SimpleGrid,
   Spacer,
   Spinner,
 } from "@chakra-ui/react";
 import { NextPage } from "next";
-import { useEffect } from "react";
 import { Card } from "../../components/card";
 import { IEventGroup, useEventGroups } from "../../hooks/useEventManager";
 
@@ -20,11 +15,8 @@ import { IEventGroup, useEventGroups } from "../../hooks/useEventManager";
  * /event-groups/
  */
 const EventGroups: NextPage = () => {
-  const { groups, loading, getEventGroups } = useEventGroups();
-  useEffect(() => {
-    getEventGroups();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const { groups, loading } = useEventGroups();
+
   return (
     <>
       <Container maxW={800} paddingTop={6}>
