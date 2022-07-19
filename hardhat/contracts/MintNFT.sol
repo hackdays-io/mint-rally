@@ -71,11 +71,6 @@ contract MintNFT is ERC721Enumerable, Ownable {
             _eventManager.verifySecretPhrase(_secretPhrase, _eventId),
             "invalid secret phrase"
         );
-        // require(
-        //     _eventManager.isAlreadyMintedNFT(msg.sender, _eventId),
-        //     "already minted NFT on event"
-        // );
-        
 
         IEventManager.EventRecord memory _event = _eventManager.getEventById(
             _eventId
