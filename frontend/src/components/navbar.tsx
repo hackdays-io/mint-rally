@@ -47,7 +47,6 @@ const Navbar = () => {
             bg="mint.subtle"
             color="mint.font"
             borderRadius={"16px"}
-            mt={5}
             variant="solid"
             onClick={connectWithMetamask}
             size="lg"
