@@ -1,24 +1,24 @@
+import {
+  Box,
+  Container,
+  Flex,
+  Heading,
+  SimpleGrid,
+  Spacer,
+  Spinner,
+} from "@chakra-ui/react";
 import type { NextPage } from "next";
-import { useAddress } from "@thirdweb-dev/react";
-import { Box } from "@chakra-ui/react";
-import Image
-  from "next/image";
+import Image from "next/image";
+import Link from "next/link";
+import EventCard from "../components/atoms/events/EventCard";
+import { useEventRecords } from "../hooks/useEventManager";
+
 const Home: NextPage = () => {
-  const address = useAddress();
+  const { records, loading } = useEventRecords();
+
   return (
-    <>
+    <Box pb={20}>
       <div>
-        {/* <div
-          style={{
-            width: '100vw',
-            height: '960px',
-            maxHeight: '500px',
-            backgroundImage: 'url("/images/mainImg.png")',
-            backgroundRepeat: "no-repeat, no-repeat, no-repeat",
-            backgroundSize: "auto, cover, cover",
-            backgroundPosition: "left, center, center"
-          }}
-        /> */}
         <Image
           src="/images/mainImg.png"
           width={1920}
@@ -26,7 +26,36 @@ const Home: NextPage = () => {
           alt="mainImg"
         />
       </div>
-    </>
+      <Container maxW={800} paddingTop={6}>
+        <Flex alignItems="bottom" paddingBottom={6}>
+          <Heading>Events</Heading>
+          <Spacer></Spacer>
+        </Flex>
+        {loading ? (
+          <Spinner></Spinner>
+        ) : (
+          <SimpleGrid columns={{ base: 2, md: 3 }} spacing={5}>
+            <>
+              {records.map((item) => {
+                return (
+                  <Link
+                    href={"/events/" + item.eventRecordId}
+                    key={item.eventRecordId.toString()}
+                  >
+                    <a>
+                      <EventCard
+                        title={item.name}
+                        description={item.description}
+                      ></EventCard>
+                    </a>
+                  </Link>
+                );
+              })}
+            </>
+          </SimpleGrid>
+        )}
+      </Container>
+    </Box>
   );
 };
 
