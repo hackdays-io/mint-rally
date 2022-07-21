@@ -39,7 +39,7 @@ const renameFile = (file: File, newFilename: string) => {
 };
 
 interface PaticipateNftRecord {
-  name: string;
+  description: string;
   dataUrl: string;
   fileObject: File | null;
   requiredParticipateCount: number;
@@ -50,9 +50,24 @@ const NewEventGroupPage: NextPage = () => {
   const [groupName, setGroupName] = useState("");
 
   const [nftRecords, setNftRecords] = useState([
-    { name: "", dataUrl: "", fileObject: null, requiredParticipateCount: 0 },
-    { name: "", dataUrl: "", fileObject: null, requiredParticipateCount: 5 },
-    { name: "", dataUrl: "", fileObject: null, requiredParticipateCount: 10 },
+    {
+      description: "",
+      dataUrl: "",
+      fileObject: null,
+      requiredParticipateCount: 0,
+    },
+    {
+      description: "",
+      dataUrl: "",
+      fileObject: null,
+      requiredParticipateCount: 5,
+    },
+    {
+      description: "",
+      dataUrl: "",
+      fileObject: null,
+      requiredParticipateCount: 10,
+    },
   ] as PaticipateNftRecord[]);
 
   const { status, errors, loading, createEventGroup } = useCreateEventGroup();
@@ -60,7 +75,8 @@ const NewEventGroupPage: NextPage = () => {
   const isAllInputed = useCallback(
     () =>
       nftRecords.every(
-        ({ name, dataUrl, fileObject }) => name && dataUrl && fileObject
+        ({ description, dataUrl, fileObject }) =>
+          description && dataUrl && fileObject
       ),
     [nftRecords]
   );
@@ -72,8 +88,9 @@ const NewEventGroupPage: NextPage = () => {
     }
     console.log("Starting to upload images to IPFS...");
     const renamedFiles = nftRecords.map(
-      ({ fileObject, requiredParticipateCount }) => ({
+      ({ fileObject, description, requiredParticipateCount }) => ({
         fileObject: renameFile(fileObject!, `${requiredParticipateCount}.png`),
+        description,
         requiredParticipateCount,
       })
     );
@@ -104,8 +121,9 @@ const NewEventGroupPage: NextPage = () => {
     }
     const { rootCid, renamedFiles } = uploadResult;
     const nftImages: INFTImage[] = renamedFiles.map(
-      ({ fileObject, requiredParticipateCount }) => ({
+      ({ fileObject, description, requiredParticipateCount }) => ({
         image: `ipfs://${rootCid}/${fileObject.name}`,
+        description: description,
         requiredParticipateCount,
       })
     );
@@ -159,15 +177,15 @@ const NewEventGroupPage: NextPage = () => {
                     </Box>
                     <Box>
                       <Box m={2}>
-                        <Text>NFT name</Text>
+                        <Text>NFT Description</Text>
                         <Input
                           variant="outline"
                           mb={4}
-                          value={record.name}
+                          value={record.description}
                           onChange={(e) => {
                             setNftRecords((_prev) => {
                               const prev = _prev.concat();
-                              prev[index].name = e.target.value;
+                              prev[index].description = e.target.value;
                               return prev;
                             });
                           }}
