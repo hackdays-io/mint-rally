@@ -11,6 +11,7 @@ import {
   Link,
   SimpleGrid,
   Spinner,
+  Textarea,
   theme,
 } from "@chakra-ui/react";
 import { useAddress } from "@thirdweb-dev/react";
@@ -134,10 +135,6 @@ const EventCreate: NextPage = () => {
                     name="eventName"
                     rules={{
                       required: "Event name is required",
-                      minLength: {
-                        value: 4,
-                        message: "Minimum length should be 4",
-                      },
                     }}
                     render={({
                       field: { onChange, value },
@@ -167,7 +164,7 @@ const EventCreate: NextPage = () => {
                       formState: { errors },
                     }) => (
                       <>
-                        <Input
+                        <Textarea
                           id="description"
                           onChange={onChange}
                           value={value}
@@ -303,6 +300,7 @@ const EventCreate: NextPage = () => {
                 >
                   {createLoading ? <Spinner /> : status ? "Success" : "Create"}
                 </Button>
+                {status && "Your Event Created!🎉"}
                 {createError && (
                   <Alert status="error" mt={2}>
                     <AlertIcon />

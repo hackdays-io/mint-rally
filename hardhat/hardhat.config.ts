@@ -37,6 +37,7 @@ const config: HardhatUserConfig = {
     local: {
       url: "http://localhost:8545",
       accounts: [String(process.env.LOCAL_PRIVATE_KEY)],
+      allowUnlimitedContractSize: true,
     },
   },
   gasReporter: {
