@@ -2,6 +2,7 @@ import { expect } from "chai";
 import { ethers } from "hardhat";
 import { MintNFT, EventManager } from "../typechain";
 import base64 from "base64-js";
+import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 
 // ToDo requiredParticipateCountに重複がある場合エラーになってしまう。
 const images = [
@@ -96,36 +97,69 @@ describe("MintNFT", function () {
   //   expect(mintNftTxn).to.throw();
   // });
 
-  it("NFT evolution", async function () {
-    const [owner1] = await ethers.getSigners();
+  describe("NFT evolution", () => {
 
-    const txn1 = await eventManager.createGroup("group1", images);
-    await txn1.wait();
+    let owner2: SignerWithAddress;
+    let anotherGroupId: number;
+    let createdEventIds: number[] = [];
+    before(async () => {
+      const signers = await ethers.getSigners();
+      owner2 = signers[1];
 
-    let mintTxn = await mintNFT
-      .connect(owner1)
-      .mintParticipateNFT(createdGroupId, createdEventIds[0], "hackdays");
-    await mintTxn.wait();
+      const txn1 = await eventManager.createGroup("AnotherGroup", images);
+      await txn1.wait();
+      const groupsList = await eventManager.getGroups();
+      anotherGroupId = groupsList[1].groupId.toNumber();
 
-    const createAnotherEvent = await eventManager.createEventRecord(
-      createdGroupId,
-      "event2",
-      "event2 description",
-      "2022-08-3O",
-      "18:00",
-      "21:00",
-      "hackdays"
-    );
-    await createAnotherEvent.wait();
-    const createdEventsList = await eventManager.getEventRecords();
-    createdEventIds.push(createdEventsList[1].eventRecordId.toNumber());
+      const createFirstEvent = await eventManager.createEventRecord(
+        anotherGroupId,
+        "anotherEvent1",
+        "anotherEvent1description",
+        "2022-08-3O",
+        "18:00",
+        "21:00",
+        "hackdays1secret"
+      );
+      await createFirstEvent.wait();
 
-    mintTxn = await mintNFT
-      .connect(owner1)
-      .mintParticipateNFT(createdGroupId, createdEventIds[1], "hackdays");
-    await mintTxn.wait();
+      const createAnotherEvent = await eventManager.createEventRecord(
+        anotherGroupId,
+        "anotherEvent2",
+        "anotherEvent2description",
+        "2022-08-3O",
+        "18:00",
+        "21:00",
+        "hackdays2secret"
+      );
+      await createAnotherEvent.wait();
 
-    let holdingNFTs = await mintNFT.connect(owner1).getOwnedNFTs();
-    expect(holdingNFTs[1].image).equal("https://i.imgur.com/TZEhCTXaaa.png");
+      const createdEventsList = await eventManager.getEventRecords();
+      createdEventIds.push(createdEventsList[1].eventRecordId.toNumber())
+      createdEventIds.push(createdEventsList[2].eventRecordId.toNumber());
+
+      const mintTxn1 = await mintNFT
+        .connect(owner2)
+        .mintParticipateNFT(anotherGroupId, createdEventIds[0], "hackdays1secret");
+      await mintTxn1.wait();
+
+      const mintTxn2 = await mintNFT
+        .connect(owner2)
+        .mintParticipateNFT(anotherGroupId, createdEventIds[1], "hackdays2secret");
+      await mintTxn2.wait();
+    });
+
+    it("mint different NFT by participate count", async () => {
+      const holdingNFTs = await mintNFT.connect(owner2).getOwnedNFTs();
+      expect(holdingNFTs[0].image).equal("https://i.imgur.com/TZEhCTX.png");
+      expect(holdingNFTs[1].image).equal("https://i.imgur.com/TZEhCTXaaa.png");
+    });
+
+    it("doesn't mint NFT for an event once attended to the same person twice", async () => {
+      await expect(
+        mintNFT
+        .connect(owner2)
+        .mintParticipateNFT(anotherGroupId, createdEventIds[0], "hackdays1secret")
+      ).to.be.revertedWith('already minted NFT on event');
+    });
   });
 });
