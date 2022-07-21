@@ -80,6 +80,7 @@ const Navbar = () => {
         color="mint.front"
         justify="space-between"
         px={{ base: 3, md: 5 }}
+        pr={{ base: 0, md: 5 }}
       >
         <Flex
           justifyContent="center"
@@ -139,9 +140,9 @@ const Navbar = () => {
         <IconButton
           aria-label="Menu"
           icon={<HamburgerIcon />}
-          size="sm"
+          size="lg"
           variant="unstyled"
-          display={{ base: "block", md: "none" }}
+          display={{ base: "flex", md: "none" }}
           onClick={onOpen}
         />
       </Flex>

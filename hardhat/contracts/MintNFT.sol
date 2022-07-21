@@ -7,7 +7,6 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./lib/Base64.sol";
-import "./lib/Concat.sol";
 
 interface IEventManager {
     function applyForParticipation(uint256 _eventRecordId) external;
@@ -91,17 +90,15 @@ contract MintNFT is ERC721Enumerable, Ownable {
                 countOwnedGroupNFTs++;
             }
         }
-        require(
-            firstMintOnEvent,
-            "already minted NFT on event"
-        );
+        require(firstMintOnEvent, "already minted NFT on event");
 
         bool minted = false;
         ParticipateNFTAttributes memory defaultNFT;
         for (uint256 index = 0; index < groupNFTAttributes.length; index++) {
             ParticipateNFTAttributes memory gp = groupNFTAttributes[index];
+            gp.groupId = _groupId;
             gp.eventId = _eventId;
-            gp.name = Concat.concatString(gp.name, ": ", _event.name);
+            gp.name = _event.name;
             gp.description = _event.description;
 
             if (gp.requiredParticipateCount == 0) {
@@ -117,7 +114,6 @@ contract MintNFT is ERC721Enumerable, Ownable {
             attributesOfNFT[_tokenIds.current()] = defaultNFT;
             _safeMint(msg.sender, _tokenIds.current());
         }
-        _eventManager.applyForParticipation(_eventId);
         string memory mintedTokenURI = tokenURI(_tokenIds.current());
         _tokenIds.increment();
         return mintedTokenURI;

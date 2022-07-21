@@ -1,15 +1,15 @@
 import { useAddress } from "@thirdweb-dev/react";
-import { ethers } from "ethers";
+import { BigNumber, ethers } from "ethers";
 import { useEffect, useState } from "react";
 const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_EVENT_MANAGER!;
 import contract from "../contracts/EventManager.json";
 export interface IEventGroup {
-  groupId: number;
+  groupId: BigNumber;
   name: string;
 }
 export interface IEventRecord {
-  eventRecordId: number;
-  groupId: number;
+  eventRecordId: BigNumber;
+  groupId: BigNumber;
   name: string;
   description: string;
   date: Date;
@@ -21,9 +21,6 @@ export interface INFTImage {
   requiredParticipateCount: number;
 }
 
-export interface IGetEventById {
-  eventId: number;
-}
 export interface ICreateEventGroupParams {
   groupName: string;
   images: INFTImage[];
@@ -211,20 +208,27 @@ export const useEventRecords = () => {
  *
  * @returns
  */
-export const useGetEventById = () => {
+export const useGetEventById = (eventId: number) => {
   const [event, setEvent] = useState<IEventRecord | null>(null);
   const [loading, setLoading] = useState(false);
-  const getEventById = async ({ eventId }: IGetEventById) => {
-    console.log("get an even record by id");
-    const eventManager = getEventManagerContract();
-    if (!eventManager) throw "error";
-    setLoading(true);
-    const data = await eventManager.getEventById(eventId);
-    console.log("retrieved: ", data);
-    setLoading(false);
-    setEvent(data);
-  };
-  return { event, loading, getEventById };
+
+  useEffect(() => {
+    const getEventById = async () => {
+      if (!eventId) return;
+      console.log("get an even record by id");
+      const eventManager = getEventManagerContract();
+      if (!eventManager) throw "error";
+      setLoading(true);
+      const data = await eventManager.getEventById(eventId);
+      console.log("retrieved: ", data);
+      setLoading(false);
+      setEvent(data);
+    };
+
+    getEventById();
+  }, [eventId]);
+
+  return { event, loading };
 };
 
 /**
