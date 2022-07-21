@@ -5,15 +5,18 @@ import { MintNFT } from "../typechain";
 const images = [
   {
     image: "https://i.imgur.com/TZEhCTX.png",
+    description: "this is common NFT",
     requiredParticipateCount: 0,
   },
   {
     image: "https://i.imgur.com/TZEhCTX.png",
+    description: "this is uncommon NFT",
     requiredParticipateCount: 3,
   },
   {
     image: "https://i.imgur.com/TZEhCTX.png",
-    requiredParticipateCount: 0,
+    description: "this is special NFT",
+    requiredParticipateCount: 6,
   },
 ];
 

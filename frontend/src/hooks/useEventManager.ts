@@ -18,6 +18,7 @@ export interface IEventRecord {
 }
 export interface INFTImage {
   image: string;
+  description: string;
   requiredParticipateCount: number;
 }
 
@@ -76,7 +77,6 @@ export const useCreateEventGroup = () => {
       setErrors(null);
       const eventManager = getEventManagerContract();
       if (!eventManager) throw "error: contract can't found";
-      console.log(params);
       const tx = await eventManager.createGroup(
         params.groupName,
         params.images
