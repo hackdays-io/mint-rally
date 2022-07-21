@@ -8,14 +8,17 @@ import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 const images = [
   {
     image: "https://i.imgur.com/TZEhCTX.png",
+    description: "this is common NFT",
     requiredParticipateCount: 0,
   },
   {
     image: "https://i.imgur.com/TZEhCTXaaa.png",
+    description: "this is uncommon NFT",
     requiredParticipateCount: 1,
   },
   {
     image: "https://i.imgur.com/TZEhCTXaaaaa.png",
+    description: "this is special NFT",
     requiredParticipateCount: 10,
   },
 ];
@@ -82,15 +85,15 @@ describe("MintNFT", function () {
       )
     );
 
-    expect(decodedAttribute.name).equal("First Group: event1");
-    expect(decodedAttribute.description).equal("event1 description");
+    expect(decodedAttribute.name).equal("event1");
+    expect(decodedAttribute.description).equal("this is common NFT");
     expect(decodedAttribute.image).equal("https://i.imgur.com/TZEhCTX.png");
     expect(decodedAttribute.id).equal(0);
 
     const ownedNFT = await mintNFT.connect(owner1).getOwnedNFTs();
     expect(ownedNFT[0].groupId.toNumber()).equal(createdGroupId);
     expect(ownedNFT[0].eventId.toNumber()).equal(1);
-    expect(ownedNFT[0].name).equal("First Group: event1");
+    expect(ownedNFT[0].name).equal("event1");
   });
 
   // it("reject mint NFT when secret phrase is invalid", async () => {
@@ -163,7 +166,9 @@ describe("MintNFT", function () {
     it("mint different NFT by participate count", async () => {
       const holdingNFTs = await mintNFT.connect(owner2).getOwnedNFTs();
       expect(holdingNFTs[0].image).equal("https://i.imgur.com/TZEhCTX.png");
+      expect(holdingNFTs[0].description).equal("this is common NFT");
       expect(holdingNFTs[1].image).equal("https://i.imgur.com/TZEhCTXaaa.png");
+      expect(holdingNFTs[1].description).equal("this is uncommon NFT");
     });
 
     it("doesn't mint NFT for an event once attended to the same person twice", async () => {

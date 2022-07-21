@@ -99,7 +99,6 @@ contract MintNFT is ERC721Enumerable, Ownable {
             gp.groupId = _groupId;
             gp.eventId = _eventId;
             gp.name = _event.name;
-            gp.description = _event.description;
 
             if (gp.requiredParticipateCount == 0) {
                 defaultNFT = gp;
@@ -160,7 +159,7 @@ contract MintNFT is ERC721Enumerable, Ownable {
                 ParticipateNFTAttributes({
                     name: attributes[index].name,
                     image: attributes[index].image,
-                    description: "",
+                    description: attributes[index].description,
                     groupId: attributes[index].groupId,
                     eventId: attributes[index].eventId,
                     requiredParticipateCount: attributes[index]

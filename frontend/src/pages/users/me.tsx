@@ -58,7 +58,7 @@ const User = () => {
   );
 
   const Collection: FC<{
-    collectionData: { image: string; name: string }[];
+    collectionData: { image: string; name: string; description: string }[];
   }> = ({ collectionData }) => {
     return (
       <Flex
@@ -90,8 +90,9 @@ const User = () => {
       {groups.length > 0 &&
         Object.entries(nftCollectionsByGroup).map(([groupIdString, nfts]) => {
           const id = groupIdString;
-          const data = nfts.map(({ name, image }) => ({
+          const data = nfts.map(({ name, image, description }) => ({
             name,
+            description,
             image: getUrlThoughGateway(image),
           }));
 
