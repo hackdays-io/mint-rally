@@ -30,6 +30,7 @@ contract EventManager is Ownable {
 
     struct GroupAttributes {
         string image;
+        string description;
         uint256 requiredParticipateCount;
     }
 
@@ -86,7 +87,7 @@ contract EventManager is Ownable {
             _participateNFTAttributes[_i] = IMintNFT.ParticipateNFTAttributes({
                 name: _name,
                 image: _groupAttributes[_i].image,
-                description: "",
+                description: _groupAttributes[_i].description,
                 groupId: _newGroupId,
                 eventId: 0,
                 requiredParticipateCount: _groupAttributes[_i]

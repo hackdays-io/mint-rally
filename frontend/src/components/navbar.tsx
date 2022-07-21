@@ -40,7 +40,7 @@ const Navbar = () => {
             onClick={disconnectWallet}
             size="lg"
           >
-            Sign out
+            Disconnect
           </Button>
         ) : (
           <Button
@@ -51,7 +51,7 @@ const Navbar = () => {
             onClick={connectWithMetamask}
             size="lg"
           >
-            Sign in
+            Connect
           </Button>
         )}
         {address && (
