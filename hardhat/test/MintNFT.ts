@@ -86,6 +86,11 @@ describe("MintNFT", function () {
     expect(decodedAttribute.description).equal("event1 description");
     expect(decodedAttribute.image).equal("https://i.imgur.com/TZEhCTX.png");
     expect(decodedAttribute.id).equal(0);
+
+    const ownedNFT = await mintNFT.connect(owner1).getOwnedNFTs();
+    expect(ownedNFT[0].groupId.toNumber()).equal(createdGroupId);
+    expect(ownedNFT[0].eventId.toNumber()).equal(1);
+    expect(ownedNFT[0].name).equal("First Group: event1");
   });
 
   // it("reject mint NFT when secret phrase is invalid", async () => {
@@ -98,7 +103,6 @@ describe("MintNFT", function () {
   // });
 
   describe("NFT evolution", () => {
-
     let owner2: SignerWithAddress;
     let anotherGroupId: number;
     let createdEventIds: number[] = [];
@@ -134,17 +138,25 @@ describe("MintNFT", function () {
       await createAnotherEvent.wait();
 
       const createdEventsList = await eventManager.getEventRecords();
-      createdEventIds.push(createdEventsList[1].eventRecordId.toNumber())
+      createdEventIds.push(createdEventsList[1].eventRecordId.toNumber());
       createdEventIds.push(createdEventsList[2].eventRecordId.toNumber());
 
       const mintTxn1 = await mintNFT
         .connect(owner2)
-        .mintParticipateNFT(anotherGroupId, createdEventIds[0], "hackdays1secret");
+        .mintParticipateNFT(
+          anotherGroupId,
+          createdEventIds[0],
+          "hackdays1secret"
+        );
       await mintTxn1.wait();
 
       const mintTxn2 = await mintNFT
         .connect(owner2)
-        .mintParticipateNFT(anotherGroupId, createdEventIds[1], "hackdays2secret");
+        .mintParticipateNFT(
+          anotherGroupId,
+          createdEventIds[1],
+          "hackdays2secret"
+        );
       await mintTxn2.wait();
     });
 
@@ -157,9 +169,13 @@ describe("MintNFT", function () {
     it("doesn't mint NFT for an event once attended to the same person twice", async () => {
       await expect(
         mintNFT
-        .connect(owner2)
-        .mintParticipateNFT(anotherGroupId, createdEventIds[0], "hackdays1secret")
-      ).to.be.revertedWith('already minted NFT on event');
+          .connect(owner2)
+          .mintParticipateNFT(
+            anotherGroupId,
+            createdEventIds[0],
+            "hackdays1secret"
+          )
+      ).to.be.revertedWith("already minted NFT on event");
     });
   });
 });

@@ -1,14 +1,15 @@
-import { ethers } from "ethers";
-import { useState } from "react";
+import { useAddress } from "@thirdweb-dev/react";
+import { BigNumber, ethers } from "ethers";
+import { useEffect, useState } from "react";
 const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_EVENT_MANAGER!;
 import contract from "../contracts/EventManager.json";
 export interface IEventGroup {
-  groupId: number;
+  groupId: BigNumber;
   name: string;
 }
 export interface IEventRecord {
-  eventRecordId: number;
-  groupId: number;
+  eventRecordId: BigNumber;
+  groupId: BigNumber;
   name: string;
   description: string;
   date: Date;
@@ -20,9 +21,6 @@ export interface INFTImage {
   requiredParticipateCount: number;
 }
 
-export interface IGetEventById {
-  eventId: number;
-}
 export interface ICreateEventGroupParams {
   groupName: string;
   images: INFTImage[];
@@ -101,17 +99,22 @@ export const useCreateEventGroup = () => {
 export const useEventGroups = () => {
   const [groups, setGroups] = useState<IEventGroup[]>([]);
   const [loading, setLoading] = useState(false);
-  const getEventGroups = async () => {
-    console.log("get event groups");
-    const eventManager = getEventManagerContract();
-    if (!eventManager) throw "error";
-    setLoading(true);
-    const data = await eventManager.getGroups();
-    console.log(data);
-    setGroups(data);
-    setLoading(false);
-  };
-  return { groups, loading, getEventGroups };
+
+  useEffect(() => {
+    const getEventGroups = async () => {
+      console.log("get event groups");
+      const eventManager = getEventManagerContract();
+      if (!eventManager) throw "error";
+      setLoading(true);
+      const data = await eventManager.getGroups();
+      console.log(data);
+      setGroups(data);
+      setLoading(false);
+    };
+    getEventGroups();
+  }, []);
+
+  return { groups, loading };
 };
 
 /**
@@ -120,16 +123,23 @@ export const useEventGroups = () => {
 export const useOwnEventGroups = () => {
   const [groups, setGroups] = useState<IEventGroup[]>([]);
   const [loading, setLoading] = useState(false);
-  const getOwnEventGroups = async () => {
-    const eventManager = getEventManagerContract();
-    if (!eventManager) throw "error: contract can't found";
-    setLoading(true);
-    const data = await eventManager.getOwnGroups();
-    setLoading(false);
-    setGroups(data);
-    console.log(data);
-  };
-  return { groups, loading, getOwnEventGroups };
+  const address = useAddress();
+
+  useEffect(() => {
+    const getOwnEventGroups = async () => {
+      if (!address) return;
+      const eventManager = getEventManagerContract();
+      if (!eventManager) throw "error: contract can't found";
+      setLoading(true);
+      const data = await eventManager.getOwnGroups();
+      setLoading(false);
+      setGroups(data);
+      console.log(data);
+    };
+    getOwnEventGroups();
+  }, [address]);
+
+  return { groups, loading };
 };
 
 /**
@@ -175,17 +185,22 @@ export const useCreateEventRecord = () => {
 export const useEventRecords = () => {
   const [records, setRecords] = useState<IEventRecord[]>([]);
   const [loading, setLoading] = useState(false);
-  const getEventRecords = async () => {
-    console.log("get event records");
-    const eventManager = getEventManagerContract();
-    if (!eventManager) throw "error";
-    setLoading(true);
-    const data = await eventManager.getEventRecords();
-    console.log("retrieved:", data);
-    setLoading(false);
-    setRecords(data);
-  };
-  return { records, loading, getEventRecords };
+
+  useEffect(() => {
+    const getEventRecords = async () => {
+      console.log("get event records");
+      const eventManager = getEventManagerContract();
+      if (!eventManager) throw "error";
+      setLoading(true);
+      const data = await eventManager.getEventRecords();
+      console.log("retrieved:", data);
+      setLoading(false);
+      setRecords(data);
+    };
+    getEventRecords();
+  }, []);
+
+  return { records, loading };
 };
 
 /**
@@ -193,20 +208,27 @@ export const useEventRecords = () => {
  *
  * @returns
  */
-export const useGetEventById = () => {
+export const useGetEventById = (eventId: number) => {
   const [event, setEvent] = useState<IEventRecord | null>(null);
   const [loading, setLoading] = useState(false);
-  const getEventById = async ({ eventId }: IGetEventById) => {
-    console.log("get an even record by id");
-    const eventManager = getEventManagerContract();
-    if (!eventManager) throw "error";
-    setLoading(true);
-    const data = await eventManager.getEventById(eventId);
-    console.log("retrieved: ", data);
-    setLoading(false);
-    setEvent(data);
-  };
-  return { event, loading, getEventById };
+
+  useEffect(() => {
+    const getEventById = async () => {
+      if (!eventId) return;
+      console.log("get an even record by id");
+      const eventManager = getEventManagerContract();
+      if (!eventManager) throw "error";
+      setLoading(true);
+      const data = await eventManager.getEventById(eventId);
+      console.log("retrieved: ", data);
+      setLoading(false);
+      setEvent(data);
+    };
+
+    getEventById();
+  }, [eventId]);
+
+  return { event, loading };
 };
 
 /**

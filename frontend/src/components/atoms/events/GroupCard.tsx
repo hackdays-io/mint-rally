@@ -1,6 +1,9 @@
 import { Box, Flex, Heading } from "@chakra-ui/react";
+import { FC } from "react";
 
-export const Card = ({ title, href }: { title: string; href: string }) => {
+type Props = { title: string };
+
+const EventGroupCard: FC<Props> = ({ title }) => {
   return (
     <Box
       maxW="sm"
@@ -9,9 +12,6 @@ export const Card = ({ title, href }: { title: string; href: string }) => {
       overflow="hidden"
       w={250}
       h={100}
-      onClick={() => {
-        location.href = href;
-      }}
       _hover={{ cursor: "pointer" }}
       textAlign="center"
       verticalAlign="center"
@@ -24,3 +24,5 @@ export const Card = ({ title, href }: { title: string; href: string }) => {
     </Box>
   );
 };
+
+export default EventGroupCard;
