@@ -35,7 +35,7 @@ const Events: NextPage = () => {
                 return (
                   <Link
                     href={"/events/" + item.eventRecordId}
-                    key={item.eventRecordId}
+                    key={item.eventRecordId.toString()}
                   >
                     <a>
                       <EventCard

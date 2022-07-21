@@ -40,7 +40,7 @@ const EventGroups: NextPage = () => {
               {groups.map((item: IEventGroup) => {
                 return (
                   <Link
-                    key={item.groupId}
+                    key={item.groupId.toString()}
                     href={"/event-groups/" + item.groupId}
                   >
                     <a>
