@@ -2,6 +2,13 @@ import { BigNumber, ethers } from "ethers";
 import { useState } from "react";
 const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_MINT_NFT_MANAGER!;
 import contract from "../contracts/MintNFT.json";
+import {
+  ChainId,
+  useAddress,
+  useMetamask,
+  useNetwork,
+  useNetworkMismatch,
+} from "@thirdweb-dev/react";
 
 export interface IMintParticipateNFTParams {
   groupId: number;
@@ -44,6 +51,10 @@ export const useMintParticipateNFT = () => {
   const [errors, setErrors] = useState<Error | null>(null);
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState(false);
+  const address = useAddress();
+  const isMismatched = useNetworkMismatch();
+  const [, switchNetwork] = useNetwork();
+  const connectWithMetamask = useMetamask();
   const mintParticipateNFT = async ({
     groupId,
     eventId,
@@ -51,11 +62,17 @@ export const useMintParticipateNFT = () => {
   }: IMintParticipateNFTParams) => {
     try {
       setErrors(null);
+      setLoading(true);
+      if (!address) {
+        await connectWithMetamask();
+      }
+      if (!isMismatched && switchNetwork) {
+        await switchNetwork(ChainId.Mumbai);
+      }
       const mintNFTManager = getMintNFTManagerContract();
       if (!mintNFTManager)
         throw new Error("Cannot find mintNFTManager contract");
 
-      setLoading(true);
       const tx = await mintNFTManager.mintParticipateNFT(
         groupId,
         eventId,
@@ -75,11 +92,21 @@ export const useMintParticipateNFT = () => {
 export const useGetOwnedNFTs = () => {
   const [ownedNFTs, setOwnedNFTs] = useState<IOwnedNFT[]>([]);
   const [loading, setLoading] = useState(false);
+  const address = useAddress();
+  const isMismatched = useNetworkMismatch();
+  const [, switchNetwork] = useNetwork();
+  const connectWithMetamask = useMetamask();
   const getOwnedNFTs = async () => {
+    setLoading(true);
+    if (!address) {
+      await connectWithMetamask();
+    }
+    if (!isMismatched && switchNetwork) {
+      await switchNetwork(ChainId.Mumbai);
+    }
     const mintNFTManager = getMintNFTManagerContract();
     if (!mintNFTManager) throw new Error("Cannot find mintNFTManager contract");
 
-    setLoading(true);
     const data = await mintNFTManager.getOwnedNFTs();
     console.log("retrieved owned nfts:", data);
     setLoading(false);

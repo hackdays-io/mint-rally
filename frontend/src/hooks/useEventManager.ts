@@ -1,4 +1,10 @@
-import { useAddress } from "@thirdweb-dev/react";
+import {
+  ChainId,
+  useAddress,
+  useMetamask,
+  useNetwork,
+  useNetworkMismatch,
+} from "@thirdweb-dev/react";
 import { BigNumber, ethers } from "ethers";
 import { useEffect, useState } from "react";
 const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_EVENT_MANAGER!;
@@ -71,10 +77,20 @@ export const useCreateEventGroup = () => {
   const [errors, setErrors] = useState<Error | null>(null);
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState(false);
+  const address = useAddress();
+  const isMismatched = useNetworkMismatch();
+  const [, switchNetwork] = useNetwork();
+  const connectWithMetamask = useMetamask();
   const createEventGroup = async (params: ICreateEventGroupParams) => {
     try {
       setLoading(true);
       setErrors(null);
+      if (!address) {
+        await connectWithMetamask();
+      }
+      if (isMismatched && switchNetwork) {
+        await switchNetwork(ChainId.Mumbai);
+      }
       const eventManager = getEventManagerContract();
       if (!eventManager) throw "error: contract can't found";
       const tx = await eventManager.createGroup(
@@ -99,13 +115,24 @@ export const useCreateEventGroup = () => {
 export const useEventGroups = () => {
   const [groups, setGroups] = useState<IEventGroup[]>([]);
   const [loading, setLoading] = useState(false);
+  const address = useAddress();
+  const isMismatched = useNetworkMismatch();
+  const [, switchNetwork] = useNetwork();
+  const connectWithMetamask = useMetamask();
 
   useEffect(() => {
     const getEventGroups = async () => {
+      setLoading(true);
+      if (!address) {
+        await connectWithMetamask();
+      }
+      if (isMismatched && switchNetwork) {
+        await switchNetwork(ChainId.Mumbai);
+      }
+
       console.log("get event groups");
       const eventManager = getEventManagerContract();
       if (!eventManager) throw "error";
-      setLoading(true);
       const data = await eventManager.getGroups();
       console.log(data);
       setGroups(data);
@@ -124,13 +151,21 @@ export const useOwnEventGroups = () => {
   const [groups, setGroups] = useState<IEventGroup[]>([]);
   const [loading, setLoading] = useState(false);
   const address = useAddress();
+  const isMismatched = useNetworkMismatch();
+  const [, switchNetwork] = useNetwork();
+  const connectWithMetamask = useMetamask();
 
   useEffect(() => {
     const getOwnEventGroups = async () => {
-      if (!address) return;
+      setLoading(true);
+      if (!address) {
+        await connectWithMetamask();
+      }
+      if (isMismatched && switchNetwork) {
+        await switchNetwork(ChainId.Mumbai);
+      }
       const eventManager = getEventManagerContract();
       if (!eventManager) throw "error: contract can't found";
-      setLoading(true);
       const data = await eventManager.getOwnGroups();
       setLoading(false);
       setGroups(data);
@@ -150,12 +185,22 @@ export const useCreateEventRecord = () => {
   const [errors, setErrors] = useState<Error | null>(null);
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState(false);
+  const address = useAddress();
+  const isMismatched = useNetworkMismatch();
+  const [, switchNetwork] = useNetwork();
+  const connectWithMetamask = useMetamask();
   const createEventRecord = async (params: ICreateEventRecordParams) => {
     setErrors(null);
     try {
+      setLoading(true);
+      if (!address) {
+        await connectWithMetamask();
+      }
+      if (isMismatched && switchNetwork) {
+        await switchNetwork(ChainId.Mumbai);
+      }
       const eventManager = getEventManagerContract();
       if (!eventManager) throw "error: contract can't found";
-      setLoading(true);
       const datestr = params.date.toLocaleDateString();
       const tx = await eventManager.createEventRecord(
         params.groupId,
@@ -185,13 +230,23 @@ export const useCreateEventRecord = () => {
 export const useEventRecords = () => {
   const [records, setRecords] = useState<IEventRecord[]>([]);
   const [loading, setLoading] = useState(false);
+  const address = useAddress();
+  const isMismatched = useNetworkMismatch();
+  const [, switchNetwork] = useNetwork();
+  const connectWithMetamask = useMetamask();
 
   useEffect(() => {
     const getEventRecords = async () => {
+      setLoading(true);
+      if (!address) {
+        await connectWithMetamask();
+      }
+      if (isMismatched && switchNetwork) {
+        await switchNetwork(ChainId.Mumbai);
+      }
       console.log("get event records");
       const eventManager = getEventManagerContract();
       if (!eventManager) throw "error";
-      setLoading(true);
       const data = await eventManager.getEventRecords();
       console.log("retrieved:", data);
       setLoading(false);
@@ -211,14 +266,24 @@ export const useEventRecords = () => {
 export const useGetEventById = (eventId: number) => {
   const [event, setEvent] = useState<IEventRecord | null>(null);
   const [loading, setLoading] = useState(false);
+  const address = useAddress();
+  const isMismatched = useNetworkMismatch();
+  const [, switchNetwork] = useNetwork();
+  const connectWithMetamask = useMetamask();
 
   useEffect(() => {
     const getEventById = async () => {
+      setLoading(true);
+      if (!address) {
+        await connectWithMetamask();
+      }
+      if (isMismatched && switchNetwork) {
+        await switchNetwork(ChainId.Mumbai);
+      }
       if (!eventId) return;
       console.log("get an even record by id");
       const eventManager = getEventManagerContract();
       if (!eventManager) throw "error";
-      setLoading(true);
       const data = await eventManager.getEventById(eventId);
       console.log("retrieved: ", data);
       setLoading(false);
@@ -239,11 +304,21 @@ export const useGetEventById = (eventId: number) => {
 export const useGetParticipationEventIds = () => {
   const [eventIds, setEventIds] = useState<number[]>([]);
   const [loading, setLoading] = useState(false);
+  const address = useAddress();
+  const isMismatched = useNetworkMismatch();
+  const [, switchNetwork] = useNetwork();
+  const connectWithMetamask = useMetamask();
   const getParticipationEventIds = async () => {
+    setLoading(true);
+    if (!address) {
+      await connectWithMetamask();
+    }
+    if (isMismatched && switchNetwork) {
+      await switchNetwork(ChainId.Mumbai);
+    }
     console.log("get event records that you have applied for participation");
     const eventManager = getEventManagerContract();
     if (!eventManager) throw "error";
-    setLoading(true);
     const data = await eventManager.getParticipationEventIds();
     console.log("retrieved:", data);
     setLoading(false);
@@ -262,12 +337,22 @@ export const useApplyForParticipation = () => {
   const [errors, setErrors] = useState<Error | null>(null);
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState(false);
+  const address = useAddress();
+  const isMismatched = useNetworkMismatch();
+  const [, switchNetwork] = useNetwork();
+  const connectWithMetamask = useMetamask();
   const applyForParticipation = async (params: IApplyForParticipation) => {
     setErrors(null);
     try {
+      setLoading(true);
+      if (!address) {
+        await connectWithMetamask();
+      }
+      if (isMismatched && switchNetwork) {
+        await switchNetwork(ChainId.Mumbai);
+      }
       const eventManager = getEventManagerContract();
       if (!eventManager) throw "error: contract can't found";
-      setLoading(true);
       const tx = await eventManager.applyForParticipation(params.eventId);
       await tx.wait();
       setLoading(false);

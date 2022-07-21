@@ -15,23 +15,63 @@ import {
   Flex,
   IconButton,
   Spacer,
+  useBoolean,
   useDisclosure,
 } from "@chakra-ui/react";
-import { useAddress, useDisconnect, useMetamask } from "@thirdweb-dev/react";
+import {
+  ChainId,
+  useAddress,
+  useDisconnect,
+  useMetamask,
+  useNetwork,
+  useNetworkMismatch,
+} from "@thirdweb-dev/react";
 import router from "next/router";
 import Image from "next/image";
 import Link from "next/link";
 
 const Navbar = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [loading, setLoading] = useBoolean(false);
   const address = useAddress();
   const connectWithMetamask = useMetamask();
+  const isMismatched = useNetworkMismatch();
+  const [, switchNetwork] = useNetwork();
   const disconnectWallet = useDisconnect();
 
   const MetamaskLogin = () => {
-    return (
-      <Flex justifyContent="center" alignItems="center" mt={{ base: 5, md: 0 }}>
-        {address ? (
+    if (isMismatched && switchNetwork) {
+      return (
+        <Flex
+          justifyContent="center"
+          alignItems="center"
+          mt={{ base: 5, md: 0 }}
+        >
+          <Button
+            bg="mint.subtle"
+            color="mint.font"
+            borderRadius={"16px"}
+            variant="solid"
+            isLoading={loading}
+            onClick={async () => {
+              setLoading.on();
+              await switchNetwork(ChainId.Mumbai);
+              setLoading.off();
+            }}
+            size="lg"
+          >
+            Switch to Mumbai Testnet
+          </Button>
+        </Flex>
+      );
+    }
+    if (address) {
+      return (
+        <Flex
+          justifyContent="center"
+          alignItems="center"
+          mt={{ base: 5, md: 0 }}
+        >
           <Button
             bg="mint.subtle"
             color="mint.font"
@@ -42,19 +82,6 @@ const Navbar = () => {
           >
             Disconnect
           </Button>
-        ) : (
-          <Button
-            bg="mint.subtle"
-            color="mint.font"
-            borderRadius={"16px"}
-            variant="solid"
-            onClick={connectWithMetamask}
-            size="lg"
-          >
-            Connect
-          </Button>
-        )}
-        {address && (
           <Box marginLeft={3} cursor="pointer">
             <Link href="/users/me">
               <Image
@@ -66,7 +93,21 @@ const Navbar = () => {
               />
             </Link>
           </Box>
-        )}
+        </Flex>
+      );
+    }
+    return (
+      <Flex justifyContent="center" alignItems="center" mt={{ base: 5, md: 0 }}>
+        <Button
+          bg="mint.subtle"
+          color="mint.font"
+          borderRadius={"16px"}
+          variant="solid"
+          onClick={connectWithMetamask}
+          size="lg"
+        >
+          Connect
+        </Button>
       </Flex>
     );
   };
