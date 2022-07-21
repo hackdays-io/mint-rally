@@ -36,7 +36,7 @@ const EventGroup = () => {
                       return (
                         <Link
                           href={"/events/" + record.eventRecordId}
-                          key={record.eventRecordId}
+                          key={record.eventRecordId.toString()}
                         >
                           <a>
                             <EventCard

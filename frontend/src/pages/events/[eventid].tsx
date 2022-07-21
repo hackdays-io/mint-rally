@@ -36,8 +36,8 @@ const Event = () => {
   const claimMint = async () => {
     if (!event) return;
     await mintParticipateNFT({
-      groupId: event.groupId,
-      eventId: (event.eventRecordId as any).toNumber(),
+      groupId: event.groupId.toNumber(),
+      eventId: event.eventRecordId.toNumber(),
       secretPhrase: enteredSecretPhrase,
     });
   };
