@@ -29,7 +29,7 @@ const Events: NextPage = () => {
         {loading ? (
           <Spinner></Spinner>
         ) : (
-          <SimpleGrid columns={3} spacing={5}>
+          <SimpleGrid columns={{ base: 2, md: 3 }} spacing={5}>
             <>
               {records.map((item) => {
                 return (
