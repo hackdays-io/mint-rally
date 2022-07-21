@@ -4,38 +4,27 @@ import {
   Container,
   Flex,
   Heading,
-  Link,
-  List,
-  ListIcon,
-  ListItem,
   SimpleGrid,
   Spacer,
   Spinner,
 } from "@chakra-ui/react";
 import { NextPage } from "next";
-import { useEffect } from "react";
-import { Card } from "../../components/card";
-import { IEventRecord, useEventRecords } from "../../hooks/useEventManager";
+import Link from "next/link";
+import EventCard from "../../components/atoms/events/EventCard";
+import { useEventRecords } from "../../hooks/useEventManager";
 
 const Events: NextPage = () => {
-  const { records, loading, getEventRecords } = useEventRecords();
-  useEffect(() => {
-    getEventRecords();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const { records, loading } = useEventRecords();
+
   return (
     <>
       <Container maxW={800} paddingTop={6}>
         <Flex alignItems="bottom" paddingBottom={6}>
           <Heading>Events</Heading>
           <Spacer></Spacer>
-          <Button
-            onClick={() => {
-              window.location.href = "/events/new";
-            }}
-          >
-            Create new event
-          </Button>
+          <Link href="/events/new">
+            <Button>Create new event</Button>
+          </Link>
         </Flex>
         {loading ? (
           <Spinner></Spinner>
@@ -44,12 +33,17 @@ const Events: NextPage = () => {
             <>
               {records.map((item) => {
                 return (
-                  <Box key={item.eventRecordId} width={400} height={300}>
-                    <Card
-                      href={"/events/" + item.eventRecordId}
-                      title={item.name}
-                    ></Card>
-                  </Box>
+                  <Link
+                    href={"/events/" + item.eventRecordId}
+                    key={item.eventRecordId.toString()}
+                  >
+                    <a>
+                      <EventCard
+                        title={item.name}
+                        description={item.description}
+                      ></EventCard>
+                    </a>
+                  </Link>
                 );
               })}
             </>

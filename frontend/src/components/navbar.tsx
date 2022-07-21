@@ -30,58 +30,44 @@ const Navbar = () => {
 
   const MetamaskLogin = () => {
     return (
-      <>
-        <Flex alignItems="center">
-          <Box marginRight="3">
-            {address ? (
-              <Button
-                bg="mint.subtle"
-                color="mint.font"
-                borderRadius={"16px"}
-                variant="solid"
-                onClick={disconnectWallet}
-                size="lg"
-              >
-                Sign out
-              </Button>
-            ) : (
-              <Button
-                bg="mint.subtle"
-                color="mint.font"
-                borderRadius={"16px"}
-                variant="solid"
-                onClick={connectWithMetamask}
-                size="lg"
-              >
-                Sign in
-              </Button>
-            )}
-          </Box>
-          {address ? (
-            <Flex as="a" marginLeft="3">
-              <Link href="/users/me">
-                <Image
-                  src="/user.png"
-                  alt="Loggedin"
-                  width={65.78}
-                  height={65.78}
-                  objectFit="contain"
-                />
-              </Link>
-            </Flex>
-          ) : (
-            <Flex marginLeft="3">
+      <Flex justifyContent="center" alignItems="center" mt={{ base: 5, md: 0 }}>
+        {address ? (
+          <Button
+            bg="mint.subtle"
+            color="mint.font"
+            borderRadius={"16px"}
+            variant="solid"
+            onClick={disconnectWallet}
+            size="lg"
+          >
+            Sign out
+          </Button>
+        ) : (
+          <Button
+            bg="mint.subtle"
+            color="mint.font"
+            borderRadius={"16px"}
+            variant="solid"
+            onClick={connectWithMetamask}
+            size="lg"
+          >
+            Sign in
+          </Button>
+        )}
+        {address && (
+          <Box marginLeft={3} cursor="pointer">
+            <Link href="/users/me">
               <Image
-                src="/images/guest.svg"
-                alt="guest"
+                src="/user.png"
+                alt="Loggedin"
                 width={65.78}
                 height={65.78}
                 objectFit="contain"
               />
-            </Flex>
-          )}
-        </Flex>
-      </>
+            </Link>
+          </Box>
+        )}
+      </Flex>
     );
   };
 
@@ -93,65 +79,70 @@ const Navbar = () => {
         align="center"
         color="mint.front"
         justify="space-between"
-        height={"120px"}
-        padding={{ base: 3, md: 5 }}
+        px={{ base: 3, md: 5 }}
+        pr={{ base: 0, md: 5 }}
       >
-        <Flex align="center" me={8} _hover={{ cursor: "pointer" }}>
+        <Flex
+          justifyContent="center"
+          width={{ base: "150px", md: "auto" }}
+          pr={8}
+        >
           <Link href="/">
             <Image
               src={"/images/logo.svg"}
-              height={110}
-              width={295}
+              height={93.5}
+              width={250}
               objectFit="contain"
               alt="Mint Rally Logo"
             />
           </Link>
         </Flex>
+        <Box pr={4} display={{ base: "none", md: "block" }}>
+          <Link href="/event-groups">
+            <Button
+              leftIcon={<SettingsIcon />}
+              bg="mint.white"
+              color="mint.font"
+              borderRadius={"16px"}
+              variant="solid"
+              size="lg"
+            >
+              EventGroups
+            </Button>
+          </Link>
+        </Box>
+        <Box display={{ base: "none", md: "block" }}>
+          <Link href="/events">
+            <Button
+              leftIcon={<CalendarIcon />}
+              bg="mint.white"
+              color="mint.font"
+              borderRadius={"16px"}
+              variant="solid"
+              size="lg"
+            >
+              Events
+            </Button>
+          </Link>
+        </Box>
         <Flex
           align="center"
           fontSize="sm"
           flexGrow={2}
           display={{ base: "none", md: "flex" }}
         >
-          <Box mr={8}>
-            <Link href="/event-groups">
-              <Button
-                leftIcon={<SettingsIcon />}
-                bg="mint.white"
-                color="mint.font"
-                borderRadius={"16px"}
-                variant="solid"
-                size="lg"
-              >
-                EventGroups
-              </Button>
-            </Link>
-          </Box>
-          <Box>
-            <Link href="/events">
-              <Button
-                leftIcon={<CalendarIcon />}
-                bg="mint.white"
-                color="mint.font"
-                borderRadius={"16px"}
-                variant="solid"
-                size="lg"
-              >
-                Events
-              </Button>
-            </Link>
-          </Box>
           <Spacer />
           <Box pr={4}>
             <MetamaskLogin></MetamaskLogin>
           </Box>
         </Flex>
+
         <IconButton
           aria-label="Menu"
           icon={<HamburgerIcon />}
-          size="sm"
+          size="lg"
           variant="unstyled"
-          display={{ base: "block", md: "none" }}
+          display={{ base: "flex", md: "none" }}
           onClick={onOpen}
         />
       </Flex>
