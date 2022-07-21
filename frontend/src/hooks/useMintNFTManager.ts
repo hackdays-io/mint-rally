@@ -11,6 +11,7 @@ export interface IMintParticipateNFTParams {
 
 export interface IOwnedNFT {
   name: string;
+  description: string;
   image: string;
   groupId: BigNumber;
   eventId: BigNumber;
