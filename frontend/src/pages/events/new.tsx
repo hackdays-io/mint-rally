@@ -116,7 +116,10 @@ const EventCreate: NextPage = () => {
                   >
                     {groups.map((item: IEventGroup) => {
                       return (
-                        <option value={item.groupId} key={item.groupId}>
+                        <option
+                          value={item.groupId.toNumber()}
+                          key={item.groupId.toString()}
+                        >
                           {item.name}
                         </option>
                       );
