@@ -43,8 +43,6 @@ const User = () => {
       <Box>
         <Image
           src={image}
-          width={179}
-          height={179}
           alt={name}
           style={{ borderRadius: "60px" }}
         />
@@ -70,7 +68,7 @@ const User = () => {
       >
         {collectionData.map((data, i) => {
           return (
-            <Box key={i} width="20%" mb={8} textAlign="center">
+            <Box key={i} width={{base:"50%", sm:"33%", md:"25%", lg:"20%"}} mb={8} textAlign="center">
               {ImageBadge({ image: data.image, name: data.name })}
             </Box>
           );
