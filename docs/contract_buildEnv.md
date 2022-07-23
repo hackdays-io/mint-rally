@@ -25,4 +25,4 @@ For deploying contract to network, deployer need gas fee for deploy.
 
 ### .env ファイルに秘密鍵をセット
 
-.env.example をもとに.env をつくって、PRIVATE_KEY に 1.4 でコピーした秘密鍵をセット。
+.env.example をもとに.env をつくって、LOCAL_PRIVATE_KEY に 1.4 でコピーした秘密鍵をセット。テストネット、メインネットにデプロイなどをする場合は、PRIVATE_KEY にもセット。
