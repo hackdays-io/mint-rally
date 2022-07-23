@@ -75,7 +75,7 @@ const Event = () => {
 
             {(hasNftForThisEvent || mintStatus)?
               <Text>
-                Thank you for your participation!
+                You already have this event's NFT. Thank you for your participation!
               </Text>:
               <Flex
                 width="100%"
