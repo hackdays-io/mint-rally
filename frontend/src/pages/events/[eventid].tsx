@@ -13,16 +13,19 @@ import {
   Flex,
   Link,
 } from "@chakra-ui/react";
+import { BigNumber } from "ethers";
 import { useRouter } from "next/router";
-import { Fragment, useState } from "react";
+import { Fragment, useState, useEffect, useMemo } from "react";
 import { useGetEventById } from "../../hooks/useEventManager";
-import { useMintParticipateNFT } from "../../hooks/useMintNFTManager";
+import { useMintParticipateNFT, getMintNFTManagerContract, useGetOwnedNFTs } from "../../hooks/useMintNFTManager";
 import dayjs from "dayjs";
+import { FEATURE_NFT_SIGNATURE_MINTABLE } from "@thirdweb-dev/sdk/dist/src/constants/erc721-features";
 
 const Event = () => {
   const router = useRouter();
   const { eventid } = router.query;
   const { event, loading: loadingFetch } = useGetEventById(Number(eventid));
+  const { ownedNFTs, loading, getOwnedNFTs } = useGetOwnedNFTs();
 
   const {
     status: mintStatus,
@@ -30,6 +33,10 @@ const Event = () => {
     loading: mintLoading,
     mintParticipateNFT,
   } = useMintParticipateNFT();
+
+  useEffect(() => {
+    getOwnedNFTs();
+  }, []);
 
   const [enteredSecretPhrase, setEnteredSecretPhrase] = useState("");
 
@@ -41,6 +48,10 @@ const Event = () => {
       secretPhrase: enteredSecretPhrase,
     });
   };
+
+  const hasNftForThisEvent = useMemo(() => {
+    return ownedNFTs.some(nft => !!event && nft.groupId.eq(event.groupId) && nft.eventId.eq(BigNumber.from(eventid)))
+  }, [event, ownedNFTs]);
 
   return (
     <>
@@ -62,34 +73,39 @@ const Event = () => {
               ))}
             </Text>
 
-            <Flex
-              width="100%"
-              justifyContent="space-between"
-              alignItems="end"
-              flexWrap="wrap"
-            >
-              <Box width={{ base: "100%", md: "48%" }} mb={{ base: 5, md: 0 }}>
-                <Text mb={2}>
-                  Secret Phrase. Event organaizers will tell you.
-                </Text>
-                <Input
-                  variant="outline"
-                  type="password"
-                  value={enteredSecretPhrase}
-                  onChange={(e) => setEnteredSecretPhrase(e.target.value)}
-                />
-              </Box>
-              <Button
-                width={{ base: "100%", md: "48%" }}
-                isLoading={mintLoading}
-                onClick={() => claimMint()}
-                background="mint.primary"
-                color="white"
-                rounded="full"
+            {(hasNftForThisEvent || mintStatus)?
+              <Text>
+                Thank you for your participation!
+              </Text>:
+              <Flex
+                width="100%"
+                justifyContent="space-between"
+                alignItems="end"
+                flexWrap="wrap"
               >
-                Claim NFT!
-              </Button>
-            </Flex>
+                <Box width={{ base: "100%", md: "48%" }} mb={{ base: 5, md: 0 }}>
+                  <Text mb={2}>
+                    Secret Phrase. Event organaizers will tell you.
+                  </Text>
+                  <Input
+                    variant="outline"
+                    type="password"
+                    value={enteredSecretPhrase}
+                    onChange={(e) => setEnteredSecretPhrase(e.target.value)}
+                  />
+                </Box>
+                <Button
+                  width={{ base: "100%", md: "48%" }}
+                  isLoading={mintLoading}
+                  onClick={() => claimMint()}
+                  background="mint.primary"
+                  color="white"
+                  rounded="full"
+                >
+                  Claim NFT!
+                </Button>
+              </Flex>
+            }
             {mintErrors && (
               <Alert status="error" mt={2} mx={4}>
                 <AlertIcon />
