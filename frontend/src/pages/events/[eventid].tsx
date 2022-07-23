@@ -19,7 +19,6 @@ import { Fragment, useState, useEffect, useMemo } from "react";
 import { useGetEventById } from "../../hooks/useEventManager";
 import { useMintParticipateNFT, getMintNFTManagerContract, useGetOwnedNFTs } from "../../hooks/useMintNFTManager";
 import dayjs from "dayjs";
-import { FEATURE_NFT_SIGNATURE_MINTABLE } from "@thirdweb-dev/sdk/dist/src/constants/erc721-features";
 
 const Event = () => {
   const router = useRouter();
