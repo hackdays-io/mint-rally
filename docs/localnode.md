@@ -1,11 +1,19 @@
 # Use Localhost node in development
 
+#### <span style="color: red; ">If you don't set private key to .env, please refer contract_buildEnv.md first</span>
+
 ## with docker
 
 ### 1. Run local node
 
 ```
 $ cd hardhat
+```
+
+Install node modules
+
+```
+$ yarn
 ```
 
 ```
