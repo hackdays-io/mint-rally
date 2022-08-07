@@ -15,6 +15,7 @@ import {
   AlertIcon,
   AlertTitle,
   AlertDescription,
+  Container,
 } from "@chakra-ui/react";
 import type { NextPage } from "next";
 import { useState, useCallback } from "react";
@@ -38,7 +39,7 @@ const renameFile = (file: File, newFilename: string) => {
 };
 
 interface PaticipateNftRecord {
-  name: string;
+  description: string;
   dataUrl: string;
   fileObject: File | null;
   requiredParticipateCount: number;
@@ -49,9 +50,24 @@ const NewEventGroupPage: NextPage = () => {
   const [groupName, setGroupName] = useState("");
 
   const [nftRecords, setNftRecords] = useState([
-    { name: "", dataUrl: "", fileObject: null, requiredParticipateCount: 0 },
-    { name: "", dataUrl: "", fileObject: null, requiredParticipateCount: 5 },
-    { name: "", dataUrl: "", fileObject: null, requiredParticipateCount: 10 },
+    {
+      description: "",
+      dataUrl: "",
+      fileObject: null,
+      requiredParticipateCount: 0,
+    },
+    {
+      description: "",
+      dataUrl: "",
+      fileObject: null,
+      requiredParticipateCount: 5,
+    },
+    {
+      description: "",
+      dataUrl: "",
+      fileObject: null,
+      requiredParticipateCount: 10,
+    },
   ] as PaticipateNftRecord[]);
 
   const { status, errors, loading, createEventGroup } = useCreateEventGroup();
@@ -59,7 +75,8 @@ const NewEventGroupPage: NextPage = () => {
   const isAllInputed = useCallback(
     () =>
       nftRecords.every(
-        ({ name, dataUrl, fileObject }) => name && dataUrl && fileObject
+        ({ description, dataUrl, fileObject }) =>
+          description && dataUrl && fileObject
       ),
     [nftRecords]
   );
@@ -71,8 +88,9 @@ const NewEventGroupPage: NextPage = () => {
     }
     console.log("Starting to upload images to IPFS...");
     const renamedFiles = nftRecords.map(
-      ({ fileObject, requiredParticipateCount }) => ({
+      ({ fileObject, description, requiredParticipateCount }) => ({
         fileObject: renameFile(fileObject!, `${requiredParticipateCount}.png`),
+        description,
         requiredParticipateCount,
       })
     );
@@ -94,72 +112,86 @@ const NewEventGroupPage: NextPage = () => {
     return { rootCid, renamedFiles };
   }, [nftRecords, isAllInputed]);
 
-  const callCreateEventGroup = (nftImages: INFTImage[]) => {
-    createEventGroup({ groupName: groupName, images: nftImages });
+  const submit = async () => {
+    const uploadResult = await uploadImagesToIpfs();
+    if (!uploadResult) {
+      console.error("uploading error");
+      // @TODO: display error alert
+      return;
+    }
+    const { rootCid, renamedFiles } = uploadResult;
+    const nftImages: INFTImage[] = renamedFiles.map(
+      ({ fileObject, description, requiredParticipateCount }) => ({
+        image: `ipfs://${rootCid}/${fileObject.name}`,
+        description: description,
+        requiredParticipateCount,
+      })
+    );
+    await callCreateEventGroup(nftImages);
+  };
+
+  const callCreateEventGroup = async (nftImages: INFTImage[]) => {
+    await createEventGroup({ groupName: groupName, images: nftImages });
   };
 
   return (
-    <>
-      {/* @TODO: padding need to be set in Layout component */}
-      <Box px={6}>
-        <Heading as="h1" textAlign="center" mb={4}>
-          Create a new event group
-        </Heading>
-        {!address ? (
-          <Box textAlign="center" fontSize="xl">
-            Sign in first!
-          </Box>
-        ) : (
-          <>
-            {!status ? (
-              <>
-                <Text>Event Group Name</Text>
-                <Input
-                  variant="outline"
-                  mb={4}
-                  value={groupName}
-                  onChange={(e) => setGroupName(e.target.value)}
-                />
-                <Heading as="h2" fontSize="3xl" mb={4}>
-                  NFTs
-                </Heading>
-                {nftRecords.map((r) => `${r.name} `)}
-                <Box>
-                  {nftRecords.map((record, index) => (
-                    <Flex
-                      key={index}
-                      w="full"
-                      flexDirection={{ base: "column", md: "row" }}
-                    >
-                      <Box flexBasis="300px" flexShrink="0" minH="300px" m={2}>
-                        <ImageSelectorWithPreview
-                          dataUrl={record.dataUrl}
-                          onChangeData={(newDataUrl, newFile) => {
-                            setNftRecords((_prev) => {
-                              const prev = _prev.concat();
-                              prev[index].dataUrl = newDataUrl;
-                              prev[index].fileObject = newFile;
-                              return prev;
-                            });
-                          }}
-                        />
-                      </Box>
-                      <Box flexBasis="1" flexGrow="1" m={2}>
-                        <Text>NFT name</Text>
+    <Container maxW={800}>
+      <Heading as="h1" my={4}>
+        Create a new event group
+      </Heading>
+      {!address ? (
+        <Text fontSize="xl">Sign in first!</Text>
+      ) : (
+        <>
+          {!status ? (
+            <>
+              <Text>Event Group Name</Text>
+              <Input
+                variant="outline"
+                mb={4}
+                value={groupName}
+                onChange={(e) => setGroupName(e.target.value)}
+              />
+              <Heading as="h2" fontSize="3xl" mb={4}>
+                NFTs
+              </Heading>
+              <Box>
+                {nftRecords.map((record, index) => (
+                  <Flex
+                    key={index}
+                    w="full"
+                    flexDirection={{ base: "column", md: "row" }}
+                  >
+                    <Box flexBasis="300px" flexShrink="0" minH="300px" mb={3}>
+                      <ImageSelectorWithPreview
+                        dataUrl={record.dataUrl}
+                        onChangeData={(newDataUrl, newFile) => {
+                          setNftRecords((_prev) => {
+                            const prev = _prev.concat();
+                            prev[index].dataUrl = newDataUrl;
+                            prev[index].fileObject = newFile;
+                            return prev;
+                          });
+                        }}
+                      />
+                    </Box>
+                    <Box>
+                      <Box m={2}>
+                        <Text>NFT Description</Text>
                         <Input
                           variant="outline"
                           mb={4}
-                          value={record.name}
+                          value={record.description}
                           onChange={(e) => {
                             setNftRecords((_prev) => {
                               const prev = _prev.concat();
-                              prev[index].name = e.target.value;
+                              prev[index].description = e.target.value;
                               return prev;
                             });
                           }}
                         />
                       </Box>
-                      <Box flexBasis="1" flexGrow="1" m={2}>
+                      <Box m={2}>
                         <Text>
                           How many events do users need participate in to get
                           this NFT?
@@ -182,50 +214,36 @@ const NewEventGroupPage: NextPage = () => {
                           </NumberInputStepper>
                         </NumberInput>
                       </Box>
-                    </Flex>
-                  ))}
-                </Box>
-                <Box mt={8} mb={4}>
-                  <Button
-                    onClick={async () => {
-                      const uploadResult = await uploadImagesToIpfs();
-                      if (!uploadResult) {
-                        console.error("uploading error");
-                        // @TODO: display error alert
-                        return;
-                      }
-                      const { rootCid, renamedFiles } = uploadResult;
-                      const nftImages: INFTImage[] = renamedFiles.map(
-                        ({ fileObject, requiredParticipateCount }) => ({
-                          image: `ipfs://${rootCid}/${fileObject.name}`,
-                          requiredParticipateCount,
-                        })
-                      );
-                      callCreateEventGroup(nftImages);
-                    }}
-                    disabled={!groupName || !isAllInputed() || loading}
-                  >
-                    Create
-                  </Button>
-                  {loading && <Spinner></Spinner>}
-                  {errors && (
-                    <Alert status="error">
-                      <AlertIcon />
-                      <AlertTitle>Error occurred</AlertTitle>
-                      <AlertDescription>{errors.message}</AlertDescription>
-                    </Alert>
-                  )}
-                </Box>
-              </>
-            ) : (
-              <>
-                <Box>Event Created!🎉</Box>
-              </>
-            )}
-          </>
-        )}
-      </Box>
-    </>
+                    </Box>
+                  </Flex>
+                ))}
+              </Box>
+              <Box mt={8} mb={10}>
+                <Button
+                  onClick={() => submit()}
+                  disabled={!groupName || !isAllInputed() || loading}
+                  width="full"
+                  background="mint.bg"
+                >
+                  {loading ? <Spinner /> : "Create"}
+                </Button>
+                {errors && (
+                  <Alert status="error">
+                    <AlertIcon />
+                    <AlertTitle>Error occurred</AlertTitle>
+                    <AlertDescription>{errors.message}</AlertDescription>
+                  </Alert>
+                )}
+              </Box>
+            </>
+          ) : (
+            <>
+              <Box>Event Group Created!🎉</Box>
+            </>
+          )}
+        </>
+      )}
+    </Container>
   );
 };
 

@@ -1,4 +1,4 @@
-import { ethers } from "ethers";
+import { BigNumber, ethers } from "ethers";
 import { useState } from "react";
 const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_MINT_NFT_MANAGER!;
 import contract from "../contracts/MintNFT.json";
@@ -11,9 +11,10 @@ export interface IMintParticipateNFTParams {
 
 export interface IOwnedNFT {
   name: string;
+  description: string;
   image: string;
-  groupId: number;
-  eventId: number;
+  groupId: BigNumber;
+  eventId: BigNumber;
   requiredParticipateCount: number;
 }
 

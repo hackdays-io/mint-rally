@@ -15,6 +15,7 @@
     "@emotion/styled": "^11",
     "@thirdweb-dev/react": "^2.4.7",
     "@thirdweb-dev/sdk": "^2.3.23",
+    "dayjs": "^1.11.4",
     "ethers": "^5.6.9",
     "framer-motion": "^6",
     "next": "12.2.0",

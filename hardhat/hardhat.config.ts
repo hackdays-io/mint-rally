@@ -30,9 +30,10 @@ const config: HardhatUserConfig = {
       accounts:
         process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
-    goerli: {
-      url: process.env.GOERLI_ALCHEMY_KEY || "",
-      accounts: [String(process.env.PRIVATE_KEY)],
+    local: {
+      url: "http://localhost:8545",
+      accounts: [String(process.env.LOCAL_PRIVATE_KEY)],
+      allowUnlimitedContractSize: true,
     },
   },
   gasReporter: {
