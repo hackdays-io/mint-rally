@@ -3,6 +3,7 @@ import {
   AlertDescription,
   AlertIcon,
   AlertTitle,
+  Box,
   Container,
   Flex,
   FormErrorMessage,
@@ -10,6 +11,7 @@ import {
   Link,
   SimpleGrid,
   Spinner,
+  Textarea,
   theme,
 } from "@chakra-ui/react";
 import { useAddress } from "@thirdweb-dev/react";
@@ -29,6 +31,7 @@ import {
   useCreateEventRecord,
   useOwnEventGroups,
 } from "../../hooks/useEventManager";
+import ErrorMessage from "../../components/atoms/form/ErrorMessage";
 
 type FormData = {
   eventGroupId: string;
@@ -58,34 +61,19 @@ const EventCreate: NextPage = () => {
       secret: "",
     },
   });
+
   // check contract address
   const address = useAddress();
   const [noGroups, setNogroups] = useState(false);
+
   // state for loading event groups
-  const { groups, loading, getOwnEventGroups } = useOwnEventGroups();
+  const { groups, loading } = useOwnEventGroups();
   const {
     status,
     errors: createError,
     loading: createLoading,
     createEventRecord,
   } = useCreateEventRecord();
-  // state for checking any group id is selected.
-  const [groupIdSelcted, setGroupIdSelected] = useState(false);
-
-  useEffect(() => {
-    if (address) {
-      getOwnEventGroups();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [address]);
-
-  useEffect(() => {
-    if (watch("eventGroupId")) {
-      console.log("selected");
-      setGroupIdSelected(true);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [watch("eventGroupId")]);
 
   const onSubmit = (data: FormData) => {
     console.log("onSubmit:", data);
@@ -109,11 +97,13 @@ const EventCreate: NextPage = () => {
   return (
     <>
       <Container maxW={800} paddingTop={6}>
-        <Heading>Create a new event</Heading>
+        <Heading as="h1" mb={10}>
+          Create a new event
+        </Heading>
         {address && groups.length > 0 ? (
           <form onSubmit={handleSubmit(onSubmit)}>
-            <FormControl>
-              <FormLabel htmlFor="eventGroupId">Event group: </FormLabel>
+            <FormControl mb={5}>
+              <FormLabel htmlFor="eventGroupId">Event group</FormLabel>
               <Controller
                 control={control}
                 name="eventGroupId"
@@ -126,7 +116,10 @@ const EventCreate: NextPage = () => {
                   >
                     {groups.map((item: IEventGroup) => {
                       return (
-                        <option value={item.groupId} key={item.groupId}>
+                        <option
+                          value={item.groupId.toNumber()}
+                          key={item.groupId.toString()}
+                        >
                           {item.name}
                         </option>
                       );
@@ -136,19 +129,15 @@ const EventCreate: NextPage = () => {
               />
             </FormControl>
 
-            {groupIdSelcted ? (
+            {watch("eventGroupId") ? (
               <>
-                <FormControl>
+                <FormControl mb={5}>
                   <FormLabel htmlFor="name">Event Name</FormLabel>
                   <Controller
                     control={control}
                     name="eventName"
                     rules={{
-                      required: "This is required",
-                      minLength: {
-                        value: 4,
-                        message: "Minimum length should be 4",
-                      },
+                      required: "Event name is required",
                     }}
                     render={({
                       field: { onChange, value },
@@ -156,20 +145,18 @@ const EventCreate: NextPage = () => {
                     }) => (
                       <>
                         <Input id="name" onChange={onChange} value={value} />
-                        <FormErrorMessage>
-                          {errors.eventName?.message}
-                        </FormErrorMessage>
+                        <ErrorMessage>{errors.eventName?.message}</ErrorMessage>
                       </>
                     )}
                   />
                 </FormControl>
-                <FormControl>
+                <FormControl mb={5}>
                   <FormLabel htmlFor="description">Description</FormLabel>
                   <Controller
                     control={control}
                     name="description"
                     rules={{
-                      required: "This is required",
+                      required: "Description is required",
                       minLength: {
                         value: 4,
                         message: "Minimum length should be 4",
@@ -180,49 +167,53 @@ const EventCreate: NextPage = () => {
                       formState: { errors },
                     }) => (
                       <>
-                        <Input
+                        <Textarea
                           id="description"
                           onChange={onChange}
                           value={value}
                         />
-                        <FormErrorMessage>
+                        <ErrorMessage>
                           {errors.description?.message}
-                        </FormErrorMessage>
+                        </ErrorMessage>
                       </>
                     )}
                   />
                 </FormControl>
-                <Flex>
-                  <FormControl>
-                    <FormLabel htmlFor="date">Date: </FormLabel>
+                <Flex mb={5} justifyContent="space-between" flexWrap="wrap">
+                  <FormControl width={{ base: "100%", md: "30%" }}>
+                    <FormLabel htmlFor="date">Date</FormLabel>
                     <Controller
                       control={control}
                       name="date"
                       rules={{
-                        required: "This is required",
+                        required: "Date is required",
                       }}
                       render={({
                         field: { onChange, value },
                         formState: { errors },
                       }) => (
                         <>
-                          <Input id="date" onChange={onChange} value={value} />
-                          <FormErrorMessage>
-                            {errors.date?.message}
-                          </FormErrorMessage>
+                          <Input
+                            id="date"
+                            onChange={onChange}
+                            value={value}
+                            type="date"
+                          />
+                          <ErrorMessage>{errors.date?.message}</ErrorMessage>
                         </>
                       )}
                     />
                   </FormControl>
-                  <FormControl>
-                    <FormLabel htmlFor="startTime">
-                      Start time(HH:MM):{" "}
-                    </FormLabel>
+                  <FormControl
+                    width={{ base: "47%", md: "30%" }}
+                    mt={{ base: 2, md: 0 }}
+                  >
+                    <FormLabel htmlFor="startTime">Start time</FormLabel>
                     <Controller
                       control={control}
                       name="startTime"
                       rules={{
-                        required: "This is required",
+                        required: "Start time is required",
                       }}
                       render={({
                         field: { onChange, value },
@@ -233,21 +224,23 @@ const EventCreate: NextPage = () => {
                             id="startTime"
                             onChange={onChange}
                             value={value}
+                            type="time"
                           />
-                          <FormErrorMessage>
-                            {errors.date?.message}
-                          </FormErrorMessage>
+                          <ErrorMessage>{errors.date?.message}</ErrorMessage>
                         </>
                       )}
                     />
                   </FormControl>
-                  <FormControl>
-                    <FormLabel htmlFor="endTime">End time(HH:MM): </FormLabel>
+                  <FormControl
+                    width={{ base: "47%", md: "30%" }}
+                    mt={{ base: 2, md: 0 }}
+                  >
+                    <FormLabel htmlFor="endTime">End time</FormLabel>
                     <Controller
                       control={control}
                       name="endTime"
                       rules={{
-                        required: "This is required",
+                        required: "End time is required",
                       }}
                       render={({
                         field: { onChange, value },
@@ -258,26 +251,29 @@ const EventCreate: NextPage = () => {
                             id="endTime"
                             onChange={onChange}
                             value={value}
+                            type="time"
                           />
-                          <FormErrorMessage>
-                            {errors.date?.message}
-                          </FormErrorMessage>
+                          <ErrorMessage>{errors.date?.message}</ErrorMessage>
                         </>
                       )}
                     />
                   </FormControl>
                 </Flex>
-                <FormControl>
-                  <FormLabel htmlFor="secret">Secret phrase to mint</FormLabel>
-                  <span>
-                    Please do not forget this phrase. you can&apos;t get this
-                    phrase after submitting
-                  </span>
+                <FormControl mb={5}>
+                  <FormLabel htmlFor="secret">
+                    Secret phrase to mint
+                    <br />
+                    <Box as="span" fontSize="14px" color="red">
+                      Please do not forget this phrase. you can&apos;t get this
+                      phrase after submitting
+                    </Box>
+                  </FormLabel>
+
                   <Controller
                     control={control}
                     name="secret"
                     rules={{
-                      required: "This is required",
+                      required: "Secret phrase is required",
                       minLength: {
                         value: 4,
                         message: "Minimum length should be 4",
@@ -289,9 +285,9 @@ const EventCreate: NextPage = () => {
                     }) => (
                       <>
                         <Input id="secret" onChange={onChange} value={value} />
-                        <FormErrorMessage>
+                        <ErrorMessage>
                           {errors.description?.message}
-                        </FormErrorMessage>
+                        </ErrorMessage>
                       </>
                     )}
                   />
@@ -299,23 +295,25 @@ const EventCreate: NextPage = () => {
                 <Button
                   mt={4}
                   type="submit"
-                  //disabled={!errors?.name}
                   isLoading={isSubmitting}
+                  backgroundColor="mint.bg"
+                  size="lg"
+                  width="full"
+                  disabled={isSubmitting || status}
                 >
-                  Create
+                  {createLoading ? <Spinner /> : status ? "Success" : "Create"}
                 </Button>
+                {status && "Your Event Created!🎉"}
                 {createError && (
-                  <Alert status="error">
+                  <Alert status="error" mt={2}>
                     <AlertIcon />
                     <AlertTitle>Error occurred</AlertTitle>
                     <AlertDescription>{createError.message}</AlertDescription>
                   </Alert>
                 )}
-                {status && <Flex>Success</Flex>}
-                {createLoading && <Spinner></Spinner>}
               </>
             ) : (
-              <span>no event group is selected</span>
+              <span>Please select event group first.</span>
             )}
           </form>
         ) : (

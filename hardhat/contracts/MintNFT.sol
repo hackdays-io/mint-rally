@@ -15,6 +15,22 @@ interface IEventManager {
         string memory _secretPhrase,
         uint256 _eventRecordId
     ) external returns (bool);
+
+    struct EventRecord {
+        uint256 eventRecordId;
+        uint256 groupId;
+        string name;
+        string description;
+        string date;
+        string startTime;
+        string endTime;
+        bytes32 secretPhrase;
+    }
+
+    function getEventById(uint256 _eventId)
+        external
+        view
+        returns (EventRecord memory);
 }
 
 contract MintNFT is ERC721Enumerable, Ownable {
@@ -34,12 +50,13 @@ contract MintNFT is ERC721Enumerable, Ownable {
     struct ParticipateNFTAttributes {
         string name;
         string image;
+        string description;
         uint256 groupId;
         uint256 eventId;
         uint256 requiredParticipateCount;
     }
 
-    mapping(uint256 => ParticipateNFTAttributes) public attributesOfNFT;
+    mapping(uint256 => ParticipateNFTAttributes) private attributesOfNFT;
     mapping(uint256 => ParticipateNFTAttributes[]) private groupsNFTAttributes;
 
     constructor() ERC721("MintRally", "MR") {}
@@ -58,22 +75,35 @@ contract MintNFT is ERC721Enumerable, Ownable {
             "invalid secret phrase"
         );
 
+        IEventManager.EventRecord memory _event = _eventManager.getEventById(
+            _eventId
+        );
+
         ParticipateNFTAttributes[] memory ownedNFTs = listNFTsByAddress(
             msg.sender
         );
+        bool firstMintOnEvent = true;
         uint256 countOwnedGroupNFTs = 0;
         for (uint256 index = 0; index < ownedNFTs.length; index++) {
             ParticipateNFTAttributes memory nft = ownedNFTs[index];
+            if (nft.groupId == _groupId && nft.eventId == _eventId) {
+                firstMintOnEvent = false;
+                break;
+            }
             if (nft.groupId == _groupId) {
                 countOwnedGroupNFTs++;
             }
         }
+        require(firstMintOnEvent, "already minted NFT on event");
 
         bool minted = false;
         ParticipateNFTAttributes memory defaultNFT;
         for (uint256 index = 0; index < groupNFTAttributes.length; index++) {
             ParticipateNFTAttributes memory gp = groupNFTAttributes[index];
+            gp.groupId = _groupId;
             gp.eventId = _eventId;
+            gp.name = _event.name;
+
             if (gp.requiredParticipateCount == 0) {
                 defaultNFT = gp;
             }
@@ -87,7 +117,6 @@ contract MintNFT is ERC721Enumerable, Ownable {
             attributesOfNFT[_tokenIds.current()] = defaultNFT;
             _safeMint(msg.sender, _tokenIds.current());
         }
-        _eventManager.applyForParticipation(_eventId);
         string memory mintedTokenURI = tokenURI(_tokenIds.current());
         _tokenIds.increment();
         return mintedTokenURI;
@@ -134,6 +163,7 @@ contract MintNFT is ERC721Enumerable, Ownable {
                 ParticipateNFTAttributes({
                     name: attributes[index].name,
                     image: attributes[index].image,
+                    description: attributes[index].description,
                     groupId: attributes[index].groupId,
                     eventId: attributes[index].eventId,
                     requiredParticipateCount: attributes[index]
@@ -161,12 +191,14 @@ contract MintNFT is ERC721Enumerable, Ownable {
 
         string memory json = Base64.encode(
             abi.encodePacked(
-                "{'name': '",
+                '{"name": "',
                 attributes.name,
-                " -- NFT #: ",
-                Strings.toString(_tokenId),
-                "', 'description': 'MintRally NFT', 'image': '",
+                '", "description": "',
+                attributes.description,
+                '", "image": "',
                 attributes.image,
+                '", "id": ',
+                Strings.toString(_tokenId),
                 "}"
             )
         );
