@@ -63,6 +63,7 @@ contract EventManager is Ownable {
     address private mintNFTAddr;
 
     function setMintNFTAddr(address _mintNftAddr) public onlyOwner {
+        require(_mintNftAddr != address(0), "mint nft address is blank");
         mintNFTAddr = _mintNftAddr;
     }
 
@@ -94,11 +95,12 @@ contract EventManager is Ownable {
                     .requiredParticipateCount
             });
         }
-        _mintNFT.pushGroupNFTAttributes(_newGroupId, _participateNFTAttributes);
+
         groups.push(
             Group({groupId: _newGroupId, ownerAddress: msg.sender, name: _name})
         );
         ownGroupIds[msg.sender].push(_newGroupId);
+        _mintNFT.pushGroupNFTAttributes(_newGroupId, _participateNFTAttributes);
         _groupIds.increment();
     }
 
