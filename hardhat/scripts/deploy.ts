@@ -21,9 +21,8 @@ async function main() {
   const eventManager = await upgrades.deployProxy(EventManager);
   await eventManager.deployed();
 
-  // FIXME can't call onlyOwner function. Logs→Error: cannot estimate gas; transaction may fail or may require manual gas limit [ See: https://links.ethers.org/v5-errors-UNPREDICTABLE_GAS_LIMIT ] (reason="Error: VM Exception while processing transaction: reverted with reason string 'Ownable: caller is not the owner'", method="estimateGas", transaction={"from":"0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266","to":"0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0","data":"0x9041e3f4000000000000000000000000dc64a140aa3e981100a9beca4e685f962f0cf6c9","accessList":null}, error={"name":"ProviderError","code":-32603,"_isProviderError":true,"data":{"message":"Error: VM Exception while processing transaction: reverted with reason string 'Ownable: caller is not the owner'","data":"0x08c379a0000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000204f776e61626c653a2063616c6c6572206973206e6f7420746865206f776e6572"}}, code=UNPREDICTABLE_GAS_LIMIT, version=providers/5.6.8)
-  // await mintNFT.setEventManagerAddr(eventManager.address);
-  // await eventManager.setMintNFTAddr(mintNFT.address);
+  await mintNFT.setEventManagerAddr(eventManager.address);
+  await eventManager.setMintNFTAddr(mintNFT.address);
 
   console.log("mintNFT address:", mintNFT.address);
   console.log("eventManager address:", eventManager.address);
