@@ -69,11 +69,12 @@ contract EventManager is OwnableUpgradeable {
     }
 
     /// @custom:oz-upgrades-unsafe-allow constructor
-    constructor() initializer {}
+    // constructor() initializer {}
 
     function initialize() public initializer {
-            _groupIds.increment();
-            _eventRecordIds.increment();
+        __Ownable_init();
+        _groupIds.increment();
+        _eventRecordIds.increment();
     }
 
     // constructor() {

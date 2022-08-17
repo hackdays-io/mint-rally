@@ -62,15 +62,22 @@ contract MintNFT is ERC721EnumerableUpgradeable, OwnableUpgradeable {
     mapping(uint256 => ParticipateNFTAttributes[]) private groupsNFTAttributes;
 
     // constructor() ERC721("MintRally", "MR") {}
-    function initialize() initializer public {
+    function initialize() public initializer {
         __ERC721_init("MintRally", "MR");
+        __Ownable_init();
     }
 
     function _msgSender() internal view virtual override returns (address) {
         return super._msgSender();
     }
 
-    function _msgData() internal view virtual override returns (bytes calldata) {
+    function _msgData()
+        internal
+        view
+        virtual
+        override
+        returns (bytes calldata)
+    {
         return super._msgData();
     }
 
