@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { ethers } from "hardhat";
+import { ethers, upgrades } from "hardhat";
 import { MintNFT, EventManager } from "../typechain";
 import base64 from "base64-js";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
@@ -32,11 +32,13 @@ describe("MintNFT", function () {
 
   before(async () => {
     //Deploy mintNFT and eventManager
-    const MintNFT = await ethers.getContractFactory("MintNFT");
-    mintNFT = await MintNFT.deploy();
+    const MintNFTFactory = await ethers.getContractFactory("MintNFT");
+    const deployedMintNFT: any = await upgrades.deployProxy(MintNFTFactory);
+    mintNFT = deployedMintNFT;
     await mintNFT.deployed();
     const EventManager = await ethers.getContractFactory("EventManager");
-    eventManager = await EventManager.deploy();
+    const deployedEventManager: any = await upgrades.deployProxy(EventManager);
+    eventManager = deployedEventManager;
     await eventManager.deployed();
     await mintNFT.setEventManagerAddr(eventManager.address);
     await eventManager.setMintNFTAddr(mintNFT.address);
