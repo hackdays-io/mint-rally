@@ -1,6 +1,7 @@
 import { expect } from "chai";
-import { ethers } from "hardhat";
-import { MintNFT } from "../typechain";
+import { Contract } from "ethers";
+import { ethers, upgrades } from "hardhat";
+import { EventManager, MintNFT } from "../typechain";
 
 const images = [
   {
@@ -23,8 +24,9 @@ const images = [
 describe("EventManager", () => {
   let mintNFT: MintNFT;
   before(async () => {
-    const MintNFT = await ethers.getContractFactory("MintNFT");
-    mintNFT = await MintNFT.deploy();
+    const MintNFTFactory = await ethers.getContractFactory("MintNFT");
+    const deployedMintNFT: any = await upgrades.deployProxy(MintNFTFactory);
+    mintNFT = deployedMintNFT;
     await mintNFT.deployed();
   });
 
@@ -33,8 +35,11 @@ describe("EventManager", () => {
       const eventManagerContractFactory = await ethers.getContractFactory(
         "EventManager"
       );
-      const eventManagerContract = await eventManagerContractFactory.deploy();
-      const eventManager = await eventManagerContract.deployed();
+      const deployedEventManagerContract: any = await upgrades.deployProxy(
+        eventManagerContractFactory
+      );
+      const eventManager: EventManager =
+        await deployedEventManagerContract.deployed();
       await eventManager.setMintNFTAddr(mintNFT.address);
       await mintNFT.setEventManagerAddr(eventManager.address);
 
@@ -110,8 +115,11 @@ describe("EventManager", () => {
         "EventManager"
       );
 
-      const eventManagerContract = await eventManagerContractFactory.deploy();
-      const eventManager = await eventManagerContract.deployed();
+      const deployedEventManagerContract: any = await upgrades.deployProxy(
+        eventManagerContractFactory
+      );
+      const eventManager: EventManager =
+        await deployedEventManagerContract.deployed();
       await eventManager.setMintNFTAddr(mintNFT.address);
       await mintNFT.setEventManagerAddr(eventManager.address);
 
@@ -157,8 +165,11 @@ describe("EventManager", () => {
         "EventManager"
       );
 
-      const eventManagerContract = await eventManagerContractFactory.deploy();
-      const eventManager = await eventManagerContract.deployed();
+      const deployedEventManagerContract: any = await upgrades.deployProxy(
+        eventManagerContractFactory
+      );
+      const eventManager: EventManager =
+        await deployedEventManagerContract.deployed();
       await eventManager.setMintNFTAddr(mintNFT.address);
       await mintNFT.setEventManagerAddr(eventManager.address);
 
@@ -222,8 +233,11 @@ describe("EventManager", () => {
         "EventManager"
       );
 
-      const eventManagerContract = await eventManagerContractFactory.deploy();
-      const eventManager = await eventManagerContract.deployed();
+      const deployedEventManagerContract: any = await upgrades.deployProxy(
+        eventManagerContractFactory
+      );
+      const eventManager: EventManager =
+        await deployedEventManagerContract.deployed();
       await eventManager.setMintNFTAddr(mintNFT.address);
       await mintNFT.setEventManagerAddr(eventManager.address);
 
@@ -287,8 +301,11 @@ describe("EventManager", () => {
         "EventManager"
       );
 
-      const eventManagerContract = await eventManagerContractFactory.deploy();
-      const eventManager = await eventManagerContract.deployed();
+      const deployedEventManagerContract: any = await upgrades.deployProxy(
+        eventManagerContractFactory
+      );
+      const eventManager: EventManager =
+        await deployedEventManagerContract.deployed();
       await eventManager.setMintNFTAddr(mintNFT.address);
       await mintNFT.setEventManagerAddr(eventManager.address);
 
@@ -331,8 +348,11 @@ describe("EventManager", () => {
         "EventManager"
       );
 
-      const eventManagerContract = await eventManagerContractFactory.deploy();
-      const eventManager = await eventManagerContract.deployed();
+      const deployedEventManagerContract: any = await upgrades.deployProxy(
+        eventManagerContractFactory
+      );
+      const eventManager: EventManager =
+        await deployedEventManagerContract.deployed();
       await eventManager.setMintNFTAddr(mintNFT.address);
       await mintNFT.setEventManagerAddr(eventManager.address);
 
