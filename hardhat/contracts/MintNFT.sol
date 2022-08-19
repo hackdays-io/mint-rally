@@ -39,7 +39,8 @@ contract MintNFT is ERC721EnumerableUpgradeable, OwnableUpgradeable {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
 
-    address private eventManagerAddr;
+    // if you wanna use previous fields, you can't use "private"
+    address internal eventManagerAddr;
 
     function setEventManagerAddr(address _eventManagerAddr) public onlyOwner {
         require(
