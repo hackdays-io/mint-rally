@@ -7,6 +7,7 @@
     "deploy:stg": "npx hardhat run scripts/deploy.ts --network mumbai",
     "deploy:local": "npx hardhat run scripts/deploy.ts --network local",
     "upgrade:local": "npx hardhat run scripts/deployUpgrade.ts --network local",
+    "upgrade3:local": "npx hardhat run scripts/deployUpgradeToV3.ts --network local",
     "deploy:mintNFT": "npx hardhat run scripts/deployMintNft.ts --network",
     "compile": "npx hardhat compile",
     "test": "npx hardhat compile && npx hardhat test",

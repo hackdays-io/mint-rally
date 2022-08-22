@@ -84,12 +84,17 @@ export const useGetOwnedNFTs = () => {
     console.log("retrieved owned nfts:", data);
     // call new function on upgraded contract.
     const xxxxxxxxx = await mintNFTManager.returnV1StateFromV2();
-    console.log({xxxxxxxxx});
+    console.log({ xxxxxxxxx });
+
+    const yyyy = await mintNFTManager.returnV1StateFromV3();
+    console.log({ yyyy });
+    const zzzz = await mintNFTManager.returnV2StateFromv3();
+    console.log({ zzzz });
+
     // FIXME this is not working. maybe initialize flag is not set on contruction.
     // const yyyyyyy = await mintNFTManager.helloV2();
     // console.log({yyyyyyy});
-    
-    
+
     setLoading(false);
     setOwnedNFTs(data);
     return data;
