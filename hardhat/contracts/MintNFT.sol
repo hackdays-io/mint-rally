@@ -2,10 +2,12 @@
 pragma solidity ^0.8.4;
 
 import "hardhat/console.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+// import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721EnumerableUpgradeable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
+// import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts/utils/Base64.sol";
 
 interface IEventManager {
@@ -33,7 +35,7 @@ interface IEventManager {
         returns (EventRecord memory);
 }
 
-contract MintNFT is ERC721Enumerable, Ownable {
+contract MintNFT is ERC721EnumerableUpgradeable, OwnableUpgradeable {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
 
@@ -59,7 +61,25 @@ contract MintNFT is ERC721Enumerable, Ownable {
     mapping(uint256 => ParticipateNFTAttributes) private attributesOfNFT;
     mapping(uint256 => ParticipateNFTAttributes[]) private groupsNFTAttributes;
 
-    constructor() ERC721("MintRally", "MR") {}
+    // constructor() ERC721("MintRally", "MR") {}
+    function initialize() public initializer {
+        __ERC721_init("MintRally", "MR");
+        __Ownable_init();
+    }
+
+    function _msgSender() internal view virtual override returns (address) {
+        return super._msgSender();
+    }
+
+    function _msgData()
+        internal
+        view
+        virtual
+        override
+        returns (bytes calldata)
+    {
+        return super._msgData();
+    }
 
     function mintParticipateNFT(
         uint256 _groupId,
@@ -80,7 +100,7 @@ contract MintNFT is ERC721Enumerable, Ownable {
         );
 
         ParticipateNFTAttributes[] memory ownedNFTs = listNFTsByAddress(
-            msg.sender
+            _msgSender()
         );
         bool firstMintOnEvent = true;
         uint256 countOwnedGroupNFTs = 0;
@@ -109,13 +129,13 @@ contract MintNFT is ERC721Enumerable, Ownable {
             }
             if (gp.requiredParticipateCount == countOwnedGroupNFTs) {
                 attributesOfNFT[_tokenIds.current()] = gp;
-                _safeMint(msg.sender, _tokenIds.current());
+                _safeMint(_msgSender(), _tokenIds.current());
                 minted = true;
             }
         }
         if (!minted) {
             attributesOfNFT[_tokenIds.current()] = defaultNFT;
-            _safeMint(msg.sender, _tokenIds.current());
+            _safeMint(_msgSender(), _tokenIds.current());
         }
         string memory mintedTokenURI = tokenURI(_tokenIds.current());
         _tokenIds.increment();
@@ -150,7 +170,7 @@ contract MintNFT is ERC721Enumerable, Ownable {
         returns (ParticipateNFTAttributes[] memory)
     {
         ParticipateNFTAttributes[]
-            memory holdingNFTsAttributes = listNFTsByAddress(msg.sender);
+            memory holdingNFTsAttributes = listNFTsByAddress(_msgSender());
         return holdingNFTsAttributes;
     }
 
@@ -199,7 +219,11 @@ contract MintNFT is ERC721Enumerable, Ownable {
                 attributes.image,
                 '", "id": ',
                 Strings.toString(_tokenId),
-                "}"
+                ', "external_url": "https://mintrally.xyz", "attributes": [{"groupId":',
+                Strings.toString(attributes.groupId),
+                '}, {"eventId":',
+                Strings.toString(attributes.eventId),
+                "}]}"
             )
         );
 

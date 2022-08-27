@@ -3,18 +3,24 @@
 //
 // When running the script with `npx hardhat run <script>` you'll find the Hardhat
 // Runtime Environment's members available in the global scope.
-import { ethers } from "hardhat";
-import { MintNFT, EventManager } from "../typechain";
+import { ethers, upgrades } from "hardhat";
+// import { MintNFT, EventManager } from "../typechain";
 
 async function main() {
-  let mintNFT: MintNFT;
-  let eventManager: EventManager;
+  // FIXME can't use types cause deployProxy return "Contract" type. it's different from below types.
+  // let mintNFT: MintNFT;
+  // let eventManager: EventManager;
+
   const MintNFT = await ethers.getContractFactory("MintNFT");
-  mintNFT = await MintNFT.deploy();
+  // mintNFT = await MintNFT.deploy();
+  const mintNFT = await upgrades.deployProxy(MintNFT);
   await mintNFT.deployed();
+
   const EventManager = await ethers.getContractFactory("EventManager");
-  eventManager = await EventManager.deploy();
+  // eventManager = await EventManager.deploy();
+  const eventManager = await upgrades.deployProxy(EventManager);
   await eventManager.deployed();
+
   await mintNFT.setEventManagerAddr(eventManager.address);
   await eventManager.setMintNFTAddr(mintNFT.address);
 
