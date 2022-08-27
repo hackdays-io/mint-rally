@@ -219,7 +219,11 @@ contract MintNFT is ERC721EnumerableUpgradeable, OwnableUpgradeable {
                 attributes.image,
                 '", "id": ',
                 Strings.toString(_tokenId),
-                "}"
+                ', "external_url": "https://mintrally.xyz", "attributes": [{"groupId":',
+                Strings.toString(attributes.groupId),
+                '}, {"eventId":',
+                Strings.toString(attributes.eventId),
+                "}]}"
             )
         );
 

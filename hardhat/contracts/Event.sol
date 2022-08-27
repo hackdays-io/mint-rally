@@ -68,19 +68,11 @@ contract EventManager is OwnableUpgradeable {
         mintNFTAddr = _mintNftAddr;
     }
 
-    /// @custom:oz-upgrades-unsafe-allow constructor
-    // constructor() initializer {}
-
     function initialize() public initializer {
         __Ownable_init();
         _groupIds.increment();
         _eventRecordIds.increment();
     }
-
-    // constructor() {
-    //     _groupIds.increment();
-    //     _eventRecordIds.increment();
-    // }
 
     function createGroup(
         string memory _name,
