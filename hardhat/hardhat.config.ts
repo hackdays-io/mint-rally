@@ -26,6 +26,13 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
 const config: HardhatUserConfig = {
   solidity: "0.8.4",
   networks: {
+    // Check current gas fee before deploy
+    // https://livdir.com/polygongaspricechart/ja/
+    polygon: {
+      url: process.env.MAINNET_ALCHEMY_KEY || "",
+      accounts: [String(process.env.MAINNET_PRIVATE_KEY)],
+      gasPrice: 30000000000,
+    },
     mumbai: {
       url: process.env.STAGING_ALCHEMY_KEY || "",
       accounts:

@@ -17,7 +17,11 @@ import { BigNumber } from "ethers";
 import { useRouter } from "next/router";
 import { Fragment, useState, useEffect, useMemo } from "react";
 import { useGetEventById } from "../../hooks/useEventManager";
-import { useMintParticipateNFT, getMintNFTManagerContract, useGetOwnedNFTs } from "../../hooks/useMintNFTManager";
+import {
+  useMintParticipateNFT,
+  getMintNFTManagerContract,
+  useGetOwnedNFTs,
+} from "../../hooks/useMintNFTManager";
 import dayjs from "dayjs";
 
 const Event = () => {
@@ -49,7 +53,12 @@ const Event = () => {
   };
 
   const hasNftForThisEvent = useMemo(() => {
-    return ownedNFTs.some(nft => !!event && nft.groupId.eq(event.groupId) && nft.eventId.eq(BigNumber.from(eventid)))
+    return ownedNFTs.some(
+      (nft) =>
+        !!event &&
+        nft.groupId.eq(event.groupId) &&
+        nft.eventId.eq(BigNumber.from(eventid))
+    );
   }, [event, ownedNFTs]);
 
   return (
@@ -72,17 +81,21 @@ const Event = () => {
               ))}
             </Text>
 
-            {(hasNftForThisEvent || mintStatus)?
+            {hasNftForThisEvent || mintStatus ? (
               <Text>
-                You already have this event's NFT. Thank you for your participation!
-              </Text>:
+                You already have this NFT. Thank you for your participation!
+              </Text>
+            ) : (
               <Flex
                 width="100%"
                 justifyContent="space-between"
                 alignItems="end"
                 flexWrap="wrap"
               >
-                <Box width={{ base: "100%", md: "48%" }} mb={{ base: 5, md: 0 }}>
+                <Box
+                  width={{ base: "100%", md: "48%" }}
+                  mb={{ base: 5, md: 0 }}
+                >
                   <Text mb={2}>
                     Secret Phrase. Event organaizers will tell you.
                   </Text>
@@ -104,7 +117,7 @@ const Event = () => {
                   Claim NFT!
                 </Button>
               </Flex>
-            }
+            )}
             {mintErrors && (
               <Alert status="error" mt={2} mx={4}>
                 <AlertIcon />
