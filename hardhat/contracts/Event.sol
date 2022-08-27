@@ -3,6 +3,7 @@ pragma solidity ^0.8.4;
 
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "hardhat/console.sol";
 
 interface IMintNFT {
@@ -21,7 +22,7 @@ interface IMintNFT {
     ) external;
 }
 
-contract EventManager is Ownable {
+contract EventManager is OwnableUpgradeable {
     struct Group {
         uint256 groupId;
         address ownerAddress;
@@ -67,7 +68,8 @@ contract EventManager is Ownable {
         mintNFTAddr = _mintNftAddr;
     }
 
-    constructor() {
+    function initialize() public initializer {
+        __Ownable_init();
         _groupIds.increment();
         _eventRecordIds.increment();
     }
