@@ -11,9 +11,13 @@ async function main() {
   // let mintNFT: MintNFT;
   // let eventManager: EventManager;
 
+  const MinimalForwarder = await ethers.getContractFactory("MinimalForwarder");
+  const minimalForwarder = await MinimalForwarder.deploy();
   const MintNFT = await ethers.getContractFactory("MintNFT");
   // mintNFT = await MintNFT.deploy();
-  const mintNFT = await upgrades.deployProxy(MintNFT);
+  const mintNFT = await upgrades.deployProxy(MintNFT, [
+    minimalForwarder.address,
+  ]);
   await mintNFT.deployed();
 
   const EventManager = await ethers.getContractFactory("EventManager");
@@ -24,6 +28,7 @@ async function main() {
   await mintNFT.setEventManagerAddr(eventManager.address);
   await eventManager.setMintNFTAddr(mintNFT.address);
 
+  console.log("minimalForwarder:", minimalForwarder.address);
   console.log("mintNFT address:", mintNFT.address);
   console.log("eventManager address:", eventManager.address);
 }
