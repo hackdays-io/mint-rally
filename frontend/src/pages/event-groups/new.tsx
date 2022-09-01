@@ -127,7 +127,8 @@ const NewEventGroupPage: NextPage = () => {
         requiredParticipateCount,
       })
     );
-    await callCreateEventGroup(nftImages);
+    console.log(nftImages);
+    // await callCreateEventGroup(nftImages);
   };
 
   const callCreateEventGroup = async (nftImages: INFTImage[]) => {
