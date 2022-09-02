@@ -6,6 +6,7 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "./IEvent.sol";
+import "hardhat/console.sol";
 
 contract MintNFT is ERC721EnumerableUpgradeable, OwnableUpgradeable {
     using Counters for Counters.Counter;
@@ -75,6 +76,8 @@ contract MintNFT is ERC721EnumerableUpgradeable, OwnableUpgradeable {
             getAddressUint256Hash(_msgSender(), _groupId)
         ];
 
+        console.logUint(participationCount);
+
         string memory metaDataURL = nftAttributes[
             getDoubleUint256Hash(_groupId, 0)
         ];
@@ -90,6 +93,9 @@ contract MintNFT is ERC721EnumerableUpgradeable, OwnableUpgradeable {
 
         nftMetaDataURL[_tokenIds.current()] = metaDataURL;
         _safeMint(_msgSender(), _tokenIds.current());
+        countOfParticipation[getAddressUint256Hash(_msgSender(), _groupId)] =
+            participationCount +
+            1;
         _tokenIds.increment();
         return metaDataURL;
     }

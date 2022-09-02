@@ -4,22 +4,7 @@ pragma solidity ^0.8.4;
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-
-interface IMintNFT {
-    struct ParticipateNFTAttributes {
-        string name;
-        string image;
-        string description;
-        uint256 groupId;
-        uint256 eventId;
-        uint256 requiredParticipateCount;
-    }
-
-    function pushGroupNFTAttributes(
-        uint256 groupId,
-        ParticipateNFTAttributes[] memory
-    ) external;
-}
+import "./IMintNFT.sol";
 
 contract EventManager is OwnableUpgradeable {
     struct Group {
@@ -29,8 +14,7 @@ contract EventManager is OwnableUpgradeable {
     }
 
     struct GroupAttributes {
-        string image;
-        string description;
+        string metaDataURL;
         uint256 requiredParticipateCount;
     }
 
@@ -80,18 +64,14 @@ contract EventManager is OwnableUpgradeable {
         uint256 _newGroupId = _groupIds.current();
         IMintNFT _mintNFT = IMintNFT(mintNFTAddr);
         uint256 _groupAttributesCount = _groupAttributes.length;
-        IMintNFT.ParticipateNFTAttributes[]
-            memory _participateNFTAttributes = new IMintNFT.ParticipateNFTAttributes[](
+        IMintNFT.NFTAttribute[]
+            memory _participateNFTAttributes = new IMintNFT.NFTAttribute[](
                 _groupAttributesCount
             );
 
         for (uint256 _i = 0; _i < _groupAttributesCount; _i++) {
-            _participateNFTAttributes[_i] = IMintNFT.ParticipateNFTAttributes({
-                name: _name,
-                image: _groupAttributes[_i].image,
-                description: _groupAttributes[_i].description,
-                groupId: _newGroupId,
-                eventId: 0,
+            _participateNFTAttributes[_i] = IMintNFT.NFTAttribute({
+                metaDataURL: _groupAttributes[_i].metaDataURL,
                 requiredParticipateCount: _groupAttributes[_i]
                     .requiredParticipateCount
             });

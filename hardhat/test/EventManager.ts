@@ -1,23 +1,20 @@
 import { expect } from "chai";
-import { Contract } from "ethers";
 import { ethers, upgrades } from "hardhat";
 import { EventManager, MintNFT } from "../typechain";
 
-const images = [
+// ToDo requiredParticipateCountに重複がある場合エラーになってしまう。
+const attributes = [
   {
-    image: "https://i.imgur.com/TZEhCTX.png",
-    description: "this is common NFT",
+    metaDataURL: "ipfs://hogehoge/count0.json",
     requiredParticipateCount: 0,
   },
   {
-    image: "https://i.imgur.com/TZEhCTX.png",
-    description: "this is uncommon NFT",
-    requiredParticipateCount: 3,
+    metaDataURL: "ipfs://hogehoge/count1.json",
+    requiredParticipateCount: 1,
   },
   {
-    image: "https://i.imgur.com/TZEhCTX.png",
-    description: "this is special NFT",
-    requiredParticipateCount: 6,
+    metaDataURL: "ipfs://hogehoge/count5.json",
+    requiredParticipateCount: 5,
   },
 ];
 
@@ -47,7 +44,7 @@ describe("EventManager", () => {
       const groupsBeforeCreate = await eventManager.getGroups();
       expect(groupsBeforeCreate.length).to.equal(0);
 
-      const txn1 = await eventManager.createGroup("group1", images);
+      const txn1 = await eventManager.createGroup("group1", attributes);
       await txn1.wait();
       const groupsAfterCreate = await eventManager.getGroups();
       expect(groupsAfterCreate.length).to.equal(1);
@@ -128,13 +125,13 @@ describe("EventManager", () => {
       // create group by address1
       const txn1 = await eventManager
         .connect(address1)
-        .createGroup("group1", images);
+        .createGroup("group1", attributes);
       await txn1.wait();
 
       // create group by address2
       const txn2 = await eventManager
         .connect(address2)
-        .createGroup("group2", images);
+        .createGroup("group2", attributes);
       await txn2.wait();
 
       // get all groups
@@ -149,7 +146,7 @@ describe("EventManager", () => {
       // create group by address1
       const txn3 = await eventManager
         .connect(address1)
-        .createGroup("group3", images);
+        .createGroup("group3", attributes);
       await txn3.wait();
 
       const ownGroups2 = await eventManager.connect(address1).getOwnGroups();
@@ -177,7 +174,7 @@ describe("EventManager", () => {
       const groupsBeforeCreate = await eventManager.getGroups();
       expect(groupsBeforeCreate.length).to.equal(0);
 
-      const txn1 = await eventManager.createGroup("group1", images);
+      const txn1 = await eventManager.createGroup("group1", attributes);
       await txn1.wait();
 
       const groupsAfterCreate = await eventManager.getGroups();
@@ -243,7 +240,7 @@ describe("EventManager", () => {
 
       const [address1] = await ethers.getSigners();
 
-      const txn1 = await eventManager.createGroup("group1", images);
+      const txn1 = await eventManager.createGroup("group1", attributes);
       await txn1.wait();
 
       const groupsAfterCreate = await eventManager.getGroups();
@@ -309,7 +306,7 @@ describe("EventManager", () => {
       await eventManager.setMintNFTAddr(mintNFT.address);
       await mintNFT.setEventManagerAddr(eventManager.address);
 
-      const txn1 = await eventManager.createGroup("group1", images);
+      const txn1 = await eventManager.createGroup("group1", attributes);
       await txn1.wait();
 
       const groups = await eventManager.getGroups();
