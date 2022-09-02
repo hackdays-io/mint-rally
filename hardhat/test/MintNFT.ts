@@ -1,25 +1,21 @@
 import { expect } from "chai";
 import { ethers, upgrades } from "hardhat";
 import { MintNFT, EventManager } from "../typechain";
-import base64 from "base64-js";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 
 // ToDo requiredParticipateCountに重複がある場合エラーになってしまう。
-const images = [
+const attributes = [
   {
-    image: "https://i.imgur.com/TZEhCTX.png",
-    description: "this is common NFT",
+    metaDataURL: "ipfs://hogehoge/count0.json",
     requiredParticipateCount: 0,
   },
   {
-    image: "https://i.imgur.com/TZEhCTXaaa.png",
-    description: "this is uncommon NFT",
+    metaDataURL: "ipfs://hogehoge/count1.json",
     requiredParticipateCount: 1,
   },
   {
-    image: "https://i.imgur.com/TZEhCTXaaaaa.png",
-    description: "this is special NFT",
-    requiredParticipateCount: 10,
+    metaDataURL: "ipfs://hogehoge/count5.json",
+    requiredParticipateCount: 5,
   },
 ];
 
@@ -46,7 +42,7 @@ describe("MintNFT", function () {
     //Create a Group and an Event
     const createGroupTxn = await eventManager.createGroup(
       "First Group",
-      images
+      attributes
     );
     await createGroupTxn.wait();
     const groupsList = await eventManager.getGroups();
@@ -65,13 +61,6 @@ describe("MintNFT", function () {
     createdEventIds.push(eventsList[0].eventRecordId.toNumber());
   });
 
-  it("check nft attributes", async () => {
-    const nftAttributes = await mintNFT.getGroupNFTAttributes(createdGroupId);
-    expect(nftAttributes[0].image).equal("https://i.imgur.com/TZEhCTX.png");
-    expect(nftAttributes[0].name).equal("First Group");
-    expect(nftAttributes[0].groupId).equal(1);
-  });
-
   it("mint NFT", async () => {
     const [owner1] = await ethers.getSigners();
 
@@ -81,21 +70,7 @@ describe("MintNFT", function () {
     await mintNftTxn.wait();
 
     const nftAttribute = await mintNFT.tokenURI(0);
-    const decodedAttribute = JSON.parse(
-      new TextDecoder().decode(
-        base64.toByteArray(nftAttribute.split("base64,")[1])
-      )
-    );
-
-    expect(decodedAttribute.name).equal("event1");
-    expect(decodedAttribute.description).equal("this is common NFT");
-    expect(decodedAttribute.image).equal("https://i.imgur.com/TZEhCTX.png");
-    expect(decodedAttribute.id).equal(0);
-
-    const ownedNFT = await mintNFT.connect(owner1).getOwnedNFTs();
-    expect(ownedNFT[0].groupId.toNumber()).equal(createdGroupId);
-    expect(ownedNFT[0].eventId.toNumber()).equal(1);
-    expect(ownedNFT[0].name).equal("event1");
+    expect(nftAttribute).equal("ipfs://hogehoge/count0.json");
   });
 
   // it("reject mint NFT when secret phrase is invalid", async () => {
@@ -115,7 +90,7 @@ describe("MintNFT", function () {
       const signers = await ethers.getSigners();
       owner2 = signers[1];
 
-      const txn1 = await eventManager.createGroup("AnotherGroup", images);
+      const txn1 = await eventManager.createGroup("AnotherGroup", attributes);
       await txn1.wait();
       const groupsList = await eventManager.getGroups();
       anotherGroupId = groupsList[1].groupId.toNumber();
@@ -166,11 +141,8 @@ describe("MintNFT", function () {
     });
 
     it("mint different NFT by participate count", async () => {
-      const holdingNFTs = await mintNFT.connect(owner2).getOwnedNFTs();
-      expect(holdingNFTs[0].image).equal("https://i.imgur.com/TZEhCTX.png");
-      expect(holdingNFTs[0].description).equal("this is common NFT");
-      expect(holdingNFTs[1].image).equal("https://i.imgur.com/TZEhCTXaaa.png");
-      expect(holdingNFTs[1].description).equal("this is uncommon NFT");
+      const holdingNFTs = await mintNFT.tokenURI(2);
+      expect(holdingNFTs).equal("ipfs://hogehoge/count1.json");
     });
 
     it("doesn't mint NFT for an event once attended to the same person twice", async () => {
