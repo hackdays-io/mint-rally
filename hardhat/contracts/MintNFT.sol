@@ -6,7 +6,6 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "./IEvent.sol";
-import "hardhat/console.sol";
 
 contract MintNFT is ERC721EnumerableUpgradeable, OwnableUpgradeable {
     using Counters for Counters.Counter;
@@ -66,17 +65,13 @@ contract MintNFT is ERC721EnumerableUpgradeable, OwnableUpgradeable {
             "invalid secret phrase"
         );
 
-        bool holdingEventNFT = isHoldingEventNFT[
-            getAddressUint256Hash(_msgSender(), _eventId)
-        ];
+        bytes32 eventHash = getAddressUint256Hash(_msgSender(), _eventId);
+        bool holdingEventNFT = isHoldingEventNFT[eventHash];
         require(!holdingEventNFT, "already minted NFT on event");
-        isHoldingEventNFT[getAddressUint256Hash(_msgSender(), _eventId)] = true;
+        isHoldingEventNFT[eventHash] = true;
 
-        uint256 participationCount = countOfParticipation[
-            getAddressUint256Hash(_msgSender(), _groupId)
-        ];
-
-        console.logUint(participationCount);
+        bytes32 groupHash = getAddressUint256Hash(_msgSender(), _groupId);
+        uint256 participationCount = countOfParticipation[groupHash];
 
         string memory metaDataURL = nftAttributes[
             getDoubleUint256Hash(_groupId, 0)
@@ -93,9 +88,7 @@ contract MintNFT is ERC721EnumerableUpgradeable, OwnableUpgradeable {
 
         nftMetaDataURL[_tokenIds.current()] = metaDataURL;
         _safeMint(_msgSender(), _tokenIds.current());
-        countOfParticipation[getAddressUint256Hash(_msgSender(), _groupId)] =
-            participationCount +
-            1;
+        countOfParticipation[groupHash] = participationCount + 1;
         _tokenIds.increment();
         return metaDataURL;
     }
