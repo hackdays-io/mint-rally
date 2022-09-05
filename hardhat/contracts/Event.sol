@@ -41,6 +41,8 @@ contract EventManager is OwnableUpgradeable {
 
     address private mintNFTAddr;
 
+    event CreatedGroupId(address indexed owner, uint256 groupId);
+
     function setMintNFTAddr(address _mintNftAddr) public onlyOwner {
         require(_mintNftAddr != address(0), "mint nft address is blank");
         mintNFTAddr = _mintNftAddr;
@@ -60,6 +62,8 @@ contract EventManager is OwnableUpgradeable {
         );
         ownGroupIds[msg.sender].push(_newGroupId);
         _groupIds.increment();
+
+        emit CreatedGroupId(msg.sender, _newGroupId);
     }
 
     function getGroups() public view returns (Group[] memory) {
