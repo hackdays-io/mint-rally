@@ -44,7 +44,7 @@ describe("EventManager", () => {
       const groupsBeforeCreate = await eventManager.getGroups();
       expect(groupsBeforeCreate.length).to.equal(0);
 
-      const txn1 = await eventManager.createGroup("group1", attributes);
+      const txn1 = await eventManager.createGroup("group1");
       await txn1.wait();
       const groupsAfterCreate = await eventManager.getGroups();
       expect(groupsAfterCreate.length).to.equal(1);
@@ -60,7 +60,8 @@ describe("EventManager", () => {
         "2022-07-3O",
         "18:00",
         "21:00",
-        "hackdays"
+        "hackdays",
+        attributes
       );
       await txn2.wait();
       const eventRecordsAfterCreate = await eventManager.getEventRecords();
@@ -94,7 +95,8 @@ describe("EventManager", () => {
           "2022-08-01",
           "18:00",
           "21:00",
-          "hackdays"
+          "hackdays",
+          attributes
         );
         await txn3.wait();
       } catch (e) {
@@ -123,15 +125,11 @@ describe("EventManager", () => {
       const [address1, address2] = await ethers.getSigners();
 
       // create group by address1
-      const txn1 = await eventManager
-        .connect(address1)
-        .createGroup("group1", attributes);
+      const txn1 = await eventManager.connect(address1).createGroup("group1");
       await txn1.wait();
 
       // create group by address2
-      const txn2 = await eventManager
-        .connect(address2)
-        .createGroup("group2", attributes);
+      const txn2 = await eventManager.connect(address2).createGroup("group2");
       await txn2.wait();
 
       // get all groups
@@ -144,9 +142,7 @@ describe("EventManager", () => {
       expect(ownGroups[0].name).to.equal("group1");
 
       // create group by address1
-      const txn3 = await eventManager
-        .connect(address1)
-        .createGroup("group3", attributes);
+      const txn3 = await eventManager.connect(address1).createGroup("group3");
       await txn3.wait();
 
       const ownGroups2 = await eventManager.connect(address1).getOwnGroups();
@@ -174,7 +170,7 @@ describe("EventManager", () => {
       const groupsBeforeCreate = await eventManager.getGroups();
       expect(groupsBeforeCreate.length).to.equal(0);
 
-      const txn1 = await eventManager.createGroup("group1", attributes);
+      const txn1 = await eventManager.createGroup("group1");
       await txn1.wait();
 
       const groupsAfterCreate = await eventManager.getGroups();
@@ -186,7 +182,8 @@ describe("EventManager", () => {
         "2022-07-3O",
         "18:00",
         "21:00",
-        "hackdays"
+        "hackdays",
+        attributes
       );
       await txn2.wait();
       const eventRecordsAfterCreate = await eventManager.getEventRecords();
@@ -205,7 +202,8 @@ describe("EventManager", () => {
         "2022-08-3O",
         "18:00",
         "21:00",
-        "hackdays"
+        "hackdays",
+        attributes
       );
       await txn4.wait();
       const participationEvents2 =
@@ -240,7 +238,7 @@ describe("EventManager", () => {
 
       const [address1] = await ethers.getSigners();
 
-      const txn1 = await eventManager.createGroup("group1", attributes);
+      const txn1 = await eventManager.createGroup("group1");
       await txn1.wait();
 
       const groupsAfterCreate = await eventManager.getGroups();
@@ -251,7 +249,8 @@ describe("EventManager", () => {
         "2022-07-3O",
         "18:00",
         "21:00",
-        "hackdays"
+        "hackdays",
+        attributes
       );
       await txn2.wait();
       const eventRecord1 = await eventManager.getEventRecords();
@@ -275,7 +274,8 @@ describe("EventManager", () => {
         "2022-08-3O",
         "18:00",
         "21:00",
-        "hackdays"
+        "hackdays",
+        attributes
       );
       await txn4.wait();
       const eventRecord2 = await eventManager.getEventRecords();
@@ -306,7 +306,7 @@ describe("EventManager", () => {
       await eventManager.setMintNFTAddr(mintNFT.address);
       await mintNFT.setEventManagerAddr(eventManager.address);
 
-      const txn1 = await eventManager.createGroup("group1", attributes);
+      const txn1 = await eventManager.createGroup("group1");
       await txn1.wait();
 
       const groups = await eventManager.getGroups();
@@ -318,7 +318,8 @@ describe("EventManager", () => {
         "2022-07-3O",
         "18:00",
         "21:00",
-        "hackdays"
+        "hackdays",
+        attributes
       );
       await txn2.wait();
       const eventRecord1 = await eventManager.getEventRecords();

@@ -40,10 +40,7 @@ describe("MintNFT", function () {
     await eventManager.setMintNFTAddr(mintNFT.address);
 
     //Create a Group and an Event
-    const createGroupTxn = await eventManager.createGroup(
-      "First Group",
-      attributes
-    );
+    const createGroupTxn = await eventManager.createGroup("First Group");
     await createGroupTxn.wait();
     const groupsList = await eventManager.getGroups();
     createdGroupId = groupsList[0].groupId.toNumber();
@@ -54,7 +51,8 @@ describe("MintNFT", function () {
       "2022-07-3O",
       "18:00",
       "21:00",
-      "hackdays"
+      "hackdays",
+      attributes
     );
     await createEventTxn.wait();
     const eventsList = await eventManager.getEventRecords();
@@ -90,7 +88,7 @@ describe("MintNFT", function () {
       const signers = await ethers.getSigners();
       owner2 = signers[1];
 
-      const txn1 = await eventManager.createGroup("AnotherGroup", attributes);
+      const txn1 = await eventManager.createGroup("AnotherGroup");
       await txn1.wait();
       const groupsList = await eventManager.getGroups();
       anotherGroupId = groupsList[1].groupId.toNumber();
@@ -102,7 +100,8 @@ describe("MintNFT", function () {
         "2022-08-3O",
         "18:00",
         "21:00",
-        "hackdays1secret"
+        "hackdays1secret",
+        attributes
       );
       await createFirstEvent.wait();
 
@@ -113,7 +112,8 @@ describe("MintNFT", function () {
         "2022-08-3O",
         "18:00",
         "21:00",
-        "hackdays2secret"
+        "hackdays2secret",
+        attributes
       );
       await createAnotherEvent.wait();
 
@@ -154,7 +154,7 @@ describe("MintNFT", function () {
             createdEventIds[0],
             "hackdays1secret"
           )
-      ).to.be.revertedWith("already minted NFT on event");
+      ).to.be.revertedWith("already minted");
     });
   });
 });
