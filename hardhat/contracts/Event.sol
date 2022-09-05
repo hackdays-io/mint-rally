@@ -13,11 +13,6 @@ contract EventManager is OwnableUpgradeable {
         string name;
     }
 
-    struct GroupAttributes {
-        string metaDataURL;
-        uint256 requiredParticipateCount;
-    }
-
     struct EventRecord {
         uint256 eventRecordId;
         uint256 groupId;
@@ -57,31 +52,13 @@ contract EventManager is OwnableUpgradeable {
         _eventRecordIds.increment();
     }
 
-    function createGroup(
-        string memory _name,
-        GroupAttributes[] memory _groupAttributes
-    ) external {
+    function createGroup(string memory _name) external {
         uint256 _newGroupId = _groupIds.current();
-        IMintNFT _mintNFT = IMintNFT(mintNFTAddr);
-        uint256 _groupAttributesCount = _groupAttributes.length;
-        IMintNFT.NFTAttribute[]
-            memory _participateNFTAttributes = new IMintNFT.NFTAttribute[](
-                _groupAttributesCount
-            );
-
-        for (uint256 _i = 0; _i < _groupAttributesCount; _i++) {
-            _participateNFTAttributes[_i] = IMintNFT.NFTAttribute({
-                metaDataURL: _groupAttributes[_i].metaDataURL,
-                requiredParticipateCount: _groupAttributes[_i]
-                    .requiredParticipateCount
-            });
-        }
 
         groups.push(
             Group({groupId: _newGroupId, ownerAddress: msg.sender, name: _name})
         );
         ownGroupIds[msg.sender].push(_newGroupId);
-        _mintNFT.pushGroupNFTAttributes(_newGroupId, _participateNFTAttributes);
         _groupIds.increment();
     }
 
@@ -115,7 +92,8 @@ contract EventManager is OwnableUpgradeable {
         string memory _date,
         string memory _startTime,
         string memory _endTime,
-        string memory _secretPhrase
+        string memory _secretPhrase,
+        IMintNFT.NFTAttribute[] memory _eventNFTAttributes
     ) external {
         bool _isGroupOwner = false;
         for (uint256 _i = 0; _i < ownGroupIds[msg.sender].length; _i++) {
@@ -123,11 +101,10 @@ contract EventManager is OwnableUpgradeable {
                 _isGroupOwner = true;
             }
         }
-        require(_isGroupOwner, "Only group owners can create event records");
+        require(_isGroupOwner, "You are not group owner");
 
         uint256 _newEventId = _eventRecordIds.current();
-        bytes memory hexSecretPhrase = bytes(_secretPhrase);
-        bytes32 encryptedSecretPhrase = keccak256(hexSecretPhrase);
+        bytes32 encryptedSecretPhrase = keccak256(bytes(_secretPhrase));
         eventRecords.push(
             EventRecord({
                 eventRecordId: _newEventId,
@@ -140,6 +117,10 @@ contract EventManager is OwnableUpgradeable {
                 secretPhrase: encryptedSecretPhrase
             })
         );
+
+        IMintNFT _mintNFT = IMintNFT(mintNFTAddr);
+        _mintNFT.pushEventNFTAttributes(_newEventId, _eventNFTAttributes);
+
         eventIdsByGroupId[_groupId].push(_newEventId);
         groupIdByEventId[_newEventId] = _groupId;
         _eventRecordIds.increment();

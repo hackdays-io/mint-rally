@@ -6,6 +6,7 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "./IEvent.sol";
+import "./lib/Hashing.sol";
 
 contract MintNFT is ERC721EnumerableUpgradeable, OwnableUpgradeable {
     using Counters for Counters.Counter;
@@ -32,8 +33,8 @@ contract MintNFT is ERC721EnumerableUpgradeable, OwnableUpgradeable {
     mapping(bytes32 => bool) private isHoldingEventNFT;
     // Participate count via hash of groupId and address hash
     mapping(bytes32 => uint256) private countOfParticipation;
-    // NFT attributes via hash of participateCount and groupId
-    mapping(bytes32 => string) private nftAttributes;
+    // NFT attribute location (ex. ipfs, centralized storage) via hash of participateCount, eventId
+    mapping(bytes32 => string) private eventNftAttributes;
 
     function initialize() public initializer {
         __ERC721_init("MintRally", "MR");
@@ -65,19 +66,25 @@ contract MintNFT is ERC721EnumerableUpgradeable, OwnableUpgradeable {
             "invalid secret phrase"
         );
 
-        bytes32 eventHash = getAddressUint256Hash(_msgSender(), _eventId);
+        bytes32 eventHash = Hashing.hashingAddressUint256(
+            _msgSender(),
+            _eventId
+        );
         bool holdingEventNFT = isHoldingEventNFT[eventHash];
-        require(!holdingEventNFT, "already minted NFT on event");
+        require(!holdingEventNFT, "already minted");
         isHoldingEventNFT[eventHash] = true;
 
-        bytes32 groupHash = getAddressUint256Hash(_msgSender(), _groupId);
+        bytes32 groupHash = Hashing.hashingAddressUint256(
+            _msgSender(),
+            _groupId
+        );
         uint256 participationCount = countOfParticipation[groupHash];
 
-        string memory metaDataURL = nftAttributes[
-            getDoubleUint256Hash(_groupId, 0)
+        string memory metaDataURL = eventNftAttributes[
+            Hashing.hashingDoubleUint256(_eventId, 0)
         ];
-        string memory specialMetaDataURL = nftAttributes[
-            getDoubleUint256Hash(_groupId, participationCount)
+        string memory specialMetaDataURL = eventNftAttributes[
+            Hashing.hashingDoubleUint256(_eventId, participationCount)
         ];
         if (
             keccak256(abi.encodePacked(specialMetaDataURL)) !=
@@ -93,14 +100,15 @@ contract MintNFT is ERC721EnumerableUpgradeable, OwnableUpgradeable {
         return metaDataURL;
     }
 
-    function pushGroupNFTAttributes(
-        uint256 _groupId,
+    function pushEventNFTAttributes(
+        uint256 _eventId,
         NFTAttribute[] memory attributes
     ) external {
+        require(_msgSender() == eventManagerAddr, "unauthorized");
         for (uint256 index = 0; index < attributes.length; index++) {
-            nftAttributes[
-                getDoubleUint256Hash(
-                    _groupId,
+            eventNftAttributes[
+                Hashing.hashingDoubleUint256(
+                    _eventId,
                     attributes[index].requiredParticipateCount
                 )
             ] = attributes[index].metaDataURL;
@@ -119,21 +127,5 @@ contract MintNFT is ERC721EnumerableUpgradeable, OwnableUpgradeable {
     {
         string memory metaDataURL = nftMetaDataURL[_tokenId];
         return metaDataURL;
-    }
-
-    function getAddressUint256Hash(address _address, uint256 _id)
-        private
-        pure
-        returns (bytes32)
-    {
-        return keccak256(abi.encodePacked(_address, _id));
-    }
-
-    function getDoubleUint256Hash(uint256 _arg1, uint256 _arg2)
-        private
-        pure
-        returns (bytes32)
-    {
-        return keccak256(abi.encodePacked(_arg1, _arg2));
     }
 }
