@@ -11,7 +11,8 @@
     "compile": "npx hardhat compile",
     "test": "npx hardhat compile && npx hardhat test",
     "localchain": "npx hardhat node",
-    "slither": "slither . --solc-remaps '@openzeppelin=node_modules/@openzeppelin' --exclude naming-convention,external-function,low-level-calls"
+    "slither": "slither . --solc-remaps '@openzeppelin=node_modules/@openzeppelin' --exclude naming-convention,external-function,low-level-calls",
+    "size": "npx hardhat size-contracts"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.1.1",
@@ -43,6 +44,7 @@
     "ethereum-waffle": "^3.0.0",
     "ethers": "^5.6.9",
     "hardhat": "^2.9.9",
+    "hardhat-contract-sizer": "^2.6.1",
     "hardhat-gas-reporter": "^1.0.8",
     "prettier": "^2.3.2",
     "prettier-plugin-solidity": "^1.0.0-beta.13",
@@ -57,6 +59,7 @@
     "@openzeppelin/contracts": "^4.7.0",
     "@openzeppelin/contracts-upgradeable": "^4.7.3",
     "defender-relay-client": "^1.28.1",
-    "eth-sig-util": "^3.0.1"
+    "eth-sig-util": "^3.0.1",
+    "hardhat-interface-generator": "^0.0.6"
   }
 }
