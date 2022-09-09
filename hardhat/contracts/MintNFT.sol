@@ -5,7 +5,6 @@ import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721Enumer
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import "./IEvent.sol";
 import "./lib/Hashing.sol";
 
 contract MintNFT is ERC721EnumerableUpgradeable, OwnableUpgradeable {
@@ -35,6 +34,12 @@ contract MintNFT is ERC721EnumerableUpgradeable, OwnableUpgradeable {
     mapping(bytes32 => uint256) private countOfParticipation;
     // NFT attribute location (ex. ipfs, centralized storage) via hash of participateCount, eventId
     mapping(bytes32 => string) private eventNftAttributes;
+    // remaining mint count of Event
+    mapping(uint256 => uint256) private remainingEventNftCount;
+    // secretPhrase via EventId
+    mapping(uint256 => bytes32) private eventSecretPhrases;
+
+    event MintedNFTAttributeURL(address indexed holder, string url);
 
     function initialize() public initializer {
         __ERC721_init("MintRally", "MR");
@@ -59,11 +64,14 @@ contract MintNFT is ERC721EnumerableUpgradeable, OwnableUpgradeable {
         uint256 _groupId,
         uint256 _eventId,
         string memory _secretPhrase
-    ) external returns (string memory) {
-        IEventManager _eventManager = IEventManager(eventManagerAddr);
+    ) external {
         require(
-            _eventManager.verifySecretPhrase(_secretPhrase, _eventId),
+            verifySecretPhrase(_secretPhrase, _eventId),
             "invalid secret phrase"
+        );
+        require(
+            remainingEventNftCount[_eventId] != 0,
+            "remaining count is zero"
         );
 
         bytes32 eventHash = Hashing.hashingAddressUint256(
@@ -96,15 +104,20 @@ contract MintNFT is ERC721EnumerableUpgradeable, OwnableUpgradeable {
         nftMetaDataURL[_tokenIds.current()] = metaDataURL;
         _safeMint(_msgSender(), _tokenIds.current());
         countOfParticipation[groupHash] = participationCount + 1;
+        remainingEventNftCount[_eventId] = remainingEventNftCount[_eventId] - 1;
         _tokenIds.increment();
-        return metaDataURL;
+        emit MintedNFTAttributeURL(_msgSender(), metaDataURL);
     }
 
-    function pushEventNFTAttributes(
+    function setEventInfo(
         uint256 _eventId,
+        uint256 _mintLimit,
+        bytes32 _secretPhrase,
         NFTAttribute[] memory attributes
     ) external {
         require(_msgSender() == eventManagerAddr, "unauthorized");
+        remainingEventNftCount[_eventId] = _mintLimit;
+        eventSecretPhrases[_eventId] = _secretPhrase;
         for (uint256 index = 0; index < attributes.length; index++) {
             eventNftAttributes[
                 Hashing.hashingDoubleUint256(
@@ -113,6 +126,14 @@ contract MintNFT is ERC721EnumerableUpgradeable, OwnableUpgradeable {
                 )
             ] = attributes[index].metaDataURL;
         }
+    }
+
+    function getRemainingNFTCount(uint256 _eventId)
+        external
+        view
+        returns (uint256)
+    {
+        return remainingEventNftCount[_eventId];
     }
 
     function burn(uint256 tokenId) public onlyOwner {
@@ -127,5 +148,15 @@ contract MintNFT is ERC721EnumerableUpgradeable, OwnableUpgradeable {
     {
         string memory metaDataURL = nftMetaDataURL[_tokenId];
         return metaDataURL;
+    }
+
+    function verifySecretPhrase(string memory _secretPhrase, uint256 _eventId)
+        internal
+        view
+        returns (bool)
+    {
+        bytes32 encryptedSecretPhrase = keccak256(bytes(_secretPhrase));
+        bool result = eventSecretPhrases[_eventId] == encryptedSecretPhrase;
+        return result;
     }
 }

@@ -49,8 +49,7 @@ describe("MintNFT", function () {
       "event1",
       "event1 description",
       "2022-07-3O",
-      "18:00",
-      "21:00",
+      100,
       "hackdays",
       attributes
     );
@@ -59,7 +58,7 @@ describe("MintNFT", function () {
     createdEventIds.push(eventsList[0].eventRecordId.toNumber());
   });
 
-  it("mint NFT", async () => {
+  describe("mint NFT", async () => {
     const [owner1] = await ethers.getSigners();
 
     const mintNftTxn = await mintNFT
@@ -81,11 +80,13 @@ describe("MintNFT", function () {
   // });
 
   describe("NFT evolution", () => {
+    let owner1: SignerWithAddress;
     let owner2: SignerWithAddress;
     let anotherGroupId: number;
     let createdEventIds: number[] = [];
     before(async () => {
       const signers = await ethers.getSigners();
+      owner1 = signers[0];
       owner2 = signers[1];
 
       const txn1 = await eventManager.createGroup("AnotherGroup");
@@ -98,8 +99,7 @@ describe("MintNFT", function () {
         "anotherEvent1",
         "anotherEvent1description",
         "2022-08-3O",
-        "18:00",
-        "21:00",
+        2,
         "hackdays1secret",
         attributes
       );
@@ -110,8 +110,7 @@ describe("MintNFT", function () {
         "anotherEvent2",
         "anotherEvent2description",
         "2022-08-3O",
-        "18:00",
-        "21:00",
+        1,
         "hackdays2secret",
         attributes
       );
@@ -122,7 +121,7 @@ describe("MintNFT", function () {
       createdEventIds.push(createdEventsList[2].eventRecordId.toNumber());
 
       const mintTxn1 = await mintNFT
-        .connect(owner2)
+        .connect(owner1)
         .mintParticipateNFT(
           anotherGroupId,
           createdEventIds[0],
@@ -131,7 +130,7 @@ describe("MintNFT", function () {
       await mintTxn1.wait();
 
       const mintTxn2 = await mintNFT
-        .connect(owner2)
+        .connect(owner1)
         .mintParticipateNFT(
           anotherGroupId,
           createdEventIds[1],
@@ -141,20 +140,32 @@ describe("MintNFT", function () {
     });
 
     it("mint different NFT by participate count", async () => {
-      const holdingNFTs = await mintNFT.tokenURI(2);
+      const holdingNFTs = await mintNFT.tokenURI(1);
       expect(holdingNFTs).equal("ipfs://hogehoge/count1.json");
     });
 
     it("doesn't mint NFT for an event once attended to the same person twice", async () => {
       await expect(
         mintNFT
-          .connect(owner2)
+          .connect(owner1)
           .mintParticipateNFT(
             anotherGroupId,
             createdEventIds[0],
             "hackdays1secret"
           )
       ).to.be.revertedWith("already minted");
+    });
+
+    it("doesn't mint NFT if there are no remaining count", async () => {
+      await expect(
+        mintNFT
+          .connect(owner2)
+          .mintParticipateNFT(
+            anotherGroupId,
+            createdEventIds[1],
+            "hackdays2secret"
+          )
+      ).to.be.revertedWith("remaining count is zero");
     });
   });
 });
