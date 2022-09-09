@@ -19,9 +19,6 @@ contract EventManager is OwnableUpgradeable {
         string name;
         string description;
         string date;
-        string startTime;
-        string endTime;
-        bytes32 secretPhrase;
     }
 
     using Counters for Counters.Counter;
@@ -33,9 +30,6 @@ contract EventManager is OwnableUpgradeable {
     EventRecord[] private eventRecords;
 
     mapping(address => uint256[]) private ownGroupIds;
-    mapping(uint256 => address[]) private participantAddresses;
-    mapping(address => uint256[]) private participantGroupIds;
-    mapping(address => uint256[]) private eventIdsByParticipant;
     mapping(uint256 => uint256[]) private eventIdsByGroupId;
     mapping(uint256 => uint256) private groupIdByEventId;
 
@@ -94,8 +88,7 @@ contract EventManager is OwnableUpgradeable {
         string memory _name,
         string memory _description,
         string memory _date,
-        string memory _startTime,
-        string memory _endTime,
+        uint256 _mintLimit,
         string memory _secretPhrase,
         IMintNFT.NFTAttribute[] memory _eventNFTAttributes
     ) external {
@@ -108,22 +101,25 @@ contract EventManager is OwnableUpgradeable {
         require(_isGroupOwner, "You are not group owner");
 
         uint256 _newEventId = _eventRecordIds.current();
-        bytes32 encryptedSecretPhrase = keccak256(bytes(_secretPhrase));
+
         eventRecords.push(
             EventRecord({
                 eventRecordId: _newEventId,
                 groupId: _groupId,
                 name: _name,
                 description: _description,
-                date: _date,
-                startTime: _startTime,
-                endTime: _endTime,
-                secretPhrase: encryptedSecretPhrase
+                date: _date
             })
         );
 
+        bytes32 encryptedSecretPhrase = keccak256(bytes(_secretPhrase));
         IMintNFT _mintNFT = IMintNFT(mintNFTAddr);
-        _mintNFT.pushEventNFTAttributes(_newEventId, _eventNFTAttributes);
+        _mintNFT.setEventInfo(
+            _newEventId,
+            _mintLimit,
+            encryptedSecretPhrase,
+            _eventNFTAttributes
+        );
 
         eventIdsByGroupId[_groupId].push(_newEventId);
         groupIdByEventId[_newEventId] = _groupId;
@@ -140,24 +136,6 @@ contract EventManager is OwnableUpgradeable {
         return _eventRecords;
     }
 
-    //申込みはregisterを別で作って管理したほうがいいかも。
-    //これだと、applyしただけの人になってしまうので。
-    function applyForParticipation(uint256 _eventRecordId) external {
-        participantAddresses[_eventRecordId].push(msg.sender);
-        eventIdsByParticipant[msg.sender].push(_eventRecordId);
-        uint256 _groupId = groupIdByEventId[_eventRecordId];
-        participantGroupIds[msg.sender].push(_groupId);
-    }
-
-    function getParticipationEventIds()
-        external
-        view
-        returns (uint256[] memory)
-    {
-        uint256[] memory _eventIds = eventIdsByParticipant[msg.sender];
-        return _eventIds;
-    }
-
     function getEventById(uint256 _eventId)
         external
         view
@@ -166,37 +144,5 @@ contract EventManager is OwnableUpgradeable {
         uint256 _eventRecordIndex = _eventId - 1;
         EventRecord memory _eventRecord = eventRecords[_eventRecordIndex];
         return _eventRecord;
-    }
-
-    function countParticipationByGroup(
-        address _participantAddress,
-        uint256 _groupId
-    ) public view returns (uint256) {
-        uint256 _numberOfGroupIds = participantGroupIds[_participantAddress]
-            .length;
-        uint256 _numberOfParticipations = 0;
-        for (uint256 _i = 0; _i < _numberOfGroupIds; _i++) {
-            if (participantGroupIds[_participantAddress][_i] == _groupId) {
-                _numberOfParticipations++;
-            }
-        }
-        return _numberOfParticipations;
-    }
-
-    function verifySecretPhrase(
-        string memory _secretPhrase,
-        uint256 _eventRecordId
-    ) external view returns (bool) {
-        bytes memory hexSecretPhrase = bytes(_secretPhrase);
-        bytes32 encryptedSecretPhrase = keccak256(hexSecretPhrase);
-        uint256 _indexOfEventRecord = _eventRecordId - 1;
-        bool result = eventRecords[_indexOfEventRecord].secretPhrase ==
-            encryptedSecretPhrase;
-        return result;
-    }
-
-    function testConnection() external pure returns (string memory) {
-        string memory testResult = "Test connection successful";
-        return testResult;
     }
 }

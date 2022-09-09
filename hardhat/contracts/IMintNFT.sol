@@ -34,8 +34,10 @@ interface IMintNFT {
 
     function ownerOf(uint256 tokenId) external view returns (address);
 
-    function pushEventNFTAttributes(
+    function setEventInfo(
         uint256 _eventId,
+        uint256 _mintLimit,
+        bytes32 _secretPhrase,
         NFTAttribute[] memory attributes
     ) external;
 
