@@ -11,26 +11,29 @@ import {
 import { IOwnedNFT, useGetOwnedNFTs } from "../../hooks/useMintNFTManager";
 import { FC, useEffect, useMemo, useState } from "react";
 import { useEventGroups } from "../../hooks/useEventManager";
+import { useAddress } from "@thirdweb-dev/react";
 
 const getUrlThoughGateway = (rawFullUrl: string) => {
-  const fileAddress = rawFullUrl.split("ipfs://")[1];
-  return `https://gateway.ipfs.io/ipfs/${fileAddress}`;
+  const rootCid = rawFullUrl.split("ipfs://")[1].split("/")[0];
+  const fileName = rawFullUrl.split("ipfs://")[1].split("/")[1];
+  return `https://${rootCid}.ipfs.w3s.link/${fileName}`;
 };
 
 const User = () => {
   const { ownedNFTs, loading, getOwnedNFTs } = useGetOwnedNFTs();
   const { groups } = useEventGroups();
+  const address = useAddress();
 
   useEffect(() => {
-    getOwnedNFTs();
-  }, []);
+    getOwnedNFTs(address);
+  }, [address]);
 
   const nftCollectionsByGroup = useMemo(() => {
     const grouped = ownedNFTs.reduce<Record<number, IOwnedNFT[]>>(
       (nfts, current) => {
-        const { groupId } = current;
-        nfts[groupId.toNumber()] = nfts[groupId.toNumber()] ?? [];
-        nfts[groupId.toNumber()].push(current);
+        const { traits } = current;
+        nfts[traits.eventGroupId] = nfts[traits.eventGroupId] ?? [];
+        nfts[traits.eventGroupId].push(current);
         return nfts;
       },
       {}
@@ -41,11 +44,7 @@ const User = () => {
   const ImageBadge = ({ image, name }: { image: string; name: string }) => (
     <Flex justifyContent="center" alignItems="center" flexDirection="column">
       <Box>
-        <Image
-          src={image}
-          alt={name}
-          style={{ borderRadius: "60px" }}
-        />
+        <Image src={image} alt={name} style={{ borderRadius: "60px" }} />
       </Box>
       <Box>
         <Flex justifyContent="center">
@@ -68,7 +67,12 @@ const User = () => {
       >
         {collectionData.map((data, i) => {
           return (
-            <Box key={i} width={{base:"50%", sm:"33%", md:"25%", lg:"20%"}} mb={8} textAlign="center">
+            <Box
+              key={i}
+              width={{ base: "50%", sm: "33%", md: "25%", lg: "20%" }}
+              mb={8}
+              textAlign="center"
+            >
               {ImageBadge({ image: data.image, name: data.name })}
             </Box>
           );

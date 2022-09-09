@@ -28,7 +28,7 @@ const Event = () => {
   const router = useRouter();
   const { eventid } = router.query;
   const { event, loading: loadingFetch } = useGetEventById(Number(eventid));
-  const { ownedNFTs, loading, getOwnedNFTs } = useGetOwnedNFTs();
+  // const { ownedNFTs, loading, getOwnedNFTs } = useGetOwnedNFTs();
 
   const {
     status: mintStatus,
@@ -37,9 +37,9 @@ const Event = () => {
     mintParticipateNFT,
   } = useMintParticipateNFT();
 
-  useEffect(() => {
-    getOwnedNFTs();
-  }, []);
+  // useEffect(() => {
+  //   getOwnedNFTs();
+  // }, []);
 
   const [enteredSecretPhrase, setEnteredSecretPhrase] = useState("");
 
@@ -52,14 +52,14 @@ const Event = () => {
     });
   };
 
-  const hasNftForThisEvent = useMemo(() => {
-    return ownedNFTs.some(
-      (nft) =>
-        !!event &&
-        nft.groupId.eq(event.groupId) &&
-        nft.eventId.eq(BigNumber.from(eventid))
-    );
-  }, [event, ownedNFTs]);
+  // const hasNftForThisEvent = useMemo(() => {
+  //   return ownedNFTs.some(
+  //     (nft) =>
+  //       !!event &&
+  //       nft.groupId.eq(event.groupId) &&
+  //       nft.eventId.eq(BigNumber.from(eventid))
+  //   );
+  // }, [event, ownedNFTs]);
 
   return (
     <>
@@ -81,7 +81,8 @@ const Event = () => {
               ))}
             </Text>
 
-            {hasNftForThisEvent || mintStatus ? (
+            {/* {hasNftForThisEvent || mintStatus ? ( */}
+            {mintStatus ? (
               <Text>
                 You already have this NFT. Thank you for your participation!
               </Text>
