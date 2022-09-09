@@ -1,5 +1,5 @@
 import { useAddress } from "@thirdweb-dev/react";
-import { BigNumber, ethers } from "ethers";
+import { BigNumber, ethers, providers } from "ethers";
 import { useEffect, useState } from "react";
 const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_EVENT_MANAGER!;
 import contract from "../contracts/EventManager.json";
@@ -24,7 +24,6 @@ export interface INFTImage {
 
 export interface ICreateEventGroupParams {
   groupName: string;
-  images: INFTImage[];
 }
 
 export interface ICreateEventRecordParams {
@@ -71,17 +70,28 @@ export const useCreateEventGroup = () => {
   const [errors, setErrors] = useState<Error | null>(null);
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState(false);
+  const [createdGroupId, setCreatedGroupId] = useState<number | null>(null);
+  const address = useAddress();
+
+  useEffect(() => {
+    const eventManager = getEventManagerContract();
+    if (!eventManager) throw "error: contract can't found";
+    const filters = eventManager?.filters.CreatedGroupId(address, null);
+    eventManager.on(filters, (_, _groupId: BigNumber) => {
+      setCreatedGroupId(_groupId.toNumber());
+    });
+  }, []);
+
   const createEventGroup = async (params: ICreateEventGroupParams) => {
     try {
+      const eventManager = getEventManagerContract();
+      setCreatedGroupId(null);
       setLoading(true);
       setErrors(null);
-      const eventManager = getEventManagerContract();
       if (!eventManager) throw "error: contract can't found";
-      const tx = await eventManager.createGroup(
-        params.groupName,
-        params.images
-      );
+      const tx = await eventManager.createGroup(params.groupName);
       await tx.wait();
+
       setLoading(false);
       setStatus(true);
     } catch (e: any) {
@@ -89,7 +99,8 @@ export const useCreateEventGroup = () => {
       setLoading(false);
     }
   };
-  return { status, errors, loading, createEventGroup };
+
+  return { status, errors, loading, createEventGroup, createdGroupId };
 };
 /**
  * custom hook function for getting all event groups
