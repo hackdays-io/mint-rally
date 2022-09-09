@@ -1,6 +1,8 @@
 import { useAddress } from "@thirdweb-dev/react";
 import { BigNumber, ethers } from "ethers";
 import { useEffect, useState } from "react";
+import { useNetworkMismatch, useChainId } from "@thirdweb-dev/react";
+
 const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_EVENT_MANAGER!;
 import contract from "../contracts/EventManager.json";
 export interface IEventGroup {
@@ -183,24 +185,32 @@ export const useCreateEventRecord = () => {
  * @returns
  */
 export const useEventRecords = () => {
+  const [errors, setErrors] = useState<Error | null>(null);
   const [records, setRecords] = useState<IEventRecord[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    setErrors(null);
     const getEventRecords = async () => {
-      console.log("get event records");
-      const eventManager = getEventManagerContract();
-      if (!eventManager) throw "error";
-      setLoading(true);
-      const data = await eventManager.getEventRecords();
-      console.log("retrieved:", data);
-      setLoading(false);
-      setRecords(data);
+      try {
+        console.log("get event records");
+        const eventManager = getEventManagerContract();
+        if (!eventManager) throw "error";
+        setLoading(true);
+        const data = await eventManager.getEventRecords();
+        console.log("retrieved:", data);
+        setLoading(false);
+        setRecords(data);
+      } catch (e: any) {
+        console.log(e)
+        setErrors(e)
+        setLoading(false)
+      }
     };
     getEventRecords();
   }, []);
 
-  return { records, loading };
+  return { records, errors, loading };
 };
 
 /**

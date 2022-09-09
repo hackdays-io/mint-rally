@@ -12,10 +12,13 @@ import Image from "next/image";
 import Link from "next/link";
 import EventCard from "../components/atoms/events/EventCard";
 import { useEventRecords } from "../hooks/useEventManager";
+import { useChainId, useNetworkMismatch } from "@thirdweb-dev/react";
 
 const Home: NextPage = () => {
-  const { records, loading } = useEventRecords();
-
+  const { records, errors, loading } = useEventRecords();
+  const chainId = useChainId();
+  const networkMismatched = useNetworkMismatch();
+  console.log(chainId, networkMismatched);
   return (
     <Box pb={20}>
       <div>
@@ -54,6 +57,7 @@ const Home: NextPage = () => {
             </>
           </SimpleGrid>
         )}
+        <div>{chainId}</div>
       </Container>
     </Box>
   );
