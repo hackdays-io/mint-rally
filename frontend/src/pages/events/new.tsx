@@ -6,17 +6,14 @@ import {
   Box,
   Container,
   Flex,
-  FormErrorMessage,
   Heading,
   Link,
-  SimpleGrid,
   Spinner,
+  Switch,
   Textarea,
-  theme,
 } from "@chakra-ui/react";
 import { useAddress } from "@thirdweb-dev/react";
 import { NextPage } from "next";
-import { ChangeEvent, useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
   FormLabel,
@@ -28,10 +25,13 @@ import {
 import {
   ICreateEventRecordParams,
   IEventGroup,
+  INFTAttribute,
+  INFTImage,
   useCreateEventRecord,
   useOwnEventGroups,
 } from "../../hooks/useEventManager";
 import ErrorMessage from "../../components/atoms/form/ErrorMessage";
+import { Web3Storage } from "web3.storage";
 
 type FormData = {
   eventGroupId: string;
@@ -40,16 +40,23 @@ type FormData = {
   date: string;
   startTime: string;
   endTime: string;
-  secret: string;
+  secretPhrase: string;
+  mintLimit: number;
+  useMtx: boolean;
 };
 
 const EventCreate: NextPage = () => {
+  const ipfsClient = new Web3Storage({
+    token: String(process.env.NEXT_PUBLIC_WEB3_STORAGE_KEY),
+    endpoint: new URL("https://api.web3.storage"),
+  });
+
   const {
     control,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { isSubmitting },
     watch,
-  } = useForm({
+  } = useForm<FormData>({
     mode: "all",
     defaultValues: {
       eventGroupId: "",
@@ -58,16 +65,17 @@ const EventCreate: NextPage = () => {
       date: "",
       startTime: "",
       endTime: "",
-      secret: "",
+      secretPhrase: "",
+      mintLimit: 0,
+      useMtx: false,
     },
   });
 
   // check contract address
   const address = useAddress();
-  const [noGroups, setNogroups] = useState(false);
 
   // state for loading event groups
-  const { groups, loading } = useOwnEventGroups();
+  const { groups } = useOwnEventGroups();
   const {
     status,
     errors: createError,
@@ -75,20 +83,62 @@ const EventCreate: NextPage = () => {
     createEventRecord,
   } = useCreateEventRecord();
 
-  const onSubmit = (data: FormData) => {
-    console.log("onSubmit:", data);
+  const saveNFTMetadataOnIPFS = async (groupId: string, eventName: string) => {
+    const baseNFTAttributes: INFTImage[] = JSON.parse(
+      String(window.localStorage.getItem(`group${groupId}`))
+    );
+    const metadataFiles: File[] = [];
+    for (const baseAttribute of baseNFTAttributes) {
+      const attribute: INFTAttribute = {
+        name: eventName,
+        image: baseAttribute.image,
+        description: baseAttribute.description,
+        external_link: "https://mintrally.xyz",
+        traits: {
+          eventGroupId: groupId,
+        },
+      };
+      metadataFiles.push(
+        new File(
+          [JSON.stringify(attribute)],
+          `${baseAttribute.requiredParticipateCount}.json`,
+          { type: "text/json" }
+        )
+      );
+    }
+    const rootCid = await ipfsClient.put(metadataFiles, {
+      name: `${groupId}_${eventName}`,
+      maxRetries: 3,
+      wrapWithDirectory: true,
+    });
+    return baseNFTAttributes.map((attribute) => {
+      return {
+        requiredParticipateCount: attribute.requiredParticipateCount,
+        metaDataURL: `ipfs://${rootCid}/${attribute.requiredParticipateCount}.json`,
+      };
+    });
+  };
+
+  const onSubmit = async (data: FormData) => {
+    const nftAttributes = await saveNFTMetadataOnIPFS(
+      data.eventGroupId,
+      data.eventName
+    );
+
     const params: ICreateEventRecordParams = {
       groupId: data.eventGroupId,
       eventName: data.eventName,
       description: data.description,
-      date: new Date(),
+      date: new Date(data.date),
       startTime: data.startTime,
       endTime: data.endTime,
-      secretPhrase: data.secret,
+      secretPhrase: data.secretPhrase,
+      mintLimit: Number(data.mintLimit),
+      useMtx: data.useMtx,
+      attributes: nftAttributes,
     };
-    console.log("params:", params);
     try {
-      createEventRecord(params);
+      await createEventRecord(params);
     } catch (error: any) {
       alert(error);
     }
@@ -96,7 +146,7 @@ const EventCreate: NextPage = () => {
 
   return (
     <>
-      <Container maxW={800} paddingTop={6}>
+      <Container maxW={800} py={6}>
         <Heading as="h1" mb={10}>
           Create a new event
         </Heading>
@@ -259,6 +309,54 @@ const EventCreate: NextPage = () => {
                     />
                   </FormControl>
                 </Flex>
+
+                <FormControl mb={5}>
+                  <FormLabel>Maximum mint of NFT</FormLabel>
+
+                  <Controller
+                    control={control}
+                    name="mintLimit"
+                    rules={{
+                      required: "Mint limit is required",
+                    }}
+                    render={({
+                      field: { onChange, value },
+                      formState: { errors },
+                    }) => (
+                      <>
+                        <Input
+                          type="number"
+                          onChange={onChange}
+                          value={value}
+                        />
+                        <ErrorMessage>
+                          {errors.description?.message}
+                        </ErrorMessage>
+                      </>
+                    )}
+                  />
+                </FormControl>
+
+                <FormControl mb={5}>
+                  <FormLabel>Taking on gas fee for participants</FormLabel>
+
+                  <Controller
+                    control={control}
+                    name="useMtx"
+                    render={({
+                      field: { onChange, value },
+                      formState: { errors },
+                    }) => (
+                      <>
+                        <Switch isChecked={value} onChange={onChange} />
+                        <ErrorMessage>
+                          {errors.description?.message}
+                        </ErrorMessage>
+                      </>
+                    )}
+                  />
+                </FormControl>
+
                 <FormControl mb={5}>
                   <FormLabel htmlFor="secret">
                     Secret phrase to mint
@@ -271,7 +369,7 @@ const EventCreate: NextPage = () => {
 
                   <Controller
                     control={control}
-                    name="secret"
+                    name="secretPhrase"
                     rules={{
                       required: "Secret phrase is required",
                       minLength: {
