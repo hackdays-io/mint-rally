@@ -5,7 +5,7 @@ import {
 } from "defender-relay-client/lib/ethers";
 
 // TODO: deploy forwarder contract and copy abi
-import { ForwarderAbi } from "../../src/forwarder";
+import { ForwarderAbi } from "../../src/forwarder.ts";
 // TODO: deploy forwarder contract and copy address
 import { MinimalForwarder as ForwarderAddress } from "../../deploy.json";
 

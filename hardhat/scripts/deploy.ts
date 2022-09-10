@@ -3,6 +3,7 @@
 //
 // When running the script with `npx hardhat run <script>` you'll find the Hardhat
 // Runtime Environment's members available in the global scope.
+import { writeFileSync } from "fs";
 import { ethers, upgrades } from "hardhat";
 // import { MintNFT, EventManager } from "../typechain";
 
@@ -11,9 +12,13 @@ async function main() {
   // let mintNFT: MintNFT;
   // let eventManager: EventManager;
 
+  const Forwarder = await ethers.getContractFactory(
+    "MinimalForwarderUpgradeable"
+  );
+  const forwarder = await upgrades.deployProxy(Forwarder, []);
   const MintNFT = await ethers.getContractFactory("MintNFT");
   // mintNFT = await MintNFT.deploy();
-  const mintNFT = await upgrades.deployProxy(MintNFT);
+  const mintNFT = await upgrades.deployProxy(MintNFT, [forwarder.address]);
   await mintNFT.deployed();
 
   const EventManager = await ethers.getContractFactory("EventManager");
@@ -24,8 +29,21 @@ async function main() {
   await mintNFT.setEventManagerAddr(eventManager.address);
   await eventManager.setMintNFTAddr(mintNFT.address);
 
+  console.log("minimalForwarderUpgradeable", forwarder.address);
   console.log("mintNFT address:", mintNFT.address);
   console.log("eventManager address:", eventManager.address);
+
+  writeFileSync(
+    "deploy.json",
+    JSON.stringify(
+      {
+        MinimalForwarder: forwarder.address,
+        MintNFT: mintNFT.address,
+      },
+      null,
+      2
+    )
+  );
 }
 
 // We recommend this pattern to be able to use async/await everywhere
