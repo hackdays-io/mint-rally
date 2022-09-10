@@ -18,7 +18,10 @@ module.exports = {
   rules: {
     "node/no-unsupported-features/es-syntax": [
       "error",
-      { ignores: ["modules"] },
+      {
+        version: ">=16.0.0",
+        ignores: ["modules"],
+      },
     ],
   },
 };
