@@ -12,7 +12,9 @@
     "test": "npx hardhat compile && npx hardhat test",
     "localchain": "npx hardhat node",
     "slither": "slither . --solc-remaps '@openzeppelin=node_modules/@openzeppelin' --exclude naming-convention,external-function,low-level-calls",
-    "size": "npx hardhat size-contracts"
+    "size": "npx hardhat size-contracts",
+    "build": "rollup -c",
+    "upload": "yarn build && node scripts/upload.js"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.1.1",
