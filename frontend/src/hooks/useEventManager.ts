@@ -1,7 +1,10 @@
 import { useAddress } from "@thirdweb-dev/react";
 import { BigNumber, ethers } from "ethers";
 import { useEffect, useState } from "react";
+import { useNetworkMismatch, useChainId } from "@thirdweb-dev/react";
+
 const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_EVENT_MANAGER!;
+const provierRpc = process.env.NEXT_PUBLIC_PROVIDER_RPC!;
 import contract from "../contracts/EventManager.json";
 export interface IEventGroup {
   groupId: BigNumber;
@@ -44,20 +47,29 @@ export interface IApplyForParticipation {
 /**
  * A bridgge to the event manager contract
  */
-export const getEventManagerContract = () => {
+export const getEventManagerContract = (config = { signin: false }) => {
   const { ethereum } = window;
   if (ethereum) {
-    const provider = new ethers.providers.Web3Provider(ethereum as any);
-    const signer = provider.getSigner();
-    if (signer) {
-      console.log("address:", contractAddress);
+    if (!config.signin) {
+      const provider = new ethers.providers.JsonRpcProvider(provierRpc)
+      const _contract = new ethers.Contract(
+        contractAddress,
+        contract.abi,
+        provider
+      );
+      console.log("Initialize payment with Provider");
+      return _contract;
+    } else {
+      const provider = new ethers.providers.Web3Provider(ethereum as any);
+      const signer = provider.getSigner();
       const _contract = new ethers.Contract(
         contractAddress,
         contract.abi,
         signer
       );
-      console.log("Initialize payment");
+      console.log("Initialize payment with signer");
       return _contract;
+
     }
   }
   return null;
@@ -75,7 +87,7 @@ export const useCreateEventGroup = () => {
     try {
       setLoading(true);
       setErrors(null);
-      const eventManager = getEventManagerContract();
+      const eventManager = getEventManagerContract({ signin: true });
       if (!eventManager) throw "error: contract can't found";
       const tx = await eventManager.createGroup(
         params.groupName,
@@ -128,7 +140,7 @@ export const useOwnEventGroups = () => {
   useEffect(() => {
     const getOwnEventGroups = async () => {
       if (!address) return;
-      const eventManager = getEventManagerContract();
+      const eventManager = getEventManagerContract({ signin: true });
       if (!eventManager) throw "error: contract can't found";
       setLoading(true);
       const data = await eventManager.getOwnGroups();
@@ -153,7 +165,7 @@ export const useCreateEventRecord = () => {
   const createEventRecord = async (params: ICreateEventRecordParams) => {
     setErrors(null);
     try {
-      const eventManager = getEventManagerContract();
+      const eventManager = getEventManagerContract({ signin: true });
       if (!eventManager) throw "error: contract can't found";
       setLoading(true);
       const datestr = params.date.toLocaleDateString();
@@ -183,24 +195,32 @@ export const useCreateEventRecord = () => {
  * @returns
  */
 export const useEventRecords = () => {
+  const [errors, setErrors] = useState<Error | null>(null);
   const [records, setRecords] = useState<IEventRecord[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    setErrors(null);
     const getEventRecords = async () => {
-      console.log("get event records");
-      const eventManager = getEventManagerContract();
-      if (!eventManager) throw "error";
-      setLoading(true);
-      const data = await eventManager.getEventRecords();
-      console.log("retrieved:", data);
-      setLoading(false);
-      setRecords(data);
+      try {
+        console.log("get event records");
+        const eventManager = getEventManagerContract();
+        if (!eventManager) throw "error";
+        setLoading(true);
+        const data = await eventManager.getEventRecords();
+        console.log("retrieved:", data);
+        setLoading(false);
+        setRecords(data);
+      } catch (e: any) {
+        console.log(e)
+        setErrors(e)
+        setLoading(false)
+      }
     };
     getEventRecords();
   }, []);
 
-  return { records, loading };
+  return { records, errors, loading };
 };
 
 /**
@@ -241,7 +261,7 @@ export const useGetParticipationEventIds = () => {
   const [loading, setLoading] = useState(false);
   const getParticipationEventIds = async () => {
     console.log("get event records that you have applied for participation");
-    const eventManager = getEventManagerContract();
+    const eventManager = getEventManagerContract({ signin: true });
     if (!eventManager) throw "error";
     setLoading(true);
     const data = await eventManager.getParticipationEventIds();
@@ -265,7 +285,7 @@ export const useApplyForParticipation = () => {
   const applyForParticipation = async (params: IApplyForParticipation) => {
     setErrors(null);
     try {
-      const eventManager = getEventManagerContract();
+      const eventManager = getEventManagerContract({ signin: true });
       if (!eventManager) throw "error: contract can't found";
       setLoading(true);
       const tx = await eventManager.applyForParticipation(params.eventId);
