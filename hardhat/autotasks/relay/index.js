@@ -7,7 +7,7 @@ import {
 // TODO: deploy forwarder contract and copy abi
 import { ForwarderAbi } from "../../src/forwarder.ts";
 // TODO: deploy forwarder contract and copy address
-import { MinimalForwarder as ForwarderAddress } from "../../deploy.json";
+import { MinimalForwarderUpgradeable as ForwarderAddress } from "../../deploy.json";
 
 async function relay(forwarder, request, signature, whitelist) {
   // Decide if we want to relay this request based on a whitelist

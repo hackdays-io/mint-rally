@@ -29,7 +29,7 @@ const getMetaTxTypeData = (chainId: number, verifyingContract: string) => {
       ForwardRequest,
     },
     domain: {
-      name: 'MinimalForwarder',
+      name: 'MinimalForwarderUpgradeable',
       version: '0.0.1',
       chainId,
       verifyingContract,
@@ -55,6 +55,7 @@ export const buildRequest = async (forwarder: ethers.Contract, input: any) => {
   // get nonce from forwarder contract
   // this nonce is used to prevent replay attack
   const nonce = await forwarder.getNonce(input.from).then((nonce: { toString: () => any }) => nonce.toString())
+  console.log('nonce:', nonce);
   return { value: 0, gas: 1e6, nonce, ...input }
 }
 
