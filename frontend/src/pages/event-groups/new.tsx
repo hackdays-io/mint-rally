@@ -18,7 +18,7 @@ import {
   Container,
 } from "@chakra-ui/react";
 import type { NextPage } from "next";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Web3Storage } from "web3.storage";
 import { useAddress } from "@thirdweb-dev/react";
 import { useCreateEventGroup, INFTImage } from "../../hooks/useEventManager";
@@ -48,6 +48,8 @@ interface PaticipateNftRecord {
 const NewEventGroupPage: NextPage = () => {
   const address = useAddress();
   const [groupName, setGroupName] = useState("");
+  const { status, errors, loading, createEventGroup, createdGroupId } =
+    useCreateEventGroup();
 
   const [nftRecords, setNftRecords] = useState([
     {
@@ -69,8 +71,6 @@ const NewEventGroupPage: NextPage = () => {
       requiredParticipateCount: 10,
     },
   ] as PaticipateNftRecord[]);
-
-  const { status, errors, loading, createEventGroup } = useCreateEventGroup();
 
   const isAllInputed = useCallback(
     () =>
@@ -127,12 +127,18 @@ const NewEventGroupPage: NextPage = () => {
         requiredParticipateCount,
       })
     );
-    await callCreateEventGroup(nftImages);
+
+    await callCreateEventGroup();
+    // saveEventGroupNFTMetaData(nftImages)
   };
 
-  const callCreateEventGroup = async (nftImages: INFTImage[]) => {
-    await createEventGroup({ groupName: groupName, images: nftImages });
+  const callCreateEventGroup = async () => {
+    await createEventGroup({ groupName: groupName });
   };
+
+  // const saveEventGroupNFTMetaData = (nftImages: INFTImage[], groupId: number) => {
+  //   window.localStorage.setItem()
+  // }
 
   return (
     <Container maxW={800}>
