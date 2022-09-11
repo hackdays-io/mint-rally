@@ -59,6 +59,7 @@ describe("EventManager", () => {
         "event1 description",
         "2022-07-3O",
         100,
+        false,
         "hackdays",
         attributes
       );
@@ -91,6 +92,7 @@ describe("EventManager", () => {
           "event2 description",
           "2022-08-01",
           100,
+          false,
           "hackdays",
           attributes
         );

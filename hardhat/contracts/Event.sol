@@ -19,6 +19,7 @@ contract EventManager is OwnableUpgradeable {
         string name;
         string description;
         string date;
+        bool useMtx;
     }
 
     using Counters for Counters.Counter;
@@ -89,6 +90,7 @@ contract EventManager is OwnableUpgradeable {
         string memory _description,
         string memory _date,
         uint256 _mintLimit,
+        bool _useMtx,
         string memory _secretPhrase,
         IMintNFT.NFTAttribute[] memory _eventNFTAttributes
     ) external {
@@ -108,7 +110,8 @@ contract EventManager is OwnableUpgradeable {
                 groupId: _groupId,
                 name: _name,
                 description: _description,
-                date: _date
+                date: _date,
+                useMtx: _useMtx
             })
         );
 

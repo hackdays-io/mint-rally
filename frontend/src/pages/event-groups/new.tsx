@@ -98,7 +98,7 @@ const NewEventGroupPage: NextPage = () => {
     const rootCid = await ipfsClient.put(
       renamedFiles.map((f) => f.fileObject),
       {
-        name: `test ${new Date().toISOString()}`,
+        name: `${new Date().toISOString()}`,
         maxRetries: 3,
         wrapWithDirectory: true,
         onRootCidReady: (rootCid) => {
@@ -120,7 +120,7 @@ const NewEventGroupPage: NextPage = () => {
       return;
     }
     const { rootCid, renamedFiles } = uploadResult;
-    const nftImages: INFTImage[] = renamedFiles.map(
+    const nftAttributes: INFTImage[] = renamedFiles.map(
       ({ fileObject, description, requiredParticipateCount }) => ({
         image: `ipfs://${rootCid}/${fileObject.name}`,
         description: description,
@@ -128,17 +128,8 @@ const NewEventGroupPage: NextPage = () => {
       })
     );
 
-    await callCreateEventGroup();
-    // saveEventGroupNFTMetaData(nftImages)
+    await createEventGroup({ groupName, nftAttributes });
   };
-
-  const callCreateEventGroup = async () => {
-    await createEventGroup({ groupName: groupName });
-  };
-
-  // const saveEventGroupNFTMetaData = (nftImages: INFTImage[], groupId: number) => {
-  //   window.localStorage.setItem()
-  // }
 
   return (
     <Container maxW={800}>
