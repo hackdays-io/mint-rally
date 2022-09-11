@@ -1,5 +1,5 @@
 import { useAddress } from "@thirdweb-dev/react";
-import { BigNumber, ethers } from "ethers";
+import { BigNumber, ethers, providers } from "ethers";
 import { useEffect, useState } from "react";
 import { useNetworkMismatch, useChainId } from "@thirdweb-dev/react";
 
@@ -27,7 +27,6 @@ export interface INFTImage {
 
 export interface ICreateEventGroupParams {
   groupName: string;
-  images: INFTImage[];
 }
 
 export interface ICreateEventRecordParams {
@@ -51,7 +50,7 @@ export const getEventManagerContract = (config = { signin: false }) => {
   const { ethereum } = window;
   if (ethereum) {
     if (!config.signin) {
-      const provider = new ethers.providers.JsonRpcProvider(provierRpc)
+      const provider = new ethers.providers.JsonRpcProvider(provierRpc);
       const _contract = new ethers.Contract(
         contractAddress,
         contract.abi,
@@ -69,7 +68,6 @@ export const getEventManagerContract = (config = { signin: false }) => {
       );
       console.log("Initialize payment with signer");
       return _contract;
-
     }
   }
   return null;
@@ -83,17 +81,28 @@ export const useCreateEventGroup = () => {
   const [errors, setErrors] = useState<Error | null>(null);
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState(false);
+  const [createdGroupId, setCreatedGroupId] = useState<number | null>(null);
+  const address = useAddress();
+
+  useEffect(() => {
+    const eventManager = getEventManagerContract();
+    if (!eventManager) throw "error: contract can't found";
+    const filters = eventManager?.filters.CreatedGroupId(address, null);
+    eventManager.on(filters, (_, _groupId: BigNumber) => {
+      setCreatedGroupId(_groupId.toNumber());
+    });
+  }, []);
+
   const createEventGroup = async (params: ICreateEventGroupParams) => {
     try {
+      setCreatedGroupId(null);
       setLoading(true);
       setErrors(null);
       const eventManager = getEventManagerContract({ signin: true });
       if (!eventManager) throw "error: contract can't found";
-      const tx = await eventManager.createGroup(
-        params.groupName,
-        params.images
-      );
+      const tx = await eventManager.createGroup(params.groupName);
       await tx.wait();
+
       setLoading(false);
       setStatus(true);
     } catch (e: any) {
@@ -101,7 +110,8 @@ export const useCreateEventGroup = () => {
       setLoading(false);
     }
   };
-  return { status, errors, loading, createEventGroup };
+
+  return { status, errors, loading, createEventGroup, createdGroupId };
 };
 /**
  * custom hook function for getting all event groups
@@ -212,9 +222,9 @@ export const useEventRecords = () => {
         setLoading(false);
         setRecords(data);
       } catch (e: any) {
-        console.log(e)
-        setErrors(e)
-        setLoading(false)
+        console.log(e);
+        setErrors(e);
+        setLoading(false);
       }
     };
     getEventRecords();
