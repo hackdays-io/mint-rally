@@ -1,11 +1,12 @@
 import { BigNumber, ethers } from "ethers";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_MINT_NFT_MANAGER!;
 import contract from "../contracts/MintNFT.json";
 // import forwarderContractAbi from '../contracts/MinimalForwarder.json';
 import { signMetaTxRequest } from "../../utils/signer";
 import { useAddress } from "@thirdweb-dev/react";
 import axios from "axios";
+import { ipfs2http } from "../../utils/ipfs2http";
 export interface IMintParticipateNFTParams {
   groupId: number;
   eventId: number;
@@ -84,6 +85,36 @@ export const useMintParticipateNFT = () => {
   const [errors, setErrors] = useState<Error | null>(null);
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState(false);
+  const [nftAttributeLink, setNftAttributeLink] = useState<string | null>(null);
+  const [mintedNftImageURL, setMintedNftImageLink] = useState<string | null>(
+    null
+  );
+  const address = useAddress();
+
+  useEffect(() => {
+    const mintNFTManager = getMintNFTManagerContract();
+    if (!mintNFTManager) throw new Error("Cannot find mintNFTManager contract");
+    const filters = mintNFTManager?.filters.MintedNFTAttributeURL(
+      address,
+      null
+    );
+    mintNFTManager.on(filters, (_, _nftAttributeLink: string) => {
+      setNftAttributeLink(_nftAttributeLink);
+    });
+  }, []);
+
+  useEffect(() => {
+    const fetchAttribute = async (tokenURI: string) => {
+      const { data } = await axios.get(ipfs2http(tokenURI));
+      setMintedNftImageLink(ipfs2http(data.image));
+      setLoading(false);
+    };
+
+    if (status && nftAttributeLink !== null) {
+      fetchAttribute(nftAttributeLink);
+    }
+  }, [nftAttributeLink, status]);
+
   const mintParticipateNFT = async ({
     groupId,
     eventId,
@@ -117,11 +148,9 @@ export const useMintParticipateNFT = () => {
       setStatus(true);
     } catch (e: any) {
       setErrors(e);
-    } finally {
-      setLoading(false);
     }
   };
-  return { status, errors, loading, mintParticipateNFT };
+  return { status, errors, loading, mintParticipateNFT, mintedNftImageURL };
 };
 
 export const useGetOwnedNFTs = () => {
@@ -139,11 +168,8 @@ export const useGetOwnedNFTs = () => {
     for (let index = 0; index < balanceOfNFTs.toNumber(); index++) {
       const tokenId = await mintNFTManager.tokenOfOwnerByIndex(address, index);
       const tokenURI = await mintNFTManager.tokenURI(tokenId);
-      const rootCid = tokenURI.split("ipfs://")[1].split("/")[0];
-      const fileName = tokenURI.split("ipfs://")[1].split("/")[1];
-      const { data } = await axios.get(
-        `https://${rootCid}.ipfs.w3s.link/${fileName}`
-      );
+      const path = ipfs2http(tokenURI);
+      const { data } = await axios.get(path);
       metadata.push(data);
     }
     setLoading(false);
