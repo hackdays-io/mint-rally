@@ -50,6 +50,7 @@ const Event = () => {
       eventId: event.eventRecordId.toNumber(),
       secretPhrase: enteredSecretPhrase,
     });
+    // TODO: add event listener for minting
   };
 
   // const hasNftForThisEvent = useMemo(() => {
