@@ -24,9 +24,17 @@ export interface INFTImage {
   description: string;
   requiredParticipateCount: number;
 }
+export interface INFTAttribute {
+  name: string;
+  image: string;
+  description: string;
+  external_link: string;
+  traits: { [key: string]: any };
+}
 
 export interface ICreateEventGroupParams {
   groupName: string;
+  nftAttributes: INFTImage[];
 }
 
 export interface ICreateEventRecordParams {
@@ -37,6 +45,9 @@ export interface ICreateEventRecordParams {
   startTime: string; // "18:00"
   endTime: string; // "21:00"
   secretPhrase: string;
+  mintLimit: number;
+  useMtx: boolean;
+  attributes: { metaDataURL: string; requiredParticipateCount: number }[];
 }
 
 export interface IApplyForParticipation {
@@ -82,6 +93,7 @@ export const useCreateEventGroup = () => {
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState(false);
   const [createdGroupId, setCreatedGroupId] = useState<number | null>(null);
+  const [nftAttributes, setNftAttributes] = useState<INFTImage[]>([]);
   const address = useAddress();
 
   useEffect(() => {
@@ -93,8 +105,18 @@ export const useCreateEventGroup = () => {
     });
   }, []);
 
+  useEffect(() => {
+    if (status && createdGroupId != null) {
+      window.localStorage.setItem(
+        `group${createdGroupId}`,
+        JSON.stringify(nftAttributes)
+      );
+    }
+  }, [status, createdGroupId]);
+
   const createEventGroup = async (params: ICreateEventGroupParams) => {
     try {
+      setNftAttributes(params.nftAttributes);
       setCreatedGroupId(null);
       setLoading(true);
       setErrors(null);
@@ -172,6 +194,7 @@ export const useCreateEventRecord = () => {
   const [errors, setErrors] = useState<Error | null>(null);
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState(false);
+
   const createEventRecord = async (params: ICreateEventRecordParams) => {
     setErrors(null);
     try {
@@ -180,13 +203,14 @@ export const useCreateEventRecord = () => {
       setLoading(true);
       const datestr = params.date.toLocaleDateString();
       const tx = await eventManager.createEventRecord(
-        params.groupId,
+        Number(params.groupId),
         params.eventName,
         params.description,
-        datestr,
-        params.startTime,
-        params.endTime,
-        params.secretPhrase
+        `${datestr} ${params.startTime}~${params.endTime}`,
+        params.mintLimit,
+        params.useMtx,
+        params.secretPhrase,
+        params.attributes
       );
       await tx.wait();
       setLoading(false);

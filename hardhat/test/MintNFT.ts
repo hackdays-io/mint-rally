@@ -50,6 +50,7 @@ describe("MintNFT", function () {
       "event1 description",
       "2022-07-3O",
       100,
+      false,
       "hackdays",
       attributes
     );
@@ -100,6 +101,7 @@ describe("MintNFT", function () {
         "anotherEvent1description",
         "2022-08-3O",
         2,
+        false,
         "hackdays1secret",
         attributes
       );
@@ -111,6 +113,7 @@ describe("MintNFT", function () {
         "anotherEvent2description",
         "2022-08-3O",
         1,
+        false,
         "hackdays2secret",
         attributes
       );
