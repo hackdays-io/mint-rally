@@ -12,12 +12,7 @@ import { IOwnedNFT, useGetOwnedNFTs } from "../../hooks/useMintNFTManager";
 import { FC, useEffect, useMemo, useState } from "react";
 import { useEventGroups } from "../../hooks/useEventManager";
 import { useAddress } from "@thirdweb-dev/react";
-
-const getUrlThoughGateway = (rawFullUrl: string) => {
-  const rootCid = rawFullUrl.split("ipfs://")[1].split("/")[0];
-  const fileName = rawFullUrl.split("ipfs://")[1].split("/")[1];
-  return `https://${rootCid}.ipfs.w3s.link/${fileName}`;
-};
+import { ipfs2http } from "../../../utils/ipfs2http";
 
 const User = () => {
   const { ownedNFTs, loading, getOwnedNFTs } = useGetOwnedNFTs();
@@ -95,7 +90,7 @@ const User = () => {
           const data = nfts.map(({ name, image, description }) => ({
             name,
             description,
-            image: getUrlThoughGateway(image),
+            image: ipfs2http(image),
           }));
 
           return (

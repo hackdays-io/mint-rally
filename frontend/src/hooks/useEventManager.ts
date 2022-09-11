@@ -15,9 +15,7 @@ export interface IEventRecord {
   groupId: BigNumber;
   name: string;
   description: string;
-  date: Date;
-  startTime: string; // "18:00"
-  endTime: string; // "21:00"
+  date: string;
 }
 export interface INFTImage {
   image: string;
@@ -106,7 +104,7 @@ export const useCreateEventGroup = () => {
   }, []);
 
   useEffect(() => {
-    if (status && createdGroupId != null) {
+    if (status && createdGroupId !== null) {
       window.localStorage.setItem(
         `group${createdGroupId}`,
         JSON.stringify(nftAttributes)

@@ -12,6 +12,7 @@ import {
   Container,
   Flex,
   Link,
+  Image,
 } from "@chakra-ui/react";
 import { BigNumber } from "ethers";
 import { useRouter } from "next/router";
@@ -34,6 +35,7 @@ const Event = () => {
     status: mintStatus,
     errors: mintErrors,
     loading: mintLoading,
+    mintedNftImageURL,
     mintParticipateNFT,
   } = useMintParticipateNFT();
 
@@ -68,10 +70,7 @@ const Event = () => {
         {event && (
           <>
             <Heading>{event.name}</Heading>
-            <Text fontSize="24px">
-              {dayjs(event.date).format("YYYY/M/D (ddd)")} {event.startTime}~
-              {event.endTime}
-            </Text>
+            <Text fontSize="24px">{event.date}</Text>
 
             <Text fontSize="16px" my={10}>
               {event.description.split(/(\n)/).map((item, index) => (
@@ -131,6 +130,14 @@ const Event = () => {
                 <AlertIcon />
                 <AlertTitle>You have claimed NFT!</AlertTitle>
               </Alert>
+            )}
+            {mintedNftImageURL && (
+              <Image
+                src={mintedNftImageURL}
+                width="400"
+                height="400"
+                objectFit="contain"
+              />
             )}
           </>
         )}
