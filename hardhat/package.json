@@ -7,7 +7,7 @@
     "deploy:main": "npx hardhat run scripts/deploy.ts --network polygon",
     "deploy:stg": "npx hardhat run scripts/deploy.ts --network mumbai",
     "deploy:local": "npx hardhat run scripts/deploy.ts --network local",
-    "deploy:mintNFT": "npx hardhat run scripts/deployMintNft.ts --network",
+    "deploy:mintNFT": "npx hardhat run scripts/upgradeMintNFTToV2.ts --network",
     "compile": "npx hardhat compile",
     "test": "npx hardhat compile && npx hardhat test",
     "localchain": "npx hardhat node",
