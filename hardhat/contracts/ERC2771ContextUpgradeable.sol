@@ -20,13 +20,6 @@ abstract contract ERC2771ContextUpgradeable is
         onlyInitializing
     {
         __Context_init_unchained();
-        __ERC2771Context_init_unchained(trustedForwarder);
-    }
-
-    function __ERC2771Context_init_unchained(address trustedForwarder)
-        internal
-        onlyInitializing
-    {
         _trustedForwarder = trustedForwarder;
     }
 

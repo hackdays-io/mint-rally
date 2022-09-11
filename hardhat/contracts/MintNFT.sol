@@ -11,8 +11,8 @@ import "./ERC2771ContextUpgradeable.sol";
 
 contract MintNFT is
     ERC721EnumerableUpgradeable,
-    OwnableUpgradeable,
-    ERC2771ContextUpgradeable
+    ERC2771ContextUpgradeable,
+    OwnableUpgradeable
 {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;

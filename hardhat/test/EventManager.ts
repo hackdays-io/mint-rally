@@ -22,7 +22,13 @@ describe("EventManager", () => {
   let mintNFT: MintNFT;
   before(async () => {
     const MintNFTFactory = await ethers.getContractFactory("MintNFT");
-    const deployedMintNFT: any = await upgrades.deployProxy(MintNFTFactory);
+    const deployedMintNFT: any = await upgrades.deployProxy(
+      MintNFTFactory,
+      ["0xdCb93093424447bF4FE9Df869750950922F1E30B"],
+      {
+        initializer: "initialize",
+      }
+    );
     mintNFT = deployedMintNFT;
     await mintNFT.deployed();
   });
