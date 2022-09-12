@@ -51,7 +51,7 @@ const Navbar = () => {
             onClick={connectWithMetamask}
             size="lg"
           >
-            Connect
+            Login
           </Button>
         )}
         {address && (
