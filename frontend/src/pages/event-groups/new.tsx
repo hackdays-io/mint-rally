@@ -20,10 +20,9 @@ import {
 import type { NextPage } from "next";
 import { useState, useCallback } from "react";
 import { Web3Storage } from "web3.storage";
-import { useAddress } from "@thirdweb-dev/react";
 import { useCreateEventGroup, INFTImage } from "../../hooks/useEventManager";
 import ImageSelectorWithPreview from "../../components/ImageSelectorWithPreview";
-import { useChainId } from "@thirdweb-dev/react";
+import LoginRequired from "../../components/atoms/web3/LoginRequired";
 
 if (!process.env.NEXT_PUBLIC_WEB3_STORAGE_KEY) {
   throw new Error("WEB3_STORAGE_KEY is required");
@@ -47,8 +46,6 @@ interface PaticipateNftRecord {
 }
 
 const NewEventGroupPage: NextPage = () => {
-  const address = useAddress();
-  const chainId = useChainId();
   const [groupName, setGroupName] = useState("");
 
   const [nftRecords, setNftRecords] = useState([
@@ -141,116 +138,103 @@ const NewEventGroupPage: NextPage = () => {
       <Heading as="h1" my={4}>
         Create a new event group
       </Heading>
-      {!address ? (
-        <Text fontSize="xl">Sign in first!</Text>
-      ) : (
+      <LoginRequired
+        requiredChainID={+process.env.NEXT_PUBLIC_CHAIN_ID!}
+        forbiddenText="Sign in First!"
+      >
         <>
           {!status ? (
             <>
-              {chainId !== +process.env.NEXT_PUBLIC_CHAIN_ID! ? (
-                <Text fontSize="xl">
-                  Connect to the right network{chainId}{" "}
-                  {process.env.NEXT_PUBLIC_CHAIN_ID}
-                </Text>
-              ) : (
-                <>
-                  <Text>Event Group Name</Text>
-                  <Input
-                    variant="outline"
-                    mb={4}
-                    value={groupName}
-                    onChange={(e) => setGroupName(e.target.value)}
-                  />
-                  <Heading as="h2" fontSize="3xl" mb={4}>
-                    NFTs
-                  </Heading>
-                  <Box>
-                    {nftRecords.map((record, index) => (
-                      <Flex
-                        key={index}
-                        w="full"
-                        flexDirection={{ base: "column", md: "row" }}
-                      >
-                        <Box
-                          flexBasis="300px"
-                          flexShrink="0"
-                          minH="300px"
-                          mb={3}
+              <Text>Event Group Name</Text>
+              <Input
+                variant="outline"
+                mb={4}
+                value={groupName}
+                onChange={(e) => setGroupName(e.target.value)}
+              />
+              <Heading as="h2" fontSize="3xl" mb={4}>
+                NFTs
+              </Heading>
+              <Box>
+                {nftRecords.map((record, index) => (
+                  <Flex
+                    key={index}
+                    w="full"
+                    flexDirection={{ base: "column", md: "row" }}
+                  >
+                    <Box flexBasis="300px" flexShrink="0" minH="300px" mb={3}>
+                      <ImageSelectorWithPreview
+                        dataUrl={record.dataUrl}
+                        onChangeData={(newDataUrl, newFile) => {
+                          setNftRecords((_prev) => {
+                            const prev = _prev.concat();
+                            prev[index].dataUrl = newDataUrl;
+                            prev[index].fileObject = newFile;
+                            return prev;
+                          });
+                        }}
+                      />
+                    </Box>
+                    <Box>
+                      <Box m={2}>
+                        <Text>NFT Description</Text>
+                        <Input
+                          variant="outline"
+                          mb={4}
+                          value={record.description}
+                          onChange={(e) => {
+                            setNftRecords((_prev) => {
+                              const prev = _prev.concat();
+                              prev[index].description = e.target.value;
+                              return prev;
+                            });
+                          }}
+                        />
+                      </Box>
+                      <Box m={2}>
+                        <Text>
+                          How many events do users need participate in to get
+                          this NFT?
+                        </Text>
+                        <NumberInput
+                          defaultValue={record.requiredParticipateCount}
+                          min={0}
+                          onChange={(__, num) => {
+                            setNftRecords((_prev) => {
+                              const prev = _prev.concat();
+                              prev[index].requiredParticipateCount = num;
+                              return prev;
+                            });
+                          }}
                         >
-                          <ImageSelectorWithPreview
-                            dataUrl={record.dataUrl}
-                            onChangeData={(newDataUrl, newFile) => {
-                              setNftRecords((_prev) => {
-                                const prev = _prev.concat();
-                                prev[index].dataUrl = newDataUrl;
-                                prev[index].fileObject = newFile;
-                                return prev;
-                              });
-                            }}
-                          />
-                        </Box>
-                        <Box>
-                          <Box m={2}>
-                            <Text>NFT Description</Text>
-                            <Input
-                              variant="outline"
-                              mb={4}
-                              value={record.description}
-                              onChange={(e) => {
-                                setNftRecords((_prev) => {
-                                  const prev = _prev.concat();
-                                  prev[index].description = e.target.value;
-                                  return prev;
-                                });
-                              }}
-                            />
-                          </Box>
-                          <Box m={2}>
-                            <Text>
-                              How many events do users need participate in to
-                              get this NFT?
-                            </Text>
-                            <NumberInput
-                              defaultValue={record.requiredParticipateCount}
-                              min={0}
-                              onChange={(__, num) => {
-                                setNftRecords((_prev) => {
-                                  const prev = _prev.concat();
-                                  prev[index].requiredParticipateCount = num;
-                                  return prev;
-                                });
-                              }}
-                            >
-                              <NumberInputField />
-                              <NumberInputStepper>
-                                <NumberIncrementStepper />
-                                <NumberDecrementStepper />
-                              </NumberInputStepper>
-                            </NumberInput>
-                          </Box>
-                        </Box>
-                      </Flex>
-                    ))}
-                  </Box>
-                  <Box mt={8} mb={10}>
-                    <Button
-                      onClick={() => submit()}
-                      disabled={!groupName || !isAllInputed() || loading}
-                      width="full"
-                      background="mint.bg"
-                    >
-                      {loading ? <Spinner /> : "Create"}
-                    </Button>
-                    {errors && (
-                      <Alert status="error">
-                        <AlertIcon />
-                        <AlertTitle>Error occurred</AlertTitle>
-                        <AlertDescription>{errors.message}</AlertDescription>
-                      </Alert>
-                    )}
-                  </Box>
-                </>
-              )}
+                          <NumberInputField />
+                          <NumberInputStepper>
+                            <NumberIncrementStepper />
+                            <NumberDecrementStepper />
+                          </NumberInputStepper>
+                        </NumberInput>
+                      </Box>
+                    </Box>
+                  </Flex>
+                ))}
+              </Box>
+              <Box mt={8} mb={10}>
+                <Button
+                  onClick={() => submit()}
+                  disabled={!groupName || !isAllInputed() || loading}
+                  width="full"
+                  background="mint.bg"
+                >
+                  {loading ? <Spinner /> : "Create"}
+                </Button>
+                {errors && (
+                  <Alert status="error">
+                    <AlertIcon />
+                    <AlertTitle>Error occurred</AlertTitle>
+                    <AlertDescription>{errors.message}</AlertDescription>
+                  </Alert>
+                )}
+              </Box>
             </>
           ) : (
             <>
@@ -258,7 +242,7 @@ const NewEventGroupPage: NextPage = () => {
             </>
           )}
         </>
-      )}
+      </LoginRequired>
     </Container>
   );
 };
