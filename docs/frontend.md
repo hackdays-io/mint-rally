@@ -30,7 +30,7 @@ If you have told these values already, please specify them.
 | NEXT_PUBLIC_CONTRACT_MINT_NFT_MANAGER | A mint NFT manager contract address created by [localnode.md](localnode.md)                                                           |
 | NEXT_PUBLIC_PROVIDER_RPC              | A RPC URI of contract. ex. https://rpc-mumbai.maticvigil.com/v1/....  use `http://localhost:8545/` if you use local chain enrironment |
 | NEXT_PUBLIC_CHAIN_ID                  | An ID of the chain that serves the minting contract. use 31337 if you use local chain enriromnent.                                    |
-| NEXT_PUBLIC_CHAIN_NAME                | A chain name: Polygon Testnet or Polygon Mainnet                                                                                      |
+| NEXT_PUBLIC_CHAIN_NAME                | A chain name: `Polygon Testnet` or `Polygon Mainnet`                                                                                  |
 | NEXT_PUBLIC_BLOCK_EXPLORER_URL        | A Block Explorer URL `https://mumbai.polygonscan.com/` or `https://polygonscan.com`                                                   |
 | NEXT_PUBLIC_METAMASK_RPC_URL          | A PRC URL for the wallet `https://matic-mumbai.chainstacklabs.com` or `https://polygon-rpc.com`                                       |
 
