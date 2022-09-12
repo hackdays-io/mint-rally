@@ -20,9 +20,9 @@ import {
 import type { NextPage } from "next";
 import { useState, useCallback } from "react";
 import { Web3Storage } from "web3.storage";
-import { useAddress } from "@thirdweb-dev/react";
 import { useCreateEventGroup, INFTImage } from "../../hooks/useEventManager";
 import ImageSelectorWithPreview from "../../components/ImageSelectorWithPreview";
+import LoginRequired from "../../components/atoms/web3/LoginRequired";
 
 if (!process.env.NEXT_PUBLIC_WEB3_STORAGE_KEY) {
   throw new Error("WEB3_STORAGE_KEY is required");
@@ -46,7 +46,6 @@ interface PaticipateNftRecord {
 }
 
 const NewEventGroupPage: NextPage = () => {
-  const address = useAddress();
   const [groupName, setGroupName] = useState("");
 
   const [nftRecords, setNftRecords] = useState([
@@ -139,9 +138,10 @@ const NewEventGroupPage: NextPage = () => {
       <Heading as="h1" my={4}>
         Create a new event group
       </Heading>
-      {!address ? (
-        <Text fontSize="xl">Sign in first!</Text>
-      ) : (
+      <LoginRequired
+        requiredChainID={+process.env.NEXT_PUBLIC_CHAIN_ID!}
+        forbiddenText="Sign in First!"
+      >
         <>
           {!status ? (
             <>
@@ -242,7 +242,7 @@ const NewEventGroupPage: NextPage = () => {
             </>
           )}
         </>
-      )}
+      </LoginRequired>
     </Container>
   );
 };
