@@ -5,7 +5,7 @@ import { ChainId, ThirdwebProvider } from "@thirdweb-dev/react";
 import Layout from "../components/layout";
 import { chakraTheme } from "../../utils/chakra-theme";
 
-const activeChainId = ChainId.Mumbai;
+const activeChainId = +process.env.NEXT_PUBLIC_CHAIN_ID!;
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (

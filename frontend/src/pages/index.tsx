@@ -57,7 +57,6 @@ const Home: NextPage = () => {
             </>
           </SimpleGrid>
         )}
-        <div>{chainId}</div>
       </Container>
     </Box>
   );
