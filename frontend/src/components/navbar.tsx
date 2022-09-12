@@ -1,9 +1,4 @@
-import {
-  CalendarIcon,
-  EmailIcon,
-  HamburgerIcon,
-  SettingsIcon,
-} from "@chakra-ui/icons";
+import { CalendarIcon, HamburgerIcon, SettingsIcon } from "@chakra-ui/icons";
 
 import {
   Box,
@@ -17,31 +12,60 @@ import {
   Spacer,
   useDisclosure,
 } from "@chakra-ui/react";
-import { useAddress, useDisconnect, useMetamask } from "@thirdweb-dev/react";
+import {
+  useAddress,
+  useChainId,
+  useDisconnect,
+  useMetamask,
+} from "@thirdweb-dev/react";
 import router from "next/router";
 import Image from "next/image";
 import Link from "next/link";
+import { switchNetwork } from "./atoms/web3/LoginRequired";
 
 const Navbar = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const address = useAddress();
+  const chainId = useChainId();
   const connectWithMetamask = useMetamask();
   const disconnectWallet = useDisconnect();
+  const requiredChainId = +process.env.NEXT_PUBLIC_CHAIN_ID!;
+  const PRCURL = process.env.NEXT_PUBLIC_METAMASK_RPC_URL!;
+  const ChainName = process.env.NEXT_PUBLIC_CHAIN_NAME!;
+  const BlockExplorerUrl = process.env.NEXT_PUBLIC_BLOCK_EXPLORER_URL!;
 
   const MetamaskLogin = () => {
     return (
       <Flex justifyContent="center" alignItems="center" mt={{ base: 5, md: 0 }}>
         {address ? (
-          <Button
-            bg="mint.subtle"
-            color="mint.font"
-            borderRadius={"16px"}
-            variant="solid"
-            onClick={disconnectWallet}
-            size="lg"
-          >
-            Disconnect
-          </Button>
+          <>
+            {chainId !== requiredChainId ? (
+              <Box pr={4}>
+                <Button
+                  bg="mint.subtle"
+                  color="mint.font"
+                  borderRadius={"16px"}
+                  variant="solid"
+                  onClick={switchNetwork}
+                  size="lg"
+                >
+                  Switch Network
+                </Button>
+              </Box>
+            ) : (
+              <></>
+            )}
+            <Button
+              bg="mint.subtle"
+              color="mint.font"
+              borderRadius={"16px"}
+              variant="solid"
+              onClick={disconnectWallet}
+              size="lg"
+            >
+              Disconnect
+            </Button>
+          </>
         ) : (
           <Button
             bg="mint.subtle"
@@ -51,7 +75,7 @@ const Navbar = () => {
             onClick={connectWithMetamask}
             size="lg"
           >
-            Login
+            Sign In
           </Button>
         )}
         {address && (
