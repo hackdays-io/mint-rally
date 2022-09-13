@@ -11,18 +11,20 @@ import { NextPage } from "next";
 import Link from "next/link";
 import EventGroupCard from "../../components/atoms/events/GroupCard";
 import { IEventGroup, useEventGroups } from "../../hooks/useEventManager";
+import { useLocale } from "../../hooks/useLocale";
 
 /**
  * /event-groups/
  */
 const EventGroups: NextPage = () => {
+  const { t } = useLocale();
   const { groups, loading } = useEventGroups();
 
   return (
     <>
       <Container maxW={800} paddingTop={6}>
         <Flex alignItems="bottom" paddingBottom={6}>
-          <Heading>Event Groups</Heading>
+          <Heading>{t.EVENTGROUPS}</Heading>
           <Spacer></Spacer>
           <Button
             onClick={() => {

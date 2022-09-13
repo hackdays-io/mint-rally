@@ -13,8 +13,10 @@ import Link from "next/link";
 import EventCard from "../components/atoms/events/EventCard";
 import { useEventRecords } from "../hooks/useEventManager";
 import { useChainId, useNetworkMismatch } from "@thirdweb-dev/react";
+import { useLocale } from "../hooks/useLocale";
 
 const Home: NextPage = () => {
+  const { t } = useLocale();
   const { records, errors, loading } = useEventRecords();
   const chainId = useChainId();
   const networkMismatched = useNetworkMismatch();
@@ -31,7 +33,7 @@ const Home: NextPage = () => {
       </div>
       <Container maxW={800} paddingTop={6}>
         <Flex alignItems="bottom" paddingBottom={6}>
-          <Heading>Events</Heading>
+          <Heading>{t.EVENTS}</Heading>
           <Spacer></Spacer>
         </Flex>
         {loading ? (
