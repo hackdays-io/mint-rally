@@ -11,7 +11,6 @@ import {
   Input,
   Container,
   Flex,
-  Link,
 } from "@chakra-ui/react";
 import { BigNumber } from "ethers";
 import { useRouter } from "next/router";
@@ -24,12 +23,14 @@ import {
 } from "../../hooks/useMintNFTManager";
 import dayjs from "dayjs";
 import LoginRequired from "../../components/atoms/web3/LoginRequired";
+import { useLocale } from "../../hooks/useLocale";
 
 const Event = () => {
   const router = useRouter();
   const { eventid } = router.query;
   const { event, loading: loadingFetch } = useGetEventById(Number(eventid));
   const { ownedNFTs, errors, loading, getOwnedNFTs } = useGetOwnedNFTs();
+  const { t } = useLocale();
 
   const {
     status: mintStatus,
@@ -83,12 +84,10 @@ const Event = () => {
             </Text>
             <LoginRequired
               requiredChainID={+process.env.NEXT_PUBLIC_CHAIN_ID!}
-              forbiddenText="Sign in to get NFT!"
+              forbiddenText={t.SIGN_IN_TO_GET_NFT}
             >
               {hasNftForThisEvent || mintStatus ? (
-                <Text>
-                  You already have this NFT. Thank you for your participation!
-                </Text>
+                <Text>{t.YOU_ALREADY_HAVE_THIS_NFT}</Text>
               ) : (
                 <Flex
                   width="100%"
@@ -100,9 +99,7 @@ const Event = () => {
                     width={{ base: "100%", md: "48%" }}
                     mb={{ base: 5, md: 0 }}
                   >
-                    <Text mb={2}>
-                      Secret Phrase. Event organaizers will tell you.
-                    </Text>
+                    <Text mb={2}>{t.ENTER_SECRET_PHRASE}</Text>
                     <Input
                       variant="outline"
                       type="password"
@@ -118,7 +115,7 @@ const Event = () => {
                     color="white"
                     rounded="full"
                   >
-                    Claim NFT!
+                    {t.CLAIM_NFT}
                   </Button>
                 </Flex>
               )}
@@ -132,7 +129,7 @@ const Event = () => {
               {mintStatus && (
                 <Alert status="success" mt={3}>
                   <AlertIcon />
-                  <AlertTitle>You have claimed NFT!</AlertTitle>
+                  <AlertTitle>{t.YOU_HAVE_CLAIMED_NFT}</AlertTitle>
                 </Alert>
               )}
             </LoginRequired>
