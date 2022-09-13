@@ -75,16 +75,25 @@ export const useMintParticipateNFT = () => {
 export const useGetOwnedNFTs = () => {
   const [ownedNFTs, setOwnedNFTs] = useState<IOwnedNFT[]>([]);
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<Error | null>(null);
   const getOwnedNFTs = async () => {
+    console.log('1')
     const mintNFTManager = getMintNFTManagerContract();
     if (!mintNFTManager) throw new Error("Cannot find mintNFTManager contract");
+    console.log('2')
 
     setLoading(true);
-    const data = await mintNFTManager.getOwnedNFTs();
-    console.log("retrieved owned nfts:", data);
-    setLoading(false);
-    setOwnedNFTs(data);
-    return data;
+    try {
+      const data = await mintNFTManager.getOwnedNFTs();
+      console.log('3')
+      console.log("retrieved owned nfts:", data);
+      setLoading(false);
+      setOwnedNFTs(data);
+      return data;
+    } catch (e: any) {
+      setErrors(e)
+      setLoading(false)
+    }
   };
-  return { ownedNFTs, loading, getOwnedNFTs };
+  return { ownedNFTs, errors, loading, getOwnedNFTs };
 };

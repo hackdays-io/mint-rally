@@ -57,10 +57,9 @@ const LoginRequired: FC<Props> = ({
   return (
     <>
       {!address ? (
-        <Text fontSize="xl">Sign in first!</Text>
+        <Text fontSize="xl">{forbiddenText}</Text>
       ) : chainId !== requiredChainID ? (
         <Text fontSize="xl">
-          Select the right network:{" "}
           <Button onClick={switchNetwork}>Switch Network</Button>
         </Text>
       ) : (
