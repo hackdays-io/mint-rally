@@ -156,6 +156,7 @@ const Navbar = () => {
           display={{ base: "none", md: "flex" }}
         >
           <Spacer />
+          <LocaleSelector></LocaleSelector>
           <Box pr={4}>
             <MetamaskLogin></MetamaskLogin>
           </Box>
@@ -183,6 +184,7 @@ const Navbar = () => {
               <Button w="100%" onClick={() => router.push("/events/")}>
                 {t.EVENTS}
               </Button>
+              <LocaleSelector></LocaleSelector>
               <MetamaskLogin></MetamaskLogin>
             </DrawerBody>
           </DrawerContent>
