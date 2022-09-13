@@ -23,12 +23,13 @@ import {
   useGetOwnedNFTs,
 } from "../../hooks/useMintNFTManager";
 import dayjs from "dayjs";
+import LoginRequired from "../../components/atoms/web3/LoginRequired";
 
 const Event = () => {
   const router = useRouter();
   const { eventid } = router.query;
   const { event, loading: loadingFetch } = useGetEventById(Number(eventid));
-  const { ownedNFTs, loading, getOwnedNFTs } = useGetOwnedNFTs();
+  const { ownedNFTs, errors, loading, getOwnedNFTs } = useGetOwnedNFTs();
 
   const {
     status: mintStatus,
@@ -80,57 +81,61 @@ const Event = () => {
                 </Fragment>
               ))}
             </Text>
-
-            {hasNftForThisEvent || mintStatus ? (
-              <Text>
-                You already have this NFT. Thank you for your participation!
-              </Text>
-            ) : (
-              <Flex
-                width="100%"
-                justifyContent="space-between"
-                alignItems="end"
-                flexWrap="wrap"
-              >
-                <Box
-                  width={{ base: "100%", md: "48%" }}
-                  mb={{ base: 5, md: 0 }}
+            <LoginRequired
+              requiredChainID={+process.env.NEXT_PUBLIC_CHAIN_ID!}
+              forbiddenText="Sign in to get NFT!"
+            >
+              {hasNftForThisEvent || mintStatus ? (
+                <Text>
+                  You already have this NFT. Thank you for your participation!
+                </Text>
+              ) : (
+                <Flex
+                  width="100%"
+                  justifyContent="space-between"
+                  alignItems="end"
+                  flexWrap="wrap"
                 >
-                  <Text mb={2}>
-                    Secret Phrase. Event organaizers will tell you.
-                  </Text>
-                  <Input
-                    variant="outline"
-                    type="password"
-                    value={enteredSecretPhrase}
-                    onChange={(e) => setEnteredSecretPhrase(e.target.value)}
-                  />
-                </Box>
-                <Button
-                  width={{ base: "100%", md: "48%" }}
-                  isLoading={mintLoading}
-                  onClick={() => claimMint()}
-                  background="mint.primary"
-                  color="white"
-                  rounded="full"
-                >
-                  Claim NFT!
-                </Button>
-              </Flex>
-            )}
-            {mintErrors && (
-              <Alert status="error" mt={2} mx={4}>
-                <AlertIcon />
-                <AlertTitle>Error occurred</AlertTitle>
-                <AlertDescription>{mintErrors.message}</AlertDescription>
-              </Alert>
-            )}
-            {mintStatus && (
-              <Alert status="success" mt={3}>
-                <AlertIcon />
-                <AlertTitle>You have claimed NFT!</AlertTitle>
-              </Alert>
-            )}
+                  <Box
+                    width={{ base: "100%", md: "48%" }}
+                    mb={{ base: 5, md: 0 }}
+                  >
+                    <Text mb={2}>
+                      Secret Phrase. Event organaizers will tell you.
+                    </Text>
+                    <Input
+                      variant="outline"
+                      type="password"
+                      value={enteredSecretPhrase}
+                      onChange={(e) => setEnteredSecretPhrase(e.target.value)}
+                    />
+                  </Box>
+                  <Button
+                    width={{ base: "100%", md: "48%" }}
+                    isLoading={mintLoading}
+                    onClick={() => claimMint()}
+                    background="mint.primary"
+                    color="white"
+                    rounded="full"
+                  >
+                    Claim NFT!
+                  </Button>
+                </Flex>
+              )}
+              {mintErrors && (
+                <Alert status="error" mt={2} mx={4}>
+                  <AlertIcon />
+                  <AlertTitle>Error occurred</AlertTitle>
+                  <AlertDescription>{mintErrors.message}</AlertDescription>
+                </Alert>
+              )}
+              {mintStatus && (
+                <Alert status="success" mt={3}>
+                  <AlertIcon />
+                  <AlertTitle>You have claimed NFT!</AlertTitle>
+                </Alert>
+              )}
+            </LoginRequired>
           </>
         )}
       </Container>
