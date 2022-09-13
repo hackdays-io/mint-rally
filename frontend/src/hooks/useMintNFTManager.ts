@@ -2,9 +2,8 @@ import { BigNumber, ethers } from "ethers";
 import { useState } from "react";
 const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_MINT_NFT_MANAGER!;
 import contract from "../contracts/MintNFT.json";
-import { ForwarderAbi } from "../../utils/forwarder";
+import FowarderABI from "../contracts/Fowarder.json";
 import { signMetaTxRequest } from "../../utils/signer";
-import { useAddress } from "@thirdweb-dev/react";
 import axios from "axios";
 export interface IMintParticipateNFTParams {
   groupId: number;
@@ -20,34 +19,38 @@ const sentMetaTx = async (
   secretPhrase: string
 ) => {
   const url = process.env.NEXT_PUBLIC_WEBHOOK_URL;
-  if (!url) throw new Error('Webhook url is required');
+  if (!url) throw new Error("Webhook url is required");
 
-  if (!process.env.NEXT_PUBLIC_FORWARDER_ADDRESS) throw new Error('Forwarder address is required');
+  if (!process.env.NEXT_PUBLIC_FORWARDER_ADDRESS)
+    throw new Error("Forwarder address is required");
 
   const forwarder = new ethers.Contract(
-    process.env.NEXT_PUBLIC_FORWARDER_ADDRESS,
-    ForwarderAbi,
+    "0x5BD8Be59e31AC6AA100eb507Cd5B4a24f40b2DCB",
+    FowarderABI.abi,
     signer
   );
 
   const from = await signer.getAddress();
-  const data = mintNFTContract.interface.encodeFunctionData('mintParticipateNFT', [
-    groupId,
-    eventId,
-    secretPhrase,
-  ]);
-  const to = mintNFTContract.address
+  const data = mintNFTContract.interface.encodeFunctionData(
+    "mintParticipateNFT",
+    [groupId, eventId, secretPhrase]
+  );
+  const to = mintNFTContract.address;
 
-  if (!signer.provider) throw new Error('Provider is not set');
+  if (!signer.provider) throw new Error("Provider is not set");
 
-  const request = await signMetaTxRequest(signer.provider, forwarder, { to, from, data });
+  const request = await signMetaTxRequest(signer.provider, forwarder, {
+    to,
+    from,
+    data,
+  });
 
   return fetch(url, {
-    method: 'POST',
+    method: "POST",
     body: JSON.stringify(request),
-    headers: { 'Content-Type': 'application/json' },
+    headers: { "Content-Type": "application/json" },
   });
-}
+};
 
 export interface IOwnedNFT {
   name: string;

@@ -12,10 +12,8 @@ async function main() {
   // let mintNFT: MintNFT;
   // let eventManager: EventManager;
 
-  const Forwarder = await ethers.getContractFactory(
-    "MinimalForwarderUpgradeable"
-  );
-  const forwarder = await upgrades.deployProxy(Forwarder, []);
+  const Forwarder = await ethers.getContractFactory("MintRallyForwarder");
+  const forwarder = await Forwarder.deploy();
   await forwarder.deployed();
   const MintNFT = await ethers.getContractFactory("MintNFT");
   // mintNFT = await MintNFT.deploy();
@@ -38,7 +36,7 @@ async function main() {
     "deploy.json",
     JSON.stringify(
       {
-        MinimalForwarderUpgradeable: forwarder.address,
+        MintRallyFowarder: forwarder.address,
         MintNFT: mintNFT.address,
       },
       null,

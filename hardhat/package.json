@@ -58,7 +58,7 @@
     "typescript": "^4.5.2"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "^4.7.0",
+    "@openzeppelin/contracts": "^4.7.3",
     "@openzeppelin/contracts-upgradeable": "^4.7.3",
     "defender-relay-client": "^1.28.1",
     "eth-sig-util": "^3.0.1",
