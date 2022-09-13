@@ -119,9 +119,8 @@ const Event = () => {
               </Flex>
             )}
             {mintErrors && (
-              <Alert status="error" mt={2} mx={4}>
+              <Alert status="error" mt={2}>
                 <AlertIcon />
-                <AlertTitle>Error occurred</AlertTitle>
                 <AlertDescription>{mintErrors.message}</AlertDescription>
               </Alert>
             )}
