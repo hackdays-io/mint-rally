@@ -19,6 +19,8 @@ import {
   useDisconnect,
   useMetamask,
 } from "@thirdweb-dev/react";
+import NextLink from "next/link";
+
 import router from "next/router";
 import Image from "next/image";
 import { switchNetwork } from "./atoms/web3/LoginRequired";
@@ -80,7 +82,7 @@ const Navbar = () => {
         )}
         {address && (
           <Box marginLeft={3} cursor="pointer">
-            <Link href="/users/me">
+            <Link href="/users/me" as={NextLink}>
               <Image
                 src="/user.png"
                 alt="Loggedin"
@@ -111,7 +113,7 @@ const Navbar = () => {
           width={{ base: "150px", md: "auto" }}
           pr={8}
         >
-          <Link href="/">
+          <Link href="/" as={NextLink}>
             <Image
               src={"/images/logo.svg"}
               height={93.5}
@@ -122,7 +124,7 @@ const Navbar = () => {
           </Link>
         </Flex>
         <Box pr={4} display={{ base: "none", md: "block" }}>
-          <Link href="/event-groups">
+          <Link href="/event-groups" as={NextLink}>
             <Button
               leftIcon={<SettingsIcon />}
               bg="mint.white"
@@ -136,7 +138,7 @@ const Navbar = () => {
           </Link>
         </Box>
         <Box display={{ base: "none", md: "block" }}>
-          <Link href="/events">
+          <Link href="/events" as={NextLink}>
             <Button
               leftIcon={<CalendarIcon />}
               bg="mint.white"
