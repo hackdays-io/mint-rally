@@ -9,6 +9,7 @@ import {
   DrawerOverlay,
   Flex,
   IconButton,
+  Link,
   Spacer,
   useDisclosure,
 } from "@chakra-ui/react";
@@ -20,7 +21,6 @@ import {
 } from "@thirdweb-dev/react";
 import router from "next/router";
 import Image from "next/image";
-import Link from "next/link";
 import { switchNetwork } from "./atoms/web3/LoginRequired";
 import { useLocale } from "../hooks/useLocale";
 import LocaleSelector from "./atoms/LocaleSelector";
