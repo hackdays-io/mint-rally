@@ -31,7 +31,7 @@ const EventGroups: NextPage = () => {
               window.location.href = "/event-groups/new";
             }}
           >
-            Create new event group
+            {t.CREATE_NEW_EVENT_GROUP}
           </Button>
         </Flex>
         {loading ? (

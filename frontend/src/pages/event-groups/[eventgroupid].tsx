@@ -4,13 +4,14 @@ import { useRouter } from "next/router";
 import { useMemo } from "react";
 import EventCard from "../../components/atoms/events/EventCard";
 import { useEventGroups, useEventRecords } from "../../hooks/useEventManager";
+import { useLocale } from "../../hooks/useLocale";
 
 const EventGroup = () => {
   const router = useRouter();
   const { eventgroupid } = router.query;
   const { groups, loading } = useEventGroups();
   const { records, loading: eventLoading } = useEventRecords();
-
+  const { t } = useLocale();
   const findgroup = useMemo(() => {
     return groups.find((item) => item.groupId.toString() == eventgroupid);
   }, [groups]);
@@ -24,7 +25,10 @@ const EventGroup = () => {
           <>
             {findgroup && (
               <>
-                <Heading mb={6}>Events of {findgroup.name}</Heading>
+                <Heading mb={6}>
+                  {findgroup.name}
+                  {t.OWN_EVENTS}
+                </Heading>
                 {eventLoading && <Spinner></Spinner>}
                 <SimpleGrid columns={3} spacing={5}>
                   {records
