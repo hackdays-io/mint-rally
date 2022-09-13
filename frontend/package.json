@@ -13,6 +13,9 @@
     "@chakra-ui/react": "^2.2.1",
     "@emotion/react": "^11",
     "@emotion/styled": "^11",
+    "@fortawesome/fontawesome-svg-core": "^6.2.0",
+    "@fortawesome/free-solid-svg-icons": "^6.2.0",
+    "@fortawesome/react-fontawesome": "^0.2.0",
     "@thirdweb-dev/react": "^2.4.7",
     "@thirdweb-dev/sdk": "^2.3.23",
     "dayjs": "^1.11.4",
@@ -24,7 +27,8 @@
     "react-feather": "^2.0.10",
     "react-hook-form": "^7.33.1",
     "web3.storage": "^4.3.0",
-    "web3modal": "^1.9.8"
+    "web3modal": "^1.9.8",
+    "　　　　　": "fortawesome/react-fontawesome"
   },
   "devDependencies": {
     "@types/node": "18.0.0",

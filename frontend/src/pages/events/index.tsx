@@ -1,5 +1,4 @@
 import {
-  Box,
   Button,
   Container,
   Flex,
@@ -12,18 +11,20 @@ import { NextPage } from "next";
 import Link from "next/link";
 import EventCard from "../../components/atoms/events/EventCard";
 import { useEventRecords } from "../../hooks/useEventManager";
+import { useLocale } from "../../hooks/useLocale";
 
 const Events: NextPage = () => {
   const { records, loading } = useEventRecords();
+  const { t } = useLocale();
 
   return (
     <>
       <Container maxW={800} paddingTop={6}>
         <Flex alignItems="bottom" paddingBottom={6}>
-          <Heading>Events</Heading>
+          <Heading>{t.EVENTS}</Heading>
           <Spacer></Spacer>
           <Link href="/events/new">
-            <Button>Create new event</Button>
+            <Button>{t.CREATE_NEW_EVENT}</Button>
           </Link>
         </Flex>
         {loading ? (

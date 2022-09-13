@@ -22,6 +22,8 @@ import router from "next/router";
 import Image from "next/image";
 import Link from "next/link";
 import { switchNetwork } from "./atoms/web3/LoginRequired";
+import { useLocale } from "../hooks/useLocale";
+import LocaleSelector from "./atoms/LocaleSelector";
 
 const Navbar = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -30,9 +32,7 @@ const Navbar = () => {
   const connectWithMetamask = useMetamask();
   const disconnectWallet = useDisconnect();
   const requiredChainId = +process.env.NEXT_PUBLIC_CHAIN_ID!;
-  const PRCURL = process.env.NEXT_PUBLIC_METAMASK_RPC_URL!;
-  const ChainName = process.env.NEXT_PUBLIC_CHAIN_NAME!;
-  const BlockExplorerUrl = process.env.NEXT_PUBLIC_BLOCK_EXPLORER_URL!;
+  const { t } = useLocale();
 
   const MetamaskLogin = () => {
     return (
@@ -49,7 +49,7 @@ const Navbar = () => {
                   onClick={switchNetwork}
                   size="lg"
                 >
-                  Switch Network
+                  {t.SWITCH_NETWORK}
                 </Button>
               </Box>
             ) : (
@@ -63,7 +63,7 @@ const Navbar = () => {
               onClick={disconnectWallet}
               size="lg"
             >
-              Disconnect
+              {t.SIGN_OUT}
             </Button>
           </>
         ) : (
@@ -75,7 +75,7 @@ const Navbar = () => {
             onClick={connectWithMetamask}
             size="lg"
           >
-            Sign In
+            {t.SIGN_IN}
           </Button>
         )}
         {address && (
@@ -131,7 +131,7 @@ const Navbar = () => {
               variant="solid"
               size="lg"
             >
-              EventGroups
+              {t.EVENTGROUPS}
             </Button>
           </Link>
         </Box>
@@ -145,7 +145,7 @@ const Navbar = () => {
               variant="solid"
               size="lg"
             >
-              Events
+              {t.EVENTS}
             </Button>
           </Link>
         </Box>
@@ -156,6 +156,7 @@ const Navbar = () => {
           display={{ base: "none", md: "flex" }}
         >
           <Spacer />
+          <LocaleSelector></LocaleSelector>
           <Box pr={4}>
             <MetamaskLogin></MetamaskLogin>
           </Box>
@@ -175,14 +176,15 @@ const Navbar = () => {
           <DrawerContent>
             <DrawerBody p={0} bg="gray.100">
               <Button w="100%" onClick={() => router.push("/")}>
-                Top
+                {t.TOP}
               </Button>
               <Button w="100%" onClick={() => router.push("/event-groups/")}>
-                Event Groups
+                {t.EVENTGROUPS}
               </Button>
               <Button w="100%" onClick={() => router.push("/events/")}>
-                Events
+                {t.EVENTS}
               </Button>
+              <LocaleSelector></LocaleSelector>
               <MetamaskLogin></MetamaskLogin>
             </DrawerBody>
           </DrawerContent>
