@@ -159,7 +159,7 @@ const Navbar = () => {
         >
           <Spacer />
           <LocaleSelector></LocaleSelector>
-          <Box pr={4}>
+          <Box px={4}>
             <MetamaskLogin></MetamaskLogin>
           </Box>
         </Flex>
@@ -176,7 +176,7 @@ const Navbar = () => {
       <Drawer placement="left" size="xs" onClose={onClose} isOpen={isOpen}>
         <DrawerOverlay>
           <DrawerContent>
-            <DrawerBody p={0} bg="gray.100">
+            <DrawerBody p={0} bg="gray.100" textAlign="center">
               <Button w="100%" onClick={() => router.push("/")}>
                 {t.TOP}
               </Button>
