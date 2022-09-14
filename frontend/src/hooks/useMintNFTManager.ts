@@ -161,7 +161,6 @@ export const useGetOwnedNFTs = () => {
     if (!address) return;
     const mintNFTManager = getMintNFTManagerContract();
     if (!mintNFTManager) throw new Error("Cannot find mintNFTManager contract");
-
     setLoading(true);
     const balanceOfNFTs = await mintNFTManager.balanceOf(address);
     const metadata: any[] = [];
@@ -173,7 +172,6 @@ export const useGetOwnedNFTs = () => {
       metadata.push(data);
     }
     setLoading(false);
-    console.log(metadata);
     setOwnedNFTs(metadata);
   };
 
