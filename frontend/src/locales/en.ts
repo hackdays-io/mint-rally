@@ -13,9 +13,12 @@ export default {
   CREATE_NEW_EVENT: "Create new event",
   // Event page
   SIGN_IN_TO_GET_NFT: "Sign in to get NFT!",
-  YOU_ALREADY_HAVE_THIS_NFT: "You already have this NFT. Thank you for your participation!",
+  YOU_ALREADY_HAVE_THIS_NFT:
+    "You already have this NFT. Thank you for your participation!",
   ENTER_SECRET_PHRASE: "Enter Secret Phrase. Event organaizers will tell you.",
   CLAIM_NFT: "Claim NFT!",
-  YOU_HAVE_CLAIMED_NFT: "You have claimed NFT!!!"
+  YOU_HAVE_CLAIMED_NFT:
+    "You have claimed NFT! Please wait for mint your NFT...",
+  YOU_HAVE_GOT_NFT: "You got NFT!!",
   // ...
-}
+};

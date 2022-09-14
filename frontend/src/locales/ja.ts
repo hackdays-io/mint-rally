@@ -18,6 +18,7 @@ export default {
   ENTER_SECRET_PHRASE:
     "イベント主催者から聞いた「あいことば」を入力してください。",
   CLAIM_NFT: "NFT取得！",
-  YOU_HAVE_CLAIMED_NFT: "NFTを入手しました！！！",
+  YOU_HAVE_CLAIMED_NFT: "NFT取得まであともう少々お待ちください...",
+  YOU_HAVE_GOT_NFT: "NFTを取得できました！！",
   // ...
 };
