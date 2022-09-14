@@ -11,25 +11,23 @@ import {
   Input,
   Container,
   Flex,
-  Link,
-  Image,
 } from "@chakra-ui/react";
-import { BigNumber } from "ethers";
 import { useRouter } from "next/router";
 import { Fragment, useState, useEffect, useMemo } from "react";
 import { useGetEventById } from "../../hooks/useEventManager";
 import {
   useMintParticipateNFT,
-  getMintNFTManagerContract,
   useGetOwnedNFTs,
 } from "../../hooks/useMintNFTManager";
-import dayjs from "dayjs";
+import LoginRequired from "../../components/atoms/web3/LoginRequired";
+import { useLocale } from "../../hooks/useLocale";
 
 const Event = () => {
   const router = useRouter();
   const { eventid } = router.query;
   const { event, loading: loadingFetch } = useGetEventById(Number(eventid));
-  // const { ownedNFTs, loading, getOwnedNFTs } = useGetOwnedNFTs();
+  const { ownedNFTs, loading, getOwnedNFTs } = useGetOwnedNFTs();
+  const { t } = useLocale();
 
   const {
     status: mintStatus,
@@ -39,9 +37,9 @@ const Event = () => {
     mintParticipateNFT,
   } = useMintParticipateNFT();
 
-  // useEffect(() => {
-  //   getOwnedNFTs();
-  // }, []);
+  useEffect(() => {
+    getOwnedNFTs();
+  }, []);
 
   const [enteredSecretPhrase, setEnteredSecretPhrase] = useState("");
 
@@ -54,14 +52,14 @@ const Event = () => {
     });
   };
 
-  // const hasNftForThisEvent = useMemo(() => {
-  //   return ownedNFTs.some(
-  //     (nft) =>
-  //       !!event &&
-  //       nft.groupId.eq(event.groupId) &&
-  //       nft.eventId.eq(BigNumber.from(eventid))
-  //   );
-  // }, [event, ownedNFTs]);
+  const hasNftForThisEvent = useMemo(() => {
+    return ownedNFTs.some(
+      (nft) =>
+        !!event &&
+        nft.traits.eventGroupId === event.groupId.toNumber() &&
+        nft.name === event.name
+    );
+  }, [event, ownedNFTs]);
 
   return (
     <>
@@ -79,66 +77,57 @@ const Event = () => {
                 </Fragment>
               ))}
             </Text>
-
-            {/* {hasNftForThisEvent || mintStatus ? ( */}
-            {mintStatus ? (
-              <Text>
-                You already have this NFT. Thank you for your participation!
-              </Text>
-            ) : (
-              <Flex
-                width="100%"
-                justifyContent="space-between"
-                alignItems="end"
-                flexWrap="wrap"
-              >
-                <Box
-                  width={{ base: "100%", md: "48%" }}
-                  mb={{ base: 5, md: 0 }}
+            <LoginRequired
+              requiredChainID={+process.env.NEXT_PUBLIC_CHAIN_ID!}
+              forbiddenText={t.SIGN_IN_TO_GET_NFT}
+            >
+              {hasNftForThisEvent || mintStatus ? (
+                <Text>{t.YOU_ALREADY_HAVE_THIS_NFT}</Text>
+              ) : (
+                <Flex
+                  width="100%"
+                  justifyContent="space-between"
+                  alignItems="end"
+                  flexWrap="wrap"
                 >
-                  <Text mb={2}>
-                    Secret Phrase. Event organaizers will tell you.
-                  </Text>
-                  <Input
-                    variant="outline"
-                    type="password"
-                    value={enteredSecretPhrase}
-                    onChange={(e) => setEnteredSecretPhrase(e.target.value)}
-                  />
-                </Box>
-                <Button
-                  width={{ base: "100%", md: "48%" }}
-                  isLoading={mintLoading}
-                  onClick={() => claimMint()}
-                  background="mint.primary"
-                  color="white"
-                  rounded="full"
-                >
-                  Claim NFT!
-                </Button>
-              </Flex>
-            )}
-            {mintErrors && (
-              <Alert status="error" mt={2} mx={4}>
-                <AlertIcon />
-                <AlertTitle>Error occurred</AlertTitle>
-                <AlertDescription>{mintErrors.message}</AlertDescription>
-              </Alert>
-            )}
-            {mintStatus && (
-              <Alert status="success" mt={3}>
-                <AlertIcon />
-                <AlertTitle>You have claimed NFT!</AlertTitle>
-              </Alert>
-            )}
-            {mintedNftImageURL && (
-              <Image
-                src={mintedNftImageURL}
-                width="400"
-                height="400"
-                objectFit="contain"
-              />
-            )}
+                  <Box
+                    width={{ base: "100%", md: "48%" }}
+                    mb={{ base: 5, md: 0 }}
+                  >
+                    <Text mb={2}>{t.ENTER_SECRET_PHRASE}</Text>
+                    <Input
+                      variant="outline"
+                      type="password"
+                      value={enteredSecretPhrase}
+                      onChange={(e) => setEnteredSecretPhrase(e.target.value)}
+                    />
+                  </Box>
+                  <Button
+                    width={{ base: "100%", md: "48%" }}
+                    isLoading={mintLoading}
+                    onClick={() => claimMint()}
+                    background="mint.primary"
+                    color="white"
+                    rounded="full"
+                  >
+                    {t.CLAIM_NFT}
+                  </Button>
+                </Flex>
+              )}
+              {mintErrors && (
+                <Alert status="error" mt={2} mx={4}>
+                  <AlertIcon />
+                  <AlertTitle>Error occurred</AlertTitle>
+                  <AlertDescription>{mintErrors.message}</AlertDescription>
+                </Alert>
+              )}
+              {mintStatus && (
+                <Alert status="success" mt={3}>
+                  <AlertIcon />
+                  <AlertTitle>{t.YOU_HAVE_CLAIMED_NFT}</AlertTitle>
+                </Alert>
+              )}
+            </LoginRequired>
           </>
         )}
       </Container>
