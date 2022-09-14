@@ -11,6 +11,7 @@ import {
   Input,
   Container,
   Flex,
+  VStack,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { Fragment, useState, useEffect, useMemo } from "react";
@@ -21,14 +22,22 @@ import {
 } from "../../hooks/useMintNFTManager";
 import LoginRequired from "../../components/atoms/web3/LoginRequired";
 import { useLocale } from "../../hooks/useLocale";
-import Image from "next/image";
+import { useReward } from "react-rewards";
 
 const Event = () => {
   const router = useRouter();
   const { eventid } = router.query;
   const { event, loading: loadingFetch } = useGetEventById(Number(eventid));
-  const { ownedNFTs, loading, getOwnedNFTs } = useGetOwnedNFTs();
+  const { ownedNFTs, getOwnedNFTs } = useGetOwnedNFTs();
   const { t } = useLocale();
+  const { reward: confettiReward } = useReward("confettiReward", "confetti", {
+    elementCount: 100,
+    lifetime: 300,
+  });
+  const { reward: balloonsReward } = useReward("balloonsReward", "balloons", {
+    elementCount: 30,
+    spread: 80,
+  });
 
   const {
     status: mintStatus,
@@ -41,6 +50,11 @@ const Event = () => {
   useEffect(() => {
     getOwnedNFTs();
   }, []);
+
+  useEffect(() => {
+    confettiReward();
+    balloonsReward();
+  }, [mintedNftImageURL]);
 
   const [enteredSecretPhrase, setEnteredSecretPhrase] = useState("");
 
@@ -83,7 +97,9 @@ const Event = () => {
               requiredChainID={+process.env.NEXT_PUBLIC_CHAIN_ID!}
               forbiddenText={t.SIGN_IN_TO_GET_NFT}
             >
-              {hasNftForThisEvent || mintStatus ? (
+              {mintedNftImageURL ? (
+                <></>
+              ) : hasNftForThisEvent || mintStatus ? (
                 <Text>{t.YOU_ALREADY_HAVE_THIS_NFT}</Text>
               ) : (
                 <Flex
@@ -123,14 +139,24 @@ const Event = () => {
                   <AlertDescription>{mintErrors.message}</AlertDescription>
                 </Alert>
               )}
-              {mintStatus && (
+              {mintStatus && !mintedNftImageURL && (
                 <Alert status="success" mt={3}>
                   <AlertIcon />
                   <AlertTitle>{t.YOU_HAVE_CLAIMED_NFT}</AlertTitle>
                 </Alert>
               )}
               {mintedNftImageURL && (
-                <img src={mintedNftImageURL} width="400" height="400" />
+                <>
+                  <Alert status="success" mt={3}>
+                    <AlertIcon />
+                    <AlertTitle>{t.YOU_HAVE_GOT_NFT}</AlertTitle>
+                  </Alert>
+                  <VStack justify="center" mt={5}>
+                    <img src={mintedNftImageURL} width="200" height="200" />
+                    <span id="confettiReward" />
+                    <span id="balloonsReward" />
+                  </VStack>
+                </>
               )}
             </LoginRequired>
           </>
