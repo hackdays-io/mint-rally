@@ -25,7 +25,7 @@ const sentMetaTx = async (
     throw new Error("Forwarder address is required");
 
   const forwarder = new ethers.Contract(
-    "0x5BD8Be59e31AC6AA100eb507Cd5B4a24f40b2DCB",
+    process.env.NEXT_PUBLIC_FORWARDER_ADDRESS,
     FowarderABI.abi,
     signer
   );

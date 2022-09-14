@@ -12,32 +12,37 @@ async function main() {
   // let mintNFT: MintNFT;
   // let eventManager: EventManager;
 
-  const Forwarder = await ethers.getContractFactory("MintRallyForwarder");
-  const forwarder = await Forwarder.deploy();
+  const ForwarderFactory = await ethers.getContractFactory(
+    "MintRallyForwarder"
+  );
+  const forwarder = await ForwarderFactory.deploy();
   await forwarder.deployed();
-  const MintNFT = await ethers.getContractFactory("MintNFT");
+  const MintNFTFactory = await ethers.getContractFactory("MintNFT");
   // mintNFT = await MintNFT.deploy();
-  const mintNFT = await upgrades.deployProxy(MintNFT, [forwarder.address]);
+  const mintNFT = await upgrades.deployProxy(MintNFTFactory, [
+    forwarder.address,
+  ]);
   await mintNFT.deployed();
 
-  const EventManager = await ethers.getContractFactory("EventManager");
+  const EventManagerFactory = await ethers.getContractFactory("EventManager");
   // eventManager = await EventManager.deploy();
-  const eventManager = await upgrades.deployProxy(EventManager);
+  const eventManager = await upgrades.deployProxy(EventManagerFactory);
   await eventManager.deployed();
 
   await mintNFT.setEventManagerAddr(eventManager.address);
   await eventManager.setMintNFTAddr(mintNFT.address);
 
-  console.log("minimalForwarderUpgradeable", forwarder.address);
+  console.log("forwarder address:", forwarder.address);
   console.log("mintNFT address:", mintNFT.address);
   console.log("eventManager address:", eventManager.address);
 
   writeFileSync(
-    "deploy.json",
+    "artifacts/deployed_contract_addr.json",
     JSON.stringify(
       {
         MintRallyFowarder: forwarder.address,
         MintNFT: mintNFT.address,
+        EventManager: eventManager.address,
       },
       null,
       2
