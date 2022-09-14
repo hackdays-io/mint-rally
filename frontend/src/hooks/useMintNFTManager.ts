@@ -2,53 +2,57 @@ import { BigNumber, ethers } from "ethers";
 import { useEffect, useState } from "react";
 const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_MINT_NFT_MANAGER!;
 import contract from "../contracts/MintNFT.json";
-// import forwarderContractAbi from '../contracts/MinimalForwarder.json';
+import FowarderABI from "../contracts/Fowarder.json";
 import { signMetaTxRequest } from "../../utils/signer";
-import { useAddress } from "@thirdweb-dev/react";
 import axios from "axios";
 import { ipfs2http } from "../../utils/ipfs2http";
+import { useAddress } from "@thirdweb-dev/react";
 export interface IMintParticipateNFTParams {
   groupId: number;
   eventId: number;
   secretPhrase: string;
 }
 
-// const sentMetaTx = async (
-//   mintNFTContract: ethers.Contract,
-//   signer: ethers.Signer,
-//   groupId: number,
-//   eventId: number,
-//   secretPhrase: string
-// ) => {
-//   const url = process.env.NEXT_PUBLIC_WEBHOOK_URL;
-//   if (!url) throw new Error('Webhook url is required');
+const sentMetaTx = async (
+  mintNFTContract: ethers.Contract,
+  signer: ethers.Signer,
+  groupId: number,
+  eventId: number,
+  secretPhrase: string
+) => {
+  const url = process.env.NEXT_PUBLIC_WEBHOOK_URL;
+  if (!url) throw new Error("Webhook url is required");
 
-//   if (!process.env.NEXT_PUBLIC_FORWARDER_ADDRESS) throw new Error('Forwarder address is required');
+  if (!process.env.NEXT_PUBLIC_FORWARDER_ADDRESS)
+    throw new Error("Forwarder address is required");
 
-//   const forwarder = new ethers.Contract(
-//     process.env.NEXT_PUBLIC_FORWARDER_ADDRESS,
-//     forwarderContractAbi.abi,
-//     signer
-//   );
+  const forwarder = new ethers.Contract(
+    process.env.NEXT_PUBLIC_FORWARDER_ADDRESS,
+    FowarderABI.abi,
+    signer
+  );
 
-//   const from = await signer.getAddress();
-//   const data = mintNFTContract.interface.encodeFunctionData('mintParticipateNFT', [
-//     groupId,
-//     eventId,
-//     secretPhrase,
-//   ]);
-//   const to = mintNFTContract.address
+  const from = await signer.getAddress();
+  const data = mintNFTContract.interface.encodeFunctionData(
+    "mintParticipateNFT",
+    [groupId, eventId, secretPhrase]
+  );
+  const to = mintNFTContract.address;
 
-//   if (!signer.provider) throw new Error('Provider is not set');
+  if (!signer.provider) throw new Error("Provider is not set");
 
-//   const request = await signMetaTxRequest(signer.provider, forwarder, { to, from, data });
+  const request = await signMetaTxRequest(signer.provider, forwarder, {
+    to,
+    from,
+    data,
+  });
 
-//   return fetch(url, {
-//     method: 'POST',
-//     body: JSON.stringify(request),
-//     headers: { 'Content-Type': 'application/json' },
-//   });
-// }
+  return fetch(url, {
+    method: "POST",
+    body: JSON.stringify(request),
+    headers: { "Content-Type": "application/json" },
+  });
+};
 
 export interface IOwnedNFT {
   name: string;
@@ -132,19 +136,13 @@ export const useMintParticipateNFT = () => {
       );
       const signer = provider.getSigner();
 
-      // return await sentMetaTx(
-      //   mintNFTManager,
-      //   signer,
-      //   groupId,
-      //   eventId,
-      //   secretPhrase
-      // );
-      const tx = await mintNFTManager.mintParticipateNFT(
+      return await sentMetaTx(
+        mintNFTManager,
+        signer,
         groupId,
         eventId,
         secretPhrase
       );
-      await tx.wait();
       setStatus(true);
     } catch (e: any) {
       setErrors(e);

@@ -6,8 +6,14 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "./lib/Hashing.sol";
+import "@openzeppelin/contracts-upgradeable/metatx/MinimalForwarderUpgradeable.sol";
+import "./ERC2771ContextUpgradeable.sol";
 
-contract MintNFT is ERC721EnumerableUpgradeable, OwnableUpgradeable {
+contract MintNFT is
+    ERC721EnumerableUpgradeable,
+    ERC2771ContextUpgradeable,
+    OwnableUpgradeable
+{
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
 
@@ -41,23 +47,45 @@ contract MintNFT is ERC721EnumerableUpgradeable, OwnableUpgradeable {
 
     event MintedNFTAttributeURL(address indexed holder, string url);
 
-    function initialize() public initializer {
+    function initialize(MinimalForwarderUpgradeable trustedForwarder)
+        public
+        initializer
+    {
         __ERC721_init("MintRally", "MR");
         __Ownable_init();
+        __ERC2771Context_init(address(trustedForwarder));
     }
 
-    function _msgSender() internal view virtual override returns (address) {
-        return super._msgSender();
+    function _msgSender()
+        internal
+        view
+        virtual
+        override(ContextUpgradeable, ERC2771ContextUpgradeable)
+        returns (address sender)
+    {
+        if (isTrustedForwarder(msg.sender)) {
+            // The assembly code is more direct than the Solidity version using `abi.decode`.
+            /// @solidity memory-safe-assembly
+            assembly {
+                sender := shr(96, calldataload(sub(calldatasize(), 20)))
+            }
+        } else {
+            return super._msgSender();
+        }
     }
 
     function _msgData()
         internal
         view
         virtual
-        override
+        override(ContextUpgradeable, ERC2771ContextUpgradeable)
         returns (bytes calldata)
     {
-        return super._msgData();
+        if (isTrustedForwarder(msg.sender)) {
+            return msg.data[:msg.data.length - 20];
+        } else {
+            return super._msgData();
+        }
     }
 
     function mintParticipateNFT(

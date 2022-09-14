@@ -9,3 +9,4 @@ cache
 artifacts
 
 .openzeppelin/unknown-*.json
+build

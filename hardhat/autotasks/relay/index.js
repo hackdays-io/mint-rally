@@ -5,9 +5,9 @@ import {
 } from "defender-relay-client/lib/ethers";
 
 // TODO: deploy forwarder contract and copy abi
-import { ForwarderAbi } from "../../src/forwarder";
+import ForwarderAbi from "../../artifacts/contracts/Forwarder.sol/MintRallyForwarder.json";
 // TODO: deploy forwarder contract and copy address
-import { MinimalForwarder as ForwarderAddress } from "../../deploy.json";
+import { MintRallyFowarder as ForwarderAddress } from "../../artifacts/deployed_contract_addr.json";
 
 async function relay(forwarder, request, signature, whitelist) {
   // Decide if we want to relay this request based on a whitelist
@@ -24,10 +24,8 @@ async function relay(forwarder, request, signature, whitelist) {
 }
 
 async function handler(event) {
-  // Parse webhook payload
   if (!event.request || !event.request.body) throw new Error(`Missing payload`);
   const { request, signature } = event.request.body;
-  console.log(`Relaying`, request);
 
   // Initialize Relayer provider and signer, and forwarder contract
   // eslint-disable-next-line node/no-unsupported-features/es-syntax
@@ -36,7 +34,7 @@ async function handler(event) {
   const signer = new DefenderRelaySigner(credentials, provider, {
     speed: "fast",
   });
-  const forwarder = new Contract(ForwarderAddress, ForwarderAbi, signer);
+  const forwarder = new Contract(ForwarderAddress, ForwarderAbi.abi, signer);
 
   // Relay transaction!
   const tx = await relay(forwarder, request, signature);
