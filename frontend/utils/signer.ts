@@ -57,7 +57,7 @@ export const buildRequest = async (forwarder: ethers.Contract, input: any) => {
   const nonce = await forwarder
     .getNonce(input.from)
     .then((nonce: { toString: () => any }) => nonce.toString());
-  return { value: 0, gas: 2e7, nonce, ...input };
+  return { value: 0, gas: 1e6, nonce, ...input };
 };
 
 export const buildTypedData = async (
