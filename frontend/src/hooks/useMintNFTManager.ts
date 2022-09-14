@@ -145,7 +145,8 @@ export const useMintParticipateNFT = () => {
       );
       setStatus(true);
     } catch (e: any) {
-      setErrors(e);
+      setErrors(e.error.data);
+      setLoading(false);
     }
   };
   return { status, errors, loading, mintParticipateNFT, mintedNftImageURL };
