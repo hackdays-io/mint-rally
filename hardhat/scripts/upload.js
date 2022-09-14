@@ -14,7 +14,7 @@ async function main() {
   } = process.env;
   if (!autotaskId) throw new Error(`Missing autotask id`);
   await uploadCode(autotaskId, apiKey, apiSecret);
-  console.log(`Code updated`);
+  console.log(`success update autotask`);
 }
 
 if (require.main === module) {
