@@ -136,13 +136,7 @@ export const useMintParticipateNFT = () => {
       );
       const signer = provider.getSigner();
 
-      return await sentMetaTx(
-        mintNFTManager,
-        signer,
-        groupId,
-        eventId,
-        secretPhrase
-      );
+      await sentMetaTx(mintNFTManager, signer, groupId, eventId, secretPhrase);
       setStatus(true);
     } catch (e: any) {
       setErrors(e.error.data);

@@ -13,9 +13,11 @@ export default {
   CREATE_NEW_EVENT: "イベントを作成",
   // Event page
   SIGN_IN_TO_GET_NFT: "NFTを取得するにはログインしてください",
-  YOU_ALREADY_HAVE_THIS_NFT: "既にこのNFTは取得済みです。ご参加ありがとうございました！",
-  ENTER_SECRET_PHRASE: "イベント主催者から聞いたシークレットフレーズを入力してください。",
+  YOU_ALREADY_HAVE_THIS_NFT:
+    "既にこのNFTは取得済みです。ご参加ありがとうございました！",
+  ENTER_SECRET_PHRASE:
+    "イベント主催者から聞いた「あいことば」を入力してください。",
   CLAIM_NFT: "NFT取得！",
-  YOU_HAVE_CLAIMED_NFT: "NFTを入手しました！！！"
+  YOU_HAVE_CLAIMED_NFT: "NFTを入手しました！！！",
   // ...
-}
+};

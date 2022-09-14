@@ -39,12 +39,12 @@ const User = () => {
   const ImageBadge = ({ image, name }: { image: string; name: string }) => (
     <Flex justifyContent="center" alignItems="center" flexDirection="column">
       <Box>
-        <Image src={image} alt={name} style={{ borderRadius: "60px" }} />
+        <Image src={image} alt={name} />
       </Box>
       <Box>
-        <Flex justifyContent="center">
-          <Text>{name}</Text>
-        </Flex>
+        <Text fontSize="md" fontWeight="bold" mt={2}>
+          {name}
+        </Text>
       </Box>
     </Flex>
   );
@@ -78,13 +78,15 @@ const User = () => {
 
   return (
     <Container maxW="1000">
-      <Box mt={16}>
-        <Heading as="h1" size="2xl" color="mint.primary" fontWeight={400}>
+      <Box mt={10}>
+        <Heading as="h1" size="xl" color="mint.primary" fontWeight={700}>
           NFT Collection
         </Heading>
       </Box>
-      {loading && <Spinner></Spinner>}
-      {groups.length > 0 &&
+      {loading ? (
+        <Spinner />
+      ) : (
+        groups.length > 0 &&
         Object.entries(nftCollectionsByGroup).map(([groupIdString, nfts]) => {
           const id = groupIdString;
           const data = nfts.map(({ name, image, description }) => ({
@@ -95,10 +97,10 @@ const User = () => {
 
           return (
             <div key={id}>
-              <Box width="100%" mt={20}>
+              <Box width="100%" mt={10}>
                 <Heading
                   as="h2"
-                  size="xl"
+                  size="lg"
                   color="mint.primary"
                   fontWeight={400}
                 >
@@ -116,7 +118,8 @@ const User = () => {
               </Box>
             </div>
           );
-        })}
+        })
+      )}
     </Container>
   );
 };

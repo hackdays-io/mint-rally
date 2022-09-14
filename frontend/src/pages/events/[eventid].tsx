@@ -130,12 +130,7 @@ const Event = () => {
                 </Alert>
               )}
               {mintedNftImageURL && (
-                <Image
-                  src={mintedNftImageURL}
-                  width="400"
-                  height="400"
-                  objectFit="contain"
-                />
+                <img src={mintedNftImageURL} width="400" height="400" />
               )}
             </LoginRequired>
           </>
