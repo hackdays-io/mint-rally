@@ -21,6 +21,7 @@ import {
 } from "../../hooks/useMintNFTManager";
 import LoginRequired from "../../components/atoms/web3/LoginRequired";
 import { useLocale } from "../../hooks/useLocale";
+import Image from "next/image";
 
 const Event = () => {
   const router = useRouter();
@@ -127,6 +128,14 @@ const Event = () => {
                   <AlertIcon />
                   <AlertTitle>{t.YOU_HAVE_CLAIMED_NFT}</AlertTitle>
                 </Alert>
+              )}
+              {mintedNftImageURL && (
+                <Image
+                  src={mintedNftImageURL}
+                  width="400"
+                  height="400"
+                  objectFit="contain"
+                />
               )}
             </LoginRequired>
           </>
