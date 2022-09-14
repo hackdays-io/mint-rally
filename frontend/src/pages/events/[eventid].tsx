@@ -13,6 +13,7 @@ import {
   Flex,
   Link,
   Image,
+  VStack,
 } from "@chakra-ui/react";
 import { BigNumber } from "ethers";
 import { useRouter } from "next/router";
@@ -24,11 +25,14 @@ import {
   useGetOwnedNFTs,
 } from "../../hooks/useMintNFTManager";
 import dayjs from "dayjs";
+import { useReward } from 'react-rewards';
 
 const Event = () => {
   const router = useRouter();
   const { eventid } = router.query;
   const { event, loading: loadingFetch } = useGetEventById(Number(eventid));
+  const {reward: confettiReward} = useReward('confettiReward', 'confetti');
+  const {reward: balloonsReward} = useReward('balloonsReward', 'balloons');
   // const { ownedNFTs, loading, getOwnedNFTs } = useGetOwnedNFTs();
 
   const {
@@ -53,6 +57,15 @@ const Event = () => {
       secretPhrase: enteredSecretPhrase,
     });
   };
+
+  const emitConfetti = () => {
+    confettiReward();
+    balloonsReward();
+  };
+
+  useEffect(() => {
+    emitConfetti();
+  }, [mintedNftImageURL]);
 
   // const hasNftForThisEvent = useMemo(() => {
   //   return ownedNFTs.some(
@@ -125,19 +138,31 @@ const Event = () => {
                 <AlertDescription>{mintErrors.message}</AlertDescription>
               </Alert>
             )}
-            {mintStatus && (
+            {mintStatus && !mintedNftImageURL && (
               <Alert status="success" mt={3}>
                 <AlertIcon />
-                <AlertTitle>You have claimed NFT!</AlertTitle>
+                <AlertTitle>You have claimed NFT! Please wait for `mint` your NFT... </AlertTitle>
               </Alert>
             )}
             {mintedNftImageURL && (
-              <Image
-                src={mintedNftImageURL}
-                width="400"
-                height="400"
-                objectFit="contain"
-              />
+              <>
+                <Alert status="success" mt={3}>
+                  <AlertIcon />
+                  <AlertTitle>Congratulations!!! You have got your NFT! </AlertTitle>
+                </Alert>
+                <VStack justify='center'>
+                    <Image
+                      src={mintedNftImageURL}
+                      width="400"
+                      height="400"
+                      objectFit="contain"
+                      alt="minted NFT"
+                      onClick={() =>emitConfetti()}
+                    />
+                    <span id="confettiReward" />
+                    <span id="balloonsReward" />
+                </VStack>
+              </>
             )}
           </>
         )}
