@@ -1,5 +1,5 @@
 import { useAddress } from "@thirdweb-dev/react";
-import { BigNumber, ethers } from "ethers";
+import { BigNumber, ethers, providers } from "ethers";
 import { useEffect, useState } from "react";
 import { useNetworkMismatch, useChainId } from "@thirdweb-dev/react";
 
@@ -15,19 +15,25 @@ export interface IEventRecord {
   groupId: BigNumber;
   name: string;
   description: string;
-  date: Date;
-  startTime: string; // "18:00"
-  endTime: string; // "21:00"
+  date: string;
+  useMtx: boolean;
 }
 export interface INFTImage {
   image: string;
   description: string;
   requiredParticipateCount: number;
 }
+export interface INFTAttribute {
+  name: string;
+  image: string;
+  description: string;
+  external_link: string;
+  traits: { [key: string]: any };
+}
 
 export interface ICreateEventGroupParams {
   groupName: string;
-  images: INFTImage[];
+  nftAttributes: INFTImage[];
 }
 
 export interface ICreateEventRecordParams {
@@ -38,6 +44,9 @@ export interface ICreateEventRecordParams {
   startTime: string; // "18:00"
   endTime: string; // "21:00"
   secretPhrase: string;
+  mintLimit: number;
+  useMtx: boolean;
+  attributes: { metaDataURL: string; requiredParticipateCount: number }[];
 }
 
 export interface IApplyForParticipation {
@@ -48,31 +57,28 @@ export interface IApplyForParticipation {
  * A bridgge to the event manager contract
  */
 export const getEventManagerContract = (config = { signin: false }) => {
-  const { ethereum } = window;
-  if (ethereum) {
-    if (!config.signin) {
-      const provider = new ethers.providers.JsonRpcProvider(provierRpc)
-      const _contract = new ethers.Contract(
-        contractAddress,
-        contract.abi,
-        provider
-      );
-      console.log("Initialize payment with Provider");
-      return _contract;
-    } else {
+  if (!config.signin) {
+    const provider = new ethers.providers.JsonRpcProvider(provierRpc);
+    const _contract = new ethers.Contract(
+      contractAddress,
+      contract.abi,
+      provider
+    );
+    return _contract;
+  } else {
+    const { ethereum } = window;
+    if (ethereum) {
       const provider = new ethers.providers.Web3Provider(ethereum as any);
+
       const signer = provider.getSigner();
       const _contract = new ethers.Contract(
         contractAddress,
         contract.abi,
         signer
       );
-      console.log("Initialize payment with signer");
       return _contract;
-
     }
   }
-  return null;
 };
 
 /**
@@ -83,25 +89,52 @@ export const useCreateEventGroup = () => {
   const [errors, setErrors] = useState<Error | null>(null);
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState(false);
+  const [createdGroupId, setCreatedGroupId] = useState<number | null>(null);
+  const [nftAttributes, setNftAttributes] = useState<INFTImage[]>([]);
+  const address = useAddress();
+
+  useEffect(() => {
+    const eventManager = getEventManagerContract();
+    if (!eventManager) throw "error: contract can't found";
+    const filters = eventManager?.filters.CreatedGroupId(address, null);
+    eventManager.on(filters, (_, _groupId: BigNumber) => {
+      setCreatedGroupId(_groupId.toNumber());
+    });
+
+    return () => {
+      eventManager.removeAllListeners("CreatedGroupId");
+    };
+  }, []);
+
+  useEffect(() => {
+    if (status && createdGroupId !== null) {
+      window.localStorage.setItem(
+        `group${createdGroupId}`,
+        JSON.stringify(nftAttributes)
+      );
+    }
+  }, [status, createdGroupId]);
+
   const createEventGroup = async (params: ICreateEventGroupParams) => {
     try {
+      setNftAttributes(params.nftAttributes);
+      setCreatedGroupId(null);
       setLoading(true);
       setErrors(null);
       const eventManager = getEventManagerContract({ signin: true });
       if (!eventManager) throw "error: contract can't found";
-      const tx = await eventManager.createGroup(
-        params.groupName,
-        params.images
-      );
+      const tx = await eventManager.createGroup(params.groupName);
       await tx.wait();
+
       setLoading(false);
       setStatus(true);
     } catch (e: any) {
-      setErrors(e);
+      setErrors(e.error?.data || "error occured");
       setLoading(false);
     }
   };
-  return { status, errors, loading, createEventGroup };
+
+  return { status, errors, loading, createEventGroup, createdGroupId };
 };
 /**
  * custom hook function for getting all event groups
@@ -114,7 +147,6 @@ export const useEventGroups = () => {
 
   useEffect(() => {
     const getEventGroups = async () => {
-      console.log("get event groups");
       const eventManager = getEventManagerContract();
       if (!eventManager) throw "error";
       setLoading(true);
@@ -162,27 +194,36 @@ export const useCreateEventRecord = () => {
   const [errors, setErrors] = useState<Error | null>(null);
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState(false);
+
   const createEventRecord = async (params: ICreateEventRecordParams) => {
     setErrors(null);
     try {
+      const { ethereum } = window;
       const eventManager = getEventManagerContract({ signin: true });
       if (!eventManager) throw "error: contract can't found";
       setLoading(true);
       const datestr = params.date.toLocaleDateString();
+      const provider = new ethers.providers.Web3Provider(ethereum as any);
+      const gasPrice = (await provider.getGasPrice()).toNumber();
+      const value = gasPrice * params.mintLimit * 250000 * 2.1;
       const tx = await eventManager.createEventRecord(
-        params.groupId,
+        Number(params.groupId),
         params.eventName,
         params.description,
-        datestr,
-        params.startTime,
-        params.endTime,
-        params.secretPhrase
+        `${datestr} ${params.startTime}~${params.endTime}`,
+        params.mintLimit,
+        params.useMtx,
+        params.secretPhrase,
+        params.attributes,
+        {
+          value: params.useMtx ? value : 0,
+        }
       );
       await tx.wait();
       setLoading(false);
       setStatus(true);
     } catch (e: any) {
-      setErrors(e);
+      setErrors(e.error?.data || "error occured");
       setLoading(false);
     }
   };
@@ -203,7 +244,6 @@ export const useEventRecords = () => {
     setErrors(null);
     const getEventRecords = async () => {
       try {
-        console.log("get event records");
         const eventManager = getEventManagerContract();
         if (!eventManager) throw "error";
         setLoading(true);
@@ -212,9 +252,8 @@ export const useEventRecords = () => {
         setLoading(false);
         setRecords(data);
       } catch (e: any) {
-        console.log(e)
-        setErrors(e)
-        setLoading(false)
+        setErrors(e.error?.data || "error occured");
+        setLoading(false);
       }
     };
     getEventRecords();
@@ -235,12 +274,10 @@ export const useGetEventById = (eventId: number) => {
   useEffect(() => {
     const getEventById = async () => {
       if (!eventId) return;
-      console.log("get an even record by id");
       const eventManager = getEventManagerContract();
       if (!eventManager) throw "error";
       setLoading(true);
       const data = await eventManager.getEventById(eventId);
-      console.log("retrieved: ", data);
       setLoading(false);
       setEvent(data);
     };
@@ -293,7 +330,7 @@ export const useApplyForParticipation = () => {
       setLoading(false);
       setStatus(true);
     } catch (e: any) {
-      setErrors(e);
+      setErrors(e.error?.data || "error occured");
       setLoading(false);
     }
   };

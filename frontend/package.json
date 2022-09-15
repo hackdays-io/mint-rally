@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:mumbai": "NODE_ENV=test next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -18,7 +19,9 @@
     "@fortawesome/react-fontawesome": "^0.2.0",
     "@thirdweb-dev/react": "^2.4.7",
     "@thirdweb-dev/sdk": "^2.3.23",
+    "axios": "^0.27.2",
     "dayjs": "^1.11.4",
+    "eth-sig-util": "^3.0.1",
     "ethers": "^5.6.9",
     "framer-motion": "^6",
     "next": "12.2.0",
@@ -26,6 +29,8 @@
     "react-dom": "18.2.0",
     "react-feather": "^2.0.10",
     "react-hook-form": "^7.33.1",
+    "react-rewards": "^2.0.4",
+    "wagmi": "^0.6.5",
     "web3.storage": "^4.3.0",
     "web3modal": "^1.9.8",
     "　　　　　": "fortawesome/react-fontawesome"

@@ -1,53 +1,68 @@
+import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { expect } from "chai";
-import { Contract } from "ethers";
+import { BigNumber } from "ethers";
 import { ethers, upgrades } from "hardhat";
 import { EventManager, MintNFT } from "../typechain";
 
-const images = [
+// ToDo requiredParticipateCountに重複がある場合エラーになってしまう。
+const attributes = [
   {
-    image: "https://i.imgur.com/TZEhCTX.png",
-    description: "this is common NFT",
+    metaDataURL: "ipfs://hogehoge/count0.json",
     requiredParticipateCount: 0,
   },
   {
-    image: "https://i.imgur.com/TZEhCTX.png",
-    description: "this is uncommon NFT",
-    requiredParticipateCount: 3,
+    metaDataURL: "ipfs://hogehoge/count1.json",
+    requiredParticipateCount: 1,
   },
   {
-    image: "https://i.imgur.com/TZEhCTX.png",
-    description: "this is special NFT",
-    requiredParticipateCount: 6,
+    metaDataURL: "ipfs://hogehoge/count5.json",
+    requiredParticipateCount: 5,
   },
 ];
 
-describe("EventManager", () => {
+describe("EventManager", function () {
   let mintNFT: MintNFT;
+  let organizer: SignerWithAddress;
+  let participant1: SignerWithAddress;
+  let relayer: SignerWithAddress;
   before(async () => {
+    [organizer, participant1, relayer] = await ethers.getSigners();
     const MintNFTFactory = await ethers.getContractFactory("MintNFT");
-    const deployedMintNFT: any = await upgrades.deployProxy(MintNFTFactory);
+    const deployedMintNFT: any = await upgrades.deployProxy(
+      MintNFTFactory,
+      ["0xdCb93093424447bF4FE9Df869750950922F1E30B"],
+      {
+        initializer: "initialize",
+      }
+    );
     mintNFT = deployedMintNFT;
     await mintNFT.deployed();
   });
 
   describe("CreateEventRecord", () => {
-    it("Should create", async () => {
+    let eventManager: EventManager;
+    before(async () => {
       const eventManagerContractFactory = await ethers.getContractFactory(
         "EventManager"
       );
       const deployedEventManagerContract: any = await upgrades.deployProxy(
-        eventManagerContractFactory
+        eventManagerContractFactory,
+        [relayer.address, 250000, 1000000],
+        {
+          initializer: "initialize",
+        }
       );
-      const eventManager: EventManager =
-        await deployedEventManagerContract.deployed();
+      eventManager = await deployedEventManagerContract.deployed();
       await eventManager.setMintNFTAddr(mintNFT.address);
       await mintNFT.setEventManagerAddr(eventManager.address);
+    });
 
+    it("Should create", async () => {
       // does not exist any groups
       const groupsBeforeCreate = await eventManager.getGroups();
       expect(groupsBeforeCreate.length).to.equal(0);
 
-      const txn1 = await eventManager.createGroup("group1", images);
+      const txn1 = await eventManager.createGroup("group1");
       await txn1.wait();
       const groupsAfterCreate = await eventManager.getGroups();
       expect(groupsAfterCreate.length).to.equal(1);
@@ -61,9 +76,10 @@ describe("EventManager", () => {
         "event1",
         "event1 description",
         "2022-07-3O",
-        "18:00",
-        "21:00",
-        "hackdays"
+        100,
+        false,
+        "hackdays",
+        attributes
       );
       await txn2.wait();
       const eventRecordsAfterCreate = await eventManager.getEventRecords();
@@ -76,8 +92,6 @@ describe("EventManager", () => {
         "event1 description"
       );
       expect(eventRecordsAfterCreate[0].date).to.equal("2022-07-3O");
-      expect(eventRecordsAfterCreate[0].startTime).to.equal("18:00");
-      expect(eventRecordsAfterCreate[0].endTime).to.equal("21:00");
 
       const eventRecord = await eventManager.getEventById(
         eventRecordsAfterCreate[0].eventRecordId.toNumber()
@@ -95,9 +109,10 @@ describe("EventManager", () => {
           "event2",
           "event2 description",
           "2022-08-01",
-          "18:00",
-          "21:00",
-          "hackdays"
+          100,
+          false,
+          "hackdays",
+          attributes
         );
         await txn3.wait();
       } catch (e) {
@@ -107,34 +122,55 @@ describe("EventManager", () => {
         await eventManager.getEventRecords();
       expect(eventRecordsAfterCreateWithInvalidGroupId.length).to.equal(1);
     });
+
+    it("Should create mtx event", async () => {
+      const txn1 = await eventManager.createGroup("group2");
+      await txn1.wait();
+      const groupsAfterCreate = await eventManager.getGroups();
+
+      const txn = await eventManager.createEventRecord(
+        groupsAfterCreate[1].groupId.toNumber(),
+        "event1",
+        "event1 description",
+        "2022-07-3O",
+        10,
+        true,
+        "hackdays",
+        attributes,
+        { value: ethers.utils.parseUnits(String(250000 * 10 * 1.33), "gwei") }
+      );
+      await txn.wait();
+
+      expect(await relayer.getBalance()).equal(
+        BigNumber.from("10000003325000000000000")
+      );
+    });
   });
 
-  describe("GetOwnGroups", () => {
+  describe("GetOwnGroups", async () => {
     it("Should get own group", async () => {
       const eventManagerContractFactory = await ethers.getContractFactory(
         "EventManager"
       );
-
       const deployedEventManagerContract: any = await upgrades.deployProxy(
-        eventManagerContractFactory
+        eventManagerContractFactory,
+        [relayer.address, 500000, 1000000],
+        {
+          initializer: "initialize",
+        }
       );
       const eventManager: EventManager =
         await deployedEventManagerContract.deployed();
       await eventManager.setMintNFTAddr(mintNFT.address);
       await mintNFT.setEventManagerAddr(eventManager.address);
-
-      const [address1, address2] = await ethers.getSigners();
-
       // create group by address1
-      const txn1 = await eventManager
-        .connect(address1)
-        .createGroup("group1", images);
+      const txn1 = await eventManager.connect(organizer).createGroup("group1");
       await txn1.wait();
 
       // create group by address2
       const txn2 = await eventManager
-        .connect(address2)
-        .createGroup("group2", images);
+        .connect(participant1)
+        .createGroup("group2");
       await txn2.wait();
 
       // get all groups
@@ -142,222 +178,18 @@ describe("EventManager", () => {
       expect(allGroups.length).to.equal(2);
 
       // get group by address1
-      const ownGroups = await eventManager.connect(address1).getOwnGroups();
+      const ownGroups = await eventManager.connect(organizer).getOwnGroups();
       expect(ownGroups.length).to.equal(1);
       expect(ownGroups[0].name).to.equal("group1");
 
       // create group by address1
-      const txn3 = await eventManager
-        .connect(address1)
-        .createGroup("group3", images);
+      const txn3 = await eventManager.connect(organizer).createGroup("group3");
       await txn3.wait();
 
-      const ownGroups2 = await eventManager.connect(address1).getOwnGroups();
+      const ownGroups2 = await eventManager.connect(organizer).getOwnGroups();
       expect(ownGroups2.length).to.equal(2);
       expect(ownGroups2[0].name).to.equal("group1");
       expect(ownGroups2[1].name).to.equal("group3");
-    });
-  });
-
-  describe("ApplyForPaticipation", () => {
-    it("Should apply", async () => {
-      const eventManagerContractFactory = await ethers.getContractFactory(
-        "EventManager"
-      );
-
-      const deployedEventManagerContract: any = await upgrades.deployProxy(
-        eventManagerContractFactory
-      );
-      const eventManager: EventManager =
-        await deployedEventManagerContract.deployed();
-      await eventManager.setMintNFTAddr(mintNFT.address);
-      await mintNFT.setEventManagerAddr(eventManager.address);
-
-      // does not exist any groups
-      const groupsBeforeCreate = await eventManager.getGroups();
-      expect(groupsBeforeCreate.length).to.equal(0);
-
-      const txn1 = await eventManager.createGroup("group1", images);
-      await txn1.wait();
-
-      const groupsAfterCreate = await eventManager.getGroups();
-
-      const txn2 = await eventManager.createEventRecord(
-        groupsAfterCreate[0].groupId.toNumber(),
-        "event1",
-        "event1 description",
-        "2022-07-3O",
-        "18:00",
-        "21:00",
-        "hackdays"
-      );
-      await txn2.wait();
-      const eventRecordsAfterCreate = await eventManager.getEventRecords();
-
-      const txn3 = await eventManager.applyForParticipation(
-        eventRecordsAfterCreate[0].eventRecordId.toNumber()
-      );
-      await txn3.wait();
-      const participationEvents = await eventManager.getParticipationEventIds();
-      expect(participationEvents.length).to.equal(1);
-
-      const txn4 = await eventManager.createEventRecord(
-        groupsAfterCreate[0].groupId.toNumber(),
-        "event1",
-        "event1 description",
-        "2022-08-3O",
-        "18:00",
-        "21:00",
-        "hackdays"
-      );
-      await txn4.wait();
-      const participationEvents2 =
-        await eventManager.getParticipationEventIds();
-      expect(participationEvents2.length).to.equal(1);
-
-      const eventRecordsAfterCreate2 = await eventManager.getEventRecords();
-      const txn5 = await eventManager.applyForParticipation(
-        eventRecordsAfterCreate2[0].eventRecordId.toNumber()
-      );
-      await txn5.wait();
-
-      const participationEvents3 =
-        await eventManager.getParticipationEventIds();
-      expect(participationEvents3.length).to.equal(2);
-    });
-  });
-
-  describe("countParticipants", () => {
-    it("Should count participants", async () => {
-      const eventManagerContractFactory = await ethers.getContractFactory(
-        "EventManager"
-      );
-
-      const deployedEventManagerContract: any = await upgrades.deployProxy(
-        eventManagerContractFactory
-      );
-      const eventManager: EventManager =
-        await deployedEventManagerContract.deployed();
-      await eventManager.setMintNFTAddr(mintNFT.address);
-      await mintNFT.setEventManagerAddr(eventManager.address);
-
-      const [address1] = await ethers.getSigners();
-
-      const txn1 = await eventManager.createGroup("group1", images);
-      await txn1.wait();
-
-      const groupsAfterCreate = await eventManager.getGroups();
-      const txn2 = await eventManager.createEventRecord(
-        groupsAfterCreate[0].groupId.toNumber(),
-        "event1",
-        "event1 description",
-        "2022-07-3O",
-        "18:00",
-        "21:00",
-        "hackdays"
-      );
-      await txn2.wait();
-      const eventRecord1 = await eventManager.getEventRecords();
-
-      const txn3 = await eventManager.applyForParticipation(
-        eventRecord1[0].eventRecordId.toNumber()
-      );
-      await txn3.wait();
-      let participationsCount = await eventManager
-        .connect(address1)
-        .countParticipationByGroup(
-          address1.address,
-          groupsAfterCreate[0].groupId.toNumber()
-        );
-      expect(participationsCount.toNumber()).to.equal(1);
-
-      const txn4 = await eventManager.createEventRecord(
-        groupsAfterCreate[0].groupId.toNumber(),
-        "event2",
-        "event2 description",
-        "2022-08-3O",
-        "18:00",
-        "21:00",
-        "hackdays"
-      );
-      await txn4.wait();
-      const eventRecord2 = await eventManager.getEventRecords();
-
-      const txn5 = await eventManager
-        .connect(address1)
-        .applyForParticipation(eventRecord2[1].eventRecordId.toNumber());
-      await txn5.wait();
-      participationsCount = await eventManager.countParticipationByGroup(
-        address1.address,
-        groupsAfterCreate[0].groupId.toNumber()
-      );
-      expect(participationsCount.toNumber()).to.equal(2);
-    });
-  });
-
-  describe("verifySecretPhrase", () => {
-    it("Should count participants", async () => {
-      const eventManagerContractFactory = await ethers.getContractFactory(
-        "EventManager"
-      );
-
-      const deployedEventManagerContract: any = await upgrades.deployProxy(
-        eventManagerContractFactory
-      );
-      const eventManager: EventManager =
-        await deployedEventManagerContract.deployed();
-      await eventManager.setMintNFTAddr(mintNFT.address);
-      await mintNFT.setEventManagerAddr(eventManager.address);
-
-      const txn1 = await eventManager.createGroup("group1", images);
-      await txn1.wait();
-
-      const groups = await eventManager.getGroups();
-
-      const txn2 = await eventManager.createEventRecord(
-        groups[0].groupId.toNumber(),
-        "event1",
-        "event1 description",
-        "2022-07-3O",
-        "18:00",
-        "21:00",
-        "hackdays"
-      );
-      await txn2.wait();
-      const eventRecord1 = await eventManager.getEventRecords();
-
-      const wrongPhrase = "wrong phrase";
-      const resultWithWrongPhrase = await eventManager.verifySecretPhrase(
-        wrongPhrase,
-        eventRecord1[0].eventRecordId.toNumber()
-      );
-      expect(resultWithWrongPhrase).to.equal(false);
-
-      const correctPhrase = "hackdays";
-      const resultWithCorrectPhrase = await eventManager.verifySecretPhrase(
-        correctPhrase,
-        eventRecord1[0].eventRecordId.toNumber()
-      );
-      expect(resultWithCorrectPhrase).to.equal(true);
-    });
-  });
-
-  describe("test connection", () => {
-    it("Should return true", async () => {
-      const eventManagerContractFactory = await ethers.getContractFactory(
-        "EventManager"
-      );
-
-      const deployedEventManagerContract: any = await upgrades.deployProxy(
-        eventManagerContractFactory
-      );
-      const eventManager: EventManager =
-        await deployedEventManagerContract.deployed();
-      await eventManager.setMintNFTAddr(mintNFT.address);
-      await mintNFT.setEventManagerAddr(eventManager.address);
-
-      const result = await eventManager.testConnection();
-      expect(result).to.equal("Test connection successful");
     });
   });
 });
