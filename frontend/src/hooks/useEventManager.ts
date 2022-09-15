@@ -223,6 +223,7 @@ export const useCreateEventRecord = () => {
       setLoading(false);
       setStatus(true);
     } catch (e: any) {
+      console.log(e);
       setErrors(e.error?.data || "error occured");
       setLoading(false);
     }

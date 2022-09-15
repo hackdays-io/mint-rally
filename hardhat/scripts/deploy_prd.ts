@@ -5,12 +5,11 @@
 // Runtime Environment's members available in the global scope.
 import { writeFileSync } from "fs";
 import { ethers, upgrades } from "hardhat";
-// import { MintNFT, EventManager } from "../typechain";
+import { MintNFT, EventManager } from "../typechain";
 
 async function main() {
-  // FIXME can't use types cause deployProxy return "Contract" type. it's different from below types.
-  // let mintNFT: MintNFT;
-  // let eventManager: EventManager;
+  let mintNFT: MintNFT;
+  let eventManager: EventManager;
 
   const ForwarderFactory = await ethers.getContractFactory(
     "MintRallyForwarder"
@@ -18,15 +17,25 @@ async function main() {
   const forwarder = await ForwarderFactory.deploy();
   await forwarder.deployed();
   const MintNFTFactory = await ethers.getContractFactory("MintNFT");
-  // mintNFT = await MintNFT.deploy();
-  const mintNFT = await upgrades.deployProxy(MintNFTFactory, [
-    forwarder.address,
-  ]);
+  const deployedMintNFT: any = await upgrades.deployProxy(
+    MintNFTFactory,
+    [forwarder.address],
+    {
+      initializer: "initialize",
+    }
+  );
+  mintNFT = deployedMintNFT;
   await mintNFT.deployed();
 
   const EventManagerFactory = await ethers.getContractFactory("EventManager");
-  // eventManager = await EventManager.deploy();
-  const eventManager = await upgrades.deployProxy(EventManagerFactory);
+  const deployedEventManager: any = await upgrades.deployProxy(
+    EventManagerFactory,
+    [process.env.POLYGON_RELAYER_ADDRESS, 250000, 1000000],
+    {
+      initializer: "initialize",
+    }
+  );
+  eventManager = deployedEventManager;
   await eventManager.deployed();
 
   await mintNFT.setEventManagerAddr(eventManager.address);
@@ -34,7 +43,11 @@ async function main() {
 
   console.log("forwarder address:", forwarder.address);
   console.log("mintNFT address:", mintNFT.address);
-  console.log("eventManager address:", eventManager.address);
+  console.log("eventManager address:", eventManager.address, "\n");
+  console.log("----------\nFor frontEnd\n----------");
+  console.log("NEXT_PUBLIC_FORWARDER_ADDRESS=", forwarder.address);
+  console.log("NEXT_PUBLIC_CONTRACT_MINT_NFT_MANAGER=", mintNFT.address);
+  console.log("NEXT_PUBLIC_CONTRACT_EVENT_MANAGER=", eventManager.address);
 
   writeFileSync(
     "artifacts/deployed_contract_addr.json",
