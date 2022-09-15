@@ -63,6 +63,10 @@ export const useMintParticipateNFT = () => {
     mintNFTManager.on(filters, (_, _nftAttributeLink: string) => {
       setNftAttributeLink(_nftAttributeLink);
     });
+
+    return () => {
+      mintNFTManager.removeAllListeners("MintedNFTAttributeURL");
+    };
   }, []);
 
   useEffect(() => {
