@@ -2,6 +2,7 @@ import { expect } from "chai";
 import { ethers, upgrades } from "hardhat";
 import { MintNFT, EventManager } from "../typechain";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
+import { BigNumber } from "ethers";
 
 // ToDo requiredParticipateCountに重複がある場合エラーになってしまう。
 const attributes = [
@@ -26,7 +27,14 @@ describe("MintNFT", function () {
   let createdGroupId: number;
   let createdEventIds: number[] = [];
 
+  let organizer: SignerWithAddress;
+  let participant1: SignerWithAddress;
+  let participant2: SignerWithAddress;
+  let relayer: SignerWithAddress;
+
   before(async () => {
+    [organizer, participant1, participant2, relayer] =
+      await ethers.getSigners();
     //Deploy mintNFT and eventManager
     const MintNFTFactory = await ethers.getContractFactory("MintNFT");
     const deployedMintNFT: any = await upgrades.deployProxy(
@@ -39,7 +47,13 @@ describe("MintNFT", function () {
     mintNFT = deployedMintNFT;
     await mintNFT.deployed();
     const EventManager = await ethers.getContractFactory("EventManager");
-    const deployedEventManager: any = await upgrades.deployProxy(EventManager);
+    const deployedEventManager: any = await upgrades.deployProxy(
+      EventManager,
+      [relayer.address, 250000, 1000000],
+      {
+        initializer: "initialize",
+      }
+    );
     eventManager = deployedEventManager;
     await eventManager.deployed();
     await mintNFT.setEventManagerAddr(eventManager.address);
@@ -55,21 +69,23 @@ describe("MintNFT", function () {
       "event1",
       "event1 description",
       "2022-07-3O",
-      100,
-      false,
+      10,
+      true,
       "hackdays",
-      attributes
+      attributes,
+      {
+        value: ethers.utils.parseUnits(String(250000 * 10 * 1.33), "gwei"),
+      }
     );
     await createEventTxn.wait();
     const eventsList = await eventManager.getEventRecords();
     createdEventIds.push(eventsList[0].eventRecordId.toNumber());
+    console.log(await relayer.getBalance());
   });
 
   describe("mint NFT", async () => {
-    const [owner1] = await ethers.getSigners();
-
     const mintNftTxn = await mintNFT
-      .connect(owner1)
+      .connect(organizer)
       .mintParticipateNFT(createdGroupId, createdEventIds[0], "hackdays");
     await mintNftTxn.wait();
 
@@ -87,15 +103,9 @@ describe("MintNFT", function () {
   // });
 
   describe("NFT evolution", () => {
-    let owner1: SignerWithAddress;
-    let owner2: SignerWithAddress;
     let anotherGroupId: number;
     let createdEventIds: number[] = [];
     before(async () => {
-      const signers = await ethers.getSigners();
-      owner1 = signers[0];
-      owner2 = signers[1];
-
       const txn1 = await eventManager.createGroup("AnotherGroup");
       await txn1.wait();
       const groupsList = await eventManager.getGroups();
@@ -130,7 +140,7 @@ describe("MintNFT", function () {
       createdEventIds.push(createdEventsList[2].eventRecordId.toNumber());
 
       const mintTxn1 = await mintNFT
-        .connect(owner1)
+        .connect(organizer)
         .mintParticipateNFT(
           anotherGroupId,
           createdEventIds[0],
@@ -139,7 +149,7 @@ describe("MintNFT", function () {
       await mintTxn1.wait();
 
       const mintTxn2 = await mintNFT
-        .connect(owner1)
+        .connect(organizer)
         .mintParticipateNFT(
           anotherGroupId,
           createdEventIds[1],
@@ -156,7 +166,7 @@ describe("MintNFT", function () {
     it("doesn't mint NFT for an event once attended to the same person twice", async () => {
       await expect(
         mintNFT
-          .connect(owner1)
+          .connect(organizer)
           .mintParticipateNFT(
             anotherGroupId,
             createdEventIds[0],
@@ -168,7 +178,7 @@ describe("MintNFT", function () {
     it("doesn't mint NFT if there are no remaining count", async () => {
       await expect(
         mintNFT
-          .connect(owner2)
+          .connect(participant1)
           .mintParticipateNFT(
             anotherGroupId,
             createdEventIds[1],
