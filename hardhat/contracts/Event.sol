@@ -5,6 +5,7 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "./IMintNFT.sol";
+import "hardhat/console.sol";
 
 contract EventManager is OwnableUpgradeable {
     struct Group {
@@ -34,29 +35,58 @@ contract EventManager is OwnableUpgradeable {
     mapping(uint256 => uint256[]) private eventIdsByGroupId;
     mapping(uint256 => uint256) private groupIdByEventId;
 
+    // Mint nft contract address
     address private mintNFTAddr;
-
-    event CreatedGroupId(address indexed owner, uint256 groupId);
+    // Relayer address for meta transaction
+    address private relayerAddr;
+    // price for mtx per mint
+    uint256 private mtxPrice;
+    // max mint limit
+    uint256 private maxMintLimit;
 
     function setMintNFTAddr(address _mintNftAddr) public onlyOwner {
         require(_mintNftAddr != address(0), "mint nft address is blank");
         mintNFTAddr = _mintNftAddr;
     }
 
-    function initialize() public initializer {
+    function setRelayerAddr(address _relayerAddr) public onlyOwner {
+        require(_relayerAddr != address(0), "relayer address is blank");
+        relayerAddr = _relayerAddr;
+    }
+
+    function setMtxPrice(uint256 _price) public onlyOwner {
+        require(_price != 0, "price is 0");
+        mtxPrice = _price;
+    }
+
+    function setMaxMintLimit(uint256 _mintLimit) public onlyOwner {
+        require(_mintLimit != 0, "mint limit is 0");
+        maxMintLimit = _mintLimit;
+    }
+
+    event CreatedGroupId(address indexed owner, uint256 groupId);
+
+    function initialize(
+        address _relayerAddr,
+        uint256 _mtxPrice,
+        uint256 _maxMintLimit
+    ) public initializer {
         __Ownable_init();
         _groupIds.increment();
         _eventRecordIds.increment();
+        setRelayerAddr(_relayerAddr);
+        setMtxPrice(_mtxPrice);
+        setMaxMintLimit(_maxMintLimit);
     }
 
     function createGroup(string memory _name) external {
         uint256 _newGroupId = _groupIds.current();
+        _groupIds.increment();
 
         groups.push(
             Group({groupId: _newGroupId, ownerAddress: msg.sender, name: _name})
         );
         ownGroupIds[msg.sender].push(_newGroupId);
-        _groupIds.increment();
 
         emit CreatedGroupId(msg.sender, _newGroupId);
     }
@@ -93,7 +123,12 @@ contract EventManager is OwnableUpgradeable {
         bool _useMtx,
         string memory _secretPhrase,
         IMintNFT.NFTAttribute[] memory _eventNFTAttributes
-    ) external {
+    ) external payable {
+        require(
+            _mintLimit > 0 && _mintLimit <= maxMintLimit,
+            "mint limit is invalid"
+        );
+
         bool _isGroupOwner = false;
         for (uint256 _i = 0; _i < ownGroupIds[msg.sender].length; _i++) {
             if (ownGroupIds[msg.sender][_i] == _groupId) {
@@ -102,7 +137,15 @@ contract EventManager is OwnableUpgradeable {
         }
         require(_isGroupOwner, "You are not group owner");
 
+        if (_useMtx) {
+            uint256 depositPrice = (_mintLimit * tx.gasprice * mtxPrice);
+            require(msg.value >= depositPrice, "Not enough value");
+            (bool success, ) = (relayerAddr).call{value: depositPrice}("");
+            require(success, "transfer failed");
+        }
+
         uint256 _newEventId = _eventRecordIds.current();
+        _eventRecordIds.increment();
 
         eventRecords.push(
             EventRecord({
@@ -126,7 +169,6 @@ contract EventManager is OwnableUpgradeable {
 
         eventIdsByGroupId[_groupId].push(_newEventId);
         groupIdByEventId[_newEventId] = _groupId;
-        _eventRecordIds.increment();
     }
 
     function getEventRecords() public view returns (EventRecord[] memory) {

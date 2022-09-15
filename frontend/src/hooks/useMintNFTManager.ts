@@ -100,9 +100,7 @@ export const useMintParticipateNFT = () => {
       address,
       null
     );
-    alert("Event Listener is OK!");
     mintNFTManager.on(filters, (_, _nftAttributeLink: string) => {
-      alert("Minted!");
       setNftAttributeLink(_nftAttributeLink);
     });
   }, []);
