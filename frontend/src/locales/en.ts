@@ -21,5 +21,10 @@ export default {
   YOU_HAVE_CLAIMED_NFT:
     "You have claimed NFT! Please wait for mint your NFT...",
   YOU_HAVE_GOT_NFT: "You got NFT!!",
+  INSTALL_METAMASK_TITLE: "Please install MetaMask",
+  INSTALL_METAMASK_NEED: "MetaMask is required in order to get NFT.",
+  INSTALL_METAMASK_DESC:
+    "If you are using a PC, install the extension in your browser. If you are using a smartphone, please install MetaMask and use the in-app browser.",
+  INSTALL_METAMASK_BUTTON: "Move to MetaMask",
   // ...
 };
