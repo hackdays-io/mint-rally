@@ -26,13 +26,9 @@ const EventGroups: NextPage = () => {
         <Flex alignItems="bottom" paddingBottom={6}>
           <Heading>{t.EVENTGROUPS}</Heading>
           <Spacer></Spacer>
-          <Button
-            onClick={() => {
-              window.location.href = "/event-groups/new";
-            }}
-          >
-            {t.CREATE_NEW_EVENT_GROUP}
-          </Button>
+          <Link href="/event-groups/new">
+            <Button>{t.CREATE_NEW_EVENT_GROUP}</Button>
+          </Link>
         </Flex>
         {loading ? (
           <Spinner></Spinner>

@@ -18,7 +18,7 @@ import {
   Container,
 } from "@chakra-ui/react";
 import type { NextPage } from "next";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Web3Storage } from "web3.storage";
 import { useCreateEventGroup, INFTImage } from "../../hooks/useEventManager";
 import ImageSelectorWithPreview from "../../components/ImageSelectorWithPreview";
@@ -47,6 +47,8 @@ interface PaticipateNftRecord {
 
 const NewEventGroupPage: NextPage = () => {
   const [groupName, setGroupName] = useState("");
+  const { status, errors, loading, createEventGroup, createdGroupId } =
+    useCreateEventGroup();
 
   const [nftRecords, setNftRecords] = useState([
     {
@@ -68,8 +70,6 @@ const NewEventGroupPage: NextPage = () => {
       requiredParticipateCount: 10,
     },
   ] as PaticipateNftRecord[]);
-
-  const { status, errors, loading, createEventGroup } = useCreateEventGroup();
 
   const isAllInputed = useCallback(
     () =>
@@ -97,7 +97,7 @@ const NewEventGroupPage: NextPage = () => {
     const rootCid = await ipfsClient.put(
       renamedFiles.map((f) => f.fileObject),
       {
-        name: `test ${new Date().toISOString()}`,
+        name: `${new Date().toISOString()}`,
         maxRetries: 3,
         wrapWithDirectory: true,
         onRootCidReady: (rootCid) => {
@@ -119,18 +119,15 @@ const NewEventGroupPage: NextPage = () => {
       return;
     }
     const { rootCid, renamedFiles } = uploadResult;
-    const nftImages: INFTImage[] = renamedFiles.map(
+    const nftAttributes: INFTImage[] = renamedFiles.map(
       ({ fileObject, description, requiredParticipateCount }) => ({
         image: `ipfs://${rootCid}/${fileObject.name}`,
         description: description,
         requiredParticipateCount,
       })
     );
-    await callCreateEventGroup(nftImages);
-  };
 
-  const callCreateEventGroup = async (nftImages: INFTImage[]) => {
-    await createEventGroup({ groupName: groupName, images: nftImages });
+    await createEventGroup({ groupName, nftAttributes });
   };
 
   return (
