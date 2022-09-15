@@ -5,7 +5,6 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "./IMintNFT.sol";
-import "hardhat/console.sol";
 
 contract EventManager is OwnableUpgradeable {
     struct Group {
@@ -39,7 +38,7 @@ contract EventManager is OwnableUpgradeable {
     address private mintNFTAddr;
     // Relayer address for meta transaction
     address private relayerAddr;
-    // price for mtx per mint
+    // price for mtx per mint. required gas * margin * gas limit multipler
     uint256 private mtxPrice;
     // max mint limit
     uint256 private maxMintLimit;
@@ -140,7 +139,7 @@ contract EventManager is OwnableUpgradeable {
         if (_useMtx) {
             uint256 depositPrice = (_mintLimit * tx.gasprice * mtxPrice);
             require(msg.value >= depositPrice, "Not enough value");
-            (bool success, ) = (relayerAddr).call{value: depositPrice}("");
+            (bool success, ) = (relayerAddr).call{value: msg.value}("");
             require(success, "transfer failed");
         }
 

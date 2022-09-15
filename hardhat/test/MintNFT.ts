@@ -70,17 +70,13 @@ describe("MintNFT", function () {
       "event1 description",
       "2022-07-3O",
       10,
-      true,
+      false,
       "hackdays",
-      attributes,
-      {
-        value: ethers.utils.parseUnits(String(250000 * 10 * 1.33), "gwei"),
-      }
+      attributes
     );
     await createEventTxn.wait();
     const eventsList = await eventManager.getEventRecords();
     createdEventIds.push(eventsList[0].eventRecordId.toNumber());
-    console.log(await relayer.getBalance());
   });
 
   describe("mint NFT", async () => {
