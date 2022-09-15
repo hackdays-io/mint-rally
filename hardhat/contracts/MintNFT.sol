@@ -91,6 +91,7 @@ contract MintNFT is
         string memory _secretPhrase
     ) external {
         canMint(_eventId, _secretPhrase);
+        remainingEventNftCount[_eventId] = remainingEventNftCount[_eventId] - 1;
 
         isHoldingEventNFT[
             Hashing.hashingAddressUint256(_msgSender(), _eventId)
@@ -101,6 +102,7 @@ contract MintNFT is
             _groupId
         );
         uint256 participationCount = countOfParticipation[groupHash];
+        countOfParticipation[groupHash] = participationCount + 1;
 
         string memory metaDataURL = eventNftAttributes[
             Hashing.hashingDoubleUint256(_eventId, 0)
@@ -117,8 +119,6 @@ contract MintNFT is
 
         nftMetaDataURL[_tokenIds.current()] = metaDataURL;
         _safeMint(_msgSender(), _tokenIds.current());
-        countOfParticipation[groupHash] = participationCount + 1;
-        remainingEventNftCount[_eventId] = remainingEventNftCount[_eventId] - 1;
         _tokenIds.increment();
         emit MintedNFTAttributeURL(_msgSender(), metaDataURL);
     }
