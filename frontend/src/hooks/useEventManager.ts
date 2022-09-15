@@ -102,6 +102,10 @@ export const useCreateEventGroup = () => {
     eventManager.on(filters, (_, _groupId: BigNumber) => {
       setCreatedGroupId(_groupId.toNumber());
     });
+
+    return () => {
+      eventManager.removeAllListeners("CreatedGroupId");
+    };
   }, []);
 
   useEffect(() => {
