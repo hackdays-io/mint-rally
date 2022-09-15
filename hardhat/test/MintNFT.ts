@@ -182,5 +182,17 @@ describe("MintNFT", function () {
           )
       ).to.be.revertedWith("remaining count is zero");
     });
+
+    it("doesn't mint NFT if wrong secret phrase", async () => {
+      await expect(
+        mintNFT
+          .connect(participant2)
+          .mintParticipateNFT(
+            anotherGroupId,
+            createdEventIds[1],
+            "hackdays2secrettest"
+          )
+      ).to.be.revertedWith("invalid secret phrase");
+    });
   });
 });

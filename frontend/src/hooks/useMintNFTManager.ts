@@ -154,6 +154,8 @@ export const useMintParticipateNFT = () => {
       );
       const signer = provider.getSigner();
 
+      await mintNFTManager.canMint(eventId, secretPhrase);
+
       if (mtx) {
         await sentMetaTx(
           mintNFTManager,
@@ -167,7 +169,7 @@ export const useMintParticipateNFT = () => {
       }
       setStatus(true);
     } catch (e: any) {
-      setErrors(e.error.data);
+      setErrors(e.error?.data || "error occured");
       setLoading(false);
     }
   };
