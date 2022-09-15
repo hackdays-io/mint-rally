@@ -23,6 +23,7 @@ import {
 import LoginRequired from "../../components/atoms/web3/LoginRequired";
 import { useLocale } from "../../hooks/useLocale";
 import { useReward } from "react-rewards";
+import InstallWalletAlert from "../../components/molecules/web3/InstallWalletAlert";
 
 const Event = () => {
   const router = useRouter();
@@ -166,6 +167,7 @@ const Event = () => {
           </>
         )}
       </Container>
+      <InstallWalletAlert />
     </>
   );
 };

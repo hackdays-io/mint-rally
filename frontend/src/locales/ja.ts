@@ -21,5 +21,9 @@ export default {
   USE_MTX: "（ガス代はかかりません）",
   YOU_HAVE_CLAIMED_NFT: "NFT取得まであともう少々お待ちください...",
   YOU_HAVE_GOT_NFT: "NFTを取得できました！！",
-  // ...
+  INSTALL_METAMASK_TITLE: "Metamaskをインストールしてください。",
+  INSTALL_METAMASK_NEED: "NFTを取得するためにはMetaMaskが必要です。",
+  INSTALL_METAMASK_DESC:
+    "PCをお使いの場合はブラウザに拡張機能をインストールしてください。スマートフォンをお使いの場合はMetaMaskをインストールして、アプリ内ブラウザをご利用ください。",
+  INSTALL_METAMASK_BUTTON: "MetaMaskを使う",
 };

@@ -64,7 +64,6 @@ export const getEventManagerContract = (config = { signin: false }) => {
       contract.abi,
       provider
     );
-    console.log("Initialize payment with Provider");
     return _contract;
   } else {
     const { ethereum } = window;
@@ -77,7 +76,6 @@ export const getEventManagerContract = (config = { signin: false }) => {
         contract.abi,
         signer
       );
-      console.log("Initialize payment with signer");
       return _contract;
     }
   }
@@ -278,12 +276,10 @@ export const useGetEventById = (eventId: number) => {
   useEffect(() => {
     const getEventById = async () => {
       if (!eventId) return;
-      console.log("get an even record by id");
       const eventManager = getEventManagerContract();
       if (!eventManager) throw "error";
       setLoading(true);
       const data = await eventManager.getEventById(eventId);
-      console.log("retrieved: ", data);
       setLoading(false);
       setEvent(data);
     };

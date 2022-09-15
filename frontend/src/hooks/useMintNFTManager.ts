@@ -55,7 +55,7 @@ export const useMintParticipateNFT = () => {
 
   useEffect(() => {
     const mintNFTManager = getMintNFTManagerContract();
-    if (!mintNFTManager) throw new Error("Cannot find mintNFTManager contract");
+    if (!mintNFTManager) return;
     const filters = mintNFTManager?.filters.MintedNFTAttributeURL(
       address,
       null
