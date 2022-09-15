@@ -1,4 +1,6 @@
+import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { expect } from "chai";
+import { BigNumber } from "ethers";
 import { ethers, upgrades } from "hardhat";
 import { EventManager, MintNFT } from "../typechain";
 
@@ -18,9 +20,13 @@ const attributes = [
   },
 ];
 
-describe("EventManager", () => {
+describe("EventManager", function () {
   let mintNFT: MintNFT;
+  let organizer: SignerWithAddress;
+  let participant1: SignerWithAddress;
+  let relayer: SignerWithAddress;
   before(async () => {
+    [organizer, participant1, relayer] = await ethers.getSigners();
     const MintNFTFactory = await ethers.getContractFactory("MintNFT");
     const deployedMintNFT: any = await upgrades.deployProxy(
       MintNFTFactory,
@@ -34,18 +40,24 @@ describe("EventManager", () => {
   });
 
   describe("CreateEventRecord", () => {
-    it("Should create", async () => {
+    let eventManager: EventManager;
+    before(async () => {
       const eventManagerContractFactory = await ethers.getContractFactory(
         "EventManager"
       );
       const deployedEventManagerContract: any = await upgrades.deployProxy(
-        eventManagerContractFactory
+        eventManagerContractFactory,
+        [relayer.address, 250000, 1000000],
+        {
+          initializer: "initialize",
+        }
       );
-      const eventManager: EventManager =
-        await deployedEventManagerContract.deployed();
+      eventManager = await deployedEventManagerContract.deployed();
       await eventManager.setMintNFTAddr(mintNFT.address);
       await mintNFT.setEventManagerAddr(eventManager.address);
+    });
 
+    it("Should create", async () => {
       // does not exist any groups
       const groupsBeforeCreate = await eventManager.getGroups();
       expect(groupsBeforeCreate.length).to.equal(0);
@@ -110,30 +122,55 @@ describe("EventManager", () => {
         await eventManager.getEventRecords();
       expect(eventRecordsAfterCreateWithInvalidGroupId.length).to.equal(1);
     });
+
+    it("Should create mtx event", async () => {
+      const txn1 = await eventManager.createGroup("group2");
+      await txn1.wait();
+      const groupsAfterCreate = await eventManager.getGroups();
+
+      const txn = await eventManager.createEventRecord(
+        groupsAfterCreate[1].groupId.toNumber(),
+        "event1",
+        "event1 description",
+        "2022-07-3O",
+        10,
+        true,
+        "hackdays",
+        attributes,
+        { value: ethers.utils.parseUnits(String(250000 * 10 * 1.33), "gwei") }
+      );
+      await txn.wait();
+
+      expect(await relayer.getBalance()).equal(
+        BigNumber.from("10000003049524562500000")
+      );
+    });
   });
 
-  describe("GetOwnGroups", () => {
+  describe("GetOwnGroups", async () => {
     it("Should get own group", async () => {
       const eventManagerContractFactory = await ethers.getContractFactory(
         "EventManager"
       );
-
       const deployedEventManagerContract: any = await upgrades.deployProxy(
-        eventManagerContractFactory
+        eventManagerContractFactory,
+        [relayer.address, 500000, 1000000],
+        {
+          initializer: "initialize",
+        }
       );
       const eventManager: EventManager =
         await deployedEventManagerContract.deployed();
       await eventManager.setMintNFTAddr(mintNFT.address);
       await mintNFT.setEventManagerAddr(eventManager.address);
-
-      const [address1, address2] = await ethers.getSigners();
-
       // create group by address1
-      const txn1 = await eventManager.connect(address1).createGroup("group1");
+      const txn1 = await eventManager.connect(organizer).createGroup("group1");
       await txn1.wait();
 
       // create group by address2
-      const txn2 = await eventManager.connect(address2).createGroup("group2");
+      const txn2 = await eventManager
+        .connect(participant1)
+        .createGroup("group2");
       await txn2.wait();
 
       // get all groups
@@ -141,15 +178,15 @@ describe("EventManager", () => {
       expect(allGroups.length).to.equal(2);
 
       // get group by address1
-      const ownGroups = await eventManager.connect(address1).getOwnGroups();
+      const ownGroups = await eventManager.connect(organizer).getOwnGroups();
       expect(ownGroups.length).to.equal(1);
       expect(ownGroups[0].name).to.equal("group1");
 
       // create group by address1
-      const txn3 = await eventManager.connect(address1).createGroup("group3");
+      const txn3 = await eventManager.connect(organizer).createGroup("group3");
       await txn3.wait();
 
-      const ownGroups2 = await eventManager.connect(address1).getOwnGroups();
+      const ownGroups2 = await eventManager.connect(organizer).getOwnGroups();
       expect(ownGroups2.length).to.equal(2);
       expect(ownGroups2[0].name).to.equal("group1");
       expect(ownGroups2[1].name).to.equal("group3");

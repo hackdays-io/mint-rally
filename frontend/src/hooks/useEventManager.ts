@@ -16,6 +16,7 @@ export interface IEventRecord {
   name: string;
   description: string;
   date: string;
+  useMtx: boolean;
 }
 export interface INFTImage {
   image: string;
@@ -56,19 +57,20 @@ export interface IApplyForParticipation {
  * A bridgge to the event manager contract
  */
 export const getEventManagerContract = (config = { signin: false }) => {
-  const { ethereum } = window;
-  if (ethereum) {
-    if (!config.signin) {
-      const provider = new ethers.providers.JsonRpcProvider(provierRpc);
-      const _contract = new ethers.Contract(
-        contractAddress,
-        contract.abi,
-        provider
-      );
-      console.log("Initialize payment with Provider");
-      return _contract;
-    } else {
+  if (!config.signin) {
+    const provider = new ethers.providers.JsonRpcProvider(provierRpc);
+    const _contract = new ethers.Contract(
+      contractAddress,
+      contract.abi,
+      provider
+    );
+    console.log("Initialize payment with Provider");
+    return _contract;
+  } else {
+    const { ethereum } = window;
+    if (ethereum) {
       const provider = new ethers.providers.Web3Provider(ethereum as any);
+
       const signer = provider.getSigner();
       const _contract = new ethers.Contract(
         contractAddress,
@@ -79,7 +81,6 @@ export const getEventManagerContract = (config = { signin: false }) => {
       return _contract;
     }
   }
-  return null;
 };
 
 /**
@@ -144,7 +145,6 @@ export const useEventGroups = () => {
 
   useEffect(() => {
     const getEventGroups = async () => {
-      console.log("get event groups");
       const eventManager = getEventManagerContract();
       if (!eventManager) throw "error";
       setLoading(true);
@@ -196,10 +196,14 @@ export const useCreateEventRecord = () => {
   const createEventRecord = async (params: ICreateEventRecordParams) => {
     setErrors(null);
     try {
+      const { ethereum } = window;
       const eventManager = getEventManagerContract({ signin: true });
       if (!eventManager) throw "error: contract can't found";
       setLoading(true);
       const datestr = params.date.toLocaleDateString();
+      const provider = new ethers.providers.Web3Provider(ethereum as any);
+      const gasPrice = (await provider.getGasPrice()).toNumber();
+      const value = gasPrice * params.mintLimit * 250000 * 2.1;
       const tx = await eventManager.createEventRecord(
         Number(params.groupId),
         params.eventName,
@@ -208,12 +212,16 @@ export const useCreateEventRecord = () => {
         params.mintLimit,
         params.useMtx,
         params.secretPhrase,
-        params.attributes
+        params.attributes,
+        {
+          value: params.useMtx ? value : 0,
+        }
       );
       await tx.wait();
       setLoading(false);
       setStatus(true);
     } catch (e: any) {
+      console.log(e);
       setErrors(e);
       setLoading(false);
     }
@@ -235,7 +243,6 @@ export const useEventRecords = () => {
     setErrors(null);
     const getEventRecords = async () => {
       try {
-        console.log("get event records");
         const eventManager = getEventManagerContract();
         if (!eventManager) throw "error";
         setLoading(true);

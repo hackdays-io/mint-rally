@@ -11,48 +11,8 @@ export interface IMintParticipateNFTParams {
   groupId: number;
   eventId: number;
   secretPhrase: string;
+  mtx: boolean;
 }
-
-const sentMetaTx = async (
-  mintNFTContract: ethers.Contract,
-  signer: ethers.Signer,
-  groupId: number,
-  eventId: number,
-  secretPhrase: string
-) => {
-  const url = process.env.NEXT_PUBLIC_WEBHOOK_URL;
-  if (!url) throw new Error("Webhook url is required");
-
-  if (!process.env.NEXT_PUBLIC_FORWARDER_ADDRESS)
-    throw new Error("Forwarder address is required");
-
-  const forwarder = new ethers.Contract(
-    process.env.NEXT_PUBLIC_FORWARDER_ADDRESS,
-    FowarderABI.abi,
-    signer
-  );
-
-  const from = await signer.getAddress();
-  const data = mintNFTContract.interface.encodeFunctionData(
-    "mintParticipateNFT",
-    [groupId, eventId, secretPhrase]
-  );
-  const to = mintNFTContract.address;
-
-  if (!signer.provider) throw new Error("Provider is not set");
-
-  const request = await signMetaTxRequest(signer.provider, forwarder, {
-    to,
-    from,
-    data,
-  });
-
-  return fetch(url, {
-    method: "POST",
-    body: JSON.stringify(request),
-    headers: { "Content-Type": "application/json" },
-  });
-};
 
 export interface IOwnedNFT {
   name: string;
@@ -100,9 +60,7 @@ export const useMintParticipateNFT = () => {
       address,
       null
     );
-    alert("Event Listener is OK!");
     mintNFTManager.on(filters, (_, _nftAttributeLink: string) => {
-      alert("Minted!");
       setNftAttributeLink(_nftAttributeLink);
     });
   }, []);
@@ -119,10 +77,66 @@ export const useMintParticipateNFT = () => {
     }
   }, [nftAttributeLink, status]);
 
+  const sentMetaTx = async (
+    mintNFTContract: ethers.Contract,
+    signer: ethers.Signer,
+    groupId: number,
+    eventId: number,
+    secretPhrase: string
+  ) => {
+    const url = process.env.NEXT_PUBLIC_WEBHOOK_URL;
+    if (!url) throw new Error("Webhook url is required");
+
+    if (!process.env.NEXT_PUBLIC_FORWARDER_ADDRESS)
+      throw new Error("Forwarder address is required");
+
+    const forwarder = new ethers.Contract(
+      process.env.NEXT_PUBLIC_FORWARDER_ADDRESS,
+      FowarderABI.abi,
+      signer
+    );
+
+    const from = await signer.getAddress();
+    const data = mintNFTContract.interface.encodeFunctionData(
+      "mintParticipateNFT",
+      [groupId, eventId, secretPhrase]
+    );
+    const to = mintNFTContract.address;
+
+    if (!signer.provider) throw new Error("Provider is not set");
+
+    const request = await signMetaTxRequest(signer.provider, forwarder, {
+      to,
+      from,
+      data,
+    });
+
+    return fetch(url, {
+      method: "POST",
+      body: JSON.stringify(request),
+      headers: { "Content-Type": "application/json" },
+    });
+  };
+
+  const sendNormalTx = async (
+    mintNFTContract: ethers.Contract,
+    groupId: number,
+    eventId: number,
+    secretPhrase: string
+  ) => {
+    const tx = await mintNFTContract.mintParticipateNFT(
+      groupId,
+      eventId,
+      secretPhrase
+    );
+    await tx.wait();
+  };
+
   const mintParticipateNFT = async ({
     groupId,
     eventId,
     secretPhrase,
+    mtx,
   }: IMintParticipateNFTParams) => {
     try {
       setErrors(null);
@@ -136,7 +150,17 @@ export const useMintParticipateNFT = () => {
       );
       const signer = provider.getSigner();
 
-      await sentMetaTx(mintNFTManager, signer, groupId, eventId, secretPhrase);
+      if (mtx) {
+        await sentMetaTx(
+          mintNFTManager,
+          signer,
+          groupId,
+          eventId,
+          secretPhrase
+        );
+      } else {
+        await sendNormalTx(mintNFTManager, groupId, eventId, secretPhrase);
+      }
       setStatus(true);
     } catch (e: any) {
       setErrors(e.error.data);

@@ -5,8 +5,8 @@
   "license": "MIT",
   "scripts": {
     "deploy:main": "npx hardhat run scripts/deploy.ts --network polygon",
-    "deploy:stg": "npx hardhat run scripts/deploy.ts --network mumbai",
-    "deploy:local": "npx hardhat run scripts/deploy.ts --network local",
+    "deploy:stg": "npx hardhat run scripts/deploy_stg.ts --network mumbai",
+    "deploy:local": "npx hardhat run scripts/deploy_local.ts --network local",
     "deploy:mintNFT": "npx hardhat run scripts/deployMintNft.ts --network",
     "compile": "npx hardhat compile",
     "test": "npx hardhat compile && npx hardhat test",
@@ -48,6 +48,7 @@
     "hardhat": "^2.9.9",
     "hardhat-contract-sizer": "^2.6.1",
     "hardhat-gas-reporter": "^1.0.8",
+    "mocha": "^10.0.0",
     "prettier": "^2.3.2",
     "prettier-plugin-solidity": "^1.0.0-beta.13",
     "rollup": "^2.78.1",
