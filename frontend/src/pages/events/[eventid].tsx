@@ -64,6 +64,7 @@ const Event = () => {
       groupId: event.groupId.toNumber(),
       eventId: event.eventRecordId.toNumber(),
       secretPhrase: enteredSecretPhrase,
+      mtx: event.useMtx,
     });
     // TODO: add event listener for minting
   };
@@ -129,6 +130,9 @@ const Event = () => {
                     rounded="full"
                   >
                     {t.CLAIM_NFT}
+                    <Text as="span" fontSize="10px">
+                      {event.useMtx ? t.USE_MTX : ""}
+                    </Text>
                   </Button>
                 </Flex>
               )}
