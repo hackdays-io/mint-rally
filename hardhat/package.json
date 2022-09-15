@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "deploy:main": "npx hardhat run scripts/deploy.ts --network polygon",
+    "deploy:main": "npx hardhat run scripts/deploy_prd.ts --network polygon",
     "deploy:stg": "npx hardhat run scripts/deploy_stg.ts --network mumbai",
     "deploy:local": "npx hardhat run scripts/deploy_local.ts --network local",
     "deploy:mintNFT": "npx hardhat run scripts/deployMintNft.ts --network",
@@ -14,7 +14,8 @@
     "slither": "slither . --solc-remaps '@openzeppelin=node_modules/@openzeppelin' --exclude naming-convention,external-function,low-level-calls",
     "size": "npx hardhat size-contracts",
     "build": "rollup -c",
-    "upload": "yarn build && node scripts/upload.js"
+    "upload": "yarn build && node scripts/upload.js",
+    "upload:prd": "NODE_ENV=production yarn build && node scripts/upload_prd.js"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.1.1",
