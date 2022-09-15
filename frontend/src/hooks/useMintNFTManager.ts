@@ -72,13 +72,11 @@ export const getMintNFTManagerContract = () => {
     const provider = new ethers.providers.Web3Provider(ethereum as any);
     const signer = provider.getSigner();
     if (signer) {
-      console.log("address:", contractAddress);
       const _contract = new ethers.Contract(
         contractAddress,
         contract.abi,
         signer
       );
-      console.log("Initialize payment");
       return _contract;
     }
   }
@@ -102,7 +100,9 @@ export const useMintParticipateNFT = () => {
       address,
       null
     );
+    alert("Event Listener is OK!");
     mintNFTManager.on(filters, (_, _nftAttributeLink: string) => {
+      alert("Minted!");
       setNftAttributeLink(_nftAttributeLink);
     });
   }, []);
