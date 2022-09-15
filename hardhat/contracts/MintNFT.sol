@@ -19,12 +19,9 @@ contract MintNFT is
 
     address private eventManagerAddr;
 
-    function setEventManagerAddr(address _eventManagerAddr) public onlyOwner {
-        require(
-            _eventManagerAddr != address(0),
-            "event manager address is blank"
-        );
-        eventManagerAddr = _eventManagerAddr;
+    function setEventManagerAddr(address _addr) public onlyOwner {
+        require(_addr != address(0), "event manager address is blank");
+        eventManagerAddr = _addr;
     }
 
     struct NFTAttribute {
@@ -93,22 +90,11 @@ contract MintNFT is
         uint256 _eventId,
         string memory _secretPhrase
     ) external {
-        require(
-            verifySecretPhrase(_secretPhrase, _eventId),
-            "invalid secret phrase"
-        );
-        require(
-            remainingEventNftCount[_eventId] != 0,
-            "remaining count is zero"
-        );
+        canMint(_eventId, _secretPhrase);
 
-        bytes32 eventHash = Hashing.hashingAddressUint256(
-            _msgSender(),
-            _eventId
-        );
-        bool holdingEventNFT = isHoldingEventNFT[eventHash];
-        require(!holdingEventNFT, "already minted");
-        isHoldingEventNFT[eventHash] = true;
+        isHoldingEventNFT[
+            Hashing.hashingAddressUint256(_msgSender(), _eventId)
+        ] = true;
 
         bytes32 groupHash = Hashing.hashingAddressUint256(
             _msgSender(),
@@ -135,6 +121,28 @@ contract MintNFT is
         remainingEventNftCount[_eventId] = remainingEventNftCount[_eventId] - 1;
         _tokenIds.increment();
         emit MintedNFTAttributeURL(_msgSender(), metaDataURL);
+    }
+
+    function canMint(uint256 _eventId, string memory _secretPhrase)
+        public
+        view
+        returns (bool)
+    {
+        require(
+            verifySecretPhrase(_secretPhrase, _eventId),
+            "invalid secret phrase"
+        );
+        require(
+            remainingEventNftCount[_eventId] != 0,
+            "remaining count is zero"
+        );
+
+        bool holdingEventNFT = isHoldingEventNFT[
+            Hashing.hashingAddressUint256(_msgSender(), _eventId)
+        ];
+        require(!holdingEventNFT, "already minted");
+
+        return true;
     }
 
     function setEventInfo(

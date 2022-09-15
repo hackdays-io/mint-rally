@@ -142,7 +142,7 @@ describe("EventManager", function () {
       await txn.wait();
 
       expect(await relayer.getBalance()).equal(
-        BigNumber.from("10000003049524562500000")
+        BigNumber.from("10000003325000000000000")
       );
     });
   });
