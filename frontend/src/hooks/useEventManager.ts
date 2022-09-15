@@ -129,7 +129,7 @@ export const useCreateEventGroup = () => {
       setLoading(false);
       setStatus(true);
     } catch (e: any) {
-      setErrors(e);
+      setErrors(e.error?.data || "error occured");
       setLoading(false);
     }
   };
@@ -223,8 +223,7 @@ export const useCreateEventRecord = () => {
       setLoading(false);
       setStatus(true);
     } catch (e: any) {
-      console.log(e);
-      setErrors(e);
+      setErrors(e.error?.data || "error occured");
       setLoading(false);
     }
   };
@@ -253,8 +252,7 @@ export const useEventRecords = () => {
         setLoading(false);
         setRecords(data);
       } catch (e: any) {
-        console.log(e);
-        setErrors(e);
+        setErrors(e.error?.data || "error occured");
         setLoading(false);
       }
     };
@@ -332,7 +330,7 @@ export const useApplyForParticipation = () => {
       setLoading(false);
       setStatus(true);
     } catch (e: any) {
-      setErrors(e);
+      setErrors(e.error?.data || "error occured");
       setLoading(false);
     }
   };
