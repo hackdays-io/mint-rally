@@ -66,7 +66,7 @@ const EventCreate: NextPage = () => {
       startTime: "",
       endTime: "",
       secretPhrase: "",
-      mintLimit: 0,
+      mintLimit: 10,
       useMtx: false,
     },
   });
@@ -318,6 +318,11 @@ const EventCreate: NextPage = () => {
                     name="mintLimit"
                     rules={{
                       required: "Mint limit is required",
+                      min: { value: 1, message: "Mint limit is at least 1" },
+                      max: {
+                        value: 1000000,
+                        message: "Mint limit is at most 1000000",
+                      },
                     }}
                     render={({
                       field: { onChange, value },

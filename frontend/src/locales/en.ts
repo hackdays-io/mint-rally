@@ -17,6 +17,7 @@ export default {
     "You already have this NFT. Thank you for your participation!",
   ENTER_SECRET_PHRASE: "Enter Secret Phrase. Event organaizers will tell you.",
   CLAIM_NFT: "Claim NFT!",
+  USE_MTX: "(without gas fee)",
   YOU_HAVE_CLAIMED_NFT:
     "You have claimed NFT! Please wait for mint your NFT...",
   YOU_HAVE_GOT_NFT: "You got NFT!!",

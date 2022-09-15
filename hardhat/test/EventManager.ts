@@ -1,5 +1,6 @@
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { expect } from "chai";
+import { BigNumber } from "ethers";
 import { ethers, upgrades } from "hardhat";
 import { EventManager, MintNFT } from "../typechain";
 
@@ -24,10 +25,8 @@ describe("EventManager", function () {
   let organizer: SignerWithAddress;
   let participant1: SignerWithAddress;
   let relayer: SignerWithAddress;
-
   before(async () => {
     [organizer, participant1, relayer] = await ethers.getSigners();
-
     const MintNFTFactory = await ethers.getContractFactory("MintNFT");
     const deployedMintNFT: any = await upgrades.deployProxy(
       MintNFTFactory,
@@ -40,21 +39,23 @@ describe("EventManager", function () {
     await mintNFT.deployed();
   });
 
-  describe("CreateEventRecord", async () => {
-    const eventManagerContractFactory = await ethers.getContractFactory(
-      "EventManager"
-    );
-    const deployedEventManagerContract: any = await upgrades.deployProxy(
-      eventManagerContractFactory,
-      [relayer.address, 250000, 1000000],
-      {
-        initializer: "initialize",
-      }
-    );
-    const eventManager: EventManager =
-      await deployedEventManagerContract.deployed();
-    await eventManager.setMintNFTAddr(mintNFT.address);
-    await mintNFT.setEventManagerAddr(eventManager.address);
+  describe("CreateEventRecord", () => {
+    let eventManager: EventManager;
+    before(async () => {
+      const eventManagerContractFactory = await ethers.getContractFactory(
+        "EventManager"
+      );
+      const deployedEventManagerContract: any = await upgrades.deployProxy(
+        eventManagerContractFactory,
+        [relayer.address, 250000, 1000000],
+        {
+          initializer: "initialize",
+        }
+      );
+      eventManager = await deployedEventManagerContract.deployed();
+      await eventManager.setMintNFTAddr(mintNFT.address);
+      await mintNFT.setEventManagerAddr(eventManager.address);
+    });
 
     it("Should create", async () => {
       // does not exist any groups
@@ -132,35 +133,36 @@ describe("EventManager", function () {
         "event1",
         "event1 description",
         "2022-07-3O",
-        100,
+        10,
         true,
         "hackdays",
         attributes,
-        { value: 250000 * 100 }
+        { value: ethers.utils.parseUnits(String(250000 * 10 * 1.33), "gwei") }
       );
       await txn.wait();
 
-      expect(0).to.equal(0);
+      expect(await relayer.getBalance()).equal(
+        BigNumber.from("10000003049524562500000")
+      );
     });
   });
 
   describe("GetOwnGroups", async () => {
-    const eventManagerContractFactory = await ethers.getContractFactory(
-      "EventManager"
-    );
-    const deployedEventManagerContract: any = await upgrades.deployProxy(
-      eventManagerContractFactory,
-      [relayer.address, 250000, 1000000],
-      {
-        initializer: "initialize",
-      }
-    );
-    const eventManager: EventManager =
-      await deployedEventManagerContract.deployed();
-    await eventManager.setMintNFTAddr(mintNFT.address);
-    await mintNFT.setEventManagerAddr(eventManager.address);
-
     it("Should get own group", async () => {
+      const eventManagerContractFactory = await ethers.getContractFactory(
+        "EventManager"
+      );
+      const deployedEventManagerContract: any = await upgrades.deployProxy(
+        eventManagerContractFactory,
+        [relayer.address, 500000, 1000000],
+        {
+          initializer: "initialize",
+        }
+      );
+      const eventManager: EventManager =
+        await deployedEventManagerContract.deployed();
+      await eventManager.setMintNFTAddr(mintNFT.address);
+      await mintNFT.setEventManagerAddr(eventManager.address);
       // create group by address1
       const txn1 = await eventManager.connect(organizer).createGroup("group1");
       await txn1.wait();
