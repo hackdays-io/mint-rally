@@ -6,19 +6,24 @@ import Layout from "../components/layout";
 import { chakraTheme } from "../../utils/chakra-theme";
 import { config } from "@fortawesome/fontawesome-svg-core";
 import "@fortawesome/fontawesome-svg-core/styles.css";
+import { GoogleAnalytics } from "nextjs-google-analytics";
+
 config.autoAddCss = false;
 
 const activeChainId = +process.env.NEXT_PUBLIC_CHAIN_ID!;
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
-    <ThirdwebProvider desiredChainId={activeChainId}>
-      <ChakraProvider theme={chakraTheme}>
-        <Layout>
-          <Component {...pageProps} />
-        </Layout>
-      </ChakraProvider>
-    </ThirdwebProvider>
+    <>
+      <GoogleAnalytics trackPageViews />
+      <ThirdwebProvider desiredChainId={activeChainId}>
+        <ChakraProvider theme={chakraTheme}>
+          <Layout>
+            <Component {...pageProps} />
+          </Layout>
+        </ChakraProvider>
+      </ThirdwebProvider>
+    </>
   );
 }
 
