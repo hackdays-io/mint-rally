@@ -23,8 +23,8 @@ const EventGroups: NextPage = () => {
   return (
     <>
       <Container maxW={800} paddingTop={6}>
-        <Flex alignItems="bottom" paddingBottom={6}>
-          <Heading>{t.EVENTGROUPS}</Heading>
+        <Flex alignItems="bottom" paddingBottom={6} flexWrap="wrap">
+          <Heading mb={2}>{t.EVENTGROUPS}</Heading>
           <Spacer></Spacer>
           <Link href="/event-groups/new">
             <Button>{t.CREATE_NEW_EVENT_GROUP}</Button>

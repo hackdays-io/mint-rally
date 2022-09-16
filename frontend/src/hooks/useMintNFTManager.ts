@@ -1,5 +1,5 @@
 import { BigNumber, ethers } from "ethers";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_MINT_NFT_MANAGER!;
 import contract from "../contracts/MintNFT.json";
 import FowarderABI from "../contracts/Fowarder.json";
@@ -43,148 +43,149 @@ export const getMintNFTManagerContract = () => {
   return null;
 };
 
-export const useMintParticipateNFT = () => {
+export const useMintParticipateNFT = (
+  eventId: number,
+  eventName: string,
+  groupId: number
+) => {
   const [errors, setErrors] = useState<Error | null>(null);
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState(false);
-  const [nftAttributeLink, setNftAttributeLink] = useState<string | null>(null);
   const [mintedNftImageURL, setMintedNftImageLink] = useState<string | null>(
     null
   );
-  const address = useAddress();
+  const { ownedNFTs, reload } = useGetOwnedNFTs();
 
   useEffect(() => {
-    const mintNFTManager = getMintNFTManagerContract();
-    if (!mintNFTManager) return;
-    const filters = mintNFTManager?.filters.MintedNFTAttributeURL(
-      address,
-      null
-    );
-    mintNFTManager.on(filters, (_, _nftAttributeLink: string) => {
-      setNftAttributeLink(_nftAttributeLink);
-    });
-
-    return () => {
-      mintNFTManager.removeAllListeners("MintedNFTAttributeURL");
-    };
-  }, []);
-
-  useEffect(() => {
-    const fetchAttribute = async (tokenURI: string) => {
-      const { data } = await axios.get(ipfs2http(tokenURI));
-      setMintedNftImageLink(ipfs2http(data.image));
-      setLoading(false);
-    };
-
-    if (status && nftAttributeLink !== null) {
-      fetchAttribute(nftAttributeLink);
-    }
-  }, [nftAttributeLink, status]);
-
-  const sentMetaTx = async (
-    mintNFTContract: ethers.Contract,
-    signer: ethers.Signer,
-    groupId: number,
-    eventId: number,
-    secretPhrase: string
-  ) => {
-    const url = process.env.NEXT_PUBLIC_WEBHOOK_URL;
-    if (!url) throw new Error("Webhook url is required");
-
-    if (!process.env.NEXT_PUBLIC_FORWARDER_ADDRESS)
-      throw new Error("Forwarder address is required");
-
-    const forwarder = new ethers.Contract(
-      process.env.NEXT_PUBLIC_FORWARDER_ADDRESS,
-      FowarderABI.abi,
-      signer
-    );
-
-    const from = await signer.getAddress();
-    const data = mintNFTContract.interface.encodeFunctionData(
-      "mintParticipateNFT",
-      [groupId, eventId, secretPhrase]
-    );
-    const to = mintNFTContract.address;
-
-    if (!signer.provider) throw new Error("Provider is not set");
-
-    const request = await signMetaTxRequest(signer.provider, forwarder, {
-      to,
-      from,
-      data,
-    });
-
-    return fetch(url, {
-      method: "POST",
-      body: JSON.stringify(request),
-      headers: { "Content-Type": "application/json" },
-    });
-  };
-
-  const sendNormalTx = async (
-    mintNFTContract: ethers.Contract,
-    groupId: number,
-    eventId: number,
-    secretPhrase: string
-  ) => {
-    const tx = await mintNFTContract.mintParticipateNFT(
-      groupId,
-      eventId,
-      secretPhrase
-    );
-    await tx.wait();
-  };
-
-  const mintParticipateNFT = async ({
-    groupId,
-    eventId,
-    secretPhrase,
-    mtx,
-  }: IMintParticipateNFTParams) => {
-    try {
-      setErrors(null);
-      const mintNFTManager = getMintNFTManagerContract();
-      if (!mintNFTManager)
-        throw new Error("Cannot find mintNFTManager contract");
-
-      setLoading(true);
-      const provider = new ethers.providers.Web3Provider(
-        window.ethereum as any
-      );
-      const signer = provider.getSigner();
-
-      await mintNFTManager.canMint(eventId, secretPhrase);
-
-      if (mtx) {
-        await sentMetaTx(
-          mintNFTManager,
-          signer,
-          groupId,
-          eventId,
-          secretPhrase
-        );
-      } else {
-        await sendNormalTx(mintNFTManager, groupId, eventId, secretPhrase);
+    const polingGetNft = setInterval(async () => {
+      if (loading && !mintedNftImageURL) {
+        await reload();
       }
-      setStatus(true);
-    } catch (e: any) {
-      setErrors(e.error?.data || "error occured");
-      setLoading(false);
-    }
-  };
+    }, 3000);
+
+    return () => clearInterval(polingGetNft);
+  }, [loading]);
+
+  useEffect(() => {
+    const nft = ownedNFTs.find(
+      (nft) =>
+        Number(nft.traits.eventGroupId) === groupId && nft.name === eventName
+    );
+    if (!nft || !status) return;
+    setMintedNftImageLink(ipfs2http(nft.image));
+    setLoading(false);
+  }, [ownedNFTs, status]);
+
+  const sentMetaTx = useCallback(
+    async (
+      mintNFTContract: ethers.Contract,
+      signer: ethers.Signer,
+      secretPhrase: string
+    ) => {
+      const url = process.env.NEXT_PUBLIC_WEBHOOK_URL;
+      if (!url) throw new Error("Webhook url is required");
+
+      if (!process.env.NEXT_PUBLIC_FORWARDER_ADDRESS)
+        throw new Error("Forwarder address is required");
+
+      const forwarder = new ethers.Contract(
+        process.env.NEXT_PUBLIC_FORWARDER_ADDRESS,
+        FowarderABI.abi,
+        signer
+      );
+
+      const from = await signer.getAddress();
+      const data = mintNFTContract.interface.encodeFunctionData(
+        "mintParticipateNFT",
+        [groupId, eventId, secretPhrase]
+      );
+      const to = mintNFTContract.address;
+
+      if (!signer.provider) throw new Error("Provider is not set");
+
+      const request = await signMetaTxRequest(signer.provider, forwarder, {
+        to,
+        from,
+        data,
+      });
+
+      return fetch(url, {
+        method: "POST",
+        body: JSON.stringify(request),
+        headers: { "Content-Type": "application/json" },
+      });
+    },
+    [eventId, groupId]
+  );
+
+  const sendNormalTx = useCallback(
+    async (mintNFTContract: ethers.Contract, secretPhrase: string) => {
+      const tx = await mintNFTContract.mintParticipateNFT(
+        groupId,
+        eventId,
+        secretPhrase
+      );
+      await tx.wait();
+    },
+    [groupId, eventId]
+  );
+
+  const mintParticipateNFT = useCallback(
+    async ({ secretPhrase, mtx }: IMintParticipateNFTParams) => {
+      try {
+        setErrors(null);
+        const mintNFTManager = getMintNFTManagerContract();
+        if (!mintNFTManager)
+          throw new Error("Cannot find mintNFTManager contract");
+
+        setLoading(true);
+        const provider = new ethers.providers.Web3Provider(
+          window.ethereum as any
+        );
+        const signer = provider.getSigner();
+
+        await mintNFTManager.canMint(eventId, secretPhrase);
+
+        if (mtx) {
+          await sentMetaTx(mintNFTManager, signer, secretPhrase);
+        } else {
+          await sendNormalTx(mintNFTManager, secretPhrase);
+        }
+        setStatus(true);
+      } catch (e: any) {
+        setErrors(e.error?.data || e.message || "error occured");
+        setLoading(false);
+      }
+    },
+    [eventId]
+  );
   return { status, errors, loading, mintParticipateNFT, mintedNftImageURL };
 };
 
 export const useGetOwnedNFTs = () => {
   const [ownedNFTs, setOwnedNFTs] = useState<IOwnedNFT[]>([]);
   const [loading, setLoading] = useState(false);
+  const [reloading, setReloading] = useState(false);
+  const address = useAddress();
 
-  const getOwnedNFTs = async (address?: string) => {
+  useEffect(() => {
+    if (address) {
+      setLoading(true);
+      getOwnedNFTs();
+      setLoading(false);
+    }
+  }, [address]);
+
+  const reload = async () => {
+    setReloading(true);
+    getOwnedNFTs();
+    setReloading(false);
+  };
+
+  const getOwnedNFTs = async () => {
     if (!address) return;
     const mintNFTManager = getMintNFTManagerContract();
     if (!mintNFTManager) throw new Error("Cannot find mintNFTManager contract");
-    setLoading(true);
     const balanceOfNFTs = await mintNFTManager.balanceOf(address);
     const metadata: any[] = [];
     for (let index = 0; index < balanceOfNFTs.toNumber(); index++) {
@@ -194,9 +195,8 @@ export const useGetOwnedNFTs = () => {
       const { data } = await axios.get(path);
       metadata.push(data);
     }
-    setLoading(false);
     setOwnedNFTs(metadata);
   };
 
-  return { ownedNFTs, loading, getOwnedNFTs };
+  return { ownedNFTs, loading, reload, reloading };
 };
