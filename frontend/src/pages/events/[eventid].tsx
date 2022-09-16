@@ -25,6 +25,7 @@ import LoginRequired from "../../components/atoms/web3/LoginRequired";
 import { useLocale } from "../../hooks/useLocale";
 import { useReward } from "react-rewards";
 import InstallWalletAlert from "../../components/molecules/web3/InstallWalletAlert";
+import { ipfs2http } from "../../../utils/ipfs2http";
 
 const Event = () => {
   const router = useRouter();
@@ -68,8 +69,8 @@ const Event = () => {
     });
   };
 
-  const hasNftForThisEvent = useMemo(() => {
-    return ownedNFTs.some(
+  const mintedNFT = useMemo(() => {
+    return ownedNFTs.find(
       (nft) =>
         Number(nft.traits.eventGroupId) === event?.groupId.toNumber() &&
         nft.name === event?.name
@@ -102,8 +103,27 @@ const Event = () => {
             >
               {mintedNftImageURL ? (
                 <></>
-              ) : hasNftForThisEvent ? (
-                <Text>{t.YOU_ALREADY_HAVE_THIS_NFT}</Text>
+              ) : mintedNFT ? (
+                <>
+                  <Text>{t.YOU_ALREADY_HAVE_THIS_NFT}</Text>
+                  <VStack justify="center" mt={5}>
+                    <img
+                      src={ipfs2http(mintedNFT.image)}
+                      width="200"
+                      height="200"
+                    />
+                  </VStack>
+                  <VStack justify="center" mt={10}>
+                    <Text>{t.GO_SURVEY}</Text>
+                    <Button
+                      as={Link}
+                      href={"https://forms.gle/kx7VykmGwRqhJiQ16"}
+                      target="_blank"
+                    >
+                      {t.SURVEY_BUTTON}
+                    </Button>
+                  </VStack>
+                </>
               ) : (
                 <Flex
                   width="100%"
@@ -162,7 +182,7 @@ const Event = () => {
                     <span id="confettiReward" />
                     <span id="balloonsReward" />
                   </VStack>
-                  <VStack justify="center" mt={5}>
+                  <VStack justify="center" mt={10}>
                     <Text>{t.GO_SURVEY}</Text>
                     <Button
                       as={Link}

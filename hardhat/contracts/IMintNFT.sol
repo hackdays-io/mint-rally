@@ -9,37 +9,42 @@ interface IMintNFT {
 
     function approve(address to, uint256 tokenId) external;
 
-    function balanceOf(address _owner) external view returns (uint256);
+    function balanceOf(address owner) external view returns (uint256);
 
     function burn(uint256 tokenId) external;
 
-    function getApproved(uint256 tokenId) external view returns (address);
-
-    function initialize() external;
-
-    function isApprovedForAll(address _owner, address operator)
+    function canMint(uint256 _eventId, string memory _secretPhrase)
         external
         view
         returns (bool);
+
+    function getApproved(uint256 tokenId) external view returns (address);
+
+    function getRemainingNFTCount(uint256 _eventId)
+        external
+        view
+        returns (uint256);
+
+    function initialize(address trustedForwarder) external;
+
+    function isApprovedForAll(address owner, address operator)
+        external
+        view
+        returns (bool);
+
+    function isTrustedForwarder(address forwarder) external view returns (bool);
 
     function mintParticipateNFT(
         uint256 _groupId,
         uint256 _eventId,
         string memory _secretPhrase
-    ) external returns (string memory);
+    ) external;
 
     function name() external view returns (string memory);
 
     function owner() external view returns (address);
 
     function ownerOf(uint256 tokenId) external view returns (address);
-
-    function setEventInfo(
-        uint256 _eventId,
-        uint256 _mintLimit,
-        bytes32 _secretPhrase,
-        NFTAttribute[] memory attributes
-    ) external;
 
     function renounceOwnership() external;
 
@@ -58,7 +63,14 @@ interface IMintNFT {
 
     function setApprovalForAll(address operator, bool approved) external;
 
-    function setEventManagerAddr(address _eventManagerAddr) external;
+    function setEventInfo(
+        uint256 _eventId,
+        uint256 _mintLimit,
+        bytes32 _secretPhrase,
+        NFTAttribute[] memory attributes
+    ) external;
+
+    function setEventManagerAddr(address _addr) external;
 
     function supportsInterface(bytes4 interfaceId) external view returns (bool);
 
@@ -66,7 +78,7 @@ interface IMintNFT {
 
     function tokenByIndex(uint256 index) external view returns (uint256);
 
-    function tokenOfOwnerByIndex(address _owner, uint256 index)
+    function tokenOfOwnerByIndex(address owner, uint256 index)
         external
         view
         returns (uint256);
