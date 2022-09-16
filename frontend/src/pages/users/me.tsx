@@ -9,19 +9,13 @@ import {
 } from "@chakra-ui/react";
 
 import { IOwnedNFT, useGetOwnedNFTs } from "../../hooks/useMintNFTManager";
-import { FC, useEffect, useMemo, useState } from "react";
+import { FC, useMemo } from "react";
 import { useEventGroups } from "../../hooks/useEventManager";
-import { useAddress } from "@thirdweb-dev/react";
 import { ipfs2http } from "../../../utils/ipfs2http";
 
 const User = () => {
-  const { ownedNFTs, loading, getOwnedNFTs } = useGetOwnedNFTs();
+  const { ownedNFTs, loading } = useGetOwnedNFTs();
   const { groups } = useEventGroups();
-  const address = useAddress();
-
-  useEffect(() => {
-    getOwnedNFTs(address);
-  }, [address]);
 
   const nftCollectionsByGroup = useMemo(() => {
     const grouped = ownedNFTs.reduce<Record<number, IOwnedNFT[]>>(

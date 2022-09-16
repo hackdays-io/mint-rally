@@ -10,7 +10,6 @@ const EventGroupCard: FC<Props> = ({ title }) => {
       borderWidth="1px"
       rounded="lg"
       overflow="hidden"
-      w={250}
       h={100}
       _hover={{ cursor: "pointer" }}
       textAlign="center"
