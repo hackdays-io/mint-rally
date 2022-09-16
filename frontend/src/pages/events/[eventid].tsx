@@ -46,11 +46,7 @@ const Event = () => {
     loading: mintLoading,
     mintedNftImageURL,
     mintParticipateNFT,
-  } = useMintParticipateNFT(
-    Number(eventid),
-    String(event?.name),
-    Number(event?.groupId.toNumber())
-  );
+  } = useMintParticipateNFT(event);
 
   useEffect(() => {
     if (mintedNftImageURL) {

@@ -30,7 +30,7 @@ async function main() {
   const EventManagerFactory = await ethers.getContractFactory("EventManager");
   const deployedEventManager: any = await upgrades.deployProxy(
     EventManagerFactory,
-    [process.env.POLYGON_RELAYER_ADDRESS, 0, 1000000],
+    [process.env.POLYGON_RELAYER_ADDRESS, 250000, 1000000],
     {
       initializer: "initialize",
     }
@@ -45,12 +45,12 @@ async function main() {
   console.log("mintNFT address:", mintNFT.address);
   console.log("eventManager address:", eventManager.address, "\n");
   console.log("----------\nFor frontEnd\n----------");
-  console.log("NEXT_PUBLIC_FORWARDER_ADDRESS=", forwarder.address);
-  console.log("NEXT_PUBLIC_CONTRACT_MINT_NFT_MANAGER=", mintNFT.address);
-  console.log("NEXT_PUBLIC_CONTRACT_EVENT_MANAGER=", eventManager.address);
+  console.log(`NEXT_PUBLIC_FORWARDER_ADDRESS=${forwarder.address}`);
+  console.log(`NEXT_PUBLIC_CONTRACT_MINT_NFT_MANAGER=${mintNFT.address}`);
+  console.log(`NEXT_PUBLIC_CONTRACT_EVENT_MANAGER=${eventManager.address}`);
 
   writeFileSync(
-    "artifacts/deployed_contract_addr.json",
+    "./scripts/deployed_contract_addr_prd.json",
     JSON.stringify(
       {
         MintRallyFowarder: forwarder.address,
