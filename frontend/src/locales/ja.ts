@@ -17,10 +17,10 @@ export default {
   YOU_ALREADY_HAVE_THIS_NFT:
     "既にこのNFTは取得済みです。ご参加ありがとうございました！",
   ENTER_SECRET_PHRASE:
-    "イベント主催者から聞いた「あいことば」を入力してください。",
+    "イベント主催者から聞いた「あいことば」を入力しNFT取得ボタンを押してください。Metamaskが立ち上がるので、「承認」ボタンを推してください。",
   CLAIM_NFT: "NFT取得！",
   USE_MTX: "（ガス代はかかりません）",
-  YOU_HAVE_CLAIMED_NFT: "NFT取得までもうしばらくお待ちください...",
+  YOU_HAVE_CLAIMED_NFT: "NFT取得までもうしばらくお待ちください...数十秒かかります🙏",
   YOU_HAVE_GOT_NFT: "NFTを取得できました！！",
   INSTALL_METAMASK_TITLE: "Metamaskをインストールしてください。",
   INSTALL_METAMASK_NEED: "NFTを取得するためにはMetaMaskが必要です。",
