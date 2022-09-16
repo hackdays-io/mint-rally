@@ -54,7 +54,6 @@ contract EventManager is OwnableUpgradeable {
     }
 
     function setMtxPrice(uint256 _price) public onlyOwner {
-        require(_price != 0, "price is 0");
         mtxPrice = _price;
     }
 
