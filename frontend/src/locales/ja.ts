@@ -17,14 +17,16 @@ export default {
   YOU_ALREADY_HAVE_THIS_NFT:
     "既にこのNFTは取得済みです。ご参加ありがとうございました！",
   ENTER_SECRET_PHRASE:
-    "イベント主催者から聞いた「あいことば」を入力してください。",
+    "イベント主催者から聞いた「あいことば」を入力しNFT取得ボタンを押してください。Metamaskが立ち上がるので、「承認」ボタンを推してください。",
   CLAIM_NFT: "NFT取得！",
   USE_MTX: "（ガス代はかかりません）",
-  YOU_HAVE_CLAIMED_NFT: "NFT取得までもうしばらくお待ちください...",
+  YOU_HAVE_CLAIMED_NFT: "NFT取得までもうしばらくお待ちください...数十秒かかります🙏",
   YOU_HAVE_GOT_NFT: "NFTを取得できました！！",
   INSTALL_METAMASK_TITLE: "Metamaskをインストールしてください。",
   INSTALL_METAMASK_NEED: "NFTを取得するためにはMetaMaskが必要です。",
   INSTALL_METAMASK_DESC:
     "PCをお使いの場合はブラウザに拡張機能をインストールしてください。スマートフォンをお使いの場合はMetaMaskをインストールして、アプリ内ブラウザをご利用ください。",
   INSTALL_METAMASK_BUTTON: "MetaMaskを使う",
+  GO_SURVEY: "NFT取得体験はどうでしたか? もしよろしければ、2〜3分で終わるアンケートにお答えください！🙏",
+  SURVEY_BUTTON: "アンケートフォームを開く"
 };
