@@ -91,7 +91,6 @@ contract EventManager is OwnableUpgradeable {
 
     function getGroups() public view returns (Group[] memory) {
         uint256 _numberOfGroups = groups.length;
-        // create array of groups
         Group[] memory _groups = new Group[](_numberOfGroups);
         _groups = groups;
         return _groups;

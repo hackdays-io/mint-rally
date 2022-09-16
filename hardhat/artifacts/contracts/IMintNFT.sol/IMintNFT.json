@@ -25,7 +25,7 @@
       "inputs": [
         {
           "internalType": "address",
-          "name": "_owner",
+          "name": "owner",
           "type": "address"
         }
       ],
@@ -57,6 +57,30 @@
       "inputs": [
         {
           "internalType": "uint256",
+          "name": "_eventId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "string",
+          "name": "_secretPhrase",
+          "type": "string"
+        }
+      ],
+      "name": "canMint",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
           "name": "tokenId",
           "type": "uint256"
         }
@@ -73,7 +97,32 @@
       "type": "function"
     },
     {
-      "inputs": [],
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_eventId",
+          "type": "uint256"
+        }
+      ],
+      "name": "getRemainingNFTCount",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "trustedForwarder",
+          "type": "address"
+        }
+      ],
       "name": "initialize",
       "outputs": [],
       "stateMutability": "nonpayable",
@@ -83,7 +132,7 @@
       "inputs": [
         {
           "internalType": "address",
-          "name": "_owner",
+          "name": "owner",
           "type": "address"
         },
         {
@@ -93,6 +142,25 @@
         }
       ],
       "name": "isApprovedForAll",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "forwarder",
+          "type": "address"
+        }
+      ],
+      "name": "isTrustedForwarder",
       "outputs": [
         {
           "internalType": "bool",
@@ -122,13 +190,7 @@
         }
       ],
       "name": "mintParticipateNFT",
-      "outputs": [
-        {
-          "internalType": "string",
-          "name": "",
-          "type": "string"
-        }
-      ],
+      "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
     },
@@ -297,7 +359,7 @@
       "inputs": [
         {
           "internalType": "address",
-          "name": "_eventManagerAddr",
+          "name": "_addr",
           "type": "address"
         }
       ],
@@ -361,7 +423,7 @@
       "inputs": [
         {
           "internalType": "address",
-          "name": "_owner",
+          "name": "owner",
           "type": "address"
         },
         {
