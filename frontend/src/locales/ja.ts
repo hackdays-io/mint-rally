@@ -19,7 +19,7 @@ export default {
     "イベント主催者から聞いた「あいことば」を入力してください。",
   CLAIM_NFT: "NFT取得！",
   USE_MTX: "（ガス代はかかりません）",
-  YOU_HAVE_CLAIMED_NFT: "NFT取得まであともう少々お待ちください...",
+  YOU_HAVE_CLAIMED_NFT: "NFT取得までもうしばらくお待ちください...",
   YOU_HAVE_GOT_NFT: "NFTを取得できました！！",
   INSTALL_METAMASK_TITLE: "Metamaskをインストールしてください。",
   INSTALL_METAMASK_NEED: "NFTを取得するためにはMetaMaskが必要です。",
