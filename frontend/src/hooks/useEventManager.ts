@@ -206,7 +206,7 @@ export const useCreateEventRecord = () => {
       const provider = new ethers.providers.Web3Provider(ethereum as any);
       const gasPrice = (await provider.getGasPrice()).toNumber();
       const value = ethers.utils.parseEther(
-        `${gasPrice * params.mintLimit * 0 * 2.1 * 0.000000000000000001}`
+        `${gasPrice * params.mintLimit * 250000 * 2.1 * 0.000000000000000001}`
       );
       console.log(value);
       const tx = await eventManager.createEventRecord(

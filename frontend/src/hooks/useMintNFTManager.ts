@@ -7,6 +7,7 @@ import { signMetaTxRequest } from "../../utils/signer";
 import axios from "axios";
 import { ipfs2http } from "../../utils/ipfs2http";
 import { useAddress } from "@thirdweb-dev/react";
+import { IEventRecord } from "./useEventManager";
 export interface IMintParticipateNFTParams {
   groupId: number;
   eventId: number;
@@ -43,11 +44,7 @@ export const getMintNFTManagerContract = () => {
   return null;
 };
 
-export const useMintParticipateNFT = (
-  eventId: number,
-  eventName: string,
-  groupId: number
-) => {
+export const useMintParticipateNFT = (event: IEventRecord | null) => {
   const [errors, setErrors] = useState<Error | null>(null);
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState(false);
@@ -69,7 +66,8 @@ export const useMintParticipateNFT = (
   useEffect(() => {
     const nft = ownedNFTs.find(
       (nft) =>
-        Number(nft.traits.eventGroupId) === groupId && nft.name === eventName
+        Number(nft.traits.eventGroupId) === event?.groupId.toNumber() &&
+        nft.name === event?.name
     );
     if (!nft || !status) return;
     setMintedNftImageLink(ipfs2http(nft.image));
@@ -97,7 +95,11 @@ export const useMintParticipateNFT = (
       const from = await signer.getAddress();
       const data = mintNFTContract.interface.encodeFunctionData(
         "mintParticipateNFT",
-        [groupId, eventId, secretPhrase]
+        [
+          event?.groupId.toNumber(),
+          event?.eventRecordId.toNumber(),
+          secretPhrase,
+        ]
       );
       const to = mintNFTContract.address;
 
@@ -115,19 +117,19 @@ export const useMintParticipateNFT = (
         headers: { "Content-Type": "application/json" },
       });
     },
-    [eventId, groupId]
+    [event]
   );
 
   const sendNormalTx = useCallback(
     async (mintNFTContract: ethers.Contract, secretPhrase: string) => {
       const tx = await mintNFTContract.mintParticipateNFT(
-        groupId,
-        eventId,
+        event?.groupId,
+        event?.eventRecordId,
         secretPhrase
       );
       await tx.wait();
     },
-    [groupId, eventId]
+    [event]
   );
 
   const mintParticipateNFT = useCallback(
@@ -144,7 +146,10 @@ export const useMintParticipateNFT = (
         );
         const signer = provider.getSigner();
 
-        await mintNFTManager.canMint(eventId, secretPhrase);
+        await mintNFTManager.canMint(
+          event?.eventRecordId.toNumber(),
+          secretPhrase
+        );
 
         if (mtx) {
           await sentMetaTx(mintNFTManager, signer, secretPhrase);
@@ -153,11 +158,12 @@ export const useMintParticipateNFT = (
         }
         setStatus(true);
       } catch (e: any) {
+        console.log(e);
         setErrors(e.error?.data || e.message || "error occured");
         setLoading(false);
       }
     },
-    [eventId]
+    [event]
   );
   return { status, errors, loading, mintParticipateNFT, mintedNftImageURL };
 };
