@@ -12,6 +12,7 @@ import {
   Container,
   Flex,
   VStack,
+  Link,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { Fragment, useState, useEffect, useMemo } from "react";
@@ -160,6 +161,16 @@ const Event = () => {
                     <img src={mintedNftImageURL} width="200" height="200" />
                     <span id="confettiReward" />
                     <span id="balloonsReward" />
+                  </VStack>
+                  <VStack justify="center" mt={5}>
+                    <Text>{t.GO_SURVEY}</Text>
+                    <Button
+                      as={Link}
+                      href={"https://forms.gle/kx7VykmGwRqhJiQ16"}
+                      target="_blank"
+                    >
+                      {t.SURVEY_BUTTON}
+                    </Button>
                   </VStack>
                 </>
               )}
