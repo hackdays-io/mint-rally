@@ -1,7 +1,7 @@
 import { useAddress } from "@thirdweb-dev/react";
-import { BigNumber, ethers, providers } from "ethers";
+import { ethers } from "ethers";
 import { useEffect, useState } from "react";
-import { useNetworkMismatch, useChainId } from "@thirdweb-dev/react";
+import BigNumber from "bignumber.js";
 
 const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_EVENT_MANAGER!;
 const provierRpc = process.env.NEXT_PUBLIC_PROVIDER_RPC!;
@@ -205,7 +205,10 @@ export const useCreateEventRecord = () => {
       const datestr = params.date.toLocaleDateString();
       const provider = new ethers.providers.Web3Provider(ethereum as any);
       const gasPrice = (await provider.getGasPrice()).toNumber();
-      const value = gasPrice * params.mintLimit * 250000 * 2.1;
+      const value = ethers.utils.parseEther(
+        `${gasPrice * params.mintLimit * 0 * 2.1 * 0.000000000000000001}`
+      );
+      console.log(value);
       const tx = await eventManager.createEventRecord(
         Number(params.groupId),
         params.eventName,
