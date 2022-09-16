@@ -27,5 +27,7 @@ export default {
   INSTALL_METAMASK_DESC:
     "If you are using a PC, install the extension in your browser. If you are using a smartphone, please install MetaMask and use the in-app browser.",
   INSTALL_METAMASK_BUTTON: "Move to MetaMask",
+  GO_SURVEY: "Did you enjoy minting? Please let us know your experience by 1-2 mins survey🙏",
+  SURVEY_BUTTON: "Open survey form"
   // ...
 };
