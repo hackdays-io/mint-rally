@@ -7,7 +7,7 @@ import {
 // TODO: deploy forwarder contract and copy abi
 import ForwarderAbi from "../../artifacts/contracts/Forwarder.sol/MintRallyForwarder.json";
 // TODO: deploy forwarder contract and copy address
-import { MintRallyFowarder as ForwarderAddress } from "../../artifacts/deployed_contract_addr.json";
+import { MintRallyFowarder as ForwarderAddress } from "../../scripts/deployed_contract_addr_stg.json";
 
 async function relay(forwarder, request, signature, whitelist) {
   // Decide if we want to relay this request based on a whitelist

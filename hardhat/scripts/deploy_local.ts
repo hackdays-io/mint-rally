@@ -45,9 +45,9 @@ async function main() {
   console.log("mintNFT address:", mintNFT.address);
   console.log("eventManager address:", eventManager.address, "\n");
   console.log("----------\nFor frontEnd\n----------");
-  console.log("NEXT_PUBLIC_FORWARDER_ADDRESS=", forwarder.address);
-  console.log("NEXT_PUBLIC_CONTRACT_MINT_NFT_MANAGER=", mintNFT.address);
-  console.log("NEXT_PUBLIC_CONTRACT_EVENT_MANAGER=", eventManager.address);
+  console.log(`NEXT_PUBLIC_FORWARDER_ADDRESS=${forwarder.address}`);
+  console.log(`NEXT_PUBLIC_CONTRACT_MINT_NFT_MANAGER=${mintNFT.address}`);
+  console.log(`NEXT_PUBLIC_CONTRACT_EVENT_MANAGER=${eventManager.address}`);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
