@@ -82,7 +82,7 @@ const Navbar = () => {
         )}
         {address && (
           <Box marginLeft={3} cursor="pointer">
-            <Link href="/users/me" as={NextLink}>
+            <Link href="/users/me">
               <Image
                 src="/user.png"
                 alt="Loggedin"
