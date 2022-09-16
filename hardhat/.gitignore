@@ -6,9 +6,7 @@ typechain
 
 #Hardhat files
 cache
-artifacts/@openzeppelin
-artifacts/build-info
-artifacts/hardhat
+artifacts
 
 .openzeppelin/unknown-*.json
 build

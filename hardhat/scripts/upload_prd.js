@@ -2,7 +2,7 @@ const { AutotaskClient } = require("defender-autotask-client");
 
 async function uploadCode(autotaskId, apiKey, apiSecret) {
   const client = new AutotaskClient({ apiKey, apiSecret });
-  await client.updateCodeFromFolder(autotaskId, "./build/relay");
+  await client.updateCodeFromFolder(autotaskId, "./build/relay_prd");
 }
 
 async function main() {
