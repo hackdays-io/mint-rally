@@ -2,6 +2,7 @@ export default {
   TOP: "TOP",
   EVENTGROUPS: "Event Groups",
   EVENTS: "Events",
+  HELP: "HELP",
   SIGN_IN: "Sign In",
   SIGN_OUT: "Sign Out",
   SWITCH_NETWORK: "Switch Network",

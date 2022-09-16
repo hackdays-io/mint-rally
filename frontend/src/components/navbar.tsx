@@ -158,6 +158,19 @@ const Navbar = () => {
           display={{ base: "none", md: "flex" }}
         >
           <Spacer />
+          <Button
+            bg="mint.subtle"
+            color="mint.font"
+            borderRadius={"16px"}
+            variant="solid"
+            as={Link}
+            size="lg"
+            mr={4}
+            href="https://hackdays.notion.site/MintRally-60edfe77fe8e43668f0179d9693dc7b0"
+            target="_blank"
+          >
+            {t.HELP}
+          </Button>
           <LocaleSelector></LocaleSelector>
           <Box px={4}>
             <MetamaskLogin></MetamaskLogin>
@@ -185,6 +198,14 @@ const Navbar = () => {
               </Button>
               <Button w="100%" onClick={() => router.push("/events/")}>
                 {t.EVENTS}
+              </Button>
+              <Button
+                as={Link}
+                w="100%"
+                href="https://hackdays.notion.site/MintRally-60edfe77fe8e43668f0179d9693dc7b0"
+                target="_blank"
+              >
+                {t.HELP}
               </Button>
               <LocaleSelector></LocaleSelector>
               <MetamaskLogin></MetamaskLogin>
