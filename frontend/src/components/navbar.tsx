@@ -158,7 +158,11 @@ const Navbar = () => {
           display={{ base: "none", md: "flex" }}
         >
           <Spacer />
-          <a href="https://s.c4j.jp/summit-nft" as={NextLink} target="_blank">
+          <a
+            href="https://s.c4j.jp/summit-nft"
+            target="_blank"
+            rel="noreferrer"
+          >
             <Button
               bg="mint.subtle"
               color="mint.font"
