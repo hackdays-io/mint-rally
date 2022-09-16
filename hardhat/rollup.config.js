@@ -4,12 +4,19 @@ import json from "@rollup/plugin-json";
 import builtins from "builtin-modules";
 
 export default {
-  input: "autotasks/relay/index.js",
-  output: {
-    file: "build/relay/index.js",
-    format: "cjs",
-    exports: "auto",
-  },
+  input: ["autotasks/relay_stg/index.js", "autotasks/relay_prd/index.js"],
+  output: [
+    {
+      dir: "build/relay_stg",
+      format: "cjs",
+      exports: "auto",
+    },
+    {
+      dir: "build/relay_prd",
+      format: "cjs",
+      exports: "auto",
+    },
+  ],
   plugins: [
     resolve({ preferBuiltins: true }),
     commonjs(),
