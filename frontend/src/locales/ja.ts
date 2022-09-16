@@ -2,6 +2,7 @@ export default {
   TOP: "トップ",
   EVENTGROUPS: "イベントグループ",
   EVENTS: "イベント",
+  HELP: "ヘルプ",
   SIGN_IN: "ログイン",
   SIGN_OUT: "ログアウト",
   SWITCH_NETWORK: "ネットワーク切替",
