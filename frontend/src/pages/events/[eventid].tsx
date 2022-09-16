@@ -111,11 +111,11 @@ const Event = () => {
                   alignItems="end"
                   flexWrap="wrap"
                 >
+                  <Text mb={2}>{t.ENTER_SECRET_PHRASE}</Text>
                   <Box
                     width={{ base: "100%", md: "48%" }}
                     mb={{ base: 5, md: 0 }}
                   >
-                    <Text mb={2}>{t.ENTER_SECRET_PHRASE}</Text>
                     <Input
                       variant="outline"
                       type="password"
