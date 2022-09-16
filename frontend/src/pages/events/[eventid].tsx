@@ -28,8 +28,8 @@ import InstallWalletAlert from "../../components/molecules/web3/InstallWalletAle
 const Event = () => {
   const router = useRouter();
   const { eventid } = router.query;
-  const { event, loading: loadingFetch } = useGetEventById(Number(eventid));
-  const { ownedNFTs, getOwnedNFTs } = useGetOwnedNFTs();
+  const { event, loading: fetchingEvent } = useGetEventById(Number(eventid));
+  const { ownedNFTs, loading: fetchingOwnNFT } = useGetOwnedNFTs();
   const { t } = useLocale();
   const { reward: confettiReward } = useReward("confettiReward", "confetti", {
     elementCount: 100,
@@ -46,15 +46,17 @@ const Event = () => {
     loading: mintLoading,
     mintedNftImageURL,
     mintParticipateNFT,
-  } = useMintParticipateNFT();
+  } = useMintParticipateNFT(
+    Number(eventid),
+    String(event?.name),
+    Number(event?.groupId.toNumber())
+  );
 
   useEffect(() => {
-    getOwnedNFTs();
-  }, []);
-
-  useEffect(() => {
-    confettiReward();
-    balloonsReward();
+    if (mintedNftImageURL) {
+      confettiReward();
+      balloonsReward();
+    }
   }, [mintedNftImageURL]);
 
   const [enteredSecretPhrase, setEnteredSecretPhrase] = useState("");
@@ -67,22 +69,24 @@ const Event = () => {
       secretPhrase: enteredSecretPhrase,
       mtx: event.useMtx,
     });
-    // TODO: add event listener for minting
   };
 
   const hasNftForThisEvent = useMemo(() => {
     return ownedNFTs.some(
       (nft) =>
-        !!event &&
-        nft.traits.eventGroupId === event.groupId.toNumber() &&
-        nft.name === event.name
+        Number(nft.traits.eventGroupId) === event?.groupId.toNumber() &&
+        nft.name === event?.name
     );
   }, [event, ownedNFTs]);
 
+  const isLoading = useMemo(() => {
+    return fetchingEvent || fetchingOwnNFT;
+  }, [fetchingEvent, fetchingOwnNFT]);
+
   return (
     <>
-      <Container maxW={800} paddingTop={6}>
-        {loadingFetch && <Spinner></Spinner>}
+      <Container maxW={800} py={6}>
+        {isLoading && <Spinner></Spinner>}
         {event && (
           <>
             <Heading>{event.name}</Heading>
@@ -101,7 +105,7 @@ const Event = () => {
             >
               {mintedNftImageURL ? (
                 <></>
-              ) : hasNftForThisEvent || mintStatus ? (
+              ) : hasNftForThisEvent ? (
                 <Text>{t.YOU_ALREADY_HAVE_THIS_NFT}</Text>
               ) : (
                 <Flex
