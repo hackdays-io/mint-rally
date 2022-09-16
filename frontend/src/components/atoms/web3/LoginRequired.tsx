@@ -1,6 +1,7 @@
 import { Button, Text } from "@chakra-ui/react";
 import { FC, ReactNode } from "react";
 import { useAddress, useChainId } from "@thirdweb-dev/react";
+import { useLocale } from "../../../hooks/useLocale";
 
 export const switchNetwork = async () => {
   const requiredChainId = +process.env.NEXT_PUBLIC_CHAIN_ID!;
@@ -54,13 +55,15 @@ const LoginRequired: FC<Props> = ({
   const address = useAddress();
   const chainId = useChainId()!;
 
+  const { t } = useLocale();
+
   return (
     <>
       {!address ? (
         <Text fontSize="xl">{forbiddenText}</Text>
       ) : chainId !== requiredChainID ? (
         <Text fontSize="xl">
-          <Button onClick={switchNetwork}>Switch Network</Button>
+          <Button onClick={switchNetwork}>{t.SWITCH_NETWORK}</Button>
         </Text>
       ) : (
         children

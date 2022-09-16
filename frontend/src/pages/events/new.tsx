@@ -32,6 +32,7 @@ import {
 } from "../../hooks/useEventManager";
 import ErrorMessage from "../../components/atoms/form/ErrorMessage";
 import { Web3Storage } from "web3.storage";
+import { useLocale } from "../../hooks/useLocale";
 
 type FormData = {
   eventGroupId: string;
@@ -46,6 +47,8 @@ type FormData = {
 };
 
 const EventCreate: NextPage = () => {
+  const { t } = useLocale();
+
   const ipfsClient = new Web3Storage({
     token: String(process.env.NEXT_PUBLIC_WEB3_STORAGE_KEY),
     endpoint: new URL("https://api.web3.storage"),
@@ -148,12 +151,12 @@ const EventCreate: NextPage = () => {
     <>
       <Container maxW={800} py={6}>
         <Heading as="h1" mb={10}>
-          Create a new event
+          {t.CREATE_NEW_EVENT}
         </Heading>
         {address && groups.length > 0 ? (
           <form onSubmit={handleSubmit(onSubmit)}>
             <FormControl mb={5}>
-              <FormLabel htmlFor="eventGroupId">Event group</FormLabel>
+              <FormLabel htmlFor="eventGroupId">{t.EVENT_GROUP}</FormLabel>
               <Controller
                 control={control}
                 name="eventGroupId"
@@ -182,7 +185,7 @@ const EventCreate: NextPage = () => {
             {watch("eventGroupId") ? (
               <>
                 <FormControl mb={5}>
-                  <FormLabel htmlFor="name">Event Name</FormLabel>
+                  <FormLabel htmlFor="name">{t.EVENT_NAME}</FormLabel>
                   <Controller
                     control={control}
                     name="eventName"
@@ -201,7 +204,9 @@ const EventCreate: NextPage = () => {
                   />
                 </FormControl>
                 <FormControl mb={5}>
-                  <FormLabel htmlFor="description">Description</FormLabel>
+                  <FormLabel htmlFor="description">
+                    {t.EVENT_DESCRIPTION}
+                  </FormLabel>
                   <Controller
                     control={control}
                     name="description"
@@ -231,7 +236,7 @@ const EventCreate: NextPage = () => {
                 </FormControl>
                 <Flex mb={5} justifyContent="space-between" flexWrap="wrap">
                   <FormControl width={{ base: "100%", md: "30%" }}>
-                    <FormLabel htmlFor="date">Date</FormLabel>
+                    <FormLabel htmlFor="date">{t.EVENT_DATE}</FormLabel>
                     <Controller
                       control={control}
                       name="date"
@@ -258,7 +263,9 @@ const EventCreate: NextPage = () => {
                     width={{ base: "47%", md: "30%" }}
                     mt={{ base: 2, md: 0 }}
                   >
-                    <FormLabel htmlFor="startTime">Start time</FormLabel>
+                    <FormLabel htmlFor="startTime">
+                      {t.EVENT_START_TIME}
+                    </FormLabel>
                     <Controller
                       control={control}
                       name="startTime"
@@ -285,7 +292,7 @@ const EventCreate: NextPage = () => {
                     width={{ base: "47%", md: "30%" }}
                     mt={{ base: 2, md: 0 }}
                   >
-                    <FormLabel htmlFor="endTime">End time</FormLabel>
+                    <FormLabel htmlFor="endTime">{t.EVENT_END_TIME}</FormLabel>
                     <Controller
                       control={control}
                       name="endTime"
@@ -311,7 +318,7 @@ const EventCreate: NextPage = () => {
                 </Flex>
 
                 <FormControl mb={5}>
-                  <FormLabel>Maximum mint of NFT</FormLabel>
+                  <FormLabel>{t.EVENT_NFT_LIMIT}</FormLabel>
 
                   <Controller
                     control={control}
@@ -343,7 +350,7 @@ const EventCreate: NextPage = () => {
                 </FormControl>
 
                 <FormControl mb={5}>
-                  <FormLabel>Taking on gas fee for participants</FormLabel>
+                  <FormLabel>{t.EVENT_USE_MTX}</FormLabel>
 
                   <Controller
                     control={control}
@@ -364,11 +371,10 @@ const EventCreate: NextPage = () => {
 
                 <FormControl mb={5}>
                   <FormLabel htmlFor="secret">
-                    Secret phrase to mint
+                    {t.EVENT_SECRETPHRASE}
                     <br />
                     <Box as="span" fontSize="14px" color="red">
-                      Please do not forget this phrase. you can&apos;t get this
-                      phrase after submitting
+                      {t.EVENT_SECRETPHRASE_DESC}
                     </Box>
                   </FormLabel>
 
