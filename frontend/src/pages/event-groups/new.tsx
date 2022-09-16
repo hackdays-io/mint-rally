@@ -16,6 +16,8 @@ import {
   AlertTitle,
   AlertDescription,
   Container,
+  IconButton,
+  Icon,
 } from "@chakra-ui/react";
 import type { NextPage } from "next";
 import { useState, useCallback, useEffect } from "react";
@@ -23,6 +25,10 @@ import { Web3Storage } from "web3.storage";
 import { useCreateEventGroup, INFTImage } from "../../hooks/useEventManager";
 import ImageSelectorWithPreview from "../../components/ImageSelectorWithPreview";
 import LoginRequired from "../../components/atoms/web3/LoginRequired";
+import { useLocale } from "../../hooks/useLocale";
+import { Controller, useFieldArray, useForm } from "react-hook-form";
+import { CloseIcon } from "@chakra-ui/icons";
+import ErrorMessage from "../../components/atoms/form/ErrorMessage";
 
 if (!process.env.NEXT_PUBLIC_WEB3_STORAGE_KEY) {
   throw new Error("WEB3_STORAGE_KEY is required");
@@ -38,55 +44,55 @@ const renameFile = (file: File, newFilename: string) => {
   return new File([file], newFilename, { type, lastModified });
 };
 
-interface PaticipateNftRecord {
-  description: string;
-  dataUrl: string;
-  fileObject: File | null;
-  requiredParticipateCount: number;
+interface FormData {
+  groupName: string;
+  nfts: {
+    description: string;
+    fileObject: File | null;
+    requiredParticipateCount: number;
+  }[];
 }
 
 const NewEventGroupPage: NextPage = () => {
-  const [groupName, setGroupName] = useState("");
-  const { status, errors, loading, createEventGroup, createdGroupId } =
-    useCreateEventGroup();
+  const { status, errors, createEventGroup, loading } = useCreateEventGroup();
+  const { t } = useLocale();
 
-  const [nftRecords, setNftRecords] = useState([
-    {
-      description: "",
-      dataUrl: "",
-      fileObject: null,
-      requiredParticipateCount: 0,
+  const {
+    control,
+    handleSubmit,
+    formState: { isSubmitting, isSubmitSuccessful },
+  } = useForm<FormData>({
+    defaultValues: {
+      groupName: "",
+      nfts: [
+        {
+          description: "",
+          fileObject: null,
+          requiredParticipateCount: 0,
+        },
+        {
+          description: "",
+          fileObject: null,
+          requiredParticipateCount: 5,
+        },
+        {
+          description: "",
+          fileObject: null,
+          requiredParticipateCount: 10,
+        },
+      ],
     },
-    {
-      description: "",
-      dataUrl: "",
-      fileObject: null,
-      requiredParticipateCount: 5,
-    },
-    {
-      description: "",
-      dataUrl: "",
-      fileObject: null,
-      requiredParticipateCount: 10,
-    },
-  ] as PaticipateNftRecord[]);
+  });
 
-  const isAllInputed = useCallback(
-    () =>
-      nftRecords.every(
-        ({ description, dataUrl, fileObject }) =>
-          description && dataUrl && fileObject
-      ),
-    [nftRecords]
-  );
+  const {
+    fields: nfts,
+    append,
+    remove,
+  } = useFieldArray({ control, name: "nfts" });
 
-  const uploadImagesToIpfs = useCallback(async () => {
-    if (!isAllInputed) {
-      console.error("You must specify image and name");
-      return;
-    }
+  const uploadImagesToIpfs = async (nfts: FormData["nfts"]) => {
     console.log("Starting to upload images to IPFS...");
-    const renamedFiles = nftRecords.map(
+    const renamedFiles = nfts.map(
       ({ fileObject, description, requiredParticipateCount }) => ({
         fileObject: renameFile(fileObject!, `${requiredParticipateCount}.png`),
         description,
@@ -109,10 +115,10 @@ const NewEventGroupPage: NextPage = () => {
       }
     );
     return { rootCid, renamedFiles };
-  }, [nftRecords, isAllInputed]);
+  };
 
-  const submit = async () => {
-    const uploadResult = await uploadImagesToIpfs();
+  const submit = async (data: FormData) => {
+    const uploadResult = await uploadImagesToIpfs(data.nfts);
     if (!uploadResult) {
       console.error("uploading error");
       // @TODO: display error alert
@@ -127,115 +133,165 @@ const NewEventGroupPage: NextPage = () => {
       })
     );
 
-    await createEventGroup({ groupName, nftAttributes });
+    await createEventGroup({ groupName: data.groupName, nftAttributes });
   };
 
   return (
     <Container maxW={800}>
-      <Heading as="h1" my={4}>
-        Create a new event group
+      <Heading as="h1" mt={4} mb={6}>
+        {t.CREATE_NEW_EVENT_GROUP}
       </Heading>
       <LoginRequired
         requiredChainID={+process.env.NEXT_PUBLIC_CHAIN_ID!}
-        forbiddenText="Sign in First!"
+        forbiddenText={t.PLEASE_SIGN_IN}
       >
         <>
           {!status ? (
-            <>
-              <Text>Event Group Name</Text>
-              <Input
-                variant="outline"
-                mb={4}
-                value={groupName}
-                onChange={(e) => setGroupName(e.target.value)}
+            <form onSubmit={handleSubmit(submit)}>
+              <Heading as="h2" fontSize="xl" mb={4}>
+                {t.NEW_EVENT_GROUP_NAME}
+              </Heading>
+              <Controller
+                control={control}
+                name="groupName"
+                rules={{ required: "Group name is required" }}
+                render={({
+                  field: { onChange, value },
+                  formState: { errors },
+                }) => (
+                  <>
+                    <Input
+                      variant="outline"
+                      value={value}
+                      onChange={(e) => onChange(e.target.value)}
+                    />
+                    <ErrorMessage>{errors.groupName?.message}</ErrorMessage>
+                  </>
+                )}
               />
-              <Heading as="h2" fontSize="3xl" mb={4}>
+
+              <Heading as="h2" fontSize="xl" my={4}>
                 NFTs
               </Heading>
               <Box>
-                {nftRecords.map((record, index) => (
+                {nfts.map((nft, index) => (
                   <Flex
                     key={index}
                     w="full"
                     flexDirection={{ base: "column", md: "row" }}
+                    mb={10}
+                    position="relative"
                   >
                     <Box flexBasis="300px" flexShrink="0" minH="300px" mb={3}>
-                      <ImageSelectorWithPreview
-                        dataUrl={record.dataUrl}
-                        onChangeData={(newDataUrl, newFile) => {
-                          setNftRecords((_prev) => {
-                            const prev = _prev.concat();
-                            prev[index].dataUrl = newDataUrl;
-                            prev[index].fileObject = newFile;
-                            return prev;
-                          });
-                        }}
+                      <Controller
+                        control={control}
+                        name={`nfts.${index}.fileObject`}
+                        rules={{ required: "NFT Image is required" }}
+                        render={({ field: { onChange } }) => (
+                          <>
+                            <ImageSelectorWithPreview
+                              onChangeData={(newFile) => {
+                                onChange(newFile);
+                              }}
+                            />
+                          </>
+                        )}
                       />
                     </Box>
-                    <Box>
-                      <Box m={2}>
-                        <Text>NFT Description</Text>
-                        <Input
-                          variant="outline"
-                          mb={4}
-                          value={record.description}
-                          onChange={(e) => {
-                            setNftRecords((_prev) => {
-                              const prev = _prev.concat();
-                              prev[index].description = e.target.value;
-                              return prev;
-                            });
+                    <Box ml={{ md: 5, base: 0 }}>
+                      <Box>
+                        <Text>{t.NFT_DESC}</Text>
+                        <Controller
+                          control={control}
+                          name={`nfts.${index}.description`}
+                          rules={{
+                            required: "NFT description is required",
                           }}
+                          render={({ field: { onChange, value } }) => (
+                            <Input
+                              variant="outline"
+                              mb={4}
+                              value={value}
+                              onChange={(e) => {
+                                onChange(e.target.value);
+                              }}
+                            />
+                          )}
                         />
                       </Box>
-                      <Box m={2}>
-                        <Text>
-                          How many events do users need participate in to get
-                          this NFT?
-                        </Text>
-                        <NumberInput
-                          defaultValue={record.requiredParticipateCount}
-                          min={0}
-                          onChange={(__, num) => {
-                            setNftRecords((_prev) => {
-                              const prev = _prev.concat();
-                              prev[index].requiredParticipateCount = num;
-                              return prev;
-                            });
-                          }}
-                        >
-                          <NumberInputField />
-                          <NumberInputStepper>
-                            <NumberIncrementStepper />
-                            <NumberDecrementStepper />
-                          </NumberInputStepper>
-                        </NumberInput>
+                      <Box mt={2}>
+                        {index > 0 ? (
+                          <>
+                            <Text>{t.TIMES_PARTICIPATE}</Text>
+                            <Controller
+                              control={control}
+                              name={`nfts.${index}.requiredParticipateCount`}
+                              rules={{
+                                required: "Times participation is required",
+                                min: 1,
+                              }}
+                              render={({ field: { onChange, value } }) => (
+                                <NumberInput
+                                  value={value}
+                                  min={0}
+                                  onChange={(__, num) => {
+                                    onChange(num);
+                                  }}
+                                >
+                                  <NumberInputField />
+                                  <NumberInputStepper>
+                                    <NumberIncrementStepper />
+                                    <NumberDecrementStepper />
+                                  </NumberInputStepper>
+                                </NumberInput>
+                              )}
+                            />
+                          </>
+                        ) : (
+                          <Text>{t.NFT_DEFAULT}</Text>
+                        )}
                       </Box>
                     </Box>
+                    {index !== 0 && (
+                      <IconButton
+                        position="absolute"
+                        right="0"
+                        top="0"
+                        borderRadius="full"
+                        aria-label=""
+                        icon={<Icon as={CloseIcon} color="mint.primary" />}
+                        onClick={() => remove(index)}
+                      />
+                    )}
                   </Flex>
                 ))}
               </Box>
               <Box mt={8} mb={10}>
                 <Button
-                  onClick={() => submit()}
-                  disabled={!groupName || !isAllInputed() || loading}
+                  disabled={isSubmitting || loading}
                   width="full"
                   background="mint.bg"
+                  size="lg"
+                  type="submit"
                 >
-                  {loading ? <Spinner /> : "Create"}
+                  {isSubmitting || loading ? (
+                    <Spinner />
+                  ) : (
+                    t.CREATE_NEW_EVENT_GROUP
+                  )}
                 </Button>
                 {errors && (
-                  <Alert status="error">
+                  <Alert status="error" mt={2}>
                     <AlertIcon />
                     <AlertTitle>Error occurred</AlertTitle>
                     <AlertDescription>{errors.message}</AlertDescription>
                   </Alert>
                 )}
               </Box>
-            </>
+            </form>
           ) : (
             <>
-              <Box>Event Group Created!🎉</Box>
+              <Box>{t.EVENT_GROUP_CREATED}🎉</Box>
             </>
           )}
         </>

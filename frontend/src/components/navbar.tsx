@@ -49,7 +49,7 @@ const Navbar = () => {
                   borderRadius={"16px"}
                   variant="solid"
                   onClick={switchNetwork}
-                  size="lg"
+                  size="md"
                 >
                   {t.SWITCH_NETWORK}
                 </Button>
@@ -63,7 +63,7 @@ const Navbar = () => {
               borderRadius={"16px"}
               variant="solid"
               onClick={disconnectWallet}
-              size="lg"
+              size="md"
             >
               {t.SIGN_OUT}
             </Button>
@@ -75,7 +75,7 @@ const Navbar = () => {
             borderRadius={"16px"}
             variant="solid"
             onClick={connectWithMetamask}
-            size="lg"
+            size="md"
           >
             {t.SIGN_IN}
           </Button>
@@ -86,8 +86,8 @@ const Navbar = () => {
               <Image
                 src="/user.png"
                 alt="Loggedin"
-                width={65.78}
-                height={65.78}
+                width={50}
+                height={50}
                 objectFit="contain"
               />
             </Link>
@@ -116,8 +116,8 @@ const Navbar = () => {
           <Link href="/">
             <Image
               src={"/images/logo.svg"}
-              height={93.5}
-              width={250}
+              height={75}
+              width={200}
               objectFit="contain"
               alt="Mint Rally Logo"
             />
@@ -131,7 +131,7 @@ const Navbar = () => {
               color="mint.font"
               borderRadius={"16px"}
               variant="solid"
-              size="lg"
+              size="md"
             >
               {t.EVENTGROUPS}
             </Button>
@@ -145,7 +145,7 @@ const Navbar = () => {
               color="mint.font"
               borderRadius={"16px"}
               variant="solid"
-              size="lg"
+              size="md"
             >
               {t.EVENTS}
             </Button>
@@ -158,22 +158,18 @@ const Navbar = () => {
           display={{ base: "none", md: "flex" }}
         >
           <Spacer />
-          <Link
-            href="https://hackdays.notion.site/MintRally-60edfe77fe8e43668f0179d9693dc7b0"
-            as={NextLink}
-            target="_blank"
-          >
+          <a href="https://s.c4j.jp/summit-nft" as={NextLink} target="_blank">
             <Button
               bg="mint.subtle"
               color="mint.font"
               borderRadius={"16px"}
               variant="solid"
-              size="lg"
+              size="md"
               mr={4}
             >
               {t.HELP}
             </Button>
-          </Link>
+          </a>
           <LocaleSelector></LocaleSelector>
           <Box px={4}>
             <MetamaskLogin></MetamaskLogin>
