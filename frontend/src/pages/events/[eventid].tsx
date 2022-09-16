@@ -83,7 +83,7 @@ const Event = () => {
 
   return (
     <>
-      <Container maxW={800} py={6} pb="60px">
+      <Container maxW={800} py={6} pb="120px">
         {isLoading && <Spinner></Spinner>}
         {event && (
           <>
