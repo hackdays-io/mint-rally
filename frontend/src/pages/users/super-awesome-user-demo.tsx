@@ -1,14 +1,10 @@
 import { Box, Divider, Flex, Heading, Text } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import Image from "next/image";
-import { useGetOwnedNFTs } from "../../hooks/useMintNFTManager";
 
 const User = () => {
   // TODO: address毎のNFTを表示する
   const router = useRouter();
-  const { userid } = router.query;
-
-  const { ownedNFTs, loading, getOwnedNFTs } = useGetOwnedNFTs();
 
   const hackDaysCollectionData = [
     {
