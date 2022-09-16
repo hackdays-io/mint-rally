@@ -113,7 +113,7 @@ const Navbar = () => {
           width={{ base: "150px", md: "auto" }}
           pr={8}
         >
-          <Link href="/" as={NextLink}>
+          <Link href="/">
             <Image
               src={"/images/logo.svg"}
               height={93.5}
@@ -158,6 +158,22 @@ const Navbar = () => {
           display={{ base: "none", md: "flex" }}
         >
           <Spacer />
+          <Link
+            href="https://hackdays.notion.site/MintRally-60edfe77fe8e43668f0179d9693dc7b0"
+            as={NextLink}
+            target="_blank"
+          >
+            <Button
+              bg="mint.subtle"
+              color="mint.font"
+              borderRadius={"16px"}
+              variant="solid"
+              size="lg"
+              mr={4}
+            >
+              {t.HELP}
+            </Button>
+          </Link>
           <LocaleSelector></LocaleSelector>
           <Box px={4}>
             <MetamaskLogin></MetamaskLogin>
@@ -186,6 +202,13 @@ const Navbar = () => {
               <Button w="100%" onClick={() => router.push("/events/")}>
                 {t.EVENTS}
               </Button>
+              <Link
+                href="https://hackdays.notion.site/MintRally-60edfe77fe8e43668f0179d9693dc7b0"
+                as={NextLink}
+                target="_blank"
+              >
+                <Button w="100%">{t.HELP}</Button>
+              </Link>
               <LocaleSelector></LocaleSelector>
               <MetamaskLogin></MetamaskLogin>
             </DrawerBody>
