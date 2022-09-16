@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "dev:mumbai": "NODE_ENV=test next dev",
+    "dev:polygon": "NODE_ENV=production next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"

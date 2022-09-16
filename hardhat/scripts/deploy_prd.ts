@@ -50,7 +50,7 @@ async function main() {
   console.log(`NEXT_PUBLIC_CONTRACT_EVENT_MANAGER=${eventManager.address}`);
 
   writeFileSync(
-    "./deployed_contract_addr_prd.json",
+    "./scripts/deployed_contract_addr_prd.json",
     JSON.stringify(
       {
         MintRallyFowarder: forwarder.address,
