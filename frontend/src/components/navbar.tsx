@@ -202,13 +202,14 @@ const Navbar = () => {
               <Button w="100%" onClick={() => router.push("/events/")}>
                 {t.EVENTS}
               </Button>
-              <Link
-                href="https://hackdays.notion.site/MintRally-60edfe77fe8e43668f0179d9693dc7b0"
-                as={NextLink}
+              <a
+                href="https://s.c4j.jp/summit-nft"
                 target="_blank"
+                rel="noreferrer"
               >
                 <Button w="100%">{t.HELP}</Button>
-              </Link>
+              </a>
+
               <LocaleSelector></LocaleSelector>
               <MetamaskLogin></MetamaskLogin>
             </DrawerBody>
