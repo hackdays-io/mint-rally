@@ -152,7 +152,7 @@ export const useMintParticipateNFT = (event: IEventRecord | null) => {
     async ({ secretPhrase, mtx }: IMintParticipateNFTParams) => {
       try {
         setErrors(null);
-        const mintNFTManager = getMintNFTManagerContract();
+        const mintNFTManager = getMintNFTManagerContract({ signin: true });
         if (!mintNFTManager)
           throw new Error("Cannot find mintNFTManager contract");
 
