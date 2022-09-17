@@ -72,8 +72,8 @@ const Event = () => {
   const mintedNFT = useMemo(() => {
     return ownedNFTs.find(
       (nft) =>
-        Number(nft.traits.EventGroupId) === event?.groupId.toNumber() &&
-        nft.name === event?.name
+        Number(nft.metaData.traits.EventGroupId) ===
+          event?.groupId.toNumber() && nft.metaData.name === event?.name
     );
   }, [event, ownedNFTs]);
 
@@ -108,7 +108,7 @@ const Event = () => {
                   <Text>{t.YOU_ALREADY_HAVE_THIS_NFT}</Text>
                   <VStack justify="center" mt={5}>
                     <img
-                      src={ipfs2http(mintedNFT.image)}
+                      src={ipfs2http(mintedNFT.metaData.image)}
                       width="200"
                       height="200"
                     />
