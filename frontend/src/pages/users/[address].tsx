@@ -9,15 +9,21 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 
-import { IOwnedNFT, useGetOwnedNFTs } from "../../hooks/useMintNFTManager";
-import { FC, useMemo, useState } from "react";
+import {
+  IOwnedNFT,
+  useGetOwnedNFTsByAddress,
+} from "../../hooks/useMintNFTManager";
+import { FC, useEffect, useMemo, useState } from "react";
 import { useEventGroups } from "../../hooks/useEventManager";
 import { ipfs2http } from "../../../utils/ipfs2http";
 import { BigNumber } from "ethers";
 import TokenModal from "../../components/molecules/user/TokenModal";
+import { useRouter } from "next/router";
 
 const User = () => {
-  const { ownedNFTs, loading } = useGetOwnedNFTs();
+  const router = useRouter();
+  const { address, tokenid } = router.query;
+  const { ownedNFTs, loading } = useGetOwnedNFTsByAddress(String(address));
   const [selectedTokenId, selectTokenId] = useState<BigNumber>();
   const { groups } = useEventGroups();
 
@@ -37,6 +43,13 @@ const User = () => {
     );
     return grouped;
   }, [groups, ownedNFTs]);
+
+  useEffect(() => {
+    if (tokenid !== undefined && tokenid !== null) {
+      selectTokenId(BigNumber.from(tokenid));
+      onOpen();
+    }
+  }, [tokenid]);
 
   const ImageBadge = ({ image, name }: { image: string; name: string }) => (
     <Flex justifyContent="center" alignItems="center" flexDirection="column">
@@ -137,12 +150,7 @@ const User = () => {
           );
         })
       )}
-      <TokenModal
-        shareURL
-        isOpen={isOpen}
-        onClose={onClose}
-        tokenId={selectedTokenId}
-      />
+      <TokenModal isOpen={isOpen} onClose={onClose} tokenId={selectedTokenId} />
     </Container>
   );
 };

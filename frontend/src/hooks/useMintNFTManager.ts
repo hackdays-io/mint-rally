@@ -1,9 +1,10 @@
-import { ethers } from "ethers";
+import { BigNumber, ethers } from "ethers";
 import { useCallback, useEffect, useState } from "react";
 const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_MINT_NFT_MANAGER!;
 import contract from "../contracts/MintNFT.json";
 import FowarderABI from "../contracts/Fowarder.json";
 import { signMetaTxRequest } from "../../utils/signer";
+const provierRpc = process.env.NEXT_PUBLIC_PROVIDER_RPC!;
 import axios from "axios";
 import { ipfs2http } from "../../utils/ipfs2http";
 import { useAddress } from "@thirdweb-dev/react";
@@ -15,7 +16,7 @@ export interface IMintParticipateNFTParams {
   mtx: boolean;
 }
 
-export interface IOwnedNFT {
+export interface INFTMetaData {
   name: string;
   description: string;
   image: string;
@@ -25,24 +26,38 @@ export interface IOwnedNFT {
   };
 }
 
+export interface IOwnedNFT {
+  tokenId: BigNumber;
+  metaData: INFTMetaData;
+}
+
 /**
  * A bridgge to the mint nft manager contract
  */
-export const getMintNFTManagerContract = () => {
-  const { ethereum } = window;
-  if (ethereum) {
-    const provider = new ethers.providers.Web3Provider(ethereum as any);
-    const signer = provider.getSigner();
-    if (signer) {
-      const _contract = new ethers.Contract(
-        contractAddress,
-        contract.abi,
-        signer
-      );
-      return _contract;
+export const getMintNFTManagerContract = (config = { signin: false }) => {
+  if (!config.signin) {
+    const provider = new ethers.providers.JsonRpcProvider(provierRpc);
+    const _contract = new ethers.Contract(
+      contractAddress,
+      contract.abi,
+      provider
+    );
+    return _contract;
+  } else {
+    const { ethereum } = window;
+    if (ethereum) {
+      const provider = new ethers.providers.Web3Provider(ethereum as any);
+      const signer = provider.getSigner();
+      if (signer) {
+        const _contract = new ethers.Contract(
+          contractAddress,
+          contract.abi,
+          signer
+        );
+        return _contract;
+      }
     }
   }
-  return null;
 };
 
 export const useMintParticipateNFT = (event: IEventRecord | null) => {
@@ -67,11 +82,11 @@ export const useMintParticipateNFT = (event: IEventRecord | null) => {
   useEffect(() => {
     const nft = ownedNFTs.find(
       (nft) =>
-        Number(nft.traits.EventGroupId) === event?.groupId.toNumber() &&
-        nft.name === event?.name
+        Number(nft.metaData.traits.EventGroupId) ===
+          event?.groupId.toNumber() && nft.metaData.name === event?.name
     );
     if (!nft || !status) return;
-    setMintedNftImageLink(ipfs2http(nft.image));
+    setMintedNftImageLink(ipfs2http(nft.metaData.image));
     setLoading(false);
   }, [ownedNFTs, status]);
 
@@ -191,6 +206,44 @@ export const useGetOwnedNFTs = () => {
 
   const getOwnedNFTs = async () => {
     if (!address) return;
+    const mintNFTManager = getMintNFTManagerContract({ signin: true });
+    if (!mintNFTManager) throw new Error("Cannot find mintNFTManager contract");
+    const balanceOfNFTs = await mintNFTManager.balanceOf(address);
+    const metadata: any[] = [];
+    for (let index = 0; index < balanceOfNFTs.toNumber(); index++) {
+      const tokenId = await mintNFTManager.tokenOfOwnerByIndex(address, index);
+      const tokenURI = await mintNFTManager.tokenURI(tokenId);
+      const path = ipfs2http(tokenURI);
+      const { data } = await axios.get(path);
+      metadata.push({ tokenId: tokenId, metaData: data });
+    }
+    setOwnedNFTs(metadata);
+  };
+
+  return { ownedNFTs, loading, reload, reloading };
+};
+
+export const useGetOwnedNFTsByAddress = (address?: string) => {
+  const [ownedNFTs, setOwnedNFTs] = useState<IOwnedNFT[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [reloading, setReloading] = useState(false);
+
+  useEffect(() => {
+    if (address) {
+      setLoading(true);
+      getOwnedNFTs();
+      setLoading(false);
+    }
+  }, [address]);
+
+  const reload = async () => {
+    setReloading(true);
+    getOwnedNFTs();
+    setReloading(false);
+  };
+
+  const getOwnedNFTs = async () => {
+    if (!address) return;
     const mintNFTManager = getMintNFTManagerContract();
     if (!mintNFTManager) throw new Error("Cannot find mintNFTManager contract");
     const balanceOfNFTs = await mintNFTManager.balanceOf(address);
@@ -200,10 +253,30 @@ export const useGetOwnedNFTs = () => {
       const tokenURI = await mintNFTManager.tokenURI(tokenId);
       const path = ipfs2http(tokenURI);
       const { data } = await axios.get(path);
-      metadata.push(data);
+      metadata.push({ tokenId: tokenId, metaData: data });
     }
     setOwnedNFTs(metadata);
   };
 
   return { ownedNFTs, loading, reload, reloading };
+};
+
+export const useTokenURI = (tokenId?: BigNumber) => {
+  const [metaData, setMetaData] = useState<INFTMetaData>();
+  useEffect(() => {
+    const fetch = async () => {
+      if (tokenId) {
+        const mintNFTManager = getMintNFTManagerContract();
+        if (!mintNFTManager)
+          throw new Error("Cannot find mintNFTManager contract");
+        const tokenURI = await mintNFTManager.tokenURI(tokenId);
+        const path = ipfs2http(tokenURI);
+        const { data } = await axios.get(path);
+        setMetaData(data);
+      }
+    };
+    fetch();
+  }, [tokenId]);
+
+  return { metaData };
 };

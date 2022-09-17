@@ -204,11 +204,13 @@ export const useCreateEventRecord = () => {
       setLoading(true);
       const datestr = params.date.toLocaleDateString();
       const provider = new ethers.providers.Web3Provider(ethereum as any);
-      const gasPrice = (await provider.getGasPrice()).toNumber();
-      const value = ethers.utils.parseEther(
-        `${gasPrice * params.mintLimit * 250000 * 2.1 * 0.000000000000000001}`
-      );
-      console.log(value);
+      let value!: ethers.BigNumber;
+      if (params.useMtx) {
+        const gasPrice = (await provider.getGasPrice())?.toNumber();
+        value = ethers.utils.parseEther(
+          `${gasPrice * params.mintLimit * 250000 * 2.1 * 0.000000000000000001}`
+        );
+      }
       const tx = await eventManager.createEventRecord(
         Number(params.groupId),
         params.eventName,
