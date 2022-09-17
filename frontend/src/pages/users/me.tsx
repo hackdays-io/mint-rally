@@ -21,8 +21,8 @@ const User = () => {
     const grouped = ownedNFTs.reduce<Record<number, IOwnedNFT[]>>(
       (nfts, current) => {
         const { traits } = current;
-        nfts[traits.eventGroupId] = nfts[traits.eventGroupId] ?? [];
-        nfts[traits.eventGroupId].push(current);
+        nfts[traits.EventGroupId] = nfts[Number(traits.EventGroupId)] ?? [];
+        nfts[traits.EventGroupId].push(current);
         return nfts;
       },
       {}
