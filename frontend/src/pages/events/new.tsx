@@ -98,7 +98,8 @@ const EventCreate: NextPage = () => {
         description: baseAttribute.description,
         external_link: "https://mintrally.xyz",
         traits: {
-          eventGroupId: groupId,
+          EventGroupId: groupId,
+          RequiredParticipateCount: baseAttribute.requiredParticipateCount,
         },
       };
       metadataFiles.push(
