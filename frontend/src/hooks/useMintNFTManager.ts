@@ -1,4 +1,4 @@
-import { BigNumber, ethers } from "ethers";
+import { ethers } from "ethers";
 import { useCallback, useEffect, useState } from "react";
 const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_MINT_NFT_MANAGER!;
 import contract from "../contracts/MintNFT.json";
@@ -20,7 +20,8 @@ export interface IOwnedNFT {
   description: string;
   image: string;
   traits: {
-    eventGroupId: number;
+    EventGroupId: number;
+    RequiredParticipateCount: number;
   };
 }
 
@@ -66,7 +67,7 @@ export const useMintParticipateNFT = (event: IEventRecord | null) => {
   useEffect(() => {
     const nft = ownedNFTs.find(
       (nft) =>
-        Number(nft.traits.eventGroupId) === event?.groupId.toNumber() &&
+        Number(nft.traits.EventGroupId) === event?.groupId.toNumber() &&
         nft.name === event?.name
     );
     if (!nft || !status) return;
