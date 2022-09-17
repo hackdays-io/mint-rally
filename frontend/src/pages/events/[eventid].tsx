@@ -72,7 +72,7 @@ const Event = () => {
   const mintedNFT = useMemo(() => {
     return ownedNFTs.find(
       (nft) =>
-        Number(nft.traits.eventGroupId) === event?.groupId.toNumber() &&
+        Number(nft.traits.EventGroupId) === event?.groupId.toNumber() &&
         nft.name === event?.name
     );
   }, [event, ownedNFTs]);
