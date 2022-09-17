@@ -84,11 +84,7 @@ const NewEventGroupPage: NextPage = () => {
     },
   });
 
-  const {
-    fields: nfts,
-    append,
-    remove,
-  } = useFieldArray({ control, name: "nfts" });
+  const { fields: nfts, remove } = useFieldArray({ control, name: "nfts" });
 
   const uploadImagesToIpfs = async (nfts: FormData["nfts"]) => {
     console.log("Starting to upload images to IPFS...");

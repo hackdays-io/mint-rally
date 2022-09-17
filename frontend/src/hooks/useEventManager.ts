@@ -98,6 +98,7 @@ export const useCreateEventGroup = () => {
     if (!eventManager) throw "error: contract can't found";
     const filters = eventManager?.filters.CreatedGroupId(address, null);
     eventManager.on(filters, (_, _groupId: BigNumber) => {
+      console.log(_groupId.toNumber());
       setCreatedGroupId(_groupId.toNumber());
     });
 
@@ -113,12 +114,10 @@ export const useCreateEventGroup = () => {
         JSON.stringify(nftAttributes)
       );
       setLoading(false);
-      setStatus(true);
     }
   }, [status, createdGroupId]);
 
   const createEventGroup = async (params: ICreateEventGroupParams) => {
-    console.log(params);
     try {
       setNftAttributes(params.nftAttributes);
       setCreatedGroupId(null);
@@ -128,7 +127,7 @@ export const useCreateEventGroup = () => {
       if (!eventManager) throw "error: contract can't found";
       const tx = await eventManager.createGroup(params.groupName);
       await tx.wait();
-      return;
+      setStatus(true);
     } catch (e: any) {
       setErrors(e.error?.data || "error occured");
       setLoading(false);
