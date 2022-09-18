@@ -2,14 +2,12 @@ import contract from "../contracts/MintNFT.json";
 import { ethers } from "ethers";
 import { ipfs2http } from "../../utils/ipfs2http";
 import axios from "axios";
+import { IOwnedNFT } from "../hooks/useMintNFTManager";
 const provierRpc = process.env.NEXT_PUBLIC_PROVIDER_RPC!;
 const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_MINT_NFT_MANAGER!;
-export interface NFTInfo {
-  tokenId: number;
-  metaData: any;
-}
 
 const getMintNFTManagerContract = () => {
+  console.log('*****getRPC:', provierRpc)
   const provider = new ethers.providers.JsonRpcProvider(provierRpc);
   const _contract = new ethers.Contract(
     contractAddress,
@@ -23,7 +21,7 @@ export const getOwnedNFTsFromAddress = async (address: string) => {
   if (!mintNFTManager) throw new Error("Cannot find mintNFTManager contract");
   const balanceOfNFTs = await mintNFTManager.balanceOf(address);
   console.log(balanceOfNFTs)
-  const metadata: NFTInfo[] = [];
+  const metadata: IOwnedNFT[] = [];
   for (let index = 0; index < balanceOfNFTs.toNumber(); index++) {
     const tokenId = await mintNFTManager.tokenOfOwnerByIndex(address, index);
     const tokenURI = await mintNFTManager.tokenURI(tokenId);
