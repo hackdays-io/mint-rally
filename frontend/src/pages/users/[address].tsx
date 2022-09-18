@@ -8,6 +8,7 @@ import {
   Container,
   useDisclosure,
 } from "@chakra-ui/react";
+import { GetServerSideProps } from "next";
 
 import {
   IOwnedNFT,
@@ -19,11 +20,28 @@ import { ipfs2http } from "../../../utils/ipfs2http";
 import { BigNumber } from "ethers";
 import TokenModal from "../../components/molecules/user/TokenModal";
 import { useRouter } from "next/router";
+type Props = {
+  address?: string;
+  tokenid?: string;
+  nft?: IOwnedNFT | null;
+};
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const address = context.query.address;
+  const props: Props = {
+    address: String(address),
+  };
+  if (context.query.tokenid) {
+    props.tokenid = String(context.query.tokenid);
+  }
+  let _nft = null;
 
-const User = () => {
-  const router = useRouter();
-  const { address, tokenid } = router.query;
-  const { ownedNFTs, loading } = useGetOwnedNFTsByAddress(String(address));
+  console.log(props);
+  return {
+    props: props,
+  };
+};
+const User = (props: Props) => {
+  const { ownedNFTs, loading } = useGetOwnedNFTsByAddress(props.address);
   const [selectedTokenId, selectTokenId] = useState<BigNumber>();
   const { groups } = useEventGroups();
 
@@ -45,11 +63,12 @@ const User = () => {
   }, [groups, ownedNFTs]);
 
   useEffect(() => {
-    if (tokenid !== undefined && tokenid !== null) {
-      selectTokenId(BigNumber.from(tokenid));
+    console.log(props.tokenid);
+    if (props.tokenid && props.tokenid != null) {
+      selectTokenId(BigNumber.from(props.tokenid));
       onOpen();
     }
-  }, [tokenid]);
+  }, [props.tokenid]);
 
   const ImageBadge = ({ image, name }: { image: string; name: string }) => (
     <Flex justifyContent="center" alignItems="center" flexDirection="column">
