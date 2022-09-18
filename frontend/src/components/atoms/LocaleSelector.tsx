@@ -6,7 +6,6 @@ import { faLanguage } from "@fortawesome/free-solid-svg-icons";
 
 const LocaleSelector = () => {
   const router = useRouter();
-  console.log(router.pathname, router.query);
   const otherLocales = router.locales!.filter((l) => l !== router.locale);
   return (
     <>

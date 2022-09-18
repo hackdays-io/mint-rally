@@ -20,7 +20,6 @@ const Home: NextPage = () => {
   const { records, errors, loading } = useEventRecords();
   const chainId = useChainId();
   const networkMismatched = useNetworkMismatch();
-  console.log(chainId, networkMismatched);
   return (
     <Box pb={20}>
       <div>

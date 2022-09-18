@@ -11,6 +11,7 @@ import {
 import { GetServerSideProps } from "next";
 
 import {
+  INFTMetaData,
   IOwnedNFT,
   useGetOwnedNFTsByAddress,
 } from "../../hooks/useMintNFTManager";
@@ -19,11 +20,13 @@ import { useEventGroups } from "../../hooks/useEventManager";
 import { ipfs2http } from "../../../utils/ipfs2http";
 import { BigNumber } from "ethers";
 import TokenModal from "../../components/molecules/user/TokenModal";
-import { useRouter } from "next/router";
+import { getNFTDataFromAddress } from "../../libs/mintManagerFunctions";
+import { NextSeo } from "next-seo";
+
 type Props = {
   address?: string;
   tokenid?: string;
-  nft?: IOwnedNFT | null;
+  nft?: INFTMetaData | null;
 };
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const address = context.query.address;
@@ -32,9 +35,11 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   };
   if (context.query.tokenid) {
     props.tokenid = String(context.query.tokenid);
+    const data = await getNFTDataFromAddress(BigNumber.from(props.tokenid));
+    if (data) {
+      props.nft = data;
+    }
   }
-  let _nft = null;
-
   console.log(props);
   return {
     props: props,
@@ -63,7 +68,6 @@ const User = (props: Props) => {
   }, [groups, ownedNFTs]);
 
   useEffect(() => {
-    console.log(props.tokenid);
     if (props.tokenid && props.tokenid != null) {
       selectTokenId(BigNumber.from(props.tokenid));
       onOpen();
@@ -123,54 +127,81 @@ const User = (props: Props) => {
   };
 
   return (
-    <Container maxW="1000">
-      <Box mt={10}>
-        <Heading as="h1" size="xl" color="mint.primary" fontWeight={700}>
-          NFT Collection
-        </Heading>
-      </Box>
-      {loading ? (
-        <Spinner />
-      ) : (
-        groups.length > 0 &&
-        Object.entries(nftCollectionsByGroup).map(([groupIdString, nfts]) => {
-          const id = groupIdString;
-          const data = nfts.map(
-            ({ tokenId, metaData: { name, image, description } }) => ({
-              name,
-              description,
-              image: ipfs2http(image),
-              tokenId,
-            })
-          );
-
-          return (
-            <div key={id}>
-              <Box width="100%" mt={10}>
-                <Heading
-                  as="h2"
-                  size="lg"
-                  color="mint.primary"
-                  fontWeight={400}
-                >
-                  {
-                    groups.find((g) => g.groupId.toNumber() === Number(id))
-                      ?.name
-                  }
-                </Heading>
-                <Box mt={4}>
-                  <div style={{ border: "2px #56F0DE solid" }} />
-                </Box>
-                <Flex justifyContent="space-between">
-                  {<Collection collectionData={data} />}
-                </Flex>
-              </Box>
-            </div>
-          );
-        })
+    <>
+      {props.nft && (
+        <NextSeo
+          title={"MintRally NFT: " + props.nft.name}
+          description={props.nft.description}
+          openGraph={{
+            url: `https://mintrally.xyz/users/${props.address}?tokenid=${props.tokenid}`,
+            title: `MintRally NFT: ${props.nft.name}`,
+            description: props.nft.description,
+            images: [
+              {
+                url: ipfs2http(props.nft.image),
+                alt: props.nft.name,
+              },
+            ],
+          }}
+          twitter={{
+            site: "@MintRally",
+            cardType: "summary_large_image",
+          }}
+        ></NextSeo>
       )}
-      <TokenModal isOpen={isOpen} onClose={onClose} tokenId={selectedTokenId} />
-    </Container>
+      <Container maxW="1000">
+        <Box mt={10}>
+          <Heading as="h1" size="xl" color="mint.primary" fontWeight={700}>
+            NFT Collection
+          </Heading>
+        </Box>
+        {loading ? (
+          <Spinner />
+        ) : (
+          groups.length > 0 &&
+          Object.entries(nftCollectionsByGroup).map(([groupIdString, nfts]) => {
+            const id = groupIdString;
+            const data = nfts.map(
+              ({ tokenId, metaData: { name, image, description } }) => ({
+                name,
+                description,
+                image: ipfs2http(image),
+                tokenId,
+              })
+            );
+
+            return (
+              <div key={id}>
+                <Box width="100%" mt={10}>
+                  <Heading
+                    as="h2"
+                    size="lg"
+                    color="mint.primary"
+                    fontWeight={400}
+                  >
+                    {
+                      groups.find((g) => g.groupId.toNumber() === Number(id))
+                        ?.name
+                    }
+                  </Heading>
+                  <Box mt={4}>
+                    <div style={{ border: "2px #56F0DE solid" }} />
+                  </Box>
+                  <Flex justifyContent="space-between">
+                    {<Collection collectionData={data} />}
+                  </Flex>
+                </Box>
+              </div>
+            );
+          })
+        )}
+        <TokenModal
+          isOpen={isOpen}
+          onClose={onClose}
+          tokenId={selectedTokenId}
+        />
+      </Container>
+    </>
   );
 };
 
