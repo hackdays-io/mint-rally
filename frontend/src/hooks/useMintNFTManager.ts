@@ -9,7 +9,7 @@ import axios from "axios";
 import { ipfs2http } from "../../utils/ipfs2http";
 import { useAddress } from "@thirdweb-dev/react";
 import { IEventRecord } from "./useEventManager";
-import { getOwnedNFTsFromAddress } from "../libs/mintManagerFunctions"
+import { getOwnedNFTsFromAddress, getNFTDataFromAddress } from "../libs/mintManagerFunctions"
 export interface IMintParticipateNFTParams {
   groupId: number;
   eventId: number;
@@ -257,12 +257,7 @@ export const useTokenURI = (tokenId?: BigNumber) => {
   useEffect(() => {
     const fetch = async () => {
       if (tokenId) {
-        const mintNFTManager = getMintNFTManagerContract();
-        if (!mintNFTManager)
-          throw new Error("Cannot find mintNFTManager contract");
-        const tokenURI = await mintNFTManager.tokenURI(tokenId);
-        const path = ipfs2http(tokenURI);
-        const { data } = await axios.get(path);
+        const data = await getNFTDataFromAddress(tokenId)
         setMetaData(data);
       }
     };
