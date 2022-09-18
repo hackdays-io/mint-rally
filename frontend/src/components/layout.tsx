@@ -3,6 +3,7 @@ import Head from "next/head";
 import Navbar from "./navbar";
 import Footer from "./footer";
 import { Box } from "@chakra-ui/react";
+import MyHead from "./atoms/MyHead";
 
 type Props = {
   children: ReactNode;
@@ -10,11 +11,7 @@ type Props = {
 };
 const Layout = ({ children }: Props) => (
   <>
-    <Head>
-      <title>Mint Rally</title>
-      <meta charSet="utf-8" />
-      <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-    </Head>
+    <MyHead></MyHead>
     <Box minHeight="100vh">
       <Navbar />
       <Box>{children}</Box>
