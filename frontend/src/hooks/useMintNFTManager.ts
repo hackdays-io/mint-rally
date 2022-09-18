@@ -9,6 +9,7 @@ import axios from "axios";
 import { ipfs2http } from "../../utils/ipfs2http";
 import { useAddress } from "@thirdweb-dev/react";
 import { IEventRecord } from "./useEventManager";
+import { getOwnedNFTsFromAddress } from "../libs/mintManagerFunctions"
 export interface IMintParticipateNFTParams {
   groupId: number;
   eventId: number;
@@ -83,7 +84,7 @@ export const useMintParticipateNFT = (event: IEventRecord | null) => {
     const nft = ownedNFTs.find(
       (nft) =>
         Number(nft.metaData.traits.EventGroupId) ===
-          event?.groupId.toNumber() && nft.metaData.name === event?.name
+        event?.groupId.toNumber() && nft.metaData.name === event?.name
     );
     if (!nft || !status) return;
     setMintedNftImageLink(ipfs2http(nft.metaData.image));
@@ -244,17 +245,7 @@ export const useGetOwnedNFTsByAddress = (address?: string) => {
 
   const getOwnedNFTs = async () => {
     if (!address) return;
-    const mintNFTManager = getMintNFTManagerContract();
-    if (!mintNFTManager) throw new Error("Cannot find mintNFTManager contract");
-    const balanceOfNFTs = await mintNFTManager.balanceOf(address);
-    const metadata: any[] = [];
-    for (let index = 0; index < balanceOfNFTs.toNumber(); index++) {
-      const tokenId = await mintNFTManager.tokenOfOwnerByIndex(address, index);
-      const tokenURI = await mintNFTManager.tokenURI(tokenId);
-      const path = ipfs2http(tokenURI);
-      const { data } = await axios.get(path);
-      metadata.push({ tokenId: tokenId, metaData: data });
-    }
+    const metadata = await getOwnedNFTsFromAddress(address);
     setOwnedNFTs(metadata);
   };
 
