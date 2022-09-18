@@ -19,7 +19,6 @@ export const getOwnedNFTsFromAddress = async (address: string) => {
   const mintNFTManager = getMintNFTManagerContract();
   if (!mintNFTManager) throw new Error("Cannot find mintNFTManager contract");
   const balanceOfNFTs = await mintNFTManager.balanceOf(address);
-  console.log(balanceOfNFTs)
   const metadata: IOwnedNFT[] = [];
   for (let index = 0; index < balanceOfNFTs.toNumber(); index++) {
     const tokenId = await mintNFTManager.tokenOfOwnerByIndex(address, index);

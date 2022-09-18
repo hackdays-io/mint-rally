@@ -98,7 +98,6 @@ export const useCreateEventGroup = () => {
     if (!eventManager) throw "error: contract can't found";
     const filters = eventManager?.filters.CreatedGroupId(address, null);
     eventManager.on(filters, (_, _groupId: BigNumber) => {
-      console.log(_groupId.toNumber());
       setCreatedGroupId(_groupId.toNumber());
     });
 
@@ -151,7 +150,6 @@ export const useEventGroups = () => {
       if (!eventManager) throw "error";
       setLoading(true);
       const data = await eventManager.getGroups();
-      console.log(data);
       setGroups(data);
       setLoading(false);
     };
@@ -178,7 +176,6 @@ export const useOwnEventGroups = () => {
       const data = await eventManager.getOwnGroups();
       setLoading(false);
       setGroups(data);
-      console.log(data);
     };
     getOwnEventGroups();
   }, [address]);
@@ -254,7 +251,6 @@ export const useEventRecords = () => {
         if (!eventManager) throw "error";
         setLoading(true);
         const data = await eventManager.getEventRecords();
-        console.log("retrieved:", data);
         setLoading(false);
         setRecords(data);
       } catch (e: any) {
@@ -308,7 +304,6 @@ export const useGetParticipationEventIds = () => {
     if (!eventManager) throw "error";
     setLoading(true);
     const data = await eventManager.getParticipationEventIds();
-    console.log("retrieved:", data);
     setLoading(false);
     const _data = data.map((d: any) => d.toNumber());
     setEventIds(_data);
