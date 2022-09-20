@@ -1,6 +1,5 @@
 import { Image, Flex } from "@chakra-ui/react";
-import { FC, useEffect, useState } from "react";
-import { ipfs2http } from "utils/ipfs2http";
+import { FC, useState } from "react";
 
 import ImageIcon from "./ImageIcon";
 import StyledFileInput from "./StyledFileInput";
@@ -17,24 +16,10 @@ const getImageData = (file: File): Promise<string | undefined> => {
 
 type Props = {
   onChangeData: (file: File) => void;
-  value?: string;
 };
 
-const ImageSelectorWithPreview: FC<Props> = ({ onChangeData, value }) => {
+const ImageSelectorWithPreview: FC<Props> = ({ onChangeData }) => {
   const [dataUrl, setDataUrl] = useState("");
-
-  useEffect(() => {
-    const updatePreview = async () => {
-      if (!value) return;
-      if (typeof value === "string") {
-        setDataUrl(ipfs2http(value));
-      } else {
-        const dataUrl = await getImageData(value);
-        setDataUrl(String(dataUrl));
-      }
-    };
-    updatePreview();
-  }, [value]);
 
   return (
     <StyledFileInput
