@@ -15,7 +15,6 @@ export default {
   CREATE_NEW_EVENT_GROUP: "イベントグループを作成",
   NEW_EVENT_GROUP_NAME: "イベントグループ名",
   EVENT_GROUP_CREATED: "イベントグループが作成されました！",
-  EVENT_GROUP_APPEND_NFT: "NFTを追加する",
   // Event group page
   OWN_EVENTS: "のイベント",
   // Event index
