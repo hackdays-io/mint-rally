@@ -11,40 +11,23 @@ import {
   Container,
 } from "@chakra-ui/react";
 import type { NextPage } from "next";
-import { Web3Storage } from "web3.storage";
 import { useCreateEventGroup, INFTImage } from "../../hooks/useEventManager";
 import LoginRequired from "../../components/atoms/web3/LoginRequired";
 import { useLocale } from "../../hooks/useLocale";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import ErrorMessage from "../../components/atoms/form/ErrorMessage";
 import NFTAttributesForm from "../../components/organisms/NFTAttributesForm";
-
-if (!process.env.NEXT_PUBLIC_WEB3_STORAGE_KEY) {
-  throw new Error("WEB3_STORAGE_KEY is required");
-}
-
-const ipfsClient = new Web3Storage({
-  token: process.env.NEXT_PUBLIC_WEB3_STORAGE_KEY,
-  endpoint: new URL("https://api.web3.storage"),
-});
-
-const renameFile = (file: File, newFilename: string) => {
-  const { type, lastModified } = file;
-  return new File([file], newFilename, { type, lastModified });
-};
+import { useUploadImageToIpfs } from "src/hooks/useIpfs";
 
 export interface EventGroupFormData {
   groupName: string;
-  nfts: {
-    description: string;
-    fileObject: File | null;
-    requiredParticipateCount: number;
-  }[];
+  nfts: INFTImage[];
 }
 
 const NewEventGroupPage: NextPage = () => {
   const { status, errors, createEventGroup, loading } = useCreateEventGroup();
   const { t } = useLocale();
+  const uploadImagesToIpfs = useUploadImageToIpfs();
 
   const {
     control,
@@ -76,50 +59,21 @@ const NewEventGroupPage: NextPage = () => {
 
   const { remove, append } = useFieldArray({ control, name: "nfts" });
 
-  const uploadImagesToIpfs = async (nfts: EventGroupFormData["nfts"]) => {
-    console.log("Starting to upload images to IPFS...");
-    const renamedFiles = nfts.map(
-      ({ fileObject, description, requiredParticipateCount }) => ({
-        fileObject: renameFile(fileObject!, `${requiredParticipateCount}.png`),
-        description,
-        requiredParticipateCount,
-      })
-    );
-
-    const rootCid = await ipfsClient.put(
-      renamedFiles.map((f) => f.fileObject),
-      {
-        name: `${new Date().toISOString()}`,
-        maxRetries: 3,
-        wrapWithDirectory: true,
-        onRootCidReady: (rootCid) => {
-          console.log("rood cid:", rootCid);
-        },
-        onStoredChunk: (size) => {
-          // console.log(`stored chunk of ${size} bytes`);
-        },
-      }
-    );
-    return { rootCid, renamedFiles };
-  };
-
   const submit = async (data: EventGroupFormData) => {
     const uploadResult = await uploadImagesToIpfs(data.nfts);
-    if (!uploadResult) {
-      console.error("uploading error");
-      // @TODO: display error alert
-      return;
-    }
-    const { rootCid, renamedFiles } = uploadResult;
-    const nftAttributes: INFTImage[] = renamedFiles.map(
-      ({ fileObject, description, requiredParticipateCount }) => ({
-        image: `ipfs://${rootCid}/${fileObject.name}`,
-        description: description,
-        requiredParticipateCount,
-      })
-    );
 
-    await createEventGroup({ groupName: data.groupName, nftAttributes });
+    if (uploadResult) {
+      const { rootCid, renamedFiles } = uploadResult;
+      const nftAttributes: INFTImage[] = renamedFiles.map(
+        ({ fileObject, description, requiredParticipateCount }) => ({
+          image: `ipfs://${rootCid}/${fileObject.name}`,
+          description: description,
+          requiredParticipateCount,
+        })
+      );
+
+      await createEventGroup({ groupName: data.groupName, nftAttributes });
+    }
   };
 
   return (

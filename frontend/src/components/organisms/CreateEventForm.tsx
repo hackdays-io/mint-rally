@@ -28,10 +28,10 @@ import {
   useOwnEventGroups,
 } from "../../hooks/useEventManager";
 import ErrorMessage from "../../components/atoms/form/ErrorMessage";
-import { Web3Storage } from "web3.storage";
 import { useLocale } from "../../hooks/useLocale";
 import Link from "next/link";
 import NFTAttributesForm from "./NFTAttributesForm";
+import { useIpfsClient, useUploadImageToIpfs } from "src/hooks/useIpfs";
 
 interface EventFormData {
   eventGroupId: string;
@@ -43,20 +43,13 @@ interface EventFormData {
   secretPhrase: string;
   mintLimit: number;
   useMtx: boolean;
-  nfts: {
-    description: string;
-    fileObject: File | null;
-    requiredParticipateCount: number;
-  }[];
+  nfts: INFTImage[];
 }
 
 const CreateEventForm: FC = () => {
   const { t } = useLocale();
-
-  const ipfsClient = new Web3Storage({
-    token: String(process.env.NEXT_PUBLIC_WEB3_STORAGE_KEY),
-    endpoint: new URL("https://api.web3.storage"),
-  });
+  const ipfsClient = useIpfsClient();
+  const uploadImagesToIpfs = useUploadImageToIpfs();
 
   const {
     control,
@@ -87,11 +80,7 @@ const CreateEventForm: FC = () => {
       `group${watch("eventGroupId")}`
     );
     if (!groupNFTAttributes) return;
-    const baseNFTAttributes: {
-      description: string;
-      fileObject: File | null;
-      requiredParticipateCount: number;
-    }[] = JSON.parse(groupNFTAttributes);
+    const baseNFTAttributes: INFTImage[] = JSON.parse(groupNFTAttributes);
     setValue("nfts", baseNFTAttributes);
   }, [watch("eventGroupId")]);
 
@@ -104,39 +93,55 @@ const CreateEventForm: FC = () => {
     createEventRecord,
   } = useCreateEventRecord();
 
-  const saveNFTMetadataOnIPFS = async (groupId: string, eventName: string) => {
-    const baseNFTAttributes: INFTImage[] = JSON.parse(
-      String(window.localStorage.getItem(`group${groupId}`))
-    );
+  const saveNFTMetadataOnIPFS = async (
+    groupId: string,
+    eventName: string,
+    nfts: INFTImage[]
+  ) => {
+    const imageUpdatedNfts = nfts.filter((nft) => nft.fileObject);
+    let baseNftAttributes = nfts.filter((nft) => !nft.fileObject);
+
+    const uploadResult = await uploadImagesToIpfs(imageUpdatedNfts);
+    if (uploadResult) {
+      const nftAttributes: INFTImage[] = uploadResult.renamedFiles.map(
+        ({ fileObject, description, requiredParticipateCount }) => ({
+          image: `ipfs://${uploadResult.rootCid}/${fileObject.name}`,
+          description: description,
+          requiredParticipateCount,
+        })
+      );
+      baseNftAttributes = nftAttributes.concat(baseNftAttributes);
+    }
+
     const metadataFiles: File[] = [];
-    for (const baseAttribute of baseNFTAttributes) {
+    for (const nftAttribute of baseNftAttributes) {
       const attribute: INFTAttribute = {
         name: eventName,
-        image: baseAttribute.image,
-        description: baseAttribute.description,
+        image: nftAttribute.image,
+        description: nftAttribute.description,
         external_link: "https://mintrally.xyz",
         traits: {
           EventGroupId: groupId,
-          RequiredParticipateCount: baseAttribute.requiredParticipateCount,
+          RequiredParticipateCount: nftAttribute.requiredParticipateCount,
         },
       };
       metadataFiles.push(
         new File(
           [JSON.stringify(attribute)],
-          `${baseAttribute.requiredParticipateCount}.json`,
+          `${nftAttribute.requiredParticipateCount}.json`,
           { type: "text/json" }
         )
       );
     }
-    const rootCid = await ipfsClient.put(metadataFiles, {
+    const metaDataRootCid = await ipfsClient.put(metadataFiles, {
       name: `${groupId}_${eventName}`,
       maxRetries: 3,
       wrapWithDirectory: true,
     });
-    return baseNFTAttributes.map((attribute) => {
+    return baseNftAttributes.map((attribute) => {
       return {
         requiredParticipateCount: attribute.requiredParticipateCount,
-        metaDataURL: `ipfs://${rootCid}/${attribute.requiredParticipateCount}.json`,
+        metaDataURL: `ipfs://${metaDataRootCid}/${attribute.requiredParticipateCount}.json`,
       };
     });
   };
@@ -144,7 +149,8 @@ const CreateEventForm: FC = () => {
   const onSubmit = async (data: EventFormData) => {
     const nftAttributes = await saveNFTMetadataOnIPFS(
       data.eventGroupId,
-      data.eventName
+      data.eventName,
+      data.nfts
     );
 
     const params: ICreateEventRecordParams = {
