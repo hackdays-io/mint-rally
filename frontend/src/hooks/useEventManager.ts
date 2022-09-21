@@ -19,6 +19,7 @@ export interface IEventRecord {
   useMtx: boolean;
 }
 export interface INFTImage {
+  name: string;
   image: string;
   description: string;
   requiredParticipateCount: number;
