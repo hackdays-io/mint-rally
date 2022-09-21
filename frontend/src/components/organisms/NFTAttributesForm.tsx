@@ -13,7 +13,7 @@ import {
   NumberInputStepper,
   Text,
 } from "@chakra-ui/react";
-import { FC } from "react";
+import { FC, useEffect, useState } from "react";
 import { Controller, Control, UseFieldArrayRemove } from "react-hook-form";
 import { INFTImage } from "src/hooks/useEventManager";
 import { useLocale } from "../../hooks/useLocale";

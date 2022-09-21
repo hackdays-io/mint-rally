@@ -25,8 +25,9 @@ const ImageSelectorWithPreview: FC<Props> = ({ onChangeData, value }) => {
 
   useEffect(() => {
     const updatePreview = async () => {
-      if (!value) return;
-      if (typeof value === "string") {
+      if (!value) {
+        setDataUrl("");
+      } else if (typeof value === "string") {
         setDataUrl(ipfs2http(value));
       } else {
         const dataUrl = await getImageData(value);
