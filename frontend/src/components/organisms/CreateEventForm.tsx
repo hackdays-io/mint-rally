@@ -104,7 +104,8 @@ const CreateEventForm: FC = () => {
     const uploadResult = await uploadImagesToIpfs(imageUpdatedNfts);
     if (uploadResult) {
       const nftAttributes: INFTImage[] = uploadResult.renamedFiles.map(
-        ({ fileObject, description, requiredParticipateCount }) => ({
+        ({ name, fileObject, description, requiredParticipateCount }) => ({
+          name: name,
           image: `ipfs://${uploadResult.rootCid}/${fileObject.name}`,
           description: description,
           requiredParticipateCount,
@@ -116,12 +117,13 @@ const CreateEventForm: FC = () => {
     const metadataFiles: File[] = [];
     for (const nftAttribute of baseNftAttributes) {
       const attribute: INFTAttribute = {
-        name: eventName,
+        name: nftAttribute.name,
         image: nftAttribute.image,
         description: nftAttribute.description,
         external_link: "https://mintrally.xyz",
         traits: {
           EventGroupId: groupId,
+          EventName: eventName,
           RequiredParticipateCount: nftAttribute.requiredParticipateCount,
         },
       };

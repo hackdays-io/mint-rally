@@ -58,8 +58,9 @@ const User = (props: Props) => {
         const {
           metaData: { traits },
         } = current;
-        nfts[traits.EventGroupId] = nfts[Number(traits.EventGroupId)] ?? [];
-        nfts[traits.EventGroupId].push(current);
+        nfts[Number(traits.EventGroupId)] =
+          nfts[Number(traits.EventGroupId)] ?? [];
+        nfts[Number(traits.EventGroupId)].push(current);
         return nfts;
       },
       {}

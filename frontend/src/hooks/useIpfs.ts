@@ -1,4 +1,5 @@
 import { Web3Storage } from "web3.storage";
+import { INFTImage } from "./useEventManager";
 
 export const useIpfsClient = () => {
   return new Web3Storage({
@@ -15,16 +16,11 @@ export const useUploadImageToIpfs = () => {
     return new File([file], newFilename, { type, lastModified });
   };
 
-  const uploadImagesToIpfs = async (
-    nfts: {
-      description: string;
-      fileObject?: File | null;
-      requiredParticipateCount: number;
-    }[]
-  ) => {
+  const uploadImagesToIpfs = async (nfts: INFTImage[]) => {
     if (nfts.length === 0) return;
     const renamedFiles = nfts.map(
-      ({ fileObject, description, requiredParticipateCount }) => ({
+      ({ name, fileObject, description, requiredParticipateCount }) => ({
+        name: name,
         fileObject: renameFile(fileObject!, `${requiredParticipateCount}.png`),
         description,
         requiredParticipateCount,

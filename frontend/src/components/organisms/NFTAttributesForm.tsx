@@ -90,8 +90,35 @@ const NFTAttributesForm: FC<Props> = ({ control, nfts, append, remove }) => {
               )}
             />
           </Box>
-          <Box ml={{ md: 5, base: 0 }}>
+          <Box ml={{ md: 5, base: 0 }} width="100%">
             <Box>
+              <Text>{t.NFT_NAME}</Text>
+              <Controller
+                control={control}
+                name={`nfts.${index}.name`}
+                rules={{
+                  required: "NFT name is required",
+                }}
+                render={({
+                  field: { onChange, value },
+                  formState: { errors },
+                }) => (
+                  <>
+                    <Input
+                      variant="outline"
+                      value={value}
+                      onChange={(e) => {
+                        onChange(e.target.value);
+                      }}
+                    />
+                    <ErrorMessage>
+                      {parseErrorJson(errors, index, "name")}
+                    </ErrorMessage>
+                  </>
+                )}
+              />
+            </Box>
+            <Box mt={2}>
               <Text>{t.NFT_DESC}</Text>
               <Controller
                 control={control}
@@ -170,7 +197,7 @@ const NFTAttributesForm: FC<Props> = ({ control, nfts, append, remove }) => {
             <IconButton
               position="absolute"
               right="0"
-              top="0"
+              top="-20px"
               borderRadius="full"
               aria-label=""
               icon={<Icon as={CloseIcon} color="mint.primary" />}
