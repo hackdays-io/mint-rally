@@ -39,16 +39,19 @@ const NewEventGroupPage: NextPage = () => {
       groupName: "",
       nfts: [
         {
+          name: "",
           description: "",
           fileObject: null,
           requiredParticipateCount: 0,
         },
         {
+          name: "",
           description: "",
           fileObject: null,
           requiredParticipateCount: 3,
         },
         {
+          name: "",
           description: "",
           fileObject: null,
           requiredParticipateCount: 5,
@@ -65,7 +68,8 @@ const NewEventGroupPage: NextPage = () => {
     if (uploadResult) {
       const { rootCid, renamedFiles } = uploadResult;
       const nftAttributes: INFTImage[] = renamedFiles.map(
-        ({ fileObject, description, requiredParticipateCount }) => ({
+        ({ name, fileObject, description, requiredParticipateCount }) => ({
+          name: name,
           image: `ipfs://${rootCid}/${fileObject.name}`,
           description: description,
           requiredParticipateCount,
@@ -111,7 +115,7 @@ const NewEventGroupPage: NextPage = () => {
               />
 
               <Heading as="h2" fontSize="xl" my={4}>
-                NFTs
+                {t.EVENT_GROUP_NFT_TITLE}
               </Heading>
               {control && (
                 <NFTAttributesForm
