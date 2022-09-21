@@ -1,4 +1,4 @@
-import { FC, useEffect } from "react";
+import { FC, useEffect, useRef } from "react";
 import {
   Alert,
   AlertDescription,
@@ -79,9 +79,16 @@ const CreateEventForm: FC = () => {
     const groupNFTAttributes = window.localStorage.getItem(
       `group${watch("eventGroupId")}`
     );
-    if (!groupNFTAttributes) return;
-    const baseNFTAttributes: INFTImage[] = JSON.parse(groupNFTAttributes);
-    setValue("nfts", baseNFTAttributes);
+    if (!groupNFTAttributes) {
+      console.log("dont has group");
+      setValue("nfts", [
+        { name: "", requiredParticipateCount: 0, description: "", image: "" },
+      ]);
+    } else {
+      console.log("has group");
+      const baseNFTAttributes: INFTImage[] = JSON.parse(groupNFTAttributes);
+      setValue("nfts", baseNFTAttributes);
+    }
   }, [watch("eventGroupId")]);
 
   // state for loading event groups
