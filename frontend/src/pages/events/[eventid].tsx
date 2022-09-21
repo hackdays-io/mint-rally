@@ -73,7 +73,9 @@ const Event = () => {
     return ownedNFTs.find(
       (nft) =>
         Number(nft.metaData.traits.EventGroupId) ===
-          event?.groupId.toNumber() && nft.metaData.name === event?.name
+          event?.groupId.toNumber() &&
+        (nft.metaData.name === event?.name ||
+          nft.metaData.traits.EventName === event?.name)
     );
   }, [event, ownedNFTs]);
 

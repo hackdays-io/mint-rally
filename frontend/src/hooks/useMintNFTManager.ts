@@ -9,7 +9,10 @@ import axios from "axios";
 import { ipfs2http } from "../../utils/ipfs2http";
 import { useAddress } from "@thirdweb-dev/react";
 import { IEventRecord } from "./useEventManager";
-import { getOwnedNFTsFromAddress, getNFTDataFromAddress } from "../libs/mintManagerFunctions"
+import {
+  getOwnedNFTsFromAddress,
+  getNFTDataFromAddress,
+} from "../libs/mintManagerFunctions";
 export interface IMintParticipateNFTParams {
   groupId: number;
   eventId: number;
@@ -22,8 +25,9 @@ export interface INFTMetaData {
   description: string;
   image: string;
   traits: {
-    EventGroupId: number;
-    RequiredParticipateCount: number;
+    EventName?: string;
+    EventGroupId?: number;
+    RequiredParticipateCount?: number;
   };
 }
 
@@ -84,7 +88,9 @@ export const useMintParticipateNFT = (event: IEventRecord | null) => {
     const nft = ownedNFTs.find(
       (nft) =>
         Number(nft.metaData.traits.EventGroupId) ===
-        event?.groupId.toNumber() && nft.metaData.name === event?.name
+          event?.groupId.toNumber() &&
+        (nft.metaData.name === event?.name ||
+          nft.metaData.traits.EventName === event?.name)
     );
     if (!nft || !status) return;
     setMintedNftImageLink(ipfs2http(nft.metaData.image));
@@ -257,7 +263,7 @@ export const useTokenURI = (tokenId?: BigNumber) => {
   useEffect(() => {
     const fetch = async () => {
       if (tokenId) {
-        const data = await getNFTDataFromAddress(tokenId)
+        const data = await getNFTDataFromAddress(tokenId);
         setMetaData(data);
       }
     };
