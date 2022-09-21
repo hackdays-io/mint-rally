@@ -15,18 +15,14 @@ import {
 } from "@chakra-ui/react";
 import { FC } from "react";
 import { Controller, Control, UseFieldArrayRemove } from "react-hook-form";
+import { INFTImage } from "src/hooks/useEventManager";
 import { useLocale } from "../../hooks/useLocale";
 import ErrorMessage from "../atoms/form/ErrorMessage";
 import ImageSelectorWithPreview from "../ImageSelectorWithPreview";
 
 type Props = {
   control: Control<any, any>;
-  nfts: {
-    description: string;
-    fileObject?: File | null;
-    image?: string;
-    requiredParticipateCount: number;
-  }[];
+  nfts: INFTImage[];
   append: (v: any) => void;
   remove: UseFieldArrayRemove;
 };
@@ -40,6 +36,14 @@ const NFTAttributesForm: FC<Props> = ({ control, nfts, append, remove }) => {
       return "required participate count should be unique";
     } else {
       return true;
+    }
+  };
+
+  const validateHasImage = (nft: INFTImage) => {
+    if (nft.fileObject || nft.image) {
+      return true;
+    } else {
+      return "NFT image is required";
     }
   };
 
@@ -62,8 +66,12 @@ const NFTAttributesForm: FC<Props> = ({ control, nfts, append, remove }) => {
           <Box flexBasis="300px" flexShrink="0" minH="300px" mb={3}>
             <Controller
               control={control}
-              name={`nfts.${index}.image`}
-              rules={{ required: "NFT Image is required" }}
+              name={`nfts.${index}.fileObject`}
+              rules={{
+                validate: {
+                  required: () => validateHasImage(nfts[index]),
+                },
+              }}
               render={({
                 field: { onChange, value },
                 formState: { errors },
@@ -73,7 +81,7 @@ const NFTAttributesForm: FC<Props> = ({ control, nfts, append, remove }) => {
                     onChangeData={(newFile) => {
                       onChange(newFile);
                     }}
-                    value={value}
+                    value={nfts[index].image || value}
                   />
                   <ErrorMessage>
                     {parseErrorJson(errors, index, "fileObject")}

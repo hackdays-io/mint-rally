@@ -22,7 +22,7 @@ export interface INFTImage {
   image: string;
   description: string;
   requiredParticipateCount: number;
-  fileObject?: File;
+  fileObject?: File | null;
 }
 export interface INFTAttribute {
   name: string;
