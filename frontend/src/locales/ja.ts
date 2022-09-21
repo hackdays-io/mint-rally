@@ -8,13 +8,16 @@ export default {
   SWITCH_NETWORK: "ネットワーク切替",
   PLEASE_SIGN_IN: "ログインしてください。",
   // NFT
-  NFT_DESC: "NFTの説明 (*NFTの名前はイベント名になります。)",
+  NFT_NAME: "NFT名",
+  NFT_DESC: "NFT説明",
   NFT_DEFAULT: "このNFTは一般参加者に配布されます。",
   TIMES_PARTICIPATE: "このNFTを取得するために必要なイベント参加回数",
   // Event group index
   CREATE_NEW_EVENT_GROUP: "イベントグループを作成",
   NEW_EVENT_GROUP_NAME: "イベントグループ名",
+  EVENT_GROUP_NFT_TITLE: "NFTs (イベントごとにNFTを設定もできます)",
   EVENT_GROUP_CREATED: "イベントグループが作成されました！",
+  EVENT_GROUP_APPEND_NFT: "NFTを追加する",
   // Event group page
   OWN_EVENTS: "のイベント",
   // Event index

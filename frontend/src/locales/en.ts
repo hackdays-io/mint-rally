@@ -8,14 +8,17 @@ export default {
   SWITCH_NETWORK: "Switch Network",
   PLEASE_SIGN_IN: "Please sign in first!",
   // NFT
-  NFT_DESC: "NFT Description *NFT name will be event name",
+  NFT_NAME: "NFT Name",
+  NFT_DESC: "NFT Description",
   TIMES_PARTICIPATE:
     "How many events do users need participate in to get this NFT?",
   NFT_DEFAULT: "This NFT will be distributed to all participants",
   // Event group index
   CREATE_NEW_EVENT_GROUP: "Create new event group",
   NEW_EVENT_GROUP_NAME: "Event Group Name",
+  EVENT_GROUP_NFT_TITLE: "NFTs (You can edit in each event.)",
   EVENT_GROUP_CREATED: "Event Group Created!",
+  EVENT_GROUP_APPEND_NFT: "Add NFT",
   // Event group page
   OWN_EVENTS: "'s Events",
   // Event index
