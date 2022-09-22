@@ -31,7 +31,9 @@ export default {
   EVENT_END_TIME: "イベント終了時刻",
   EVENT_NFT_LIMIT: "NFTの発行上限数",
   EVENT_USE_MTX:
-    "参加者が無料でNFTを受け取れるようにする。（ガス代を肩代わりできます）",
+    "ガス代を肩代わりして、参加者が無料でNFTを受け取れるようにする。",
+  EVENT_USE_MTX_TRUE: "肩代わりする",
+  EVENT_USE_MTX_FALSE: "肩代わりしない",
   EVENT_SECRETPHRASE: "NFT受け取りのひみつの「あいことば」",
   EVENT_SECRETPHRASE_DESC:
     "ひみつの「あいことば」は忘れないようにしてください。あとから確認することはできません。",
