@@ -6,6 +6,8 @@ import {
   AlertTitle,
   Box,
   Flex,
+  Radio,
+  RadioGroup,
   Spinner,
   Switch,
   Text,
@@ -42,7 +44,7 @@ interface EventFormData {
   endTime: string;
   secretPhrase: string;
   mintLimit: number;
-  useMtx: boolean;
+  useMtx: "true" | "false";
   nfts: INFTImage[];
 }
 
@@ -68,7 +70,7 @@ const CreateEventForm: FC = () => {
       endTime: "",
       secretPhrase: "",
       mintLimit: 10,
-      useMtx: false,
+      useMtx: undefined,
       nfts: [],
     },
   });
@@ -171,7 +173,7 @@ const CreateEventForm: FC = () => {
       endTime: data.endTime,
       secretPhrase: data.secretPhrase,
       mintLimit: Number(data.mintLimit),
-      useMtx: data.useMtx,
+      useMtx: data.useMtx === "true",
       attributes: nftAttributes,
     };
     try {
@@ -311,7 +313,7 @@ const CreateEventForm: FC = () => {
                           value={value}
                           type="time"
                         />
-                        <ErrorMessage>{errors.date?.message}</ErrorMessage>
+                        <ErrorMessage>{errors.startTime?.message}</ErrorMessage>
                       </>
                     )}
                   />
@@ -338,7 +340,7 @@ const CreateEventForm: FC = () => {
                           value={value}
                           type="time"
                         />
-                        <ErrorMessage>{errors.date?.message}</ErrorMessage>
+                        <ErrorMessage>{errors.endTime?.message}</ErrorMessage>
                       </>
                     )}
                   />
@@ -365,7 +367,7 @@ const CreateEventForm: FC = () => {
                   }) => (
                     <>
                       <Input type="number" onChange={onChange} value={value} />
-                      <ErrorMessage>{errors.description?.message}</ErrorMessage>
+                      <ErrorMessage>{errors.mintLimit?.message}</ErrorMessage>
                     </>
                   )}
                 />
@@ -377,13 +379,21 @@ const CreateEventForm: FC = () => {
                 <Controller
                   control={control}
                   name="useMtx"
+                  rules={{
+                    required: "required",
+                  }}
                   render={({
                     field: { onChange, value },
                     formState: { errors },
                   }) => (
                     <>
-                      <Switch isChecked={value} onChange={onChange} />
-                      <ErrorMessage>{errors.description?.message}</ErrorMessage>
+                      <RadioGroup onChange={onChange}>
+                        <Radio value="false" mr={6}>
+                          {t.EVENT_USE_MTX_FALSE}
+                        </Radio>
+                        <Radio value="true">{t.EVENT_USE_MTX_TRUE}</Radio>
+                      </RadioGroup>
+                      <ErrorMessage>{errors.useMtx?.message}</ErrorMessage>
                     </>
                   )}
                 />
@@ -414,7 +424,9 @@ const CreateEventForm: FC = () => {
                   }) => (
                     <>
                       <Input id="secret" onChange={onChange} value={value} />
-                      <ErrorMessage>{errors.description?.message}</ErrorMessage>
+                      <ErrorMessage>
+                        {errors.secretPhrase?.message}
+                      </ErrorMessage>
                     </>
                   )}
                 />

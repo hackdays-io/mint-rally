@@ -32,6 +32,8 @@ export default {
   EVENT_END_TIME: "End Time",
   EVENT_NFT_LIMIT: "Limit for number of nfts",
   EVENT_USE_MTX: "Taking on gas fee for participants",
+  EVENT_USE_MTX_TRUE: "Yes",
+  EVENT_USE_MTX_FALSE: "No",
   EVENT_SECRETPHRASE: "SecretPhrase to mint",
   EVENT_SECRETPHRASE_DESC:
     "Please do not forget this phrase. you can't get this phrase after submitting",
