@@ -1,4 +1,4 @@
-import { FC, useEffect, useRef, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import {
   Alert,
   AlertDescription,
@@ -24,7 +24,6 @@ import {
 import {
   ICreateEventRecordParams,
   IEventGroup,
-  INFTAttribute,
   INFTImage,
   useCreateEventRecord,
   useOwnEventGroups,
@@ -104,7 +103,6 @@ const CreateEventForm: FC = () => {
 
   const onSubmit = async (data: EventFormData) => {
     setFormData(data);
-    console.log(formData);
     saveNFTMetadataOnIPFS(data.eventGroupId, data.eventName, data.nfts);
   };
 
