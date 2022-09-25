@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { getIpfsClient, uploadFilesToWeb3 } from "src/libs/libIpfs";
+import { getIpfsClient, ipfsUploader } from "src/libs/libIpfs";
 import { INFTAttribute, INFTImage } from "./useEventManager";
 
 export interface NFTAttribute {
@@ -26,10 +26,9 @@ export const useIpfs = () => {
     setLoading(true)
     setErrors(null)
     setNftAttributes([])
-    console.log('saveNFT', groupId)
     const imageUpdatedNfts = nfts.filter((nft) => nft.fileObject);
     let baseNftAttributes = nfts.filter((nft) => !nft.fileObject);
-    const uploadNFTsToIpfs = uploadFilesToWeb3()
+    const { uploadNFTsToIpfs, uploadMetadataFilesToIpfs } = ipfsUploader()
     const uploadResult = await uploadNFTsToIpfs(imageUpdatedNfts);
     if (uploadResult) {
       const nftAttributes: INFTImage[] = uploadResult.renamedFiles.map(
@@ -64,14 +63,8 @@ export const useIpfs = () => {
         )
       );
     }
-    const ipfsClient = getIpfsClient();
-    const metaDataRootCid = await ipfsClient.put(metadataFiles, {
-      name: `${groupId}_${eventName}`,
-      maxRetries: 3,
-      wrapWithDirectory: true,
-    });
+    const metaDataRootCid = await uploadMetadataFilesToIpfs(metadataFiles, `${groupId}_${eventName}`)
     setLoading(false);
-    console.log('finished')
     setNftAttributes(baseNftAttributes.map((attribute) => {
       return {
         requiredParticipateCount: attribute.requiredParticipateCount,
