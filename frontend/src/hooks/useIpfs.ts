@@ -1,48 +1,85 @@
-import { Web3Storage } from "web3.storage";
-import { INFTImage } from "./useEventManager";
 
-export const useIpfsClient = () => {
-  return new Web3Storage({
-    token: process.env.NEXT_PUBLIC_WEB3_STORAGE_KEY || "",
-    endpoint: new URL("https://api.web3.storage"),
-  });
-};
+import { useState } from "react";
+import { getIpfsClient, uploadFilesToWeb3 } from "src/libs/libIpfs";
+import { INFTAttribute, INFTImage } from "./useEventManager";
 
-export const useUploadImageToIpfs = () => {
-  const ipfsClient = useIpfsClient();
+export interface NFTAttribute {
+  requiredParticipateCount: number;
+  metaDataURL: string;
+}
 
-  const renameFile = (file: File, newFilename: string) => {
-    const { type, lastModified } = file;
-    return new File([file], newFilename, { type, lastModified });
+export const useIpfs = () => {
+  const [loading, setLoading] = useState(false)
+  const [errors, setErrors] = useState<Error | null>(null)
+  const [nftAttributes, setNftAttributes] = useState<NFTAttribute[]>([])
+  /**
+   * @param eventGroupId 
+   * @param eventName 
+   * @param nfts 
+   * @returns 
+   */
+  const saveNFTMetadataOnIPFS = async (
+    groupId: string,
+    eventName: string,
+    nfts: INFTImage[]
+  ) => {
+    setLoading(true)
+    setErrors(null)
+    setNftAttributes([])
+    console.log('saveNFT', groupId)
+    const imageUpdatedNfts = nfts.filter((nft) => nft.fileObject);
+    let baseNftAttributes = nfts.filter((nft) => !nft.fileObject);
+    const uploadNFTsToIpfs = uploadFilesToWeb3()
+    const uploadResult = await uploadNFTsToIpfs(imageUpdatedNfts);
+    if (uploadResult) {
+      const nftAttributes: INFTImage[] = uploadResult.renamedFiles.map(
+        ({ name, fileObject, description, requiredParticipateCount }) => ({
+          name: name,
+          image: `ipfs://${uploadResult.rootCid}/${fileObject.name}`,
+          description: description,
+          requiredParticipateCount,
+        })
+      );
+      baseNftAttributes = nftAttributes.concat(baseNftAttributes);
+    }
+
+    const metadataFiles: File[] = [];
+    for (const nftAttribute of baseNftAttributes) {
+      const attribute: INFTAttribute = {
+        name: nftAttribute.name,
+        image: nftAttribute.image,
+        description: nftAttribute.description,
+        external_link: "https://mintrally.xyz",
+        traits: {
+          EventGroupId: groupId,
+          EventName: eventName,
+          RequiredParticipateCount: nftAttribute.requiredParticipateCount,
+        },
+      };
+      metadataFiles.push(
+        new File(
+          [JSON.stringify(attribute)],
+          `${nftAttribute.requiredParticipateCount}.json`,
+          { type: "text/json" }
+        )
+      );
+    }
+    const ipfsClient = getIpfsClient();
+    const metaDataRootCid = await ipfsClient.put(metadataFiles, {
+      name: `${groupId}_${eventName}`,
+      maxRetries: 3,
+      wrapWithDirectory: true,
+    });
+    setLoading(false);
+    console.log('finished')
+    setNftAttributes(baseNftAttributes.map((attribute) => {
+      return {
+        requiredParticipateCount: attribute.requiredParticipateCount,
+        metaDataURL: `ipfs://${metaDataRootCid}/${attribute.requiredParticipateCount}.json`,
+      };
+    }));
+
   };
 
-  const uploadImagesToIpfs = async (nfts: INFTImage[]) => {
-    if (nfts.length === 0) return;
-    const renamedFiles = nfts.map(
-      ({ name, fileObject, description, requiredParticipateCount }) => ({
-        name: name,
-        fileObject: renameFile(fileObject!, `${requiredParticipateCount}.png`),
-        description,
-        requiredParticipateCount,
-      })
-    );
-
-    const rootCid = await ipfsClient.put(
-      renamedFiles.map((f) => f.fileObject),
-      {
-        name: `${new Date().toISOString()}`,
-        maxRetries: 3,
-        wrapWithDirectory: true,
-        onRootCidReady: (rootCid) => {
-          console.log("rood cid:", rootCid);
-        },
-        onStoredChunk: (size) => {
-          // console.log(`stored chunk of ${size} bytes`);
-        },
-      }
-    );
-    return { rootCid, renamedFiles };
-  };
-
-  return uploadImagesToIpfs;
-};
+  return { loading, errors, nftAttributes, saveNFTMetadataOnIPFS }
+}
