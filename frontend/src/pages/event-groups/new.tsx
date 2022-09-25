@@ -27,7 +27,7 @@ export interface EventGroupFormData {
 const NewEventGroupPage: NextPage = () => {
   const { status, errors, createEventGroup, loading } = useCreateEventGroup();
   const { t } = useLocale();
-  const { uploadNFTsToIpfs } = ipfsUploader();
+  const uploader = new ipfsUploader();
 
   const {
     control,
@@ -64,7 +64,7 @@ const NewEventGroupPage: NextPage = () => {
 
   const submit = async (data: EventGroupFormData) => {
     console.log(data.nfts);
-    const uploadResult = await uploadNFTsToIpfs(data.nfts);
+    const uploadResult = await uploader.uploadNFTsToIpfs(data.nfts);
 
     if (uploadResult) {
       const { rootCid, renamedFiles } = uploadResult;
