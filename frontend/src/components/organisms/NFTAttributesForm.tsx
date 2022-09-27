@@ -106,7 +106,7 @@ const NFTAttributesForm: FC<Props> = ({ control, nfts, append, remove }) => {
                   <>
                     <Input
                       variant="outline"
-                      value={value}
+                      value={value || nfts[index].name}
                       onChange={(e) => {
                         onChange(e.target.value);
                       }}
@@ -133,7 +133,7 @@ const NFTAttributesForm: FC<Props> = ({ control, nfts, append, remove }) => {
                   <>
                     <Input
                       variant="outline"
-                      value={value}
+                      value={value || nfts[index].description}
                       onChange={(e) => {
                         onChange(e.target.value);
                       }}
