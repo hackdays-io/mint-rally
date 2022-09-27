@@ -17,7 +17,7 @@ import { useLocale } from "../../hooks/useLocale";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import ErrorMessage from "../../components/atoms/form/ErrorMessage";
 import NFTAttributesForm from "../../components/organisms/NFTAttributesForm";
-import { useUploadImageToIpfs } from "src/hooks/useIpfs";
+import { ipfsUploader } from "src/libs/libIpfs";
 
 export interface EventGroupFormData {
   groupName: string;
@@ -27,7 +27,7 @@ export interface EventGroupFormData {
 const NewEventGroupPage: NextPage = () => {
   const { status, errors, createEventGroup, loading } = useCreateEventGroup();
   const { t } = useLocale();
-  const uploadImagesToIpfs = useUploadImageToIpfs();
+  const { uploadNFTsToIpfs } = ipfsUploader();
 
   const {
     control,
@@ -63,7 +63,8 @@ const NewEventGroupPage: NextPage = () => {
   const { remove, append } = useFieldArray({ control, name: "nfts" });
 
   const submit = async (data: EventGroupFormData) => {
-    const uploadResult = await uploadImagesToIpfs(data.nfts);
+    console.log(data.nfts);
+    const uploadResult = await uploadNFTsToIpfs(data.nfts);
 
     if (uploadResult) {
       const { rootCid, renamedFiles } = uploadResult;
@@ -75,7 +76,7 @@ const NewEventGroupPage: NextPage = () => {
           requiredParticipateCount,
         })
       );
-
+      console.log(nftAttributes);
       await createEventGroup({ groupName: data.groupName, nftAttributes });
     }
   };
