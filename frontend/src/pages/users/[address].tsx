@@ -22,6 +22,7 @@ import { BigNumber } from "ethers";
 import TokenModal from "../../components/molecules/user/TokenModal";
 import { getNFTDataFromAddress } from "../../libs/mintManagerFunctions";
 import { NextSeo } from "next-seo";
+import { useAddress } from "@thirdweb-dev/react";
 
 type Props = {
   address?: string;
@@ -49,6 +50,7 @@ const User = (props: Props) => {
   const { ownedNFTs, loading } = useGetOwnedNFTsByAddress(props.address);
   const [selectedTokenId, selectTokenId] = useState<BigNumber>();
   const { groups } = useEventGroups();
+  const address = useAddress();
 
   const { isOpen, onClose, onOpen } = useDisclosure();
 
@@ -155,6 +157,7 @@ const User = (props: Props) => {
           <Heading as="h1" size="xl" color="mint.primary" fontWeight={700}>
             NFT Collection
           </Heading>
+          <Text fontSize="xl">Wallet: {address?.substring(0, 12)}...</Text>
         </Box>
         {loading ? (
           <Spinner />
@@ -173,7 +176,7 @@ const User = (props: Props) => {
 
             return (
               <div key={id}>
-                <Box width="100%" mt={10}>
+                <Box width="100%" mt={5}>
                   <Heading
                     as="h2"
                     size="lg"
