@@ -15,11 +15,13 @@ import { useEventGroups } from "../../hooks/useEventManager";
 import { ipfs2http } from "../../../utils/ipfs2http";
 import { BigNumber } from "ethers";
 import TokenModal from "../../components/molecules/user/TokenModal";
+import { useAddress } from "@thirdweb-dev/react";
 
 const User = () => {
   const { ownedNFTs, loading } = useGetOwnedNFTs();
   const [selectedTokenId, selectTokenId] = useState<BigNumber>();
   const { groups } = useEventGroups();
+  const address = useAddress();
 
   const { isOpen, onClose, onOpen } = useDisclosure();
 
@@ -97,6 +99,7 @@ const User = () => {
         <Heading as="h1" size="xl" color="mint.primary" fontWeight={700}>
           NFT Collection
         </Heading>
+        <Text fontSize="xl">Wallet: {address?.substring(0, 12)}...</Text>
       </Box>
       {loading ? (
         <Spinner />
@@ -115,7 +118,7 @@ const User = () => {
 
           return (
             <div key={id}>
-              <Box width="100%" mt={10}>
+              <Box width="100%" mt={5}>
                 <Heading
                   as="h2"
                   size="lg"
