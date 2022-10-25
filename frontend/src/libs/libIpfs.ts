@@ -1,17 +1,21 @@
-import { Web3Storage } from "web3.storage";
 import { INFTImage } from "../hooks/useEventManager";
+import { IIpfsClient, IPFS_CLIENT_TYPE } from "./ipfsClient";
+import { PinataClient } from "./pinataClient";
+import { Web3StorageClient } from "./web3StorageClient";
 
-export const getIpfsClient = () => {
-  return new Web3Storage({
-    token: process.env.NEXT_PUBLIC_WEB3_STORAGE_KEY || "",
-    endpoint: new URL("https://api.web3.storage"),
-  });
+
+export const getIpfsClient = (type: IPFS_CLIENT_TYPE): IIpfsClient => {
+  if (process.env.NEXT_PUBLIC_PINATA_JWT) {
+    return new PinataClient()
+  } else {
+    return new Web3StorageClient()
+  }
 };
 
 export class ipfsUploader {
-  ipfsClient: Web3Storage;
+  ipfsClient: IIpfsClient;
   constructor() {
-    this.ipfsClient = getIpfsClient();
+    this.ipfsClient = getIpfsClient(IPFS_CLIENT_TYPE.IPFS_CLIENT_TYPE_WEB3CLIENT);
   }
   renameFile(file: File, newFilename: string) {
     const { type, lastModified } = file;
@@ -29,28 +33,12 @@ export class ipfsUploader {
       })
     );
 
-    const rootCid: string = await this.ipfsClient.put(
-      renamedFiles.map((f) => f.fileObject),
-      {
-        name: `${new Date().toISOString()}`,
-        maxRetries: 3,
-        wrapWithDirectory: true,
-        onRootCidReady: (rootCid) => {
-          console.log("rood cid:", rootCid);
-        },
-        onStoredChunk: (size) => {
-          // console.log(`stored chunk of ${size} bytes`);
-        },
-      }
-    );
+    const rootCid = await this.ipfsClient.put(
+      renamedFiles.map((f) => f.fileObject), new Date().toISOString());
     return { rootCid, renamedFiles };
   };
   async uploadMetadataFilesToIpfs(files: File[], fileName: string) {
-    const metaDataRootCid = await this.ipfsClient.put(files, {
-      name: fileName,
-      maxRetries: 3,
-      wrapWithDirectory: true,
-    });
+    const metaDataRootCid = await this.ipfsClient.put(files, fileName);
     return metaDataRootCid
   }
 };
