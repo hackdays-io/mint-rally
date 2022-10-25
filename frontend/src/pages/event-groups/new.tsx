@@ -63,7 +63,6 @@ const NewEventGroupPage: NextPage = () => {
   const { remove, append } = useFieldArray({ control, name: "nfts" });
 
   const submit = async (data: EventGroupFormData) => {
-    console.log(data.nfts);
     const uploadResult = await uploader.uploadNFTsToIpfs(data.nfts);
 
     if (uploadResult) {
@@ -76,7 +75,6 @@ const NewEventGroupPage: NextPage = () => {
           requiredParticipateCount,
         })
       );
-      console.log(nftAttributes);
       await createEventGroup({ groupName: data.groupName, nftAttributes });
     }
   };
