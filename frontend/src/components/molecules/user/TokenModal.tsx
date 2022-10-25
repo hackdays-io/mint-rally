@@ -9,7 +9,7 @@ import {
 } from "@chakra-ui/react";
 import { useAddress } from "@thirdweb-dev/react";
 import { BigNumber } from "ethers";
-import { FC, ReactNode } from "react";
+import { FC } from "react";
 import { ipfs2http } from "../../../../utils/ipfs2http";
 import { useTokenURI } from "../../../hooks/useMintNFTManager";
 import ModalBase from "../common/ModalBase";
@@ -59,6 +59,10 @@ const TokenModal: FC<Props> = ({ isOpen, onClose, tokenId, shareURL }) => {
           {shareURL && (
             <Box>
               <Divider my={3} />
+              <Text mb={2}>
+                Token ID：
+                {tokenId?.toNumber()}
+              </Text>
               <Text mb={1}>Share URL</Text>
               <Textarea
                 id="shareURL"
