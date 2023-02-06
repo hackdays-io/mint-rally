@@ -1,9 +1,5 @@
 # Use Localhost node in development
 
-#### <span style="color: red; ">If you don't set private key to .env, please refer contract_buildEnv.md first</span>
-
-## with docker
-
 ### 1. Run local node
 
 ```
@@ -16,8 +12,16 @@ Install node modules
 $ yarn
 ```
 
+If you want to run local node on docker. please run this command.
+
 ```
 $ docker-compose up
+```
+
+Otherwise, please run this command.
+
+```
+$ yarn localchain
 ```
 
 ### 2. Setup localnetwork in metamask and add a local wallet address
@@ -63,8 +67,16 @@ $ yarn deploy:local
 you will get like this
 
 ```
-mintNFT address: 0x5FbDB2315678afecb367f032d93F642f64180aa3
-eventManager address: 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512
+forwarder address: 0xa513E6E4b8f...
+mintNFT address: 0x2279B7A0a...
+eventManager address: 0x8A791620dd626...
+
+----------
+For frontEnd
+----------
+NEXT_PUBLIC_FORWARDER_ADDRESS=0xa513E6E4b8f...
+NEXT_PUBLIC_CONTRACT_MINT_NFT_MANAGER=0x2279B7A0a...
+NEXT_PUBLIC_CONTRACT_EVENT_MANAGER=0x8A791620dd626...
 ```
 
 ### 5. Set contracts address to frontend .env
@@ -78,12 +90,4 @@ NEXT_PUBLIC_CONTRACT_MINT_NFT_MANAGER=0x5FbDB2315678afecb367f032d93F642f64180aa3
 
 ### Run frontend
 
-Now, you can create event groups, and mint NFT on your localhost!
-
-```
-$ cd frontend
-```
-
-```
-$ yarn dev
-```
+If you don't build frontend development environment, please follow [this doc (Frontend)](docs/frontend.md)
