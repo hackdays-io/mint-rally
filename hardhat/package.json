@@ -15,7 +15,8 @@
     "size": "npx hardhat size-contracts",
     "build": "rollup -c",
     "upload:prd": "yarn build && node scripts/upload_prd.js",
-    "upload:stg": "yarn build && node scripts/upload_stg.js"
+    "upload:stg": "yarn build && node scripts/upload_stg.js",
+    "verify": "npx hardhat verify"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.1.1",
