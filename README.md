@@ -10,7 +10,6 @@
 - Organizers can easily generate nice NFT images on the screen
 - Participants can gain attractive NFTs by continuing to attend events.
 
-
 ## Problem to be solved
 
 Solves the problem of organizers struggling with event retention rates.
@@ -19,13 +18,16 @@ Solves the problem of organizers struggling with event retention rates.
 
 - frontend: Next.js, Typecript
 - contract: Solidity, ERC721Enumerable, Hardhat
-- image: IPFS, Web3.storage
-
+- image: IPFS, Pinata
 
 ## Development
 
 - [Frontend](docs/frontend.md)
 - [Contracts](docs/localnode.md)
+
+## Deployment
+
+- [Deploy](docs/deploy.md)
 
 ## Challenges Faced
 
