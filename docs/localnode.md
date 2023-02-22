@@ -24,6 +24,13 @@ Otherwise, please run this command.
 $ yarn localchain
 ```
 
+Copy env file
+
+```
+$ cp .env.example .env
+```
+
+
 ### 2. Setup localnetwork in metamask and add a local wallet address
 
 _You need to do this step only once, if you are already done this, skip to step4_
