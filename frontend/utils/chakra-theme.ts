@@ -6,6 +6,7 @@ const colors = {
     primary: "#552306",
     subtle1: "#A25020",
     subtle2: "#C68762",
+    subtle3: "#f0cda9",
     white: "#FFFFFF",
     subtle: "#E3FFFC",
   },

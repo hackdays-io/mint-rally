@@ -7,6 +7,7 @@ const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_EVENT_MANAGER!;
 const provierRpc = process.env.NEXT_PUBLIC_PROVIDER_RPC!;
 import contract from "../contracts/EventManager.json";
 import { EVENT_BLACK_LIST } from "src/constants/event";
+import { reverse } from "lodash";
 export interface IEventGroup {
   groupId: BigNumber;
   name: string;
@@ -256,8 +257,10 @@ export const useEventRecords = () => {
         const data: IEventRecord[] = await eventManager.getEventRecords();
         setLoading(false);
         setRecords(
-          data.filter(
-            (e) => !EVENT_BLACK_LIST.includes(e.eventRecordId.toNumber())
+          reverse(
+            data.filter(
+              (e) => !EVENT_BLACK_LIST.includes(e.eventRecordId.toNumber())
+            )
           )
         );
       } catch (e: any) {
