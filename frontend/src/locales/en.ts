@@ -1,7 +1,8 @@
 export default {
   TOP: "TOP",
   EVENTGROUPS: "Event Groups",
-  EVENTS: "Events",
+  EVENTS: "Recent Events",
+  RECENT_EVENTS: "Recent Events",
   HELP: "HELP",
   SIGN_IN: "Sign In",
   SIGN_OUT: "Sign Out",
@@ -56,5 +57,25 @@ export default {
   GO_SURVEY:
     "Did you enjoy minting? Please let us know your experience by 1-2 mins survey🙏",
   SURVEY_BUTTON: "Open survey form",
-  // ...
+
+  FEATUE: "FEATURES",
+  FEATUE_DESC_1:
+    "You can keep a record of your participation in special events.",
+  FEATUE_DESC_2: "By repeatedly participating, you can acquire special NFTs.",
+  FEATUE_DESC_3:
+    "You can start distributing NFTs by filling out a simple form.",
+
+  HOW_IT_WORKS: "HOW IT WORKS",
+  ORGANIZER: "Organizers",
+  ORGANIZER_DESC:
+    "Ready to distribute in minutes!<br/>Simply type in your event information and sign with your wallet, no screening is required.",
+  PARTICIPANTS: "Participants",
+  PARTICIPANTS_DESC:
+    "Mint NFT with secret words!<br/>You can get NFTs by entering the secret words that the event organizer taught you!",
+  ORGANIZER_PARTICIPANTS: "Organizers & Participants",
+  ORGANIZER_PARTICIPANTS_DESC:
+    "Participate repeatedly!<br/>Earn special NFTs for repeat participation and make unforgettable events to return to!",
+  CONTRIBUTORS_WANTED: "We are seeking contributors!",
+  CONTRIBUTORS_WANTED_DESC:
+    "MintRally is an open source project being developed by members of the civic tech project Hackdays.<br/> We are looking for colleagues to help us make MintRally a better open source project while working to expand its functionality, improve usability, and address accessibility issues.",
 };

@@ -20,13 +20,18 @@ const EventCard: FC<Props> = ({ title, description }) => {
       <Box>
         <Image
           src="/images/events/default-thumb.png"
-          objectFit="cover"
-          width="300"
-          height="150"
+          width="350"
+          height="160"
         />
       </Box>
-      <Box p={3} h={100}>
-        <Heading size="md" justifyContent="center" mb={1}>
+      <Box p={3} h={130}>
+        <Heading
+          size="md"
+          justifyContent="center"
+          mb={1}
+          height="50px"
+          overflow="hidden"
+        >
           {title}
         </Heading>
         <Text height="50px" overflow="hidden">
