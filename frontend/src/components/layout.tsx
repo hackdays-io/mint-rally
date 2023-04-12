@@ -1,8 +1,7 @@
 import React, { ReactNode } from "react";
-import Head from "next/head";
 import Navbar from "./navbar";
 import Footer from "./footer";
-import { Box } from "@chakra-ui/react";
+import { Box, Grid } from "@chakra-ui/react";
 import MyHead from "./atoms/MyHead";
 
 type Props = {
@@ -12,10 +11,15 @@ type Props = {
 const Layout = ({ children }: Props) => (
   <>
     <MyHead></MyHead>
-    <Box minHeight="100vh">
+    <Grid
+      gridTemplateColumns="100%"
+      gridTemplateRows="auto 1fr auto"
+      minHeight="100vh"
+    >
       <Navbar />
       <Box>{children}</Box>
-    </Box>
+      <Footer />
+    </Grid>
   </>
 );
 export default Layout;

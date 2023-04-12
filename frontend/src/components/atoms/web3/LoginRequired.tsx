@@ -1,6 +1,6 @@
 import { Button, Text } from "@chakra-ui/react";
 import { FC, ReactNode } from "react";
-import { useAddress, useChainId } from "@thirdweb-dev/react";
+import { useAddress, useChainId, useMetamask } from "@thirdweb-dev/react";
 import { useLocale } from "../../../hooks/useLocale";
 
 export const switchNetwork = async () => {
@@ -54,13 +54,19 @@ const LoginRequired: FC<Props> = ({
 }: Props) => {
   const address = useAddress();
   const chainId = useChainId()!;
+  const connectWithMetamask = useMetamask();
 
   const { t } = useLocale();
 
   return (
     <>
       {!address ? (
-        <Text fontSize="xl">{forbiddenText}</Text>
+        <>
+          <Text mb={2}>{forbiddenText}</Text>
+          <Button variant="solid" onClick={connectWithMetamask} size="md">
+            {t.SIGN_IN}
+          </Button>
+        </>
       ) : chainId !== requiredChainID ? (
         <Text fontSize="xl">
           <Button onClick={switchNetwork}>{t.SWITCH_NETWORK}</Button>
