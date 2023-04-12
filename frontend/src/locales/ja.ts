@@ -2,6 +2,7 @@ export default {
   TOP: "トップ",
   EVENTGROUPS: "イベントグループ",
   EVENTS: "イベント",
+  RECENT_EVENTS: "最近のイベント",
   HELP: "ヘルプ",
   SIGN_IN: "ログイン",
   SIGN_OUT: "ログアウト",
@@ -56,4 +57,24 @@ export default {
   GO_SURVEY:
     "NFT取得体験はどうでしたか? もしよろしければ、2〜3分で終わるアンケートにお答えください！🙏",
   SURVEY_BUTTON: "アンケートフォームを開く",
+
+  FEATUE: "特徴",
+  FEATUE_DESC_1: "大切なイベントに参加した記録を残すことができます",
+  FEATUE_DESC_2: "繰り返し参加することで、特別なNFTを取得できます",
+  FEATUE_DESC_3: "簡単なフォーム入力でNFTを配布しはじめられます",
+
+  HOW_IT_WORKS: "使い方",
+  ORGANIZER: "主催者",
+  ORGANIZER_DESC:
+    "数分で簡単に配布準備完了！<br/>イベント情報を入力してウォレットで署名するだけで、審査は不要です。",
+  PARTICIPANTS: "参加者",
+  PARTICIPANTS_DESC:
+    "あいことばでNFTをGET！<br/>イベント主催者から教えてもらったあいことばを入力してNFTを手に入れることができます！",
+  ORGANIZER_PARTICIPANTS: "主催者&参加者",
+  ORGANIZER_PARTICIPANTS_DESC:
+    "たくさん参加しよう！<br/>何度も参加することでもらえる特別なNFTをMintして、また参加したくなるイベントをつくろう！",
+
+  CONTRIBUTORS_WANTED: "コントリビューター募集中！",
+  CONTRIBUTORS_WANTED_DESC:
+    "MintRallyはシビックテックプロジェクトHackdaysのメンバーで開発しているオープンソースプロジェクトです。<br />機能拡充やユーザビリティの向上、アクセシビリティへの対応などに取り組みながら、よりよいオープンソースプロジェクトにしていくための仲間を探しています。",
 };
