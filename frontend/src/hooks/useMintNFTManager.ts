@@ -103,9 +103,6 @@ export const useMintParticipateNFT = (event: IEventRecord | null) => {
       signer: ethers.Signer,
       secretPhrase: string
     ) => {
-      const url = process.env.NEXT_PUBLIC_WEBHOOK_URL;
-      if (!url) throw new Error("Webhook url is required");
-
       if (!process.env.NEXT_PUBLIC_FORWARDER_ADDRESS)
         throw new Error("Forwarder address is required");
 
@@ -134,7 +131,7 @@ export const useMintParticipateNFT = (event: IEventRecord | null) => {
         data,
       });
 
-      return fetch(url, {
+      return fetch("/api/autotask", {
         method: "POST",
         body: JSON.stringify(request),
         headers: { "Content-Type": "application/json" },
