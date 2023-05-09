@@ -14,16 +14,16 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import {
+  ConnectWallet,
   useAddress,
   useChainId,
   useDisconnect,
-  useMetamask,
+  useSwitchChain,
 } from "@thirdweb-dev/react";
 import NextLink from "next/link";
 
 import router from "next/router";
 import Image from "next/image";
-import { switchNetwork } from "./atoms/web3/LoginRequired";
 import { useLocale } from "../hooks/useLocale";
 import LocaleSelector from "./atoms/LocaleSelector";
 
@@ -31,12 +31,13 @@ const Navbar = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const address = useAddress();
   const chainId = useChainId();
-  const connectWithMetamask = useMetamask();
   const disconnectWallet = useDisconnect();
   const requiredChainId = +process.env.NEXT_PUBLIC_CHAIN_ID!;
   const { t } = useLocale();
 
-  const MetamaskLogin = () => {
+  const switchChain = useSwitchChain();
+
+  const Login = () => {
     return (
       <Flex justifyContent="center" alignItems="center" mt={{ base: 5, md: 0 }}>
         {address ? (
@@ -48,7 +49,7 @@ const Navbar = () => {
                   color="mint.font"
                   borderRadius={"16px"}
                   variant="solid"
-                  onClick={switchNetwork}
+                  onClick={() => switchChain(requiredChainId)}
                   size="md"
                 >
                   {t.SWITCH_NETWORK}
@@ -69,16 +70,7 @@ const Navbar = () => {
             </Button>
           </>
         ) : (
-          <Button
-            bg="mint.subtle"
-            color="mint.font"
-            borderRadius={"16px"}
-            variant="solid"
-            onClick={connectWithMetamask}
-            size="md"
-          >
-            {t.SIGN_IN}
-          </Button>
+          <ConnectWallet btnTitle={t.SIGN_IN} style={{ fontWeight: "bold" }} />
         )}
         {address && (
           <Box marginLeft={3} cursor="pointer">
@@ -176,7 +168,7 @@ const Navbar = () => {
           </a>
           <LocaleSelector></LocaleSelector>
           <Box px={4}>
-            <MetamaskLogin></MetamaskLogin>
+            <Login />
           </Box>
         </Flex>
 
@@ -209,9 +201,8 @@ const Navbar = () => {
               >
                 <Button w="100%">{t.HELP}</Button>
               </a>
-
               <LocaleSelector></LocaleSelector>
-              <MetamaskLogin></MetamaskLogin>
+              <Login />
             </DrawerBody>
           </DrawerContent>
         </DrawerOverlay>

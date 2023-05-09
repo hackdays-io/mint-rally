@@ -218,8 +218,12 @@ export const useGetOwnedNFTs = () => {
       const tokenId = await mintNFTManager.tokenOfOwnerByIndex(address, index);
       const tokenURI = await mintNFTManager.tokenURI(tokenId);
       const path = ipfs2http(tokenURI);
-      const { data } = await axios.get(path);
-      metadata.push({ tokenId: tokenId, metaData: data });
+      try {
+        const { data } = await axios.get(path);
+        metadata.push({ tokenId: tokenId, metaData: data });
+      } catch (_) {
+        continue;
+      }
     }
     setOwnedNFTs(metadata);
   };
