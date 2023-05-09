@@ -14,7 +14,7 @@ const getMintNFTManagerContract = () => {
     provider
   );
   return _contract;
-}
+};
 export const getOwnedNFTsFromAddress = async (address: string) => {
   const mintNFTManager = getMintNFTManagerContract();
   if (!mintNFTManager) throw new Error("Cannot find mintNFTManager contract");
@@ -28,13 +28,12 @@ export const getOwnedNFTsFromAddress = async (address: string) => {
     metadata.push({ tokenId: tokenId, metaData: data });
   }
   return metadata;
-}
+};
 export const getNFTDataFromAddress = async (tokenId: BigNumber) => {
   const mintNFTManager = getMintNFTManagerContract();
-  if (!mintNFTManager)
-    throw new Error("Cannot find mintNFTManager contract");
+  if (!mintNFTManager) throw new Error("Cannot find mintNFTManager contract");
   const tokenURI = await mintNFTManager.tokenURI(tokenId);
   const path = ipfs2http(tokenURI);
   const { data } = await axios.get(path);
   return data as INFTMetaData;
-}
+};
