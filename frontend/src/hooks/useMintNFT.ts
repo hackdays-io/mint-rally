@@ -4,6 +4,7 @@ import {
   useContractEvents,
   useContractRead,
   useContractWrite,
+  useSDK,
   useSigner,
 } from "@thirdweb-dev/react";
 import mintNFTABI from "../contracts/MintNFT.json";
@@ -180,17 +181,28 @@ export const useSortNFTsByGroup = (_nfts: NFT.Metadata[]) => {
 
 export const useMintParticipateNFT = (
   event: Event.EventRecord,
-  address: string
+  address: string,
+  useMTX: boolean = false
 ) => {
   const { mintNFTContract } = useMintNFTContract();
   const { forwarderContract } = useForwarderContract();
   const signer = useSigner();
+  const sdk = useSDK();
   const {
     mutateAsync,
     isLoading: isMinting,
     error: mintError,
     status: mintStatus,
   } = useContractWrite(mintNFTContract, "mintParticipateNFT");
+  const [mtxStatus, setMtxStatus] = useState<{
+    error: any;
+    isLoading: boolean;
+    status: "error" | "idle" | "loading" | "success";
+  }>({
+    error: null,
+    isLoading: false,
+    status: "idle",
+  });
   const { data } = useContractEvents(mintNFTContract, "Transfer", {
     queryFilter: {
       filters: {
@@ -202,14 +214,14 @@ export const useMintParticipateNFT = (
   });
 
   const error: any = useMemo(() => {
-    return mintError;
-  }, [mintError]);
+    return useMTX ? mtxStatus.error : mintError;
+  }, [mintError, mtxStatus]);
   const isLoading = useMemo(() => {
-    return isMinting;
-  }, [isMinting]);
+    return useMTX ? mtxStatus.isLoading : isMinting;
+  }, [isMinting, mtxStatus]);
   const status = useMemo(() => {
-    return mintStatus;
-  }, [mintStatus]);
+    return useMTX ? mtxStatus.status : mintStatus;
+  }, [mintStatus, mtxStatus]);
 
   const [mintedNFTId, setMintedNFTId] = useState<number | null>(null);
   const [mintedNFT, setMintedNFT] = useState<NFT.Metadata | null>(null);
@@ -233,6 +245,19 @@ export const useMintParticipateNFT = (
     setMintedNFTId(tokenId);
   }, [data, status]);
 
+  const checkCanMint = useCallback(
+    async (eventId: number, secretPhrase: string) => {
+      if (!mintNFTContract) return;
+      try {
+        await mintNFTContract.call("canMint", [eventId, secretPhrase]);
+        return;
+      } catch (error) {
+        throw error;
+      }
+    },
+    [mintNFTContract]
+  );
+
   const mint = useCallback(
     async (secretPhrase: string) => {
       if (!event || !event.eventRecordId || !event.groupId) return;
@@ -247,28 +272,30 @@ export const useMintParticipateNFT = (
 
   const mintMTX = useCallback(
     async (secretPhrase: string) => {
-      if (!event || !event.eventRecordId || !event.groupId || !signer) return;
+      if (!event || !event.eventRecordId || !event.groupId || !sdk) return;
+      setMtxStatus({ isLoading: true, status: "loading", error: null });
       try {
+        await checkCanMint(event.eventRecordId.toNumber(), secretPhrase);
         const to = mintNFTContract?.getAddress();
         const from = address;
-        const txData = mintNFTContract?.encoder.encode("mintParticipateNFT", [
+        const data = mintNFTContract?.encoder.encode("mintParticipateNFT", [
           event?.groupId.toNumber(),
           event?.eventRecordId.toNumber(),
           secretPhrase,
         ]);
-        const request = await signMetaTxRequest(signer, forwarderContract, {
+        const request = await signMetaTxRequest(sdk.wallet, forwarderContract, {
           from,
           to,
-          txData,
+          data,
         });
-
-        const { data } = await axios.post(
-          "/api/autotask",
-          JSON.stringify(request)
-        );
-        return data;
+        const { data: response } = await axios.post("/api/autotask", {
+          request: request.request,
+          signature: request.signature.signature,
+        });
+        setMtxStatus({ ...mtxStatus, status: "success", isLoading: false });
+        return response;
       } catch (error) {
-        console.log(error);
+        setMtxStatus({ ...mtxStatus, error, status: "error" });
       }
     },
     [event, forwarderContract, signer]

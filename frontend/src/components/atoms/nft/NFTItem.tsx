@@ -7,7 +7,7 @@ import { ipfs2http } from "utils/ipfs2http";
 type Props = {
   nft: NFT.Metadata;
   tokenId: number;
-  shareURL: boolean;
+  shareURL?: boolean;
 };
 
 export const NFTItem: FC<Props> = ({ nft, tokenId, shareURL = true }) => {
