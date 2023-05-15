@@ -26,7 +26,7 @@ type Props = {
 export const MintForm: FC<Props> = ({ event, address }) => {
   const { t } = useLocale();
   const { mint, mintMTX, isLoading, error, mintedNFT, status } =
-    useMintParticipateNFT(event, address);
+    useMintParticipateNFT(event, address, event.useMtx);
 
   const { reward: confettiReward } = useReward("confettiReward", "confetti", {
     elementCount: 100,

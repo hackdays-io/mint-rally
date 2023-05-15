@@ -1,15 +1,5 @@
-import { BaseContract, Signer, ethers } from "ethers";
-import ethSignUtil from "eth-sig-util";
-import { SmartContract } from "@thirdweb-dev/sdk";
-
-// definistion of domainSeparator
-// https://eips.ethereum.org/EIPS/eip-712
-const EIP712Domain = [
-  { name: "name", type: "string" },
-  { name: "version", type: "string" },
-  { name: "chainId", type: "uint256" },
-  { name: "verifyingContract", type: "address" },
-];
+import { BaseContract } from "ethers";
+import { SmartContract, UserWallet } from "@thirdweb-dev/sdk";
 
 // forwarder request struct
 // ref: lib/openzeppelin-contracts/contracts/metatx/MinimalForwarder.sol
@@ -26,7 +16,6 @@ const getMetaTxTypeData = (chainId: number, verifyingContract: string) => {
   // Specification of the eth_signTypedData JSON RPC
   return {
     types: {
-      EIP712Domain,
       ForwardRequest,
     },
     domain: {
@@ -40,8 +29,9 @@ const getMetaTxTypeData = (chainId: number, verifyingContract: string) => {
 };
 
 // TODO: do not use any type
-const signTypeData = async (signer: Signer, data: any) => {
-  return await signer.signMessage(JSON.stringify(data));
+const signTypeData = async (signer: UserWallet, data: any) => {
+  console.log(data.message);
+  return await signer.signTypedData(data.domain, data.types, data.message);
 };
 
 export const buildRequest = async (
@@ -64,12 +54,12 @@ export const buildTypedData = async (
 };
 
 export const signMetaTxRequest = async (
-  signer: Signer,
+  signer: UserWallet,
   forwarder: any,
   input: any
 ) => {
   const request = await buildRequest(forwarder, input);
   const toSign = await buildTypedData(forwarder, request);
-  const signature = await signTypeData(signer, toSign.message);
+  const signature = await signTypeData(signer, toSign);
   return { signature, request };
 };
