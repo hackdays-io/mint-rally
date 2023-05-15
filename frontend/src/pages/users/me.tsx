@@ -4,7 +4,6 @@ import { FC } from "react";
 import { GroupedCollection } from "src/components/organisms/nft/GroupedCollection";
 import {
   useGetOwnedNFTByAddress,
-  useGetOwnedNftIdsByAddress,
   useSortNFTsByGroup,
 } from "src/hooks/useMintNFT";
 
