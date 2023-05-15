@@ -1,5 +1,6 @@
-import { ethers } from "ethers";
+import { BaseContract, Signer, ethers } from "ethers";
 import ethSignUtil from "eth-sig-util";
+import { SmartContract } from "@thirdweb-dev/sdk";
 
 // definistion of domainSeparator
 // https://eips.ethereum.org/EIPS/eip-712
@@ -39,43 +40,36 @@ const getMetaTxTypeData = (chainId: number, verifyingContract: string) => {
 };
 
 // TODO: do not use any type
-const signTypeData = async (signer: any, from: string, data: any) => {
-  // if signer is a private key, use it to sign
-  if (typeof signer === "string") {
-    const privateKey = Buffer.from(signer.replace(/^0x/, ""), "hex");
-    return ethSignUtil.signTypedMessage(privateKey, { data });
-  }
-
-  // Otherwise, send the signTypedData RPC call
-  const [method, argData] = ["eth_signTypedData_v4", JSON.stringify(data)];
-  return await signer.send(method, [from, argData]);
+const signTypeData = async (signer: Signer, data: any) => {
+  return await signer.signMessage(JSON.stringify(data));
 };
 
-export const buildRequest = async (forwarder: ethers.Contract, input: any) => {
+export const buildRequest = async (
+  forwarder: SmartContract<BaseContract>,
+  input: any
+) => {
   // get nonce from forwarder contract
   // this nonce is used to prevent replay attack
-  const nonce = await forwarder
-    .getNonce(input.from)
-    .then((nonce: { toString: () => any }) => nonce.toString());
+  const nonce = (await forwarder.call("getNonce", [input.from])).toString();
   return { value: 0, gas: 1e6, nonce, ...input };
 };
 
 export const buildTypedData = async (
-  forwarder: ethers.Contract,
+  forwarder: SmartContract<BaseContract>,
   request: any
 ) => {
-  const chainId = await forwarder.provider.getNetwork().then((n) => n.chainId);
-  const typeData = getMetaTxTypeData(chainId, forwarder.address);
+  const chainId = forwarder.chainId;
+  const typeData = getMetaTxTypeData(chainId, forwarder.getAddress());
   return { ...typeData, message: request };
 };
 
 export const signMetaTxRequest = async (
-  signer: any,
-  forwarder: ethers.Contract,
+  signer: Signer,
+  forwarder: any,
   input: any
 ) => {
   const request = await buildRequest(forwarder, input);
   const toSign = await buildTypedData(forwarder, request);
-  const signature = await signTypeData(signer, input.from, toSign);
+  const signature = await signTypeData(signer, toSign.message);
   return { signature, request };
 };

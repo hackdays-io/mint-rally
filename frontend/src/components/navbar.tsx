@@ -70,7 +70,11 @@ const Navbar = () => {
             </Button>
           </>
         ) : (
-          <ConnectWallet btnTitle={t.SIGN_IN} style={{ fontWeight: "bold" }} />
+          <ConnectWallet
+            theme="light"
+            btnTitle={t.SIGN_IN}
+            style={{ fontWeight: "bold", backgroundColor: "#562406" }}
+          />
         )}
         {address && (
           <Box marginLeft={3} cursor="pointer">

@@ -132,7 +132,11 @@ const CreateEventForm: FC = () => {
 
   return (
     <>
-      {groups.length > 0 ? (
+      {groups.length === 0 ? (
+        <Link href="/event-groups/new">please create event group first</Link>
+      ) : status ? (
+        "Your Event Created!🎉"
+      ) : (
         <form onSubmit={handleSubmit(onSubmit)}>
           <FormControl mb={5}>
             <FormLabel htmlFor="eventGroupId">{t.EVENT_GROUP}</FormLabel>
@@ -402,7 +406,7 @@ const CreateEventForm: FC = () => {
               >
                 {createLoading ? <Spinner /> : status ? "Success" : "Create"}
               </Button>
-              {status && "Your Event Created!🎉"}
+
               {createError && (
                 <Alert status="error" mt={2}>
                   <AlertIcon />
@@ -415,8 +419,6 @@ const CreateEventForm: FC = () => {
             <span>Please select event group first.</span>
           )}
         </form>
-      ) : (
-        <Link href="/event-groups/new">please create event group first</Link>
       )}
     </>
   );
