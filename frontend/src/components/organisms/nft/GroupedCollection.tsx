@@ -16,7 +16,7 @@ export const GroupedCollection: FC<Props> = ({ groupedNFTs }) => {
   ) : (
     <Box mt={5}>
       {Object.keys(groupedNFTs).map((groupId: string) => (
-        <Box mb={10}>
+        <Box mb={10} key={`group${groupId}`}>
           <Heading
             as="h2"
             pb={2}
@@ -38,7 +38,11 @@ export const GroupedCollection: FC<Props> = ({ groupedNFTs }) => {
             gridTemplateColumns={{ md: "1fr 1fr 1fr 1fr 1fr", sm: "1fr 1fr" }}
           >
             {groupedNFTs[Number(groupId)].map((nft) => (
-              <NFTItem nft={nft} tokenId={nft.tokenId} />
+              <NFTItem
+                nft={nft}
+                tokenId={nft.tokenId}
+                key={`group${groupId}nft${nft.tokenId}`}
+              />
             ))}
           </Grid>
         </Box>
