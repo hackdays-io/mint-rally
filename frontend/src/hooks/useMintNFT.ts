@@ -1,4 +1,5 @@
 import {
+  getBlockNumber,
   useAddress,
   useContract,
   useContractEvents,
@@ -203,15 +204,33 @@ export const useMintParticipateNFT = (
     isLoading: false,
     status: "idle",
   });
+  const [fromBlock, setFromBlock] = useState<number>();
   const { data } = useContractEvents(mintNFTContract, "Transfer", {
     queryFilter: {
       filters: {
         from: null,
         to: address,
+        fromBlock: fromBlock,
       },
     },
     subscribe: true,
   });
+
+  useEffect(() => {
+    const fetch = async () => {
+      const chainId = process.env.NEXT_PUBLIC_CHAIN_ID!;
+      const number = await getBlockNumber({
+        network:
+          chainId === "80001"
+            ? "mumbai"
+            : chainId === "137"
+            ? "polygon"
+            : "localhost",
+      });
+      setFromBlock(number);
+    };
+    fetch();
+  }, []);
 
   const error: any = useMemo(() => {
     return useMTX ? mtxStatus.error : mintError;
@@ -241,6 +260,7 @@ export const useMintParticipateNFT = (
 
   useEffect(() => {
     if (status !== "success" || !data || data.length < 1) return;
+    console.log(data);
     const tokenId = data[data.length - 1].data?.tokenId.toNumber();
     setMintedNFTId(tokenId);
   }, [data, status]);

@@ -17,6 +17,7 @@ import { useMintParticipateNFT } from "src/hooks/useMintNFT";
 import { Event } from "types/Event";
 import { ipfs2http } from "utils/ipfs2http";
 import { useReward } from "react-rewards";
+import { getBlockNumber } from "@thirdweb-dev/sdk";
 
 type Props = {
   event: Event.EventRecord;
@@ -25,6 +26,7 @@ type Props = {
 
 export const MintForm: FC<Props> = ({ event, address }) => {
   const { t } = useLocale();
+
   const { mint, mintMTX, isLoading, error, mintedNFT, status } =
     useMintParticipateNFT(event, address, event.useMtx);
 
