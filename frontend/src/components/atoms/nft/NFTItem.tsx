@@ -26,7 +26,7 @@ export const NFTItem: FC<Props> = ({ nft, tokenId, shareURL = true }) => {
         </Box>
         <Box>
           <Text fontSize="md" fontWeight="bold" mt={2}>
-            test
+            {nft.name}
           </Text>
         </Box>
       </Flex>
