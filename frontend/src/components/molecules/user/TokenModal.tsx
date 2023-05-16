@@ -11,18 +11,18 @@ import { useAddress } from "@thirdweb-dev/react";
 import { BigNumber } from "ethers";
 import { FC } from "react";
 import { ipfs2http } from "../../../../utils/ipfs2http";
-import { useTokenURI } from "../../../hooks/useMintNFTManager";
 import ModalBase from "../common/ModalBase";
+import { NFT } from "types/NFT";
 
 type Props = {
   isOpen: boolean;
   onClose: () => void;
-  tokenId?: BigNumber;
+  tokenId: number;
+  nft: NFT.Metadata;
   shareURL?: boolean;
 };
 
-const TokenModal: FC<Props> = ({ isOpen, onClose, tokenId, shareURL }) => {
-  const { metaData } = useTokenURI(tokenId);
+const TokenModal: FC<Props> = ({ isOpen, onClose, nft, shareURL, tokenId }) => {
   const address = useAddress();
 
   const copyClipBoard = () => {
@@ -33,43 +33,44 @@ const TokenModal: FC<Props> = ({ isOpen, onClose, tokenId, shareURL }) => {
 
   return (
     <ModalBase isOpen={isOpen} onClose={onClose}>
-      {metaData && (
+      {nft && (
         <Box p={{ base: 5, md: 10 }}>
           <Box mb={6}>
             <Image
               width={200}
-              src={ipfs2http(String(metaData?.image))}
-              alt={metaData?.name}
+              src={ipfs2http(String(nft?.image))}
+              alt={nft?.name}
               m="0 auto"
             />
           </Box>
           <Text mb={2}>
             Name：
-            {metaData?.name}
+            {nft?.name}
           </Text>
           <Text mb={2}>
             Description：
-            {metaData?.description}
+            {nft?.description}
           </Text>
-          <Text>
+          <Text mb={2}>
             Event Group ID：
-            {metaData?.traits.EventGroupId}
+            {nft?.traits.EventGroupId}
+          </Text>
+          <Text mb={2}>
+            Token ID：
+            {tokenId}
           </Text>
 
           {shareURL && (
             <Box>
               <Divider my={3} />
-              <Text mb={2}>
-                Token ID：
-                {tokenId?.toNumber()}
-              </Text>
+
               <Text mb={1}>Share URL</Text>
               <Textarea
                 id="shareURL"
                 color="mint.primary"
                 rows={2}
                 p={1}
-                value={`https://mintrally.xyz/users/${address}?tokenid=${tokenId?.toNumber()}`}
+                value={`https://mintrally.xyz/users/${address}?tokenid=${tokenId}`}
               ></Textarea>
               <Button
                 size="small"

@@ -8,6 +8,7 @@ const provierRpc = process.env.NEXT_PUBLIC_PROVIDER_RPC!;
 import contract from "../contracts/EventManager.json";
 import { EVENT_BLACK_LIST } from "src/constants/event";
 import { reverse } from "lodash";
+import { Event } from "types/Event";
 export interface IEventGroup {
   groupId: BigNumber;
   name: string;
@@ -280,7 +281,7 @@ export const useEventRecords = () => {
  * @returns
  */
 export const useGetEventById = (eventId: number) => {
-  const [event, setEvent] = useState<IEventRecord | null>(null);
+  const [event, setEvent] = useState<Event.EventRecord | null>(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {

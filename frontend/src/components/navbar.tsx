@@ -14,16 +14,16 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import {
+  ConnectWallet,
   useAddress,
   useChainId,
   useDisconnect,
-  useMetamask,
+  useSwitchChain,
 } from "@thirdweb-dev/react";
 import NextLink from "next/link";
 
 import router from "next/router";
 import Image from "next/image";
-import { switchNetwork } from "./atoms/web3/LoginRequired";
 import { useLocale } from "../hooks/useLocale";
 import LocaleSelector from "./atoms/LocaleSelector";
 
@@ -31,12 +31,13 @@ const Navbar = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const address = useAddress();
   const chainId = useChainId();
-  const connectWithMetamask = useMetamask();
   const disconnectWallet = useDisconnect();
   const requiredChainId = +process.env.NEXT_PUBLIC_CHAIN_ID!;
   const { t } = useLocale();
 
-  const MetamaskLogin = () => {
+  const switchChain = useSwitchChain();
+
+  const Login = () => {
     return (
       <Flex justifyContent="center" alignItems="center" mt={{ base: 5, md: 0 }}>
         {address ? (
@@ -48,7 +49,7 @@ const Navbar = () => {
                   color="mint.font"
                   borderRadius={"16px"}
                   variant="solid"
-                  onClick={switchNetwork}
+                  onClick={() => switchChain(requiredChainId)}
                   size="md"
                 >
                   {t.SWITCH_NETWORK}
@@ -69,20 +70,15 @@ const Navbar = () => {
             </Button>
           </>
         ) : (
-          <Button
-            bg="mint.subtle"
-            color="mint.font"
-            borderRadius={"16px"}
-            variant="solid"
-            onClick={connectWithMetamask}
-            size="md"
-          >
-            {t.SIGN_IN}
-          </Button>
+          <ConnectWallet
+            theme="light"
+            btnTitle={t.SIGN_IN}
+            style={{ fontWeight: "bold", backgroundColor: "#562406" }}
+          />
         )}
         {address && (
           <Box marginLeft={3} cursor="pointer">
-            <Link href="/users/me">
+            <NextLink href="/users/me">
               <Image
                 src="/user.png"
                 alt="Loggedin"
@@ -90,7 +86,7 @@ const Navbar = () => {
                 height={50}
                 objectFit="contain"
               />
-            </Link>
+            </NextLink>
           </Box>
         )}
       </Flex>
@@ -113,7 +109,7 @@ const Navbar = () => {
           width={{ base: "150px", md: "auto" }}
           pr={8}
         >
-          <Link href="/">
+          <NextLink href="/">
             <Image
               src={"/images/logo.svg"}
               height={75}
@@ -121,10 +117,10 @@ const Navbar = () => {
               objectFit="contain"
               alt="Mint Rally Logo"
             />
-          </Link>
+          </NextLink>
         </Flex>
         <Box pr={4} display={{ base: "none", md: "block" }}>
-          <Link href="/event-groups" as={NextLink}>
+          <NextLink href="/event-groups">
             <Button
               leftIcon={<SettingsIcon />}
               bg="mint.white"
@@ -135,10 +131,10 @@ const Navbar = () => {
             >
               {t.EVENTGROUPS}
             </Button>
-          </Link>
+          </NextLink>
         </Box>
         <Box display={{ base: "none", md: "block" }}>
-          <Link href="/events" as={NextLink}>
+          <NextLink href="/events">
             <Button
               leftIcon={<CalendarIcon />}
               bg="mint.white"
@@ -149,7 +145,7 @@ const Navbar = () => {
             >
               {t.EVENTS}
             </Button>
-          </Link>
+          </NextLink>
         </Box>
         <Flex
           align="center"
@@ -176,7 +172,7 @@ const Navbar = () => {
           </a>
           <LocaleSelector></LocaleSelector>
           <Box px={4}>
-            <MetamaskLogin></MetamaskLogin>
+            <Login />
           </Box>
         </Flex>
 
@@ -209,9 +205,8 @@ const Navbar = () => {
               >
                 <Button w="100%">{t.HELP}</Button>
               </a>
-
               <LocaleSelector></LocaleSelector>
-              <MetamaskLogin></MetamaskLogin>
+              <Login />
             </DrawerBody>
           </DrawerContent>
         </DrawerOverlay>
