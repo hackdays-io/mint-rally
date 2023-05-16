@@ -18,6 +18,7 @@ import { Controller, useFieldArray, useForm } from "react-hook-form";
 import ErrorMessage from "../../components/atoms/form/ErrorMessage";
 import NFTAttributesForm from "../../components/organisms/NFTAttributesForm";
 import { ipfsUploader } from "src/libs/libIpfs";
+import Link from "next/link";
 
 export interface EventGroupFormData {
   groupName: string;
@@ -149,7 +150,10 @@ const NewEventGroupPage: NextPage = () => {
             </form>
           ) : (
             <>
-              <Box>{t.EVENT_GROUP_CREATED}🎉</Box>
+              <Box mb={5}>{t.EVENT_GROUP_CREATED}🎉</Box>
+              <Link href="/events/new">
+                <Button>{t.CREATE_NEW_EVENT}</Button>
+              </Link>
             </>
           )}
         </>
