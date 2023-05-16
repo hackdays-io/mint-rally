@@ -3,8 +3,8 @@ import type { AppProps } from "next/app";
 import { ChakraProvider } from "@chakra-ui/react";
 import {
   ThirdwebProvider,
+  magicLink,
   metamaskWallet,
-  paperWallet,
   safeWallet,
 } from "@thirdweb-dev/react";
 import Layout from "../components/layout";
@@ -33,7 +33,14 @@ function MyApp({ Component, pageProps }: AppProps) {
         supportedWallets={[
           metamaskWallet(),
           safeWallet(),
-          paperWallet({ clientId: process.env.NEXT_PUBLIC_PAPERWALLET_ID! }),
+          magicLink({
+            apiKey: process.env.NEXT_PUBLIC_MAGIC_LINK_KEY!,
+            magicSdkConfiguration: {
+              locale: "ja",
+              network: activeChain as any,
+            },
+            smsLogin: false,
+          }),
         ]}
       >
         <ChakraProvider theme={chakraTheme}>
