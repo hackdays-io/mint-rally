@@ -78,7 +78,7 @@ const Navbar = () => {
         )}
         {address && (
           <Box marginLeft={3} cursor="pointer">
-            <Link href="/users/me">
+            <NextLink href="/users/me">
               <Image
                 src="/user.png"
                 alt="Loggedin"
@@ -86,7 +86,7 @@ const Navbar = () => {
                 height={50}
                 objectFit="contain"
               />
-            </Link>
+            </NextLink>
           </Box>
         )}
       </Flex>
@@ -109,7 +109,7 @@ const Navbar = () => {
           width={{ base: "150px", md: "auto" }}
           pr={8}
         >
-          <Link href="/">
+          <NextLink href="/">
             <Image
               src={"/images/logo.svg"}
               height={75}
@@ -117,10 +117,10 @@ const Navbar = () => {
               objectFit="contain"
               alt="Mint Rally Logo"
             />
-          </Link>
+          </NextLink>
         </Flex>
         <Box pr={4} display={{ base: "none", md: "block" }}>
-          <Link href="/event-groups" as={NextLink}>
+          <NextLink href="/event-groups">
             <Button
               leftIcon={<SettingsIcon />}
               bg="mint.white"
@@ -131,10 +131,10 @@ const Navbar = () => {
             >
               {t.EVENTGROUPS}
             </Button>
-          </Link>
+          </NextLink>
         </Box>
         <Box display={{ base: "none", md: "block" }}>
-          <Link href="/events" as={NextLink}>
+          <NextLink href="/events">
             <Button
               leftIcon={<CalendarIcon />}
               bg="mint.white"
@@ -145,7 +145,7 @@ const Navbar = () => {
             >
               {t.EVENTS}
             </Button>
-          </Link>
+          </NextLink>
         </Box>
         <Flex
           align="center"
