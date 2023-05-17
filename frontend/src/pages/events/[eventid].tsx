@@ -64,7 +64,6 @@ const Event = () => {
           </>
         )}
       </Container>
-      <InstallWalletAlert />
     </>
   );
 };
