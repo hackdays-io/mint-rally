@@ -12,6 +12,12 @@ Install node modules
 $ yarn
 ```
 
+Copy env file
+
+```
+$ cp .env.example .env
+```
+
 If you want to run local node on docker. please run this command.
 
 ```
@@ -22,12 +28,6 @@ Otherwise, please run this command.
 
 ```
 $ yarn localchain
-```
-
-Copy env file
-
-```
-$ cp .env.example .env
 ```
 
 
