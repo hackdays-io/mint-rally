@@ -155,7 +155,9 @@ export const useEventGroups = () => {
       if (!eventManager) throw "error";
       setLoading(true);
       const data = await eventManager.getGroups();
-      setGroups(data);
+      // `reverse` is destructive, data is immutable, so need to clone before reverse
+      const reversedData = reverse([...data]);
+      setGroups(reversedData);
       setLoading(false);
     };
     getEventGroups();
