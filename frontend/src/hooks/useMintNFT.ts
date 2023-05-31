@@ -1,4 +1,5 @@
 import {
+  ContractEvent,
   getBlockNumber,
   useAddress,
   useContract,
@@ -49,7 +50,7 @@ export const useGetTokenURI = (id: number | null) => {
 
 export const useGetOwnedNftIdsByAddress = (address?: string) => {
   const { mintNFTContract, isLoading } = useMintNFTContract();
-  const [ids, setIds] = useState<number[]>([]);
+  const [ids, setIds] = useState<number[]>();
 
   useEffect(() => {
     const fetch = async () => {
@@ -140,11 +141,11 @@ export const useGetOwnedNFTByAddress = (address?: string) => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    setIsLoading(true);
     setNfts([]);
     if (!ids) return;
 
     const fetch = async () => {
+      setIsLoading(true);
       const _nfts: any[] = [];
       for (const id of ids) {
         try {
@@ -259,11 +260,20 @@ export const useMintParticipateNFT = (
   }, [mintedTokenURI]);
 
   useEffect(() => {
-    if (status !== "success" || !data || data.length < 1) return;
-    console.log(data);
-    const tokenId = data[data.length - 1].data?.tokenId.toNumber();
+    const includesNewEvent = (data: ContractEvent<Record<string, any>>[]) => {
+      if (!fromBlock) return false;
+      return data.some((event) => {
+        return event.transaction.blockNumber > fromBlock;
+      });
+    };
+    if (status !== "success" || !data || !includesNewEvent(data)) return;
+    const tokenId = data
+      .sort((a, b) => {
+        return b.transaction.blockNumber - a.transaction.blockNumber;
+      })[0]
+      .data?.tokenId.toNumber();
     setMintedNFTId(tokenId);
-  }, [data, status]);
+  }, [data, status, fromBlock]);
 
   const checkCanMint = useCallback(
     async (eventId: number, secretPhrase: string) => {
