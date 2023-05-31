@@ -55,16 +55,15 @@ export const useGetOwnedNftIdsByAddress = (address?: string) => {
   useEffect(() => {
     const fetch = async () => {
       if (!address || isLoading) return;
-      const _ids: number[] = [];
       const balance = await mintNFTContract?.call("balanceOf", [address]);
-      for (let index = 0; index < balance.toNumber(); index++) {
-        const tokenId = await mintNFTContract?.call("tokenOfOwnerByIndex", [
-          address,
-          index,
-        ]);
-        _ids.push(tokenId.toNumber());
-      }
-      setIds(_ids);
+      const tokenIdsPromise = Array(balance.toNumber())
+        .fill("")
+        .map((_, index) => {
+          return mintNFTContract?.call("tokenOfOwnerByIndex", [address, index]);
+        });
+      const tokenIds = await Promise.all(tokenIdsPromise);
+
+      setIds(tokenIds.map((id) => id.toNumber()));
     };
     fetch();
   }, [address, isLoading]);
@@ -146,18 +145,29 @@ export const useGetOwnedNFTByAddress = (address?: string) => {
 
     const fetch = async () => {
       setIsLoading(true);
-      const _nfts: any[] = [];
-      for (const id of ids) {
-        try {
+
+      const tokenURIPromises = ids.map((id) => {
+        const getTokenURI = async (id: number) => {
           const tokenURI = await mintNFTContract?.call("tokenURI", [id]);
-          const { data: metaData } = await axios.get(ipfs2http(tokenURI));
-          _nfts.push({ ...metaData, tokenId: id });
-        } catch (error) {
-          console.log(error);
-          continue;
-        }
-      }
-      setNfts(_nfts);
+          return { tokenURI, tokenId: id };
+        };
+        return getTokenURI(id);
+      });
+      const tokenURIs = await Promise.all(tokenURIPromises);
+
+      const metaDataPromises = tokenURIs.map(({ tokenURI, tokenId }) => {
+        const getMetaData = async (tokenURI: string, tokenId: number) => {
+          try {
+            const { data: metaData } = await axios.get(ipfs2http(tokenURI));
+            return { ...metaData, tokenId };
+          } catch (error) {
+            console.log(error);
+          }
+        };
+        return getMetaData(tokenURI, tokenId);
+      });
+      const _nfts = await Promise.all(metaDataPromises);
+      setNfts(_nfts.filter((nft) => nft));
       setIsLoading(false);
     };
 
