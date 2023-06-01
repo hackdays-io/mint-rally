@@ -1,4 +1,5 @@
 import {
+  ContractEvent,
   getBlockNumber,
   useAddress,
   useContract,
@@ -49,21 +50,20 @@ export const useGetTokenURI = (id: number | null) => {
 
 export const useGetOwnedNftIdsByAddress = (address?: string) => {
   const { mintNFTContract, isLoading } = useMintNFTContract();
-  const [ids, setIds] = useState<number[]>([]);
+  const [ids, setIds] = useState<number[]>();
 
   useEffect(() => {
     const fetch = async () => {
       if (!address || isLoading) return;
-      const _ids: number[] = [];
       const balance = await mintNFTContract?.call("balanceOf", [address]);
-      for (let index = 0; index < balance.toNumber(); index++) {
-        const tokenId = await mintNFTContract?.call("tokenOfOwnerByIndex", [
-          address,
-          index,
-        ]);
-        _ids.push(tokenId.toNumber());
-      }
-      setIds(_ids);
+      const tokenIdsPromise = Array(balance.toNumber())
+        .fill("")
+        .map((_, index) => {
+          return mintNFTContract?.call("tokenOfOwnerByIndex", [address, index]);
+        });
+      const tokenIds = await Promise.all(tokenIdsPromise);
+
+      setIds(tokenIds.map((id) => id.toNumber()));
     };
     fetch();
   }, [address, isLoading]);
@@ -140,23 +140,34 @@ export const useGetOwnedNFTByAddress = (address?: string) => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    setIsLoading(true);
     setNfts([]);
     if (!ids) return;
 
     const fetch = async () => {
-      const _nfts: any[] = [];
-      for (const id of ids) {
-        try {
+      setIsLoading(true);
+
+      const tokenURIPromises = ids.map((id) => {
+        const getTokenURI = async (id: number) => {
           const tokenURI = await mintNFTContract?.call("tokenURI", [id]);
-          const { data: metaData } = await axios.get(ipfs2http(tokenURI));
-          _nfts.push({ ...metaData, tokenId: id });
-        } catch (error) {
-          console.log(error);
-          continue;
-        }
-      }
-      setNfts(_nfts);
+          return { tokenURI, tokenId: id };
+        };
+        return getTokenURI(id);
+      });
+      const tokenURIs = await Promise.all(tokenURIPromises);
+
+      const metaDataPromises = tokenURIs.map(({ tokenURI, tokenId }) => {
+        const getMetaData = async (tokenURI: string, tokenId: number) => {
+          try {
+            const { data: metaData } = await axios.get(ipfs2http(tokenURI));
+            return { ...metaData, tokenId };
+          } catch (error) {
+            console.log(error);
+          }
+        };
+        return getMetaData(tokenURI, tokenId);
+      });
+      const _nfts = await Promise.all(metaDataPromises);
+      setNfts(_nfts.filter((nft) => nft));
       setIsLoading(false);
     };
 
@@ -259,11 +270,20 @@ export const useMintParticipateNFT = (
   }, [mintedTokenURI]);
 
   useEffect(() => {
-    if (status !== "success" || !data || data.length < 1) return;
-    console.log(data);
-    const tokenId = data[data.length - 1].data?.tokenId.toNumber();
+    const includesNewEvent = (data: ContractEvent<Record<string, any>>[]) => {
+      if (!fromBlock) return false;
+      return data.some((event) => {
+        return event.transaction.blockNumber > fromBlock;
+      });
+    };
+    if (status !== "success" || !data || !includesNewEvent(data)) return;
+    const tokenId = data
+      .sort((a, b) => {
+        return b.transaction.blockNumber - a.transaction.blockNumber;
+      })[0]
+      .data?.tokenId.toNumber();
     setMintedNFTId(tokenId);
-  }, [data, status]);
+  }, [data, status, fromBlock]);
 
   const checkCanMint = useCallback(
     async (eventId: number, secretPhrase: string) => {
