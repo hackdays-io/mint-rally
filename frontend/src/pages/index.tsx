@@ -17,13 +17,14 @@ import { useEventRecords } from "../hooks/useEventManager";
 import { useLocale } from "../hooks/useLocale";
 
 const Home: NextPage = () => {
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
   const { records, loading } = useEventRecords();
+  const filename = locale === "ja" ? "mainImg-ja" : "mainImg"
   return (
     <Box>
       <div>
         <Image
-          src="/images/mainImg.png"
+          src={`/images/${filename}.png`}
           width={1920}
           height={960}
           alt="mainImg"
