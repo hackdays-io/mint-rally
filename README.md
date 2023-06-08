@@ -16,7 +16,7 @@ Solves the problem of organizers struggling with event retention rates.
 
 ## Technology used
 
-- frontend: Next.js, Typecript
+- frontend: Next.js, TypeScript
 - contract: Solidity, ERC721Enumerable, Hardhat
 - image: IPFS, Pinata
 
