@@ -17,6 +17,7 @@ import axios from "axios";
 import { ipfs2http } from "utils/ipfs2http";
 import { Event } from "types/Event";
 import { signMetaTxRequest } from "utils/signer";
+import { BigNumber } from "ethers";
 
 export const useMintNFTContract = () => {
   const {
@@ -343,3 +344,10 @@ export const useMintParticipateNFT = (
 
   return { mint, mintMTX, isLoading, error, status, mintedNFT };
 };
+
+export const useIsHoldingEventNftByAddress = (address?: string, eventId?: BigNumber) => {
+  const { mintNFTContract } = useMintNFTContract();
+  const { data, isLoading } = useContractRead(mintNFTContract, "isHoldingEventNFTByAddress", [address, eventId]);
+
+  return {isHoldingEventNft: data, isLoading};
+}

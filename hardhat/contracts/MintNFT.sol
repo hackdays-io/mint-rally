@@ -44,10 +44,9 @@ contract MintNFT is
 
     event MintedNFTAttributeURL(address indexed holder, string url);
 
-    function initialize(MinimalForwarderUpgradeable trustedForwarder)
-        public
-        initializer
-    {
+    function initialize(
+        MinimalForwarderUpgradeable trustedForwarder
+    ) public initializer {
         __ERC721_init("MintRally", "MR");
         __Ownable_init();
         __ERC2771Context_init(address(trustedForwarder));
@@ -123,11 +122,10 @@ contract MintNFT is
         emit MintedNFTAttributeURL(_msgSender(), metaDataURL);
     }
 
-    function canMint(uint256 _eventId, string memory _secretPhrase)
-        public
-        view
-        returns (bool)
-    {
+    function canMint(
+        uint256 _eventId,
+        string memory _secretPhrase
+    ) public view returns (bool) {
         require(
             verifySecretPhrase(_secretPhrase, _eventId),
             "invalid secret phrase"
@@ -137,12 +135,20 @@ contract MintNFT is
             "remaining count is zero"
         );
 
-        bool holdingEventNFT = isHoldingEventNFT[
-            Hashing.hashingAddressUint256(_msgSender(), _eventId)
-        ];
-        require(!holdingEventNFT, "already minted");
+        require(
+            !isHoldingEventNFTByAddress(_msgSender(), _eventId),
+            "already minted"
+        );
 
         return true;
+    }
+
+    function isHoldingEventNFTByAddress(
+        address _addr,
+        uint256 _eventId
+    ) public view returns (bool) {
+        return
+            isHoldingEventNFT[Hashing.hashingAddressUint256(_addr, _eventId)];
     }
 
     function setEventInfo(
@@ -164,11 +170,9 @@ contract MintNFT is
         }
     }
 
-    function getRemainingNFTCount(uint256 _eventId)
-        external
-        view
-        returns (uint256)
-    {
+    function getRemainingNFTCount(
+        uint256 _eventId
+    ) external view returns (uint256) {
         return remainingEventNftCount[_eventId];
     }
 
@@ -176,21 +180,17 @@ contract MintNFT is
         _burn(tokenId);
     }
 
-    function tokenURI(uint256 _tokenId)
-        public
-        view
-        override
-        returns (string memory)
-    {
+    function tokenURI(
+        uint256 _tokenId
+    ) public view override returns (string memory) {
         string memory metaDataURL = nftMetaDataURL[_tokenId];
         return metaDataURL;
     }
 
-    function verifySecretPhrase(string memory _secretPhrase, uint256 _eventId)
-        internal
-        view
-        returns (bool)
-    {
+    function verifySecretPhrase(
+        string memory _secretPhrase,
+        uint256 _eventId
+    ) internal view returns (bool) {
         bytes32 encryptedSecretPhrase = keccak256(bytes(_secretPhrase));
         bool result = eventSecretPhrases[_eventId] == encryptedSecretPhrase;
         return result;
