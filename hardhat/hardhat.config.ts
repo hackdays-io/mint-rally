@@ -32,8 +32,7 @@ const config: HardhatUserConfig = {
     // https://livdir.com/polygongaspricechart/ja/
     polygon: {
       url: process.env.MAINNET_ALCHEMY_KEY || "",
-      accounts: [String(process.env.MAINNET_PRIVATE_KEY)],
-      gasPrice: 35000000000,
+      accounts: [String(process.env.MAINNET_PRIVATE_KEY)]
     },
     mumbai: {
       url: process.env.STAGING_ALCHEMY_KEY || "",
