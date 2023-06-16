@@ -2,7 +2,6 @@ import { expect } from "chai";
 import { ethers, upgrades } from "hardhat";
 import { MintNFT, EventManager } from "../typechain";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
-import { BigNumber } from "ethers";
 
 // ToDo requiredParticipateCountに重複がある場合エラーになってしまう。
 const attributes = [
@@ -160,6 +159,9 @@ describe("MintNFT", function () {
     });
 
     it("doesn't mint NFT for an event once attended to the same person twice", async () => {
+      expect(
+        await mintNFT.isHoldingEventNFTByAddress(organizer.address, createdEventIds[0])
+      ).equal(true);
       await expect(
         mintNFT
           .connect(organizer)
