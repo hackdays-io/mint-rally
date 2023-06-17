@@ -17,6 +17,8 @@ import { useMintParticipateNFT } from "src/hooks/useMintNFT";
 import { Event } from "types/Event";
 import { ipfs2http } from "utils/ipfs2http";
 import { useReward } from "react-rewards";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { getBlockNumber } from "@thirdweb-dev/sdk";
 
 type Props = {
@@ -47,6 +49,13 @@ export const MintForm: FC<Props> = ({ event, address }) => {
   }, [status, mintedNFT]);
 
   const [enteredSecretPhrase, setEnteredSecretPhrase] = useState("");
+  const [passwordType, setPasswordType] = useState("password");
+
+  const togglePasswordVisibility = () => {
+    setPasswordType((prevType) =>
+      prevType === "password" ? "text" : "password"
+    );
+  };
 
   const claimMint = async () => {
     if (!event) return;
@@ -70,10 +79,23 @@ export const MintForm: FC<Props> = ({ event, address }) => {
           <Box width={{ base: "100%", md: "48%" }} mb={{ base: 5, md: 0 }}>
             <Input
               variant="outline"
-              type="password"
+              type={passwordType}
               value={enteredSecretPhrase}
               onChange={(e) => setEnteredSecretPhrase(e.target.value)}
             />
+            {passwordType === "password" ? (
+              <FontAwesomeIcon
+                onClick={togglePasswordVisibility}
+                icon={faEye}
+                className="Password__visual"
+              />
+            ) : (
+              <FontAwesomeIcon
+                onClick={togglePasswordVisibility}
+                icon={faEyeSlash}
+                className="Password__visual"
+              />
+            )}
           </Box>
           <Button
             width={{ base: "100%", md: "48%" }}
