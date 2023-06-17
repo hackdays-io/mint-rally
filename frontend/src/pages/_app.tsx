@@ -13,6 +13,8 @@ import { config } from "@fortawesome/fontawesome-svg-core";
 import "@fortawesome/fontawesome-svg-core/styles.css";
 import { GoogleAnalytics } from "nextjs-google-analytics";
 import { Localhost, Mumbai, Polygon } from "@thirdweb-dev/chains";
+import { useLocale } from "src/hooks/useLocale";
+import { useMemo } from "react";
 
 config.autoAddCss = false;
 
@@ -24,24 +26,39 @@ const activeChain =
     ? Polygon
     : { ...Localhost, chainId: 31337 };
 
+const magicLinkConfig = magicLink({
+  apiKey: process.env.NEXT_PUBLIC_MAGIC_LINK_KEY!,
+  magicSdkConfiguration: {
+    locale: "ja",
+    network: activeChain as any,
+  },
+  smsLogin: false,
+});
+
+magicLinkConfig.meta.name = "メールアドレス";
+
 function MyApp({ Component, pageProps }: AppProps) {
+  const { t } = useLocale();
+
+  const magicLinkConfig = useMemo(() => {
+    const m_config = magicLink({
+      apiKey: process.env.NEXT_PUBLIC_MAGIC_LINK_KEY!,
+      magicSdkConfiguration: {
+        locale: "ja",
+        network: activeChain as any,
+      },
+      smsLogin: false,
+    });
+    m_config.meta.name = t.GET_VIA_EMAIL;
+    return m_config;
+  }, [t]);
+
   return (
     <>
       <GoogleAnalytics trackPageViews />
       <ThirdwebProvider
         activeChain={activeChain}
-        supportedWallets={[
-          metamaskWallet(),
-          safeWallet(),
-          magicLink({
-            apiKey: process.env.NEXT_PUBLIC_MAGIC_LINK_KEY!,
-            magicSdkConfiguration: {
-              locale: "ja",
-              network: activeChain as any,
-            },
-            smsLogin: false,
-          }),
-        ]}
+        supportedWallets={[metamaskWallet(), safeWallet(), magicLinkConfig]}
       >
         <ChakraProvider theme={chakraTheme}>
           <Layout>
