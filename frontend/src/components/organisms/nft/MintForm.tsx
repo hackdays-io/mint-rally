@@ -19,7 +19,7 @@ import { ipfs2http } from "utils/ipfs2http";
 import { useReward } from "react-rewards";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
-import { getBlockNumber } from "@thirdweb-dev/sdk";
+import { useWallet } from "@thirdweb-dev/react";
 
 type Props = {
   event: Event.EventRecord;
@@ -28,6 +28,7 @@ type Props = {
 
 export const MintForm: FC<Props> = ({ event, address }) => {
   const { t } = useLocale();
+  const walletMetadata = useWallet()?.getMeta();
 
   const { mint, mintMTX, isLoading, error, mintedNFT, status } =
     useMintParticipateNFT(event, address, event.useMtx);
@@ -75,27 +76,44 @@ export const MintForm: FC<Props> = ({ event, address }) => {
           alignItems="end"
           flexWrap="wrap"
         >
-          <Text mb={2}>{t.ENTER_SECRET_PHRASE}</Text>
-          <Box width={{ base: "100%", md: "48%" }} mb={{ base: 5, md: 0 }}>
+          <Text mb={2}>
+            {t.ENTER_SECRET_PHRASE}
+            {walletMetadata?.name === "MetaMask" &&
+              t.ENTER_SECRET_PHRASE_METAMASK}
+          </Text>
+          <Box
+            width={{ base: "100%", md: "48%" }}
+            mb={{ base: 5, md: 0 }}
+            position="relative"
+          >
             <Input
               variant="outline"
               type={passwordType}
               value={enteredSecretPhrase}
               onChange={(e) => setEnteredSecretPhrase(e.target.value)}
+              pr={10}
+              placeholder={t.INPUT_SECRET_PHRASE}
             />
-            {passwordType === "password" ? (
-              <FontAwesomeIcon
-                onClick={togglePasswordVisibility}
-                icon={faEye}
-                className="Password__visual"
-              />
-            ) : (
-              <FontAwesomeIcon
-                onClick={togglePasswordVisibility}
-                icon={faEyeSlash}
-                className="Password__visual"
-              />
-            )}
+            <Box
+              as="span"
+              position="absolute"
+              right={3}
+              top={2}
+              zIndex={5}
+              cursor="pointer"
+            >
+              {passwordType === "password" ? (
+                <FontAwesomeIcon
+                  onClick={togglePasswordVisibility}
+                  icon={faEye}
+                />
+              ) : (
+                <FontAwesomeIcon
+                  onClick={togglePasswordVisibility}
+                  icon={faEyeSlash}
+                />
+              )}
+            </Box>
           </Box>
           <Button
             width={{ base: "100%", md: "48%" }}
