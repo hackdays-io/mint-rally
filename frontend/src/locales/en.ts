@@ -6,6 +6,7 @@ export default {
   HELP: "HELP",
   SIGN_IN: "Sign In",
   SIGN_OUT: "Sign Out",
+  GET_VIA_EMAIL: "Connect with Email",
   SWITCH_NETWORK: "Switch Network",
   PLEASE_SIGN_IN: "Please sign in first!",
   // NFT

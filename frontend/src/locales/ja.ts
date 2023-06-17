@@ -6,6 +6,7 @@ export default {
   HELP: "ヘルプ",
   SIGN_IN: "ログイン",
   SIGN_OUT: "ログアウト",
+  GET_VIA_EMAIL: "メールアドレスで接続",
   SWITCH_NETWORK: "ネットワーク切替",
   PLEASE_SIGN_IN: "ログインしてください。",
   // NFT
