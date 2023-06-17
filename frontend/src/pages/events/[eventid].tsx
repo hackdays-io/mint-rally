@@ -6,13 +6,19 @@ import LoginRequired from "../../components/atoms/web3/LoginRequired";
 import { useLocale } from "../../hooks/useLocale";
 import { MintForm } from "src/components/organisms/nft/MintForm";
 import { useAddress } from "@thirdweb-dev/react";
-import { useGetOwnedNFTByAddress, useIsHoldingEventNftByAddress } from "src/hooks/useMintNFT";
+import {
+  useGetOwnedNFTByAddress,
+  useIsHoldingEventNftByAddress,
+} from "src/hooks/useMintNFT";
 import { NFTItem } from "src/components/atoms/nft/NFTItem";
 import { Event } from "types/Event";
 
 const MintNFTSection: FC<{ event: Event.EventRecord }> = ({ event }) => {
   const address = useAddress();
-  const {isHoldingEventNft, isLoading} = useIsHoldingEventNftByAddress(address, event.eventRecordId);
+  const { isHoldingEventNft, isLoading } = useIsHoldingEventNftByAddress(
+    address,
+    event.eventRecordId
+  );
   const { nfts, isLoading: checkHoldingNFTs } =
     useGetOwnedNFTByAddress(address);
 
@@ -28,16 +34,14 @@ const MintNFTSection: FC<{ event: Event.EventRecord }> = ({ event }) => {
     <>
       {isLoading || checkHoldingNFTs || !address ? (
         <Spinner />
-      ) : isHoldingEventNft ? (
-        holdingNFT && (
-          <Box maxW={200} mx="auto" cursor="pointer">
-            <NFTItem
-              shareURL={false}
-              nft={holdingNFT}
-              tokenId={holdingNFT.tokenId}
-            />
-          </Box>
-        )
+      ) : isHoldingEventNft && holdingNFT ? (
+        <Box maxW={200} mx="auto" cursor="pointer">
+          <NFTItem
+            shareURL={false}
+            nft={holdingNFT}
+            tokenId={holdingNFT.tokenId}
+          />
+        </Box>
       ) : (
         <MintForm event={event} address={address} />
       )}
