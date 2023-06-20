@@ -5,7 +5,7 @@ yarn
 の順番にインストールします。
 
 ## Homebrewをインストールする
-Homebrewは、macOS用のパッケージマネージャーです。以下の手順に従ってHomebrewをインストールします。
+[Homebrew](https://brew.sh/index_ja "配布元サイトへのリンク")は、macOS用のパッケージマネージャーです。以下の手順に従ってHomebrewをインストールします。
 
 1. ターミナルを開きます。Spotlight検索（Cmd + Space）で「ターミナル」と入力して起動します。
 
