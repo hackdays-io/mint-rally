@@ -54,7 +54,9 @@ Yarnは、JavaScriptのパッケージマネージャーであり、依存関係
    もし、バージョン情報が表示されない場合は、インストールコマンドのタイプミスまたはネットワークエラーの可能性があるため、インストールログを確認してください。
 
 ## 補足
-MintRallではNodeとYarnを必須としていますがHomebrewは必須としていません。
-従ってHomebrewを入れずにnodeをインストールすることは可能です。
-ですがHomebrewでnodeの管理をする事がMacでの開発のデファクトとなっているため、本手順でもHomebrewをインストールしています。
+MintRallではNodeとYarnを必須としていますがHomebrewは必須としていません。  
+従ってHomebrewを入れずにnodeをインストールすることは可能です。ですがHomebrewでnodeの管理をする事がMacでの開発のデファクトです。デファクトに従う事として本手順でもHomebrewをインストールしています。  
+[MintRallの依存関係](https://github.com/hackdays-io/mint-rally/blob/main/docs/frontend.md#dependencies)に記載された制約に従う為にnodeの最新版ではなくてVersion16をインストールするようにしています。  
+Nextは、package.jsonの内容に従ってyarnコマンドによって組み込まれるため手順書として登場させていません。  
+ソースコードのエディタは何を使っても問題ありませんが、VSC(VisualStudioCode)がおすすめです。
 
