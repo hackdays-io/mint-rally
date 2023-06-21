@@ -1,7 +1,8 @@
-## M1/M2 MacでHomebrewをインストールする
-Homebrew
-node
-yarn
+## MintRally開発の前提となっている開発プラットホームをインストールする。
+- Homebrew
+- node
+- yarn
+  
 の順番にインストールします。
 
 ## Homebrewをインストールする
