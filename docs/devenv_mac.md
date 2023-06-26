@@ -31,6 +31,13 @@ Node.jsは、JavaScriptランタイム環境であり、サーバーサイドで
    ```
    MintRallyではversion16と18にて動作確認をとっています。
    そのためVersion18を指定してインストールしています。
+
+2. Nodeのバージョン指定しているので"keg-only"となっており、PATHが通されていないはずなので以下のコマンドを実行する。
+
+   ```shell
+   'export PATH="/opt/homebrew/opt/node@18/bin:$PATH"' >> ~/.zshrc"
+   ```
+
    
 3. インストール確認
    ```shell
