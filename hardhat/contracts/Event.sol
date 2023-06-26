@@ -62,7 +62,8 @@ contract EventManager is OwnableUpgradeable {
         maxMintLimit = _mintLimit;
     }
 
-    event CreatedGroupId(address indexed owner, uint256 groupId);
+    event CreateGroup(address indexed owner, uint256 groupId);
+    event CreateEvent(address indexed owner, uint256 eventId);
 
     function initialize(
         address _relayerAddr,
@@ -86,7 +87,7 @@ contract EventManager is OwnableUpgradeable {
         );
         ownGroupIds[msg.sender].push(_newGroupId);
 
-        emit CreatedGroupId(msg.sender, _newGroupId);
+        emit CreateGroup(msg.sender, _newGroupId);
     }
 
     function getGroups() public view returns (Group[] memory) {
@@ -166,6 +167,8 @@ contract EventManager is OwnableUpgradeable {
 
         eventIdsByGroupId[_groupId].push(_newEventId);
         groupIdByEventId[_newEventId] = _groupId;
+
+        emit CreateEvent(msg.sender, _newEventId);
     }
 
     function getEventRecords() public view returns (EventRecord[] memory) {
@@ -178,11 +181,9 @@ contract EventManager is OwnableUpgradeable {
         return _eventRecords;
     }
 
-    function getEventById(uint256 _eventId)
-        external
-        view
-        returns (EventRecord memory)
-    {
+    function getEventById(
+        uint256 _eventId
+    ) external view returns (EventRecord memory) {
         uint256 _eventRecordIndex = _eventId - 1;
         EventRecord memory _eventRecord = eventRecords[_eventRecordIndex];
         return _eventRecord;
