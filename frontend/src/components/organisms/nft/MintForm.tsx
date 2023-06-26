@@ -16,6 +16,7 @@ import { useLocale } from "src/hooks/useLocale";
 import { useMintParticipateNFT } from "src/hooks/useMintNFT";
 import { Event } from "types/Event";
 import { ipfs2http } from "utils/ipfs2http";
+import AlertMessage from "src/components/atoms/form/AlertMessage";
 import { useReward } from "react-rewards";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
@@ -130,25 +131,13 @@ export const MintForm: FC<Props> = ({ event, address }) => {
           </Button>
         </Flex>
       )}
-      {error && (
-        <Alert status="error" mt={2}>
-          <AlertIcon />
-          <AlertTitle>Error occurred</AlertTitle>
-          <AlertDescription>{error.reason}</AlertDescription>
-        </Alert>
-      )}
+      {error && <AlertMessage>{error.reason}</AlertMessage>}
       {status == "success" && !mintedNFT && (
-        <Alert status="success" mt={3}>
-          <AlertIcon />
-          <AlertTitle>{t.YOU_HAVE_CLAIMED_NFT}</AlertTitle>
-        </Alert>
+        <AlertMessage status="success" mt={3} title={t.YOU_HAVE_CLAIMED_NFT} />
       )}
       {mintedNFT && (
         <>
-          <Alert status="success" mt={3}>
-            <AlertIcon />
-            <AlertTitle>{t.YOU_HAVE_GOT_NFT}</AlertTitle>
-          </Alert>
+          <AlertMessage status="success" mt={3} title={t.YOU_HAVE_GOT_NFT} />
           <VStack justify="center" mt={5}>
             <img src={ipfs2http(mintedNFT.image)} width="200" height="200" />
             <span id="confettiReward" />

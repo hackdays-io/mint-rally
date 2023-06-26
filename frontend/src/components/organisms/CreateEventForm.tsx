@@ -1,9 +1,5 @@
 import { FC, useEffect, useState } from "react";
 import {
-  Alert,
-  AlertDescription,
-  AlertIcon,
-  AlertTitle,
   Box,
   Flex,
   Radio,
@@ -28,6 +24,7 @@ import {
   useOwnEventGroups,
 } from "../../hooks/useEventManager";
 import ErrorMessage from "../../components/atoms/form/ErrorMessage";
+import AlertMessage from "../../components/atoms/form/AlertMessage";
 import { useLocale } from "../../hooks/useLocale";
 import Link from "next/link";
 import NFTAttributesForm from "./NFTAttributesForm";
@@ -408,11 +405,7 @@ const CreateEventForm: FC = () => {
               </Button>
 
               {createError && (
-                <Alert status="error" mt={2}>
-                  <AlertIcon />
-                  <AlertTitle>Error occurred</AlertTitle>
-                  <AlertDescription>{createError.message}</AlertDescription>
-                </Alert>
+                <AlertMessage>{createError.message}</AlertMessage>
               )}
             </>
           ) : (

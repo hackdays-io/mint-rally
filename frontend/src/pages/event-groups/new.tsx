@@ -4,10 +4,6 @@ import {
   Heading,
   Box,
   Spinner,
-  Alert,
-  AlertIcon,
-  AlertTitle,
-  AlertDescription,
   Container,
 } from "@chakra-ui/react";
 import type { NextPage } from "next";
@@ -17,6 +13,7 @@ import { useLocale } from "../../hooks/useLocale";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import ErrorMessage from "../../components/atoms/form/ErrorMessage";
 import NFTAttributesForm from "../../components/organisms/NFTAttributesForm";
+import AlertMessage from "../../components/atoms/form/AlertMessage";
 import { ipfsUploader } from "src/libs/libIpfs";
 import Link from "next/link";
 
@@ -139,13 +136,7 @@ const NewEventGroupPage: NextPage = () => {
                     t.CREATE_NEW_EVENT_GROUP
                   )}
                 </Button>
-                {errors && (
-                  <Alert status="error" mt={2}>
-                    <AlertIcon />
-                    <AlertTitle>Error occurred</AlertTitle>
-                    <AlertDescription>{errors.message}</AlertDescription>
-                  </Alert>
-                )}
+                {errors && <AlertMessage>{errors.message}</AlertMessage>}
               </Box>
             </form>
           ) : (
