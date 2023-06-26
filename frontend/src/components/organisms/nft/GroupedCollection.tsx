@@ -1,5 +1,4 @@
 import { Box, Grid, Heading, Spinner } from "@chakra-ui/react";
-import { BigNumber } from "ethers";
 import { FC } from "react";
 import { NFTItem } from "src/components/atoms/nft/NFTItem";
 import { useEventGroups } from "src/hooks/useEventManager";
