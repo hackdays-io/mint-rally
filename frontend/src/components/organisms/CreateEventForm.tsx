@@ -1,9 +1,5 @@
 import { FC, useEffect, useMemo, useState } from "react";
 import {
-  Alert,
-  AlertDescription,
-  AlertIcon,
-  AlertTitle,
   Box,
   Flex,
   Radio,
@@ -21,6 +17,7 @@ import {
   Button,
 } from "@chakra-ui/react";
 import ErrorMessage from "../../components/atoms/form/ErrorMessage";
+import AlertMessage from "../../components/atoms/form/AlertMessage";
 import { useLocale } from "../../hooks/useLocale";
 import Link from "next/link";
 import NFTAttributesForm from "./NFTAttributesForm";
@@ -410,13 +407,9 @@ const CreateEventForm: FC<Props> = ({ address }) => {
               </Button>
 
               {errorMessage && (
-                <Alert status="error" mt={2}>
-                  <AlertIcon />
-                  <AlertTitle>Error occurred</AlertTitle>
-                  <AlertDescription>
-                    {errorMessage?.reason || errorMessage?.message}
-                  </AlertDescription>
-                </Alert>
+                <AlertMessage>
+                  {errorMessage?.reason || errorMessage?.message}
+                </AlertMessage>
               )}
             </>
           ) : (

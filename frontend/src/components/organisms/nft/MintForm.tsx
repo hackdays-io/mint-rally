@@ -1,20 +1,10 @@
-import {
-  Alert,
-  AlertDescription,
-  AlertIcon,
-  AlertTitle,
-  Box,
-  Button,
-  Flex,
-  Input,
-  Text,
-  VStack,
-} from "@chakra-ui/react";
+import { Box, Button, Flex, Input, Text, VStack } from "@chakra-ui/react";
 import Link from "next/link";
 import { FC, useEffect, useState } from "react";
 import { useLocale } from "src/hooks/useLocale";
 import { useMintParticipateNFT } from "src/hooks/useMintNFT";
 import { Event } from "types/Event";
+import AlertMessage from "src/components/atoms/form/AlertMessage";
 import { useReward } from "react-rewards";
 import { useWallet } from "@thirdweb-dev/react";
 import { NFTItem } from "src/components/atoms/nft/NFTItem";
@@ -101,25 +91,13 @@ export const MintForm: FC<Props> = ({ event, address }) => {
           </Button>
         </Flex>
       )}
-      {error && (
-        <Alert status="error" mt={2}>
-          <AlertIcon />
-          <AlertTitle>Error occurred</AlertTitle>
-          <AlertDescription>{error.reason}</AlertDescription>
-        </Alert>
-      )}
+      {error && <AlertMessage>{error.reason}</AlertMessage>}
       {status == "success" && !mintedNFT && (
-        <Alert status="success" mt={3}>
-          <AlertIcon />
-          <AlertTitle>{t.YOU_HAVE_CLAIMED_NFT}</AlertTitle>
-        </Alert>
+        <AlertMessage status="success" mt={3} title={t.YOU_HAVE_CLAIMED_NFT} />
       )}
       {mintedNFT && (
         <>
-          <Alert status="success" mt={3}>
-            <AlertIcon />
-            <AlertTitle>{t.YOU_HAVE_GOT_NFT}</AlertTitle>
-          </Alert>
+          <AlertMessage status="success" mt={3} title={t.YOU_HAVE_GOT_NFT} />
           <VStack justify="center" mt={5}>
             <Box maxW={250}>
               <NFTItem
