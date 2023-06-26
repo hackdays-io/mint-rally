@@ -29,7 +29,7 @@ export const useCreateEventGroup = (address: string) => {
     isLoading: isCreating,
     error: createError,
     status: createStatus,
-  } = useContractWrite(eventManagerContract, "createEventGroup");
+  } = useContractWrite(eventManagerContract, "createGroup");
   const fromBlock = useCurrentBlock();
   const { data } = useContractEvents(eventManagerContract, "CreatedGroupId", {
     queryFilter: {

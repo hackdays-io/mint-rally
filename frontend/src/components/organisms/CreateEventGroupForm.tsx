@@ -1,6 +1,17 @@
-import { FC } from "react";
-import { useForm } from "react-hook-form";
+import {
+  Alert,
+  AlertDescription,
+  AlertIcon,
+  AlertTitle,
+  Box,
+  Button,
+  Input,
+} from "@chakra-ui/react";
+import Link from "next/link";
+import { FC, useCallback, useMemo } from "react";
+import { Controller, useForm } from "react-hook-form";
 import { useCreateEventGroup } from "src/hooks/useEvent";
+import { useLocale } from "src/hooks/useLocale";
 
 type Props = {
   address: string;
@@ -10,7 +21,9 @@ interface EventGroupFormData {
   groupName: string;
 }
 
-export const createEventGroupForm: FC<Props> = ({ address }) => {
+export const CreateEventGroupForm: FC<Props> = ({ address }) => {
+  const { t } = useLocale();
+
   const {
     createEventGroup,
     createStatus,
@@ -22,9 +35,67 @@ export const createEventGroupForm: FC<Props> = ({ address }) => {
   const {
     control,
     handleSubmit,
-    watch,
     formState: { isSubmitting },
   } = useForm<EventGroupFormData>({ defaultValues: { groupName: "" } });
 
-  return <form></form>;
+  const submit = useCallback(
+    async (data: EventGroupFormData) => {
+      if (isSubmitting) return;
+      await createEventGroup(data);
+    },
+    [createEventGroup]
+  );
+
+  const errorMessage = useMemo(() => {
+    if (createError) {
+      return createError as any;
+    }
+  }, [createError]);
+
+  return createdGroupId ? (
+    <>
+      <Box mb={5}>{t.EVENT_GROUP_CREATED}🎉</Box>
+      <Link href={`/events/new?group_id=${createdGroupId}`}>
+        <Button>{t.CREATE_NEW_EVENT}</Button>
+      </Link>
+    </>
+  ) : (
+    <form onSubmit={handleSubmit(submit)}>
+      <Controller
+        name="groupName"
+        control={control}
+        rules={{ required: true }}
+        render={({ field }) => (
+          <Input
+            variant="outline"
+            type="text"
+            value={field.value}
+            onChange={field.onChange}
+            placeholder={t.EVENT_GROUP}
+          ></Input>
+        )}
+      />
+      <Button
+        isLoading={isSubmitting}
+        backgroundColor="mint.bg"
+        size="md"
+        width="full"
+        disabled={isSubmitting || isCreating}
+        mt={5}
+        type="submit"
+      >
+        {t.CREATE_NEW_EVENT_GROUP}
+      </Button>
+
+      {errorMessage && (
+        <Alert status="error" mt={2}>
+          <AlertIcon />
+          <AlertTitle>Error occurred</AlertTitle>
+          <AlertDescription>
+            {errorMessage?.reason || errorMessage?.message}
+          </AlertDescription>
+        </Alert>
+      )}
+    </form>
+  );
 };
