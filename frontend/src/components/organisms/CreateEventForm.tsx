@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect, useMemo, useState } from "react";
 import {
   Alert,
   AlertDescription,
@@ -8,7 +8,6 @@ import {
   Flex,
   Radio,
   RadioGroup,
-  Spinner,
   Text,
   Textarea,
 } from "@chakra-ui/react";
@@ -24,7 +23,6 @@ import {
   ICreateEventRecordParams,
   IEventGroup,
   INFTImage,
-  useCreateEventRecord,
   useOwnEventGroups,
 } from "../../hooks/useEventManager";
 import ErrorMessage from "../../components/atoms/form/ErrorMessage";
@@ -32,6 +30,11 @@ import { useLocale } from "../../hooks/useLocale";
 import Link from "next/link";
 import NFTAttributesForm from "./NFTAttributesForm";
 import { useIpfs } from "src/hooks/useIpfs";
+import { useCreateEvent } from "src/hooks/useEvent";
+
+type Props = {
+  address: string;
+};
 
 interface EventFormData {
   eventGroupId: string;
@@ -46,16 +49,21 @@ interface EventFormData {
   nfts: INFTImage[];
 }
 
-const CreateEventForm: FC = () => {
+const CreateEventForm: FC<Props> = ({ address }) => {
   const { t } = useLocale();
-  const { loading, errors, nftAttributes, saveNFTMetadataOnIPFS } = useIpfs();
+  const {
+    loading: isUploadingMetadata,
+    errors,
+    nftAttributes,
+    saveNFTMetadataOnIPFS,
+  } = useIpfs();
   const [formData, setFormData] = useState<EventFormData | null>(null);
+
   const {
     control,
     handleSubmit,
     formState: { isSubmitting },
     watch,
-    setValue,
   } = useForm<EventFormData>({
     mode: "all",
     defaultValues: {
@@ -68,37 +76,18 @@ const CreateEventForm: FC = () => {
       secretPhrase: "",
       mintLimit: 10,
       useMtx: undefined,
-      nfts: [],
+      nfts: [
+        { name: "", requiredParticipateCount: 0, description: "", image: "" },
+      ],
     },
   });
 
   const { remove, append } = useFieldArray({ control, name: "nfts" });
 
-  useEffect(() => {
-    const groupNFTAttributes = window.localStorage.getItem(
-      `group${watch("eventGroupId")}`
-    );
-    if (!groupNFTAttributes) {
-      console.log("dont has group");
-      setValue("nfts", [
-        { name: "", requiredParticipateCount: 0, description: "", image: "" },
-      ]);
-    } else {
-      console.log("has group", groupNFTAttributes);
-      const baseNFTAttributes: INFTImage[] = JSON.parse(groupNFTAttributes);
-      console.log(baseNFTAttributes);
-      setValue("nfts", baseNFTAttributes);
-    }
-  }, [watch("eventGroupId")]);
-
   // state for loading event groups
   const { groups } = useOwnEventGroups();
-  const {
-    status,
-    errors: createError,
-    loading: createLoading,
-    createEventRecord,
-  } = useCreateEventRecord();
+  const { createEvent, isCreating, createError, createStatus, createdEventId } =
+    useCreateEvent(address);
 
   const onSubmit = async (data: EventFormData) => {
     setFormData(data);
@@ -106,36 +95,50 @@ const CreateEventForm: FC = () => {
   };
 
   useEffect(() => {
-    console.log("nftAttributes", nftAttributes);
-    if (nftAttributes.length > 0 && formData) {
-      console.log("ok", formData);
-      const params: ICreateEventRecordParams = {
-        groupId: formData.eventGroupId,
-        eventName: formData.eventName,
-        description: formData.description,
-        date: new Date(formData.date),
-        startTime: formData.startTime,
-        endTime: formData.endTime,
-        secretPhrase: formData.secretPhrase,
-        mintLimit: Number(formData.mintLimit),
-        useMtx: formData.useMtx === "true",
-        attributes: nftAttributes,
-      };
-      try {
-        console.log(params);
-        createEventRecord(params);
-      } catch (error: any) {
-        alert(error);
+    const create = async () => {
+      if (nftAttributes.length > 0 && formData) {
+        const params: ICreateEventRecordParams = {
+          groupId: formData.eventGroupId,
+          eventName: formData.eventName,
+          description: formData.description,
+          date: new Date(formData.date),
+          startTime: formData.startTime,
+          endTime: formData.endTime,
+          secretPhrase: formData.secretPhrase,
+          mintLimit: Number(formData.mintLimit),
+          useMtx: formData.useMtx === "true",
+          attributes: nftAttributes,
+        };
+        await createEvent(params);
       }
-    }
+    };
+    create();
   }, [nftAttributes]);
+
+  const errorMessage = useMemo(() => {
+    if (createError || errors) {
+      return (createError || errors) as any;
+    }
+  }, [createError, errors]);
+
+  const isLoading = useMemo(() => {
+    if (isCreating || isUploadingMetadata) return true;
+  }, [isCreating, isUploadingMetadata]);
 
   return (
     <>
       {groups.length === 0 ? (
         <Link href="/event-groups/new">please create event group first</Link>
-      ) : status ? (
-        "Your Event Created!🎉"
+      ) : createdEventId ? (
+        <Box>
+          <Text>Your Event Created🎉</Text>
+
+          <Link href={`/events/${createdEventId}`}>
+            <Button mt={10} backgroundColor="mint.bg" size="md">
+              Go to Event Page
+            </Button>
+          </Link>
+        </Box>
       ) : (
         <form onSubmit={handleSubmit(onSubmit)}>
           <FormControl mb={5}>
@@ -398,20 +401,22 @@ const CreateEventForm: FC = () => {
               <Button
                 mt={10}
                 type="submit"
-                isLoading={isSubmitting}
+                isLoading={isLoading || isSubmitting}
                 backgroundColor="mint.bg"
                 size="lg"
                 width="full"
-                disabled={isSubmitting || status}
+                disabled={isLoading || isSubmitting}
               >
-                {createLoading ? <Spinner /> : status ? "Success" : "Create"}
+                {t.CREATE_NEW_EVENT}
               </Button>
 
-              {createError && (
+              {errorMessage && (
                 <Alert status="error" mt={2}>
                   <AlertIcon />
                   <AlertTitle>Error occurred</AlertTitle>
-                  <AlertDescription>{createError.message}</AlertDescription>
+                  <AlertDescription>
+                    {errorMessage?.reason || errorMessage?.message}
+                  </AlertDescription>
                 </Alert>
               )}
             </>
