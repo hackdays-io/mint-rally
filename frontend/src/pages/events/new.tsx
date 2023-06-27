@@ -15,7 +15,11 @@ const EventCreate: NextPage = () => {
         <Heading as="h1" mb={10}>
           {t.CREATE_NEW_EVENT}
         </Heading>
-        {address ? <CreateEventForm /> : <span>please sign in first</span>}
+        {address ? (
+          <CreateEventForm address={address} />
+        ) : (
+          <span>please sign in first</span>
+        )}
       </Container>
     </>
   );
