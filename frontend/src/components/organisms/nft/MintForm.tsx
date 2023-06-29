@@ -80,7 +80,7 @@ export const MintForm: FC<Props> = ({ event, address }) => {
           >
             <Input
               variant="outline"
-              type="password"
+              type="text"
               value={enteredSecretPhrase}
               onChange={(e) => setEnteredSecretPhrase(e.target.value)}
               pr={10}
