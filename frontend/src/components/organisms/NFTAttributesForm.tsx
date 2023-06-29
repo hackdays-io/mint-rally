@@ -13,16 +13,16 @@ import {
   NumberInputStepper,
   Text,
 } from "@chakra-ui/react";
-import { FC, useEffect, useState } from "react";
+import { FC } from "react";
 import { Controller, Control, UseFieldArrayRemove } from "react-hook-form";
-import { INFTImage } from "src/hooks/useEventManager";
 import { useLocale } from "../../hooks/useLocale";
 import ErrorMessage from "../atoms/form/ErrorMessage";
 import ImageSelectorWithPreview from "../ImageSelectorWithPreview";
+import { NFT } from "types/NFT";
 
 type Props = {
   control: Control<any, any>;
-  nfts: INFTImage[];
+  nfts: NFT.NFTImage[];
   append: (v: any) => void;
   remove: UseFieldArrayRemove;
 };
@@ -39,7 +39,7 @@ const NFTAttributesForm: FC<Props> = ({ control, nfts, append, remove }) => {
     }
   };
 
-  const validateHasImage = (nft: INFTImage) => {
+  const validateHasImage = (nft: NFT.NFTImage) => {
     if (nft.fileObject || nft.image) {
       return true;
     } else {

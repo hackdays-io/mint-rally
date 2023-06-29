@@ -3,11 +3,10 @@ import {
   Button,
   Divider,
   Image,
-  Input,
+  Link,
   Text,
   Textarea,
 } from "@chakra-ui/react";
-import Link from "next/link";
 import { useAddress } from "@thirdweb-dev/react";
 import { BigNumber } from "ethers";
 import { FC } from "react";
@@ -38,9 +37,9 @@ const TokenModal: FC<Props> = ({ isOpen, onClose, nft, shareURL, tokenId }) => {
     return chainId === "80001"
       ? "https://testnets.opensea.io/assets/mumbai"
       : chainId === "137"
-        ? "https://opensea.io/assets/matic"
-        : "localhost";
-  }
+      ? "https://opensea.io/assets/matic"
+      : "localhost";
+  };
 
   return (
     <ModalBase isOpen={isOpen} onClose={onClose}>
@@ -95,13 +94,20 @@ const TokenModal: FC<Props> = ({ isOpen, onClose, nft, shareURL, tokenId }) => {
             </Box>
           )}
           <Box>
-            <Link href={`${openseaLinkByChainId()}/${process.env.NEXT_PUBLIC_CONTRACT_MINT_NFT_MANAGER}/${tokenId}`} target="_blank">
+            <Link
+              href={`${openseaLinkByChainId()}/${
+                process.env.NEXT_PUBLIC_CONTRACT_MINT_NFT_MANAGER
+              }/${tokenId}`}
+              target="_blank"
+            >
               <Button
                 size="small"
                 p={2}
                 width="full"
                 mt={3}
-                leftIcon={<OpenseaIcon />}>
+                leftIcon={<OpenseaIcon />}
+              >
+                OpenSea
               </Button>
             </Link>
           </Box>

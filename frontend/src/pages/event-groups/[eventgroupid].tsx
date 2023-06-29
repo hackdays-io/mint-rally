@@ -3,23 +3,26 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useMemo } from "react";
 import EventCard from "../../components/atoms/events/EventCard";
-import { useEventGroups, useEventRecords } from "../../hooks/useEventManager";
 import { useLocale } from "../../hooks/useLocale";
+import { useEventGroups, useEvents } from "src/hooks/useEvent";
+import { Event } from "types/Event";
 
 const EventGroup = () => {
   const router = useRouter();
   const { eventgroupid } = router.query;
-  const { groups, loading } = useEventGroups();
-  const { records, loading: eventLoading } = useEventRecords();
+  const { groups, isLoading } = useEventGroups();
+  const { events, isLoading: eventLoading } = useEvents();
   const { t } = useLocale();
   const findgroup = useMemo(() => {
-    return groups.find((item) => item.groupId.toString() == eventgroupid);
+    return groups?.find(
+      (item: Event.EventGroup) => item.groupId.toString() == eventgroupid
+    );
   }, [groups]);
 
   return (
     <>
       <Container maxW={800} paddingTop={6}>
-        {loading ? (
+        {isLoading ? (
           <Spinner></Spinner>
         ) : (
           <>
@@ -31,21 +34,21 @@ const EventGroup = () => {
                 </Heading>
                 {eventLoading && <Spinner></Spinner>}
                 <SimpleGrid columns={3} spacing={5}>
-                  {records
+                  {events
                     .filter(
-                      (findgroup) =>
+                      (findgroup: Event.EventRecord) =>
                         findgroup.groupId.toString() == eventgroupid
                     )
-                    .map((record) => {
+                    .map((event: Event.EventRecord) => {
                       return (
                         <Link
-                          href={"/events/" + record.eventRecordId}
-                          key={record.eventRecordId.toString()}
+                          href={"/events/" + event.eventRecordId}
+                          key={event.eventRecordId.toString()}
                         >
                           <a>
                             <EventCard
-                              title={record.name}
-                              description={record.description}
+                              title={event.name}
+                              description={event.description}
                             ></EventCard>
                           </a>
                         </Link>

@@ -97,14 +97,16 @@ contract EventManager is OwnableUpgradeable {
         return _groups;
     }
 
-    function getOwnGroups() public view returns (Group[] memory) {
-        uint256 _numberOfOwnGroups = ownGroupIds[msg.sender].length;
+    function getOwnGroups(
+        address _address
+    ) public view returns (Group[] memory) {
+        uint256 _numberOfOwnGroups = ownGroupIds[_address].length;
         uint256 _numberOfAllGroups = groups.length;
 
         Group[] memory _groups = new Group[](_numberOfOwnGroups);
         uint256 _count = 0;
         for (uint256 _i = 0; _i < _numberOfAllGroups; _i++) {
-            if (groups[_i].ownerAddress == msg.sender) {
+            if (groups[_i].ownerAddress == _address) {
                 _groups[_count] = groups[_i];
                 _count++;
             }
