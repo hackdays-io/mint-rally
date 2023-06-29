@@ -8,6 +8,7 @@ import {
   Flex,
   Radio,
   RadioGroup,
+  Spinner,
   Text,
   Textarea,
 } from "@chakra-ui/react";
@@ -19,18 +20,14 @@ import {
   Input,
   Button,
 } from "@chakra-ui/react";
-import {
-  ICreateEventRecordParams,
-  IEventGroup,
-  INFTImage,
-  useOwnEventGroups,
-} from "../../hooks/useEventManager";
 import ErrorMessage from "../../components/atoms/form/ErrorMessage";
 import { useLocale } from "../../hooks/useLocale";
 import Link from "next/link";
 import NFTAttributesForm from "./NFTAttributesForm";
 import { useIpfs } from "src/hooks/useIpfs";
-import { useCreateEvent } from "src/hooks/useEvent";
+import { useCreateEvent, useOwnEventGroups } from "src/hooks/useEvent";
+import { Event } from "types/Event";
+import { NFT } from "types/NFT";
 
 type Props = {
   address: string;
@@ -46,7 +43,7 @@ interface EventFormData {
   secretPhrase: string;
   mintLimit: number;
   useMtx: "true" | "false";
-  nfts: INFTImage[];
+  nfts: NFT.NFTImage[];
 }
 
 const CreateEventForm: FC<Props> = ({ address }) => {
@@ -85,7 +82,7 @@ const CreateEventForm: FC<Props> = ({ address }) => {
   const { remove, append } = useFieldArray({ control, name: "nfts" });
 
   // state for loading event groups
-  const { groups } = useOwnEventGroups();
+  const { groups, isLoading: isLoadingEventGroups } = useOwnEventGroups();
   const { createEvent, isCreating, createError, createStatus, createdEventId } =
     useCreateEvent(address);
 
@@ -97,7 +94,7 @@ const CreateEventForm: FC<Props> = ({ address }) => {
   useEffect(() => {
     const create = async () => {
       if (nftAttributes.length > 0 && formData) {
-        const params: ICreateEventRecordParams = {
+        const params = {
           groupId: formData.eventGroupId,
           eventName: formData.eventName,
           description: formData.description,
@@ -127,7 +124,9 @@ const CreateEventForm: FC<Props> = ({ address }) => {
 
   return (
     <>
-      {groups.length === 0 ? (
+      {isLoadingEventGroups || typeof groups == "undefined" ? (
+        <Spinner />
+      ) : groups?.length === 0 ? (
         <Link href="/event-groups/new">please create event group first</Link>
       ) : createdEventId ? (
         <Box>
@@ -153,7 +152,7 @@ const CreateEventForm: FC<Props> = ({ address }) => {
                   value={value}
                   onChange={onChange}
                 >
-                  {groups.map((item: IEventGroup) => {
+                  {groups.map((item: Event.EventGroup) => {
                     return (
                       <option
                         value={item.groupId.toNumber()}

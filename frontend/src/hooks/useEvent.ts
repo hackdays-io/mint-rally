@@ -1,15 +1,19 @@
 import {
   ContractEvent,
+  useAddress,
   useContract,
   useContractEvents,
+  useContractRead,
   useContractWrite,
   useSDK,
 } from "@thirdweb-dev/react";
 import eventManagerABI from "../contracts/EventManager.json";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useCurrentBlock } from "./useBlockChain";
 import { Event } from "types/Event";
 import { ethers } from "ethers";
+import { reverse } from "lodash";
+import { EVENT_BLACK_LIST } from "src/constants/event";
 
 export const useEventManagerContract = () => {
   const {
@@ -82,6 +86,31 @@ export const useCreateEventGroup = (address: string) => {
     createStatus,
     createError,
   };
+};
+
+/**
+ * custom hook function for get login user's groups
+ */
+export const useOwnEventGroups = () => {
+  const { eventManagerContract } = useEventManagerContract();
+  const address = useAddress();
+  const {
+    isLoading,
+    data: groups,
+    error,
+  } = useContractRead(eventManagerContract, "getOwnGroups", [address]);
+
+  return { groups, isLoading, error };
+};
+
+export const useEventGroups = () => {
+  const { eventManagerContract } = useEventManagerContract();
+  const { isLoading, data: groups } = useContractRead(
+    eventManagerContract,
+    "getGroups"
+  );
+
+  return { groups, isLoading };
 };
 
 export const useCreateEvent = (address: string) => {
@@ -168,4 +197,33 @@ export const useCreateEvent = (address: string) => {
     createStatus,
     createError,
   };
+};
+
+export const useEvents = () => {
+  const { eventManagerContract } = useEventManagerContract();
+  const { isLoading, data, error } = useContractRead(
+    eventManagerContract,
+    "getEventRecords"
+  );
+
+  const events = useMemo(() => {
+    return reverse(
+      data?.filter(
+        (e: any) => !EVENT_BLACK_LIST.includes(e.eventRecordId.toNumber())
+      )
+    );
+  }, [data]);
+
+  return { events, isLoading, error };
+};
+
+export const useEventById = (id: number) => {
+  const { eventManagerContract } = useEventManagerContract();
+  const {
+    isLoading,
+    data: event,
+    error,
+  } = useContractRead(eventManagerContract, "getEventById", [id]);
+
+  return { event, isLoading, error };
 };

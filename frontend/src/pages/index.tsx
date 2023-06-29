@@ -13,13 +13,13 @@ import type { NextPage } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import EventCard from "../components/atoms/events/EventCard";
-import { useEventRecords } from "../hooks/useEventManager";
 import { useLocale } from "../hooks/useLocale";
+import { useEvents } from "src/hooks/useEvent";
 
 const Home: NextPage = () => {
   const { t, locale } = useLocale();
-  const { records, loading } = useEventRecords();
-  const filename = locale === "ja" ? "mainImg-ja" : "mainImg"
+  const { events, isLoading } = useEvents();
+  const filename = locale === "ja" ? "mainImg-ja" : "mainImg";
   return (
     <Box>
       <div>
@@ -241,12 +241,12 @@ const Home: NextPage = () => {
           <Heading fontSize="3xl">{t.RECENT_EVENTS}</Heading>
           <Spacer></Spacer>
         </Flex>
-        {loading ? (
+        {isLoading ? (
           <Spinner></Spinner>
         ) : (
           <SimpleGrid columns={{ base: 2, md: 3 }} spacing={5}>
             <>
-              {records.slice(0, 6).map((item) => {
+              {events.slice(0, 6).map((item: any) => {
                 return (
                   <Link
                     href={"/events/" + item.eventRecordId}

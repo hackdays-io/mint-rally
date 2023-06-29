@@ -8,7 +8,7 @@ async function main() {
   );
   await deployedEventManager.deployed();
 
-  console.log("mintNFT address:", deployedEventManager.address);
+  console.log("eventManager address:", deployedEventManager.address);
 }
 
 main().catch((error) => {

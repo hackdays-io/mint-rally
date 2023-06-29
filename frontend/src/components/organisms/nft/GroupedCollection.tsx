@@ -1,16 +1,16 @@
 import { Box, Grid, Heading, Spinner } from "@chakra-ui/react";
 import { FC } from "react";
 import { NFTItem } from "src/components/atoms/nft/NFTItem";
-import { useEventGroups } from "src/hooks/useEventManager";
+import { useEventGroups } from "src/hooks/useEvent";
 import { NFT } from "types/NFT";
 
 type Props = {
   groupedNFTs: { [key: number]: NFT.Metadata[] };
 };
 export const GroupedCollection: FC<Props> = ({ groupedNFTs }) => {
-  const { groups, loading: fetchingGroups } = useEventGroups();
+  const { groups, isLoading } = useEventGroups();
 
-  return fetchingGroups ? (
+  return isLoading ? (
     <Spinner />
   ) : (
     <Box mt={5}>
@@ -25,7 +25,7 @@ export const GroupedCollection: FC<Props> = ({ groupedNFTs }) => {
           >
             {
               groups.find(
-                (group) => group.groupId.toNumber() === Number(groupId)
+                (group: any) => group.groupId.toNumber() === Number(groupId)
               )?.name
             }
           </Heading>
@@ -39,7 +39,7 @@ export const GroupedCollection: FC<Props> = ({ groupedNFTs }) => {
             {groupedNFTs[Number(groupId)].map((nft) => (
               <NFTItem
                 nft={nft}
-                tokenId={nft.tokenId}
+                tokenId={nft.tokenId || 0}
                 key={`group${groupId}nft${nft.tokenId}`}
               />
             ))}
