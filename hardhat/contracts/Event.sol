@@ -62,7 +62,8 @@ contract EventManager is OwnableUpgradeable {
         maxMintLimit = _mintLimit;
     }
 
-    event CreatedGroupId(address indexed owner, uint256 groupId);
+    event CreateGroup(address indexed owner, uint256 groupId);
+    event CreateEvent(address indexed owner, uint256 eventId);
 
     function initialize(
         address _relayerAddr,
@@ -86,7 +87,7 @@ contract EventManager is OwnableUpgradeable {
         );
         ownGroupIds[msg.sender].push(_newGroupId);
 
-        emit CreatedGroupId(msg.sender, _newGroupId);
+        emit CreateGroup(msg.sender, _newGroupId);
     }
 
     function getGroups() public view returns (Group[] memory) {
@@ -96,14 +97,16 @@ contract EventManager is OwnableUpgradeable {
         return _groups;
     }
 
-    function getOwnGroups() public view returns (Group[] memory) {
-        uint256 _numberOfOwnGroups = ownGroupIds[msg.sender].length;
+    function getOwnGroups(
+        address _address
+    ) public view returns (Group[] memory) {
+        uint256 _numberOfOwnGroups = ownGroupIds[_address].length;
         uint256 _numberOfAllGroups = groups.length;
 
         Group[] memory _groups = new Group[](_numberOfOwnGroups);
         uint256 _count = 0;
         for (uint256 _i = 0; _i < _numberOfAllGroups; _i++) {
-            if (groups[_i].ownerAddress == msg.sender) {
+            if (groups[_i].ownerAddress == _address) {
                 _groups[_count] = groups[_i];
                 _count++;
             }
@@ -166,6 +169,8 @@ contract EventManager is OwnableUpgradeable {
 
         eventIdsByGroupId[_groupId].push(_newEventId);
         groupIdByEventId[_newEventId] = _groupId;
+
+        emit CreateEvent(msg.sender, _newEventId);
     }
 
     function getEventRecords() public view returns (EventRecord[] memory) {
@@ -178,11 +183,9 @@ contract EventManager is OwnableUpgradeable {
         return _eventRecords;
     }
 
-    function getEventById(uint256 _eventId)
-        external
-        view
-        returns (EventRecord memory)
-    {
+    function getEventById(
+        uint256 _eventId
+    ) external view returns (EventRecord memory) {
         uint256 _eventRecordIndex = _eventId - 1;
         EventRecord memory _eventRecord = eventRecords[_eventRecordIndex];
         return _eventRecord;
