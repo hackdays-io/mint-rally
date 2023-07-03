@@ -1,7 +1,6 @@
 import { Heading, Spinner, Text, Container, Box } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { FC, Fragment, useMemo } from "react";
-import { useGetEventById } from "../../hooks/useEventManager";
 import LoginRequired from "../../components/atoms/web3/LoginRequired";
 import { useLocale } from "../../hooks/useLocale";
 import { MintForm } from "src/components/organisms/nft/MintForm";
@@ -12,6 +11,7 @@ import {
 } from "src/hooks/useMintNFT";
 import { NFTItem } from "src/components/atoms/nft/NFTItem";
 import { Event } from "types/Event";
+import { useEventById } from "src/hooks/useEvent";
 
 const MintNFTSection: FC<{ event: Event.EventRecord }> = ({ event }) => {
   const address = useAddress();
@@ -38,7 +38,7 @@ const MintNFTSection: FC<{ event: Event.EventRecord }> = ({ event }) => {
           <NFTItem
             shareURL={false}
             nft={holdingNFT}
-            tokenId={holdingNFT.tokenId}
+            tokenId={holdingNFT.tokenId || 0}
             address={address}
             showShareButtons={true}
             showOpenSeaLink={true}
@@ -54,25 +54,27 @@ const MintNFTSection: FC<{ event: Event.EventRecord }> = ({ event }) => {
 const Event: FC = () => {
   const router = useRouter();
   const { eventid } = router.query;
-  const { event, loading: fetchingEvent } = useGetEventById(Number(eventid));
+  const { event, isLoading } = useEventById(Number(eventid));
 
   const { t } = useLocale();
 
   return (
     <>
       <Container maxW={800} py={6} pb="120px">
-        {fetchingEvent && <Spinner />}
+        {isLoading && <Spinner />}
         {event && (
           <>
             <Heading>{event.name}</Heading>
             <Text fontSize="24px">{event.date}</Text>
 
             <Text fontSize="16px" my={10}>
-              {event.description.split(/(\n)/).map((item, index) => (
-                <Fragment key={index}>
-                  {item.match(/\n/) ? <br /> : item}
-                </Fragment>
-              ))}
+              {event.description
+                .split(/(\n)/)
+                .map((item: any, index: number) => (
+                  <Fragment key={index}>
+                    {item.match(/\n/) ? <br /> : item}
+                  </Fragment>
+                ))}
             </Text>
 
             <LoginRequired

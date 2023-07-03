@@ -2,7 +2,7 @@ import { ChevronDownIcon } from "@chakra-ui/icons";
 import { Button, Menu, MenuButton, MenuItem, MenuList } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faLanguage } from "@fortawesome/free-solid-svg-icons";
+import { faGlobe } from "@fortawesome/free-solid-svg-icons";
 
 const LocaleSelector = () => {
   const router = useRouter();
@@ -11,7 +11,7 @@ const LocaleSelector = () => {
     <>
       <Menu>
         <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
-          <FontAwesomeIcon icon={faLanguage} />
+          <FontAwesomeIcon icon={faGlobe} />
         </MenuButton>
         <MenuList>
           {otherLocales.map((locale) => {
