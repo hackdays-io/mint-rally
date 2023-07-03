@@ -81,4 +81,5 @@ export default {
   CONTRIBUTORS_WANTED: "コントリビューター募集中！",
   CONTRIBUTORS_WANTED_DESC:
     "MintRallyはシビックテックプロジェクトHackdaysのメンバーで開発しているオープンソースプロジェクトです。<br />機能拡充やユーザビリティの向上、アクセシビリティへの対応などに取り組みながら、よりよいオープンソースプロジェクトにしていくための仲間を探しています。",
+  SHOW_NFT_ON_METAMASK: "入手したNFTをメタマスクでも見れるようにする方法",
 };

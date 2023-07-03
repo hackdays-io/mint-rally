@@ -18,6 +18,7 @@ import { Event } from "types/Event";
 import { ipfs2http } from "utils/ipfs2http";
 import { useReward } from "react-rewards";
 import { useWallet } from "@thirdweb-dev/react";
+import { NFTItem } from "src/components/atoms/nft/NFTItem";
 
 type Props = {
   event: Event.EventRecord;
@@ -122,7 +123,15 @@ export const MintForm: FC<Props> = ({ event, address }) => {
             <AlertTitle>{t.YOU_HAVE_GOT_NFT}</AlertTitle>
           </Alert>
           <VStack justify="center" mt={5}>
-            <img src={ipfs2http(mintedNFT.image)} width="200" height="200" />
+            <NFTItem
+              nft={mintedNFT}
+              tokenId={mintedNFT.tokenId}
+              shareURL={false}
+              clickable={false}
+              address={address}
+              showShareButtons={true}
+              showOpenSeaLink={true}
+            />
             <span id="confettiReward" />
             <span id="balloonsReward" />
           </VStack>
