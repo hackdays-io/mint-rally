@@ -1,7 +1,6 @@
-
 import { useState } from "react";
 import { ipfsUploader } from "src/libs/libIpfs";
-import { INFTAttribute, INFTImage } from "./useEventManager";
+import { NFT } from "types/NFT";
 
 export interface NFTAttribute {
   requiredParticipateCount: number;
@@ -9,29 +8,29 @@ export interface NFTAttribute {
 }
 
 export const useIpfs = () => {
-  const [loading, setLoading] = useState(false)
-  const [errors, setErrors] = useState<Error | null>(null)
-  const [nftAttributes, setNftAttributes] = useState<NFTAttribute[]>([])
+  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<Error | null>(null);
+  const [nftAttributes, setNftAttributes] = useState<NFTAttribute[]>([]);
   /**
-   * @param eventGroupId 
-   * @param eventName 
-   * @param nfts 
-   * @returns 
+   * @param eventGroupId
+   * @param eventName
+   * @param nfts
+   * @returns
    */
   const saveNFTMetadataOnIPFS = async (
     groupId: string,
     eventName: string,
-    nfts: INFTImage[]
+    nfts: NFT.NFTImage[]
   ) => {
-    setLoading(true)
-    setErrors(null)
-    setNftAttributes([])
+    setLoading(true);
+    setErrors(null);
+    setNftAttributes([]);
     const imageUpdatedNfts = nfts.filter((nft) => nft.fileObject);
     let baseNftAttributes = nfts.filter((nft) => !nft.fileObject);
-    const uploader = new ipfsUploader()
+    const uploader = new ipfsUploader();
     const uploadResult = await uploader.uploadNFTsToIpfs(imageUpdatedNfts);
     if (uploadResult) {
-      const nftAttributes: INFTImage[] = uploadResult.renamedFiles.map(
+      const nftAttributes: NFT.NFTImage[] = uploadResult.renamedFiles.map(
         ({ name, fileObject, description, requiredParticipateCount }) => ({
           name: name,
           image: `ipfs://${uploadResult.rootCid}/${fileObject.name}`,
@@ -44,7 +43,7 @@ export const useIpfs = () => {
 
     const metadataFiles: File[] = [];
     for (const nftAttribute of baseNftAttributes) {
-      const attribute: INFTAttribute = {
+      const attribute: NFT.Metadata = {
         name: nftAttribute.name,
         image: nftAttribute.image,
         description: nftAttribute.description,
@@ -63,16 +62,20 @@ export const useIpfs = () => {
         )
       );
     }
-    const metaDataRootCid = await uploader.uploadMetadataFilesToIpfs(metadataFiles, `${groupId}_${eventName}`)
+    const metaDataRootCid = await uploader.uploadMetadataFilesToIpfs(
+      metadataFiles,
+      `${groupId}_${eventName}`
+    );
     setLoading(false);
-    setNftAttributes(baseNftAttributes.map((attribute) => {
-      return {
-        requiredParticipateCount: attribute.requiredParticipateCount,
-        metaDataURL: `ipfs://${metaDataRootCid}/${attribute.requiredParticipateCount}.json`,
-      };
-    }));
-
+    setNftAttributes(
+      baseNftAttributes.map((attribute) => {
+        return {
+          requiredParticipateCount: attribute.requiredParticipateCount,
+          metaDataURL: `ipfs://${metaDataRootCid}/${attribute.requiredParticipateCount}.json`,
+        };
+      })
+    );
   };
 
-  return { loading, errors, nftAttributes, saveNFTMetadataOnIPFS }
-}
+  return { loading, errors, nftAttributes, saveNFTMetadataOnIPFS };
+};

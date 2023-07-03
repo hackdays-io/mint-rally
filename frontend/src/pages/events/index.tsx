@@ -10,11 +10,12 @@ import {
 import { NextPage } from "next";
 import Link from "next/link";
 import EventCard from "../../components/atoms/events/EventCard";
-import { useEventRecords } from "../../hooks/useEventManager";
 import { useLocale } from "../../hooks/useLocale";
+import { useEvents } from "src/hooks/useEvent";
+import { Event } from "types/Event";
 
 const Events: NextPage = () => {
-  const { records, loading } = useEventRecords();
+  const { events, isLoading } = useEvents();
   const { t } = useLocale();
 
   return (
@@ -27,12 +28,12 @@ const Events: NextPage = () => {
             <Button>{t.CREATE_NEW_EVENT}</Button>
           </Link>
         </Flex>
-        {loading ? (
+        {isLoading ? (
           <Spinner></Spinner>
         ) : (
           <SimpleGrid columns={{ base: 2, md: 3 }} spacing={5}>
             <>
-              {records.map((item) => {
+              {events.map((item: Event.EventRecord) => {
                 return (
                   <Link
                     href={"/events/" + item.eventRecordId}
