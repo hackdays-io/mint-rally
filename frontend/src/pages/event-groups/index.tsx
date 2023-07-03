@@ -10,15 +10,16 @@ import {
 import { NextPage } from "next";
 import Link from "next/link";
 import EventGroupCard from "../../components/atoms/events/GroupCard";
-import { IEventGroup, useEventGroups } from "../../hooks/useEventManager";
 import { useLocale } from "../../hooks/useLocale";
+import { useEventGroups } from "src/hooks/useEvent";
+import { Event } from "types/Event";
 
 /**
  * /event-groups/
  */
 const EventGroups: NextPage = () => {
   const { t } = useLocale();
-  const { groups, loading } = useEventGroups();
+  const { groups, isLoading } = useEventGroups();
 
   return (
     <>
@@ -30,12 +31,12 @@ const EventGroups: NextPage = () => {
             <Button>{t.CREATE_NEW_EVENT_GROUP}</Button>
           </Link>
         </Flex>
-        {loading ? (
+        {isLoading ? (
           <Spinner></Spinner>
         ) : (
           <SimpleGrid columns={{ base: 2, md: 3 }} spacing={5}>
             <>
-              {groups.map((item: IEventGroup) => {
+              {groups.map((item: Event.EventGroup) => {
                 return (
                   <Link
                     key={item.groupId.toString()}

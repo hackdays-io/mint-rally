@@ -1,7 +1,6 @@
 import {
   ContractEvent,
   getBlockNumber,
-  useAddress,
   useContract,
   useContractEvents,
   useContractRead,
@@ -18,6 +17,7 @@ import { ipfs2http } from "utils/ipfs2http";
 import { Event } from "types/Event";
 import { signMetaTxRequest } from "utils/signer";
 import { BigNumber } from "ethers";
+import { useCurrentBlock } from "./useBlockChain";
 
 export const useMintNFTContract = () => {
   const {
@@ -216,7 +216,7 @@ export const useMintParticipateNFT = (
     isLoading: false,
     status: "idle",
   });
-  const [fromBlock, setFromBlock] = useState<number>();
+  const fromBlock = useCurrentBlock();
   const { data } = useContractEvents(mintNFTContract, "Transfer", {
     queryFilter: {
       filters: {
@@ -227,22 +227,6 @@ export const useMintParticipateNFT = (
     },
     subscribe: true,
   });
-
-  useEffect(() => {
-    const fetch = async () => {
-      const chainId = process.env.NEXT_PUBLIC_CHAIN_ID!;
-      const number = await getBlockNumber({
-        network:
-          chainId === "80001"
-            ? "mumbai"
-            : chainId === "137"
-            ? "polygon"
-            : "localhost",
-      });
-      setFromBlock(number);
-    };
-    fetch();
-  }, []);
 
   const error: any = useMemo(() => {
     return useMTX ? mtxStatus.error : mintError;
@@ -345,9 +329,16 @@ export const useMintParticipateNFT = (
   return { mint, mintMTX, isLoading, error, status, mintedNFT };
 };
 
-export const useIsHoldingEventNftByAddress = (address?: string, eventId?: BigNumber) => {
+export const useIsHoldingEventNftByAddress = (
+  address?: string,
+  eventId?: BigNumber
+) => {
   const { mintNFTContract } = useMintNFTContract();
-  const { data, isLoading } = useContractRead(mintNFTContract, "isHoldingEventNFTByAddress", [address, eventId]);
+  const { data, isLoading } = useContractRead(
+    mintNFTContract,
+    "isHoldingEventNFTByAddress",
+    [address, eventId]
+  );
 
-  return {isHoldingEventNft: data, isLoading};
-}
+  return { isHoldingEventNft: data, isLoading };
+};
