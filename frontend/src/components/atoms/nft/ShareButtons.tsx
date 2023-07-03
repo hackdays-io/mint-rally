@@ -11,8 +11,6 @@ import {
 } from "@chakra-ui/react";
 import { FC, useEffect } from "react";
 import { TwitterShareButton, TwitterIcon } from "next-share";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCopy } from "@fortawesome/free-solid-svg-icons";
 import { CopyIcon } from "@chakra-ui/icons";
 
 type Props = {
@@ -27,7 +25,6 @@ export const ShareButtons: FC<Props> = ({
   twitter = null,
 }) => {
   const copyClipBoard = () => {
-    console.log("hoge");
     const copyText: any = document.getElementById("shareURL");
     copyText?.select();
     navigator.clipboard.writeText(copyText.value);
