@@ -21,7 +21,6 @@ const MintNFTSection: FC<{ event: Event.EventRecord }> = ({ event }) => {
   );
   const { nfts, isLoading: checkHoldingNFTs } =
     useGetOwnedNFTByAddress(address);
-
   const holdingNFT = useMemo(() => {
     return nfts.find(
       (nft) =>
@@ -40,6 +39,9 @@ const MintNFTSection: FC<{ event: Event.EventRecord }> = ({ event }) => {
             shareURL={false}
             nft={holdingNFT}
             tokenId={holdingNFT.tokenId}
+            address={address}
+            showShareButtons={true}
+            showOpenSeaLink={true}
           />
         </Box>
       ) : (

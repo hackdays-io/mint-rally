@@ -23,6 +23,7 @@ type Props = {
 };
 
 const TokenModal: FC<Props> = ({ isOpen, onClose, nft, shareURL, tokenId }) => {
+  // TODO fix this
   const address = useAddress();
 
   const copyClipBoard = () => {
