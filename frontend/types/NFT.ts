@@ -1,6 +1,6 @@
 export namespace NFT {
   export interface Metadata {
-    tokenId: number;
+    tokenId?: number;
     name: string;
     image: string;
     description: string;
@@ -10,5 +10,13 @@ export namespace NFT {
       EventGroupId: string;
       RequiredParticipateCount: number;
     };
+  }
+
+  export interface NFTImage {
+    name: string;
+    image: string;
+    description: string;
+    requiredParticipateCount: number;
+    fileObject?: File | null;
   }
 }
