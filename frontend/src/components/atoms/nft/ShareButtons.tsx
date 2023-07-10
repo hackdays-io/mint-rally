@@ -1,18 +1,7 @@
 // SNS share buttons for NFTs
-import {
-  Box,
-  Button,
-  Flex,
-  Image,
-  Text,
-  Textarea,
-  useDisclosure,
-  Icon,
-} from "@chakra-ui/react";
-import { FC, useEffect } from "react";
+import { Box, Flex, Text, Textarea, Icon, IconButton } from "@chakra-ui/react";
+import { FC } from "react";
 import { TwitterShareButton, TwitterIcon } from "next-share";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCopy } from "@fortawesome/free-solid-svg-icons";
 import { CopyIcon } from "@chakra-ui/icons";
 
 type Props = {
@@ -33,19 +22,29 @@ export const ShareButtons: FC<Props> = ({
   };
 
   return (
-    <Flex alignItems="center" justifyContent="center">
-      <Text mb={1}>Share on</Text>
+    <Flex alignItems="center">
+      <Text mb={1} mr={5}>
+        Share on
+      </Text>
       {twitter && (
-        <Box p={1}>
-          <TwitterShareButton
-            url={`https://mintrally.xyz/users/${address}?tokenid=${tokenId}`}
-            title={`Check out my NFT on Mintrally!`}
-            hashtags={["MintRally"]}
-          >
-            <TwitterIcon size={32} round />
-          </TwitterShareButton>
-        </Box>
+        <TwitterShareButton
+          url={`https://mintrally.xyz/users/${address}?tokenid=${tokenId}`}
+          title={`Check out my NFT on Mintrally!`}
+          hashtags={["MintRally"]}
+        >
+          <TwitterIcon size={32} round />
+        </TwitterShareButton>
       )}
+      <Icon
+        as={CopyIcon}
+        onClick={() => copyClipBoard()}
+        w={6}
+        h={6}
+        color="green.500"
+        size="lg"
+        mx={2}
+        cursor="pointer"
+      />
       <Textarea
         id="shareURL"
         color="mint.primary"
@@ -54,15 +53,6 @@ export const ShareButtons: FC<Props> = ({
         p={1}
         value={`https://mintrally.xyz/users/${address}?tokenid=${tokenId}`}
       ></Textarea>
-      <Icon
-        as={CopyIcon}
-        onClick={() => copyClipBoard()}
-        w={6}
-        h={6}
-        color="green.500"
-        size="lg"
-        m={1}
-      ></Icon>
     </Flex>
   );
 };

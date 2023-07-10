@@ -246,6 +246,7 @@ export const useMintParticipateNFT = (
       if (!mintedTokenURI) return;
       try {
         const { data } = await axios.get(ipfs2http(mintedTokenURI));
+        data.tokenId = mintedNFTId;
         setMintedNFT(data);
       } catch (_) {
         return;
