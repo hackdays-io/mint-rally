@@ -21,7 +21,6 @@ type Props = {
 export const NFTItem: FC<Props> = ({
   nft,
   tokenId,
-  shareURL = true,
   clickable = true,
   address = "",
   showShareButtons = false,
@@ -29,7 +28,6 @@ export const NFTItem: FC<Props> = ({
 }) => {
   const { tokenid } = useRouter().query;
   const { isOpen, onOpen, onClose } = useDisclosure();
-  // If tokenid parameter is same as tokenId, open modal view
   useEffect(() => {
     if (!clickable && String(tokenid) == String(tokenId)) {
       onOpen();
@@ -45,7 +43,7 @@ export const NFTItem: FC<Props> = ({
           alignItems="center"
           flexDirection="column"
           p={4}
-          border="1px"
+          cursor={clickable ? "pointer" : "default"}
         >
           <Box onClick={onOpen}>
             <Image src={ipfs2http(nft.image)} alt={nft.name} />
@@ -60,14 +58,14 @@ export const NFTItem: FC<Props> = ({
           <ShareButtons tokenId={tokenId} address={address} twitter={true} />
         )}
       </Flex>
-      {showOpenSeaLink && (
+      {/* {showOpenSeaLink && (
         <Flex>
           <QuestionIcon m={2} />
           <Link href="https://hackdays.notion.site/NFT-ea948c883ef645879d3ea86a87336598">
             {t.SHOW_NFT_ON_METAMASK}
           </Link>
         </Flex>
-      )}
+      )} */}
 
       {clickable && (
         <TokenModal
@@ -75,7 +73,6 @@ export const NFTItem: FC<Props> = ({
           tokenId={tokenId}
           isOpen={isOpen}
           onClose={onClose}
-          shareURL={shareURL}
           address={address}
         />
       )}
