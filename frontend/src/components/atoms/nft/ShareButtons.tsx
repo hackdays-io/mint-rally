@@ -27,7 +27,6 @@ export const ShareButtons: FC<Props> = ({
   twitter = null,
 }) => {
   const copyClipBoard = () => {
-    console.log("hoge");
     const copyText: any = document.getElementById("shareURL");
     copyText?.select();
     navigator.clipboard.writeText(copyText.value);
