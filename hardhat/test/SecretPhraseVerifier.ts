@@ -31,6 +31,7 @@ describe("generate proof", () => {
     const circuitPubInput = computeEffEcdsaPubInput(r, v, msgHash);
 
     const circuitInput = {
+      secretPhrase: "",
       s: BigInt("0x" + s.toString("hex")),
       Tx: circuitPubInput.Tx,
       Ty: circuitPubInput.Ty,
@@ -46,6 +47,6 @@ describe("generate proof", () => {
     );
 
     const w = await circuit.calculateWitness(circuitInput, true);
-    await circuit.assertOut(w, { addr: BigInt(signer.address).toString(10) });
+    await circuit.assertOut(w, { verified: true });
   });
 });
