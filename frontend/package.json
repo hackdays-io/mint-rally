@@ -31,6 +31,7 @@
     "lodash": "^4.17.21",
     "next": "12.2.0",
     "next-seo": "^5.5.0",
+    "next-share": "^0.21.0",
     "nextjs-google-analytics": "^2.1.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
