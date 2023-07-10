@@ -76,6 +76,7 @@ export const NFTItem: FC<Props> = ({
           isOpen={isOpen}
           onClose={onClose}
           shareURL={shareURL}
+          address={address}
         />
       )}
     </>

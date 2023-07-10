@@ -50,7 +50,6 @@ export const MintForm: FC<Props> = ({ event, address }) => {
 
   const [enteredSecretPhrase, setEnteredSecretPhrase] = useState("");
 
-
   const claimMint = async () => {
     if (!event) return;
     if (event.useMtx) {
@@ -125,7 +124,7 @@ export const MintForm: FC<Props> = ({ event, address }) => {
           <VStack justify="center" mt={5}>
             <NFTItem
               nft={mintedNFT}
-              tokenId={mintedNFT.tokenId}
+              tokenId={mintedNFT.tokenId || 0}
               shareURL={false}
               clickable={false}
               address={address}

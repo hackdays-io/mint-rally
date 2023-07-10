@@ -1,19 +1,23 @@
 import {
   Box,
-  Button,
+  Flex,
   Divider,
   Image,
   Link,
   Text,
   Textarea,
+  Icon,
+  Button,
 } from "@chakra-ui/react";
 import { useAddress } from "@thirdweb-dev/react";
-import { BigNumber } from "ethers";
+import { useRouter } from "next/router";
 import { FC } from "react";
 import { ipfs2http } from "../../../../utils/ipfs2http";
 import ModalBase from "../common/ModalBase";
 import { NFT } from "types/NFT";
 import { OpenseaIcon } from "../../atoms/icons/opensea/OpenseaIcon";
+import { TwitterShareButton, TwitterIcon } from "next-share";
+import { CopyIcon } from "@chakra-ui/icons";
 
 type Props = {
   isOpen: boolean;
@@ -21,16 +25,31 @@ type Props = {
   tokenId: number;
   nft: NFT.Metadata;
   shareURL?: boolean;
+  address: string;
 };
 
-const TokenModal: FC<Props> = ({ isOpen, onClose, nft, shareURL, tokenId }) => {
-  // TODO fix this
-  const address = useAddress();
+const TokenModal: FC<Props> = ({
+  isOpen,
+  onClose,
+  nft,
+  shareURL,
+  tokenId,
+  address,
+}) => {
+  const { address: urladdress } = useRouter().query;
+  const myaddress = useAddress();
 
+  if (address == "" || address == undefined) {
+    if (urladdress == undefined) {
+      address = String(myaddress);
+    } else {
+      address = String(urladdress);
+    }
+  }
   const copyClipBoard = () => {
     const copyText: any = document.getElementById("shareURL");
     copyText?.select();
-    document.execCommand("copy");
+    navigator.clipboard.writeText(copyText.value);
   };
 
   const openseaLinkByChainId = () => {
@@ -75,23 +94,35 @@ const TokenModal: FC<Props> = ({ isOpen, onClose, nft, shareURL, tokenId }) => {
             <Box>
               <Divider my={3} />
 
-              <Text mb={1}>Share URL</Text>
-              <Textarea
-                id="shareURL"
-                color="mint.primary"
-                rows={2}
-                p={1}
-                value={`https://mintrally.xyz/users/${address}?tokenid=${tokenId}`}
-              ></Textarea>
-              <Button
-                size="small"
-                p={2}
-                width="full"
-                mt={3}
-                onClick={() => copyClipBoard()}
-              >
-                Copy ClipBoard
-              </Button>
+              <Flex alignItems="center" justifyContent="center">
+                <Text mb={1}>Share on</Text>
+                <Box p={1}>
+                  <TwitterShareButton
+                    url={`https://mintrally.xyz/users/${address}?tokenid=${tokenId}`}
+                    title={`Check out my NFT on Mintrally!`}
+                    hashtags={["MintRally"]}
+                  >
+                    <TwitterIcon size={32} round />
+                  </TwitterShareButton>
+                </Box>
+                <Textarea
+                  id="shareURL"
+                  color="mint.primary"
+                  hidden={true}
+                  rows={2}
+                  p={1}
+                  value={`https://mintrally.xyz/users/${address}?tokenid=${tokenId}`}
+                ></Textarea>
+                <Icon
+                  as={CopyIcon}
+                  onClick={() => copyClipBoard()}
+                  w={6}
+                  h={6}
+                  color="green.500"
+                  size="lg"
+                  m={1}
+                ></Icon>
+              </Flex>
             </Box>
           )}
           <Box>
