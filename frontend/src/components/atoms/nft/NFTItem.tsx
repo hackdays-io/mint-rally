@@ -28,11 +28,13 @@ export const NFTItem: FC<Props> = ({
 }) => {
   const { tokenid } = useRouter().query;
   const { isOpen, onOpen, onClose } = useDisclosure();
+
   useEffect(() => {
-    if (!clickable && String(tokenid) == String(tokenId)) {
+    if (clickable && String(tokenid) == String(tokenId)) {
       onOpen();
     }
-  }, [tokenid, tokenId]);
+  }, [tokenid, tokenId, clickable]);
+
   const { t } = useLocale();
 
   return (
