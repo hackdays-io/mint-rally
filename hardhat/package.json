@@ -19,7 +19,8 @@
     "build": "rollup -c",
     "upload:prd": "yarn build && node scripts/upload_prd.js",
     "upload:stg": "yarn build && node scripts/upload_stg.js",
-    "verify": "npx hardhat verify"
+    "verify": "npx hardhat verify",
+    "build:circuit": "circom ./circuits/SecretPhrase.circom --sym --wasm --r1cs -o circuits"
   },
   "devDependencies": {
     "@ethereumjs/util": "^8.1.0",

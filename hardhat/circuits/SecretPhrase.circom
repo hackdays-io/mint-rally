@@ -6,14 +6,12 @@ include "../node_modules/circomlib/circuits/bitify.circom";
 
 template VerifySecretPhrase () {
     var bits = 256;
-    signal input secretPhrase;
-    signal input addr;
     signal input s;
     signal input Tx; // T = r^-1 * R
     signal input Ty; 
     signal input Ux; // U = -(m * r^-1 * G)
     signal input Uy;
-    signal output verified;
+    signal output addr;
 
     // sMultT = s * T
     component sMultT = Secp256k1Mul();
@@ -42,9 +40,9 @@ template VerifySecretPhrase () {
         pubToAddr.pubkeyBits[i + 256] <== pubKeyXBits.out[i];
     }
     
-    if (addr == pubToAddr.address) {
-        verified <== 1;
-    }
+    // signal addr_diff <== pubToAddr.address - addr;
+    // verified <== addr_diff * addr_diff;
+    addr <== pubToAddr.address;
 }
 
-component main {public [addr]} = VerifySecretPhrase();
+component main = VerifySecretPhrase();

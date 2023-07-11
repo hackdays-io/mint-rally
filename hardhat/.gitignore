@@ -11,3 +11,5 @@ artifacts/build-info
 
 .openzeppelin/unknown-*.json
 build
+
+*.ptau
