@@ -1,36 +1,32 @@
-import {
-  Box,
-  Button,
-  Divider,
-  Image,
-  Link,
-  Text,
-  Textarea,
-} from "@chakra-ui/react";
+import { Box, Divider, Image, Link, Text } from "@chakra-ui/react";
 import { useAddress } from "@thirdweb-dev/react";
-import { BigNumber } from "ethers";
+import { useRouter } from "next/router";
 import { FC } from "react";
 import { ipfs2http } from "../../../../utils/ipfs2http";
 import ModalBase from "../common/ModalBase";
 import { NFT } from "types/NFT";
 import { OpenseaIcon } from "../../atoms/icons/opensea/OpenseaIcon";
+import { ShareButtons } from "src/components/atoms/nft/ShareButtons";
 
 type Props = {
   isOpen: boolean;
   onClose: () => void;
   tokenId: number;
   nft: NFT.Metadata;
-  shareURL?: boolean;
+  address: string;
 };
 
-const TokenModal: FC<Props> = ({ isOpen, onClose, nft, shareURL, tokenId }) => {
-  const address = useAddress();
+const TokenModal: FC<Props> = ({ isOpen, onClose, nft, tokenId, address }) => {
+  const { address: urladdress } = useRouter().query;
+  const myaddress = useAddress();
 
-  const copyClipBoard = () => {
-    const copyText: any = document.getElementById("shareURL");
-    copyText?.select();
-    document.execCommand("copy");
-  };
+  if (address == "" || address == undefined) {
+    if (urladdress == undefined) {
+      address = String(myaddress);
+    } else {
+      address = String(urladdress);
+    }
+  }
 
   const openseaLinkByChainId = () => {
     const chainId = process.env.NEXT_PUBLIC_CHAIN_ID!;
@@ -70,45 +66,21 @@ const TokenModal: FC<Props> = ({ isOpen, onClose, nft, shareURL, tokenId }) => {
             {tokenId}
           </Text>
 
-          {shareURL && (
-            <Box>
-              <Divider my={3} />
+          <Divider my={5} />
 
-              <Text mb={1}>Share URL</Text>
-              <Textarea
-                id="shareURL"
-                color="mint.primary"
-                rows={2}
-                p={1}
-                value={`https://mintrally.xyz/users/${address}?tokenid=${tokenId}`}
-              ></Textarea>
-              <Button
-                size="small"
-                p={2}
-                width="full"
-                mt={3}
-                onClick={() => copyClipBoard()}
-              >
-                Copy ClipBoard
-              </Button>
-            </Box>
-          )}
-          <Box>
+          <ShareButtons tokenId={tokenId} address={address} twitter={true} />
+
+          <Box mt={2}>
             <Link
               href={`${openseaLinkByChainId()}/${
                 process.env.NEXT_PUBLIC_CONTRACT_MINT_NFT_MANAGER
               }/${tokenId}`}
               target="_blank"
             >
-              <Button
-                size="small"
-                p={2}
-                width="full"
-                mt={3}
-                leftIcon={<OpenseaIcon />}
-              >
-                OpenSea
-              </Button>
+              View on OpenSea
+              <Box as="span" ml={2}>
+                <OpenseaIcon />
+              </Box>
             </Link>
           </Box>
         </Box>
