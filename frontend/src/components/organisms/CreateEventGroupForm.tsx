@@ -1,12 +1,4 @@
-import {
-  Alert,
-  AlertDescription,
-  AlertIcon,
-  AlertTitle,
-  Box,
-  Button,
-  Input,
-} from "@chakra-ui/react";
+import { Box, Button, Input } from "@chakra-ui/react";
 import Link from "next/link";
 import { FC, useCallback, useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -25,13 +17,8 @@ interface EventGroupFormData {
 export const CreateEventGroupForm: FC<Props> = ({ address }) => {
   const { t } = useLocale();
 
-  const {
-    createEventGroup,
-    createStatus,
-    isCreating,
-    createError,
-    createdGroupId,
-  } = useCreateEventGroup(address);
+  const { createEventGroup, isCreating, createError, createdGroupId } =
+    useCreateEventGroup(address);
 
   const {
     control,
