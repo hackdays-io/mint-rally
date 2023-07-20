@@ -13,3 +13,5 @@ artifacts/build-info
 build
 
 *.ptau
+*.wtns
+*.zkey

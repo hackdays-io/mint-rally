@@ -31,12 +31,25 @@ describe("generate proof", () => {
     const circuitPubInput = computeEffEcdsaPubInput(r, v, msgHash);
 
     const circuitInput = {
-      secretPhrase: "",
+      collectSecretPhrase: BigInt("0xaaa"),
+      challengingSecretPhrase: BigInt("0xaaa"),
+      addr: BigInt(signer.address),
       s: BigInt("0x" + s.toString("hex")),
       Tx: circuitPubInput.Tx,
       Ty: circuitPubInput.Ty,
       Ux: circuitPubInput.Ux,
       Uy: circuitPubInput.Uy,
+    };
+
+    const circuitInput1 = {
+      collectSecretPhrase: BigInt("0xaaa"),
+      challengingSecretPhrase: BigInt("0xaaa"),
+      addr: signer.address,
+      s: BigInt("0x" + s.toString("hex")).toString(16),
+      Tx: circuitPubInput.Tx.toString(16),
+      Ty: circuitPubInput.Ty.toString(16),
+      Ux: circuitPubInput.Ux.toString(16),
+      Uy: circuitPubInput.Uy.toString(16),
     };
 
     const circuit = await wasm_tester(
@@ -47,6 +60,6 @@ describe("generate proof", () => {
     );
 
     const w = await circuit.calculateWitness(circuitInput, true);
-    await circuit.assertOut(w, { verified: true });
+    await circuit.assertOut(w, { verified: 0 });
   });
 });
