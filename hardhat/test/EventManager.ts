@@ -178,7 +178,7 @@ describe("EventManager", function () {
       expect(allGroups.length).to.equal(2);
 
       // get group by address1
-      const ownGroups = await eventManager.connect(organizer).getOwnGroups();
+      const ownGroups = await eventManager.connect(organizer).getOwnGroups(organizer.address);
       expect(ownGroups.length).to.equal(1);
       expect(ownGroups[0].name).to.equal("group1");
 
@@ -186,7 +186,7 @@ describe("EventManager", function () {
       const txn3 = await eventManager.connect(organizer).createGroup("group3");
       await txn3.wait();
 
-      const ownGroups2 = await eventManager.connect(organizer).getOwnGroups();
+      const ownGroups2 = await eventManager.connect(organizer).getOwnGroups(organizer.address);
       expect(ownGroups2.length).to.equal(2);
       expect(ownGroups2[0].name).to.equal("group1");
       expect(ownGroups2[1].name).to.equal("group3");

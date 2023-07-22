@@ -41,6 +41,8 @@ contract MintNFT is
     mapping(uint256 => uint256) private remainingEventNftCount;
     // secretPhrase via EventId
     mapping(uint256 => bytes32) private eventSecretPhrases;
+    // mintable flag via eventId
+    mapping(uint256 => bool) private isLocked;
 
     event MintedNFTAttributeURL(address indexed holder, string url);
 
@@ -139,6 +141,10 @@ contract MintNFT is
             !isHoldingEventNFTByAddress(_msgSender(), _eventId),
             "already minted"
         );
+        require(
+            !isLocked[_eventId],
+            "no longer mintable"
+        );
 
         return true;
     }
@@ -168,6 +174,15 @@ contract MintNFT is
                 )
             ] = attributes[index].metaDataURL;
         }
+    }
+
+    function changeMintableFlag(uint256 _eventId) public onlyOwner returns (bool) {
+        isLocked[_eventId] = true;
+        return isLocked[_eventId];
+    }
+
+    function getIsLocked(uint256 _eventId) public view returns (bool) {
+        return isLocked[_eventId];
     }
 
     function getRemainingNFTCount(
