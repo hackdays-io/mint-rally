@@ -208,7 +208,7 @@ describe("MintNFT", function () {
       expect(flag).equal(true);
     });
 
-    it("should not change mintable flag by owner", async () => {
+    it("No one but the owner should be able to change mintable flag", async () => {
       await expect(
         mintNFT.connect(participant1).changeMintableFlag(createdEventIds[1])).to.be.revertedWith("Ownable: caller is not the owner");
     });
