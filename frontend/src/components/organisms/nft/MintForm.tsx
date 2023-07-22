@@ -91,7 +91,11 @@ export const MintForm: FC<Props> = ({ event, address }) => {
           </Button>
         </Flex>
       )}
-      {error && <AlertMessage>{error.reason}</AlertMessage>}
+      {error && (
+        <AlertMessage title={t.ERROR_MINTING_PARTICIPATION_NFT}>
+          {error.reason}
+        </AlertMessage>
+      )}
       {status == "success" && !mintedNFT && (
         <AlertMessage status="success" mt={3} title={t.YOU_HAVE_CLAIMED_NFT} />
       )}

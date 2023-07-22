@@ -407,7 +407,7 @@ const CreateEventForm: FC<Props> = ({ address }) => {
               </Button>
 
               {errorMessage && (
-                <AlertMessage>
+                <AlertMessage title={t.ERROR_CREATING_EVENT}>
                   {errorMessage?.reason || errorMessage?.message}
                 </AlertMessage>
               )}
