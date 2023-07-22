@@ -95,4 +95,8 @@ export default {
   SHOW_NFT_ON_METAMASK: "How to show this NFT on MetaMask",
   OWNER: "Owner",
   MINTGUIDE: guide
+  ERROR_CREATING_EVENT: "An error occurred when creating your new event",
+  ERROR_CREATING_EVENT_GROUP:
+    "An error occurred when creating your new event group",
+  ERROR_MINTING_PARTICIPATION_NFT: "An error occurred when minting your NFT",
 };
