@@ -196,5 +196,21 @@ describe("MintNFT", function () {
           )
       ).to.be.revertedWith("invalid secret phrase");
     });
+
+    it("should get mintable flag", async () => {
+      const flag = await mintNFT.connect(organizer).getIsLocked(createdEventIds[1]);
+      expect(flag).equal(false);
+    });
+
+    it("should change mintable flag by owner", async () => {
+      await mintNFT.connect(organizer).changeMintableFlag(createdEventIds[1]);
+      const flag = await mintNFT.connect(organizer).getIsLocked(createdEventIds[1]);
+      expect(flag).equal(true);
+    });
+
+    it("should not change mintable flag by owner", async () => {
+      await expect(
+        mintNFT.connect(participant1).changeMintableFlag(createdEventIds[1])).to.be.revertedWith("Ownable: caller is not the owner");
+    });
   });
 });
