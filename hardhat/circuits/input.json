@@ -1,4 +1,4 @@
 {
-  "collectSecretPhrase": "0xaaa",
+  "correctSecretPhraseHash": "0xaaa",
   "challengingSecretPhrase": "0xaaa"
 }
