@@ -1,7 +1,7 @@
 export default {
   TOP: "TOP",
   EVENTGROUPS: "Event Groups",
-  EVENTS: "Recent Events",
+  EVENTS: "Recent Events List",
   RECENT_EVENTS: "Recent Events",
   HELP: "HELP",
   SIGN_IN: "Sign In",
