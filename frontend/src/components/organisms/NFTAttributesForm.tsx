@@ -154,7 +154,7 @@ const NFTAttributesForm: FC<Props> = ({ control, nfts, append, remove }) => {
                     name={`nfts.${index}.requiredParticipateCount`}
                     rules={{
                       required: "Times participation is required",
-                      // 追加用のNFTは2回目の追加様なので、2回目以上の数字(内部値でいうと0)を設定してもらう方がいいです。
+                      // 追加用のNFTは2回目の追加様なので、2回目以上の数字(内部値でいうと0)のみ設定可能とする。
                       // 表示値ではなくて内部値でチェックするので2回目を意味する1よりも大きい数となる様にバリデーションを行っている。
                       min: 1,
                       validate: {
