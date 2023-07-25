@@ -1,4 +1,22 @@
 // SPDX-License-Identifier: GPL-3.0
+/*
+    Copyright 2021 0KIMS association.
+
+    This file is generated with [snarkJS](https://github.com/iden3/snarkjs).
+
+    snarkJS is a free software: you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    snarkJS is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+    or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public
+    License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with snarkJS. If not, see <https://www.gnu.org/licenses/>.
+*/
 
 pragma solidity ^0.8.4;
 
@@ -28,41 +46,41 @@ contract SecretPhraseVerifier {
 
     // Verification Key data
     uint32 constant n = 4096;
-    uint16 constant nPublic = 2;
-    uint16 constant nLagrange = 2;
+    uint16 constant nPublic = 1;
+    uint16 constant nLagrange = 1;
 
     uint256 constant Qmx =
-        6348704252224945956221332290754692245357608978723798712296337581040443467190;
+        6895605184909091311799286818334197540192959117490408660297190979631756458213;
     uint256 constant Qmy =
-        8531962628862395445683521146915301024737262543734228912518553324495193664061;
+        11683930642192134969195101891247541278957471089536528971589306794604740886344;
     uint256 constant Qlx =
-        7830336298860180969074855797452093434151868947516274340053929305356688660412;
+        20435686860149773757086890481544742946322588340291361955660240527553545452233;
     uint256 constant Qly =
-        13429022561711981926212768041302426361660260517221989229607948110211624417886;
+        11173914249967472442482001485726201858157044509275900017346950483142140157994;
     uint256 constant Qrx =
-        13303823111537068127738034582007637926412076806291138374523520909996800841222;
+        14711753178313808023525473873997925479158693204865804713018574151795466475796;
     uint256 constant Qry =
-        17723231577596929978792516329702645111014325490209685679845182356624142640387;
+        15499620471763898032785029782207226690890181446252948384751815050611678748664;
     uint256 constant Qox =
-        21320755724368478379415494919587034426611324471597472897440328269582969988971;
+        19655335848774683721360780200210143362017619313540072957516627676101447546031;
     uint256 constant Qoy =
-        19175687031286382232376321675029125727260040133389839856894121575472982065739;
+        14780886135053075116022328866116490944477147856886809553892898866081655894826;
     uint256 constant Qcx =
-        4165529980509681665953871677731677988417998410039146317395225093030135314817;
+        19960572746244995451217257842993526613074367240536677902758675629366622059134;
     uint256 constant Qcy =
-        4921550874773956023174554450778068774137499079270094647843902988647702870316;
+        644880368194219240273725811688597751736705269005954411014690009394105956874;
     uint256 constant S1x =
-        15964391903486455764500703445647369226396060269713943020813763907296480959735;
+        14177502714214589064963935642722933923631752053542834063933832498904491774616;
     uint256 constant S1y =
-        20602578918611007342746242844845419242729103610729253254297793737246581969543;
+        4328059196695632946418700311344665326366505563048370802824961934606544076552;
     uint256 constant S2x =
-        19190158604385786226027609569033966385887907086912882803707383512397797447866;
+        14494273522639578931694789068038341068818156819651337446979049229111599770244;
     uint256 constant S2y =
-        14941014727624334830156115053988101663351462624170379067519630621859220789506;
+        2731662238743079369372690913703259821922911397186676442880447442514976169199;
     uint256 constant S3x =
-        13942402507109334745570385832158552563813774562702645021254430318914936843460;
+        1375208901560859362477168802580587975864183333500378502717026635540032586236;
     uint256 constant S3y =
-        4438232745488918007924580722415379015504044918449863152584000430823423748330;
+        30202787847492984580850752667121728791473253950974830985593702465820574105;
     uint256 constant k1 = 2;
     uint256 constant k2 = 3;
     uint256 constant X2x1 =
@@ -121,9 +139,7 @@ contract SecretPhraseVerifier {
 
     uint16 constant pEval_l1 = 800;
 
-    uint16 constant pEval_l2 = 832;
-
-    uint16 constant lastMem = 864;
+    uint16 constant lastMem = 832;
 
     mapping(uint256 => mapping(bytes32 => bool)) internal usedProofs;
 
@@ -139,7 +155,7 @@ contract SecretPhraseVerifier {
 
     function verifyProof(
         uint256[24] calldata _proof,
-        uint256[2] calldata _pubSignals,
+        uint256[1] calldata _pubSignals,
         uint256 _eventId
     ) public view returns (bool) {
         if (usedProofs[_eventId][hashProof(_proof)] == true) {
@@ -267,16 +283,14 @@ contract SecretPhraseVerifier {
 
                 mstore(add(mIn, 512), calldataload(add(pPublic, 0)))
 
-                mstore(add(mIn, 544), calldataload(add(pPublic, 32)))
+                mstore(add(mIn, 544), calldataload(pA))
+                mstore(add(mIn, 576), calldataload(add(pA, 32)))
+                mstore(add(mIn, 608), calldataload(pB))
+                mstore(add(mIn, 640), calldataload(add(pB, 32)))
+                mstore(add(mIn, 672), calldataload(pC))
+                mstore(add(mIn, 704), calldataload(add(pC, 32)))
 
-                mstore(add(mIn, 576), calldataload(pA))
-                mstore(add(mIn, 608), calldataload(add(pA, 32)))
-                mstore(add(mIn, 640), calldataload(pB))
-                mstore(add(mIn, 672), calldataload(add(pB, 32)))
-                mstore(add(mIn, 704), calldataload(pC))
-                mstore(add(mIn, 736), calldataload(add(pC, 32)))
-
-                beta := mod(keccak256(mIn, 768), q)
+                beta := mod(keccak256(mIn, 736), q)
                 mstore(add(pMem, pBeta), beta)
 
                 // challenges.gamma
@@ -382,14 +396,7 @@ contract SecretPhraseVerifier {
                     mulmod(n, mod(add(sub(mload(add(pMem, pXi)), w), q), q), q)
                 )
 
-                w := mulmod(w, w1, q)
-
-                mstore(
-                    add(pMem, pEval_l2),
-                    mulmod(n, mod(add(sub(mload(add(pMem, pXi)), w), q), q), q)
-                )
-
-                inverseArray(add(pMem, pZhInv), 3)
+                inverseArray(add(pMem, pZhInv), 2)
 
                 let zh := mload(add(pMem, pZh))
                 w := 1
@@ -397,13 +404,6 @@ contract SecretPhraseVerifier {
                 mstore(
                     add(pMem, pEval_l1),
                     mulmod(mload(add(pMem, pEval_l1)), zh, q)
-                )
-
-                w := mulmod(w, w1, q)
-
-                mstore(
-                    add(pMem, pEval_l2),
-                    mulmod(w, mulmod(mload(add(pMem, pEval_l2)), zh, q), q)
                 )
             }
 
@@ -417,21 +417,6 @@ contract SecretPhraseVerifier {
                             mulmod(
                                 mload(add(pMem, pEval_l1)),
                                 calldataload(add(pPub, 0)),
-                                q
-                            )
-                        ),
-                        q
-                    ),
-                    q
-                )
-
-                pl := mod(
-                    add(
-                        sub(
-                            pl,
-                            mulmod(
-                                mload(add(pMem, pEval_l2)),
-                                calldataload(add(pPub, 32)),
                                 q
                             )
                         ),
