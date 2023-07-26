@@ -1,17 +1,10 @@
-import {
-  Alert,
-  AlertDescription,
-  AlertIcon,
-  AlertTitle,
-  Box,
-  Button,
-  Input,
-} from "@chakra-ui/react";
+import { Box, Button, Input } from "@chakra-ui/react";
 import Link from "next/link";
 import { FC, useCallback, useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useCreateEventGroup } from "src/hooks/useEvent";
 import { useLocale } from "src/hooks/useLocale";
+import AlertMessage from "src/components/atoms/form/AlertMessage";
 
 type Props = {
   address: string;
@@ -24,13 +17,8 @@ interface EventGroupFormData {
 export const CreateEventGroupForm: FC<Props> = ({ address }) => {
   const { t } = useLocale();
 
-  const {
-    createEventGroup,
-    createStatus,
-    isCreating,
-    createError,
-    createdGroupId,
-  } = useCreateEventGroup(address);
+  const { createEventGroup, isCreating, createError, createdGroupId } =
+    useCreateEventGroup(address);
 
   const {
     control,
@@ -88,13 +76,9 @@ export const CreateEventGroupForm: FC<Props> = ({ address }) => {
       </Button>
 
       {errorMessage && (
-        <Alert status="error" mt={2}>
-          <AlertIcon />
-          <AlertTitle>Error occurred</AlertTitle>
-          <AlertDescription>
-            {errorMessage?.reason || errorMessage?.message}
-          </AlertDescription>
-        </Alert>
+        <AlertMessage>
+          {errorMessage?.reason || errorMessage?.message}
+        </AlertMessage>
       )}
     </form>
   );

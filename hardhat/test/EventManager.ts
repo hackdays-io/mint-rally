@@ -178,18 +178,74 @@ describe("EventManager", function () {
       expect(allGroups.length).to.equal(2);
 
       // get group by address1
-      const ownGroups = await eventManager.connect(organizer).getOwnGroups();
+      const ownGroups = await eventManager
+        .connect(organizer)
+        .getOwnGroups(organizer.address);
       expect(ownGroups.length).to.equal(1);
       expect(ownGroups[0].name).to.equal("group1");
 
       // create group by address1
       const txn3 = await eventManager.connect(organizer).createGroup("group3");
       await txn3.wait();
-
-      const ownGroups2 = await eventManager.connect(organizer).getOwnGroups();
+      const ownGroups2 = await eventManager
+        .connect(organizer)
+        .getOwnGroups(organizer.address);
       expect(ownGroups2.length).to.equal(2);
       expect(ownGroups2[0].name).to.equal("group1");
       expect(ownGroups2[1].name).to.equal("group3");
+    });
+  });
+
+  describe("mint locked flag", () => {
+    let eventManager: EventManager;
+    before(async () => {
+      const eventManagerContractFactory = await ethers.getContractFactory(
+        "EventManager"
+      );
+      const deployedEventManagerContract: any = await upgrades.deployProxy(
+        eventManagerContractFactory,
+        [relayer.address, 250000, 1000000],
+        {
+          initializer: "initialize",
+        }
+      );
+      eventManager = await deployedEventManagerContract.deployed();
+      await eventManager.setMintNFTAddr(mintNFT.address);
+      await mintNFT.setEventManagerAddr(eventManager.address);
+    });
+
+    it("should get mintable flag", async () => {
+      const txn1 = await eventManager.connect(organizer).createGroup("group1");
+      await txn1.wait();
+
+      const txn2 = await eventManager
+        .connect(organizer)
+        .createEventRecord(
+          1,
+          "event1",
+          "event1 description",
+          "2022-07-3O",
+          100,
+          false,
+          "hackdays",
+          attributes
+        );
+      await txn2.wait();
+
+      const flag = await eventManager.connect(organizer).getIsMintLocked(1);
+      expect(flag).equal(false);
+    });
+
+    it("should change mintable flag by owner", async () => {
+      await eventManager.connect(organizer).changeMintLocked(1, true);
+      const flag = await eventManager.connect(organizer).getIsMintLocked(1);
+      expect(flag).equal(true);
+    });
+
+    it("No one but the owner should be able to change mintable flag", async () => {
+      await expect(
+        eventManager.connect(participant1).changeMintLocked(1, false)
+      ).to.be.revertedWith("You are not group owner");
     });
   });
 });
