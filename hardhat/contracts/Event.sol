@@ -33,6 +33,7 @@ contract EventManager is OwnableUpgradeable {
     mapping(address => uint256[]) private ownGroupIds;
     mapping(uint256 => uint256[]) private eventIdsByGroupId;
     mapping(uint256 => uint256) private groupIdByEventId;
+    mapping(uint256 => bool) private isMintLocked;
 
     // Mint nft contract address
     address private mintNFTAddr;
@@ -42,6 +43,29 @@ contract EventManager is OwnableUpgradeable {
     uint256 private mtxPrice;
     // max mint limit
     uint256 private maxMintLimit;
+
+    modifier onlyGroupOwner(uint256 _groupId) {
+        bool _isGroupOwner = false;
+        for (uint256 _i = 0; _i < ownGroupIds[msg.sender].length; _i++) {
+            if (ownGroupIds[msg.sender][_i] == _groupId) {
+                _isGroupOwner = true;
+            }
+        }
+        require(_isGroupOwner, "You are not group owner");
+        _;
+    }
+
+    modifier onlyGroupOwnerByEventId(uint256 _eventId) {
+        uint256 _groupId = groupIdByEventId[_eventId];
+        bool _isGroupOwner = false;
+        for (uint256 _i = 0; _i < ownGroupIds[msg.sender].length; _i++) {
+            if (ownGroupIds[msg.sender][_i] == _groupId) {
+                _isGroupOwner = true;
+            }
+        }
+        require(_isGroupOwner, "You are not group owner");
+        _;
+    }
 
     function setMintNFTAddr(address _mintNftAddr) public onlyOwner {
         require(_mintNftAddr != address(0), "mint nft address is blank");
@@ -64,6 +88,7 @@ contract EventManager is OwnableUpgradeable {
 
     event CreateGroup(address indexed owner, uint256 groupId);
     event CreateEvent(address indexed owner, uint256 eventId);
+    event MintLocked(uint256 indexed eventId, bool isLocked);
 
     function initialize(
         address _relayerAddr,
@@ -123,19 +148,11 @@ contract EventManager is OwnableUpgradeable {
         bool _useMtx,
         string memory _secretPhrase,
         IMintNFT.NFTAttribute[] memory _eventNFTAttributes
-    ) external payable {
+    ) external payable onlyGroupOwner(_groupId) {
         require(
             _mintLimit > 0 && _mintLimit <= maxMintLimit,
             "mint limit is invalid"
         );
-
-        bool _isGroupOwner = false;
-        for (uint256 _i = 0; _i < ownGroupIds[msg.sender].length; _i++) {
-            if (ownGroupIds[msg.sender][_i] == _groupId) {
-                _isGroupOwner = true;
-            }
-        }
-        require(_isGroupOwner, "You are not group owner");
 
         if (_useMtx) {
             uint256 depositPrice = (_mintLimit * tx.gasprice * mtxPrice);
@@ -189,5 +206,17 @@ contract EventManager is OwnableUpgradeable {
         uint256 _eventRecordIndex = _eventId - 1;
         EventRecord memory _eventRecord = eventRecords[_eventRecordIndex];
         return _eventRecord;
+    }
+
+    function changeMintLocked(
+        uint256 _eventId,
+        bool _locked
+    ) external onlyGroupOwnerByEventId(_eventId) {
+        isMintLocked[_eventId] = _locked;
+        emit MintLocked(_eventId, _locked);
+    }
+
+    function getIsMintLocked(uint256 _eventId) external view returns (bool) {
+        return isMintLocked[_eventId];
     }
 }
