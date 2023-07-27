@@ -13,5 +13,3 @@ fi
 
 echo "Generating trusted setup..."
 snarkjs pks ../../circuits/build/SecretPhrase.r1cs ../../circuits/powersOfTau28_hez_final_12.ptau ../../circuits/build/SecretPhrase.zkey
-echo "Generating solidity verifier..."
-snarkjs zkey export solidityverifier ../../circuits/build/SecretPhrase.zkey ../../contracts/SecretPhraseVerifier.sol

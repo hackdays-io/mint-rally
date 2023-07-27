@@ -42,6 +42,10 @@ contract MintNFT is
     mapping(uint256 => uint256) private remainingEventNftCount;
     // secretPhrase via EventId
     mapping(uint256 => bytes32) private eventSecretPhrases;
+    // secretPhrase via EventId for ZK
+    mapping(uint256 => string) private eventSecretPhrasesForZK;
+
+    address private secretPhraseVerifierAddr;
 
     event MintedNFTAttributeURL(address indexed holder, string url);
 
