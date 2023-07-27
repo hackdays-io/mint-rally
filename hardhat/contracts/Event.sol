@@ -33,7 +33,6 @@ contract EventManager is OwnableUpgradeable {
     mapping(address => uint256[]) private ownGroupIds;
     mapping(uint256 => uint256[]) private eventIdsByGroupId;
     mapping(uint256 => uint256) private groupIdByEventId;
-    mapping(uint256 => bool) private isMintLocked;
 
     // Mint nft contract address
     address private mintNFTAddr;
@@ -45,18 +44,6 @@ contract EventManager is OwnableUpgradeable {
     uint256 private maxMintLimit;
 
     modifier onlyGroupOwner(uint256 _groupId) {
-        bool _isGroupOwner = false;
-        for (uint256 _i = 0; _i < ownGroupIds[msg.sender].length; _i++) {
-            if (ownGroupIds[msg.sender][_i] == _groupId) {
-                _isGroupOwner = true;
-            }
-        }
-        require(_isGroupOwner, "You are not group owner");
-        _;
-    }
-
-    modifier onlyGroupOwnerByEventId(uint256 _eventId) {
-        uint256 _groupId = groupIdByEventId[_eventId];
         bool _isGroupOwner = false;
         for (uint256 _i = 0; _i < ownGroupIds[msg.sender].length; _i++) {
             if (ownGroupIds[msg.sender][_i] == _groupId) {
@@ -88,7 +75,6 @@ contract EventManager is OwnableUpgradeable {
 
     event CreateGroup(address indexed owner, uint256 groupId);
     event CreateEvent(address indexed owner, uint256 eventId);
-    event MintLocked(uint256 indexed eventId, bool isLocked);
 
     function initialize(
         address _relayerAddr,
@@ -146,7 +132,7 @@ contract EventManager is OwnableUpgradeable {
         string memory _date,
         uint256 _mintLimit,
         bool _useMtx,
-        string memory _secretPhrase,
+        bytes32 _secretPhrase,
         IMintNFT.NFTAttribute[] memory _eventNFTAttributes
     ) external payable onlyGroupOwner(_groupId) {
         require(
@@ -175,12 +161,11 @@ contract EventManager is OwnableUpgradeable {
             })
         );
 
-        bytes32 encryptedSecretPhrase = keccak256(bytes(_secretPhrase));
         IMintNFT _mintNFT = IMintNFT(mintNFTAddr);
         _mintNFT.setEventInfo(
             _newEventId,
             _mintLimit,
-            encryptedSecretPhrase,
+            _secretPhrase,
             _eventNFTAttributes
         );
 
@@ -208,15 +193,17 @@ contract EventManager is OwnableUpgradeable {
         return _eventRecord;
     }
 
-    function changeMintLocked(
-        uint256 _eventId,
-        bool _locked
-    ) external onlyGroupOwnerByEventId(_eventId) {
-        isMintLocked[_eventId] = _locked;
-        emit MintLocked(_eventId, _locked);
-    }
-
-    function getIsMintLocked(uint256 _eventId) external view returns (bool) {
-        return isMintLocked[_eventId];
+    function isGroupOwnerByEventId(
+        address _address,
+        uint256 _eventId
+    ) public view returns (bool) {
+        uint256 _groupId = groupIdByEventId[_eventId];
+        bool isGroupOwner = false;
+        for (uint256 _i = 0; _i < ownGroupIds[_address].length; _i++) {
+            if (ownGroupIds[_address][_i] == _groupId) {
+                isGroupOwner = true;
+            }
+        }
+        return isGroupOwner;
     }
 }

@@ -149,7 +149,10 @@ contract SecretPhraseVerifier {
         return keccak256(abi.encodePacked(_proof));
     }
 
-    function submitProof(uint256[24] calldata _proof, uint256 _eventId) public {
+    function submitProof(
+        uint256[24] calldata _proof,
+        uint256 _eventId
+    ) external {
         usedProofs[_eventId][hashProof(_proof)] = true;
     }
 
@@ -157,7 +160,7 @@ contract SecretPhraseVerifier {
         uint256[24] calldata _proof,
         uint256[1] calldata _pubSignals,
         uint256 _eventId
-    ) public view returns (bool) {
+    ) external view returns (bool) {
         if (usedProofs[_eventId][hashProof(_proof)] == true) {
             return false;
         }

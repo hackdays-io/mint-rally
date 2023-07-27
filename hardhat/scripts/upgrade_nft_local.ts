@@ -3,7 +3,7 @@ import { ethers, upgrades } from "hardhat";
 async function main() {
   const MintNFTFactory = await ethers.getContractFactory("MintNFT");
   const deployedMintNFT: any = await upgrades.upgradeProxy(
-    "0x7d895Ca96caa5344EC0b732c6e1DEfa560671e14",
+    "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9",
     MintNFTFactory
   );
   await deployedMintNFT.deployed();
