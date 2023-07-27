@@ -42,8 +42,11 @@ contract MintNFT is
     mapping(uint256 => uint256) private remainingEventNftCount;
     // secretPhrase via EventId
     mapping(uint256 => bytes32) private eventSecretPhrases;
+    // is mint locked via EventId
+    mapping(uint256 => bool) private isMintLocked;
 
     event MintedNFTAttributeURL(address indexed holder, string url);
+    event MintLocked(uint256 indexed eventId, bool isLocked);
 
     function initialize(
         MinimalForwarderUpgradeable trustedForwarder
@@ -141,10 +144,23 @@ contract MintNFT is
             "already minted"
         );
 
-        IEventManager eventManager = IEventManager(eventManagerAddr);
-        require(!eventManager.getIsMintLocked(_eventId), "mint is locked");
+        require(!isMintLocked[_eventId], "mint is locked");
 
         return true;
+    }
+
+    function changeMintLocked(uint256 _eventId, bool _locked) external {
+        IEventManager eventManager = IEventManager(eventManagerAddr);
+        require(
+            eventManager.isGroupOwnerByEventId(msg.sender, _eventId),
+            "you are not event group owner"
+        );
+        isMintLocked[_eventId] = _locked;
+        emit MintLocked(_eventId, _locked);
+    }
+
+    function getIsMintLocked(uint256 _eventId) external view returns (bool) {
+        return isMintLocked[_eventId];
     }
 
     function isHoldingEventNFTByAddress(
