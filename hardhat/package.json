@@ -13,6 +13,7 @@
     "upgrade:eventmanager:main": "npx hardhat run scripts/upgrade_eventmanager_prd.ts --network polygon",
     "upgrade:eventmanager:stg": "npx hardhat run scripts/upgrade_eventmanager_stg.ts --network mumbai",
     "upgrade:eventmanager:local": "npx hardhat run scripts/upgrade_eventmanager_local.ts --network local",
+    "forceimport:main": "npx hardhat run scripts/force_import.ts --network polygon",
     "compile": "npx hardhat compile",
     "test": "npx hardhat compile && npx hardhat test",
     "localchain": "npx hardhat node",
