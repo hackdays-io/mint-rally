@@ -1,6 +1,5 @@
 import {
   ContractEvent,
-  getBlockNumber,
   useContract,
   useContractEvents,
   useContractRead,
@@ -18,6 +17,7 @@ import { Event } from "types/Event";
 import { signMetaTxRequest } from "utils/signer";
 import { BigNumber } from "ethers";
 import { useCurrentBlock } from "./useBlockChain";
+import { useGenerateProof } from "./useSecretPhrase";
 
 export const useMintNFTContract = () => {
   const {
@@ -202,6 +202,12 @@ export const useMintParticipateNFT = (
   const signer = useSigner();
   const sdk = useSDK();
   const {
+    generateProof,
+    isLoading: isPreparingProof,
+    error: preparingProofError,
+  } = useGenerateProof();
+
+  const {
     mutateAsync,
     isLoading: isMinting,
     error: mintError,
@@ -229,11 +235,11 @@ export const useMintParticipateNFT = (
   });
 
   const error: any = useMemo(() => {
-    return useMTX ? mtxStatus.error : mintError;
-  }, [mintError, mtxStatus]);
+    return mtxStatus.error || mintError || preparingProofError;
+  }, [mintError, mtxStatus, preparingProofError]);
   const isLoading = useMemo(() => {
-    return useMTX ? mtxStatus.isLoading : isMinting;
-  }, [isMinting, mtxStatus]);
+    return isPreparingProof || mtxStatus.isLoading || isMinting;
+  }, [isMinting, mtxStatus, isPreparingProof]);
   const status = useMemo(() => {
     return useMTX ? mtxStatus.status : mintStatus;
   }, [mintStatus, mtxStatus]);
@@ -272,10 +278,10 @@ export const useMintParticipateNFT = (
   }, [data, status, fromBlock]);
 
   const checkCanMint = useCallback(
-    async (eventId: number, secretPhrase: string) => {
+    async (eventId: number, proof: any) => {
       if (!mintNFTContract) return;
       try {
-        await mintNFTContract.call("canMint", [eventId, secretPhrase]);
+        await mintNFTContract.call("canMint", [eventId, proof]);
         return;
       } catch (error) {
         throw error;
@@ -288,8 +294,10 @@ export const useMintParticipateNFT = (
     async (secretPhrase: string) => {
       if (!event || !event.eventRecordId || !event.groupId) return;
       try {
+        const proof = await generateProof(secretPhrase);
+
         await mutateAsync({
-          args: [event.groupId, event.eventRecordId, secretPhrase],
+          args: [event.groupId, event.eventRecordId, proof?.proofCalldata],
         });
       } catch (_) {}
     },
@@ -301,13 +309,18 @@ export const useMintParticipateNFT = (
       if (!event || !event.eventRecordId || !event.groupId || !sdk) return;
       setMtxStatus({ isLoading: true, status: "loading", error: null });
       try {
-        await checkCanMint(event.eventRecordId.toNumber(), secretPhrase);
+        const proof = await generateProof(secretPhrase);
+
+        await checkCanMint(
+          event.eventRecordId.toNumber(),
+          proof?.proofCalldata
+        );
         const to = mintNFTContract?.getAddress();
         const from = address;
         const data = mintNFTContract?.encoder.encode("mintParticipateNFT", [
           event?.groupId.toNumber(),
           event?.eventRecordId.toNumber(),
-          secretPhrase,
+          proof?.proofCalldata,
         ]);
         const request = await signMetaTxRequest(sdk.wallet, forwarderContract, {
           from,
