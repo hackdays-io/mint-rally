@@ -13,3 +13,8 @@ fi
 
 echo "Generating trusted setup..."
 snarkjs pks ../../circuits/build/SecretPhrase.r1cs ../../circuits/powersOfTau28_hez_final_12.ptau ../../circuits/build/SecretPhrase.zkey
+
+echo "copy wasm and zkey for frontend..."
+mkdir -p ../../../frontend/src/pages/api/circuits
+cp ../../circuits/build/SecretPhrase_js/SecretPhrase.wasm ../../../frontend/src/pages/api/circuits/SecretPhrase.wasm
+cp ../../circuits/build/SecretPhrase.zkey ../../../frontend/src/pages/api/circuits/SecretPhrase.zkey
