@@ -39,6 +39,3 @@ yarn-error.log*
 # environment
 .env[\.*]
 .env
-
-SecretPhrase.wasm
-SecretPhrase.zkey
