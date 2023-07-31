@@ -41,7 +41,7 @@ const EventCard: FC<Props> = ({ title, description, date }) => {
           <Flex alignItems="center">
             <CalendarIcon
               color={"gray.700"}
-              mr={2}
+              mr={3}
             />
             <Text
               fontSize={"sm"}
