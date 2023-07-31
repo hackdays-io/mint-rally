@@ -5,21 +5,29 @@
 // Runtime Environment's members available in the global scope.
 import { writeFileSync } from "fs";
 import { ethers, upgrades } from "hardhat";
-import { MintNFT, EventManager } from "../typechain";
+import { MintNFT, EventManager, SecretPhraseVerifier } from "../typechain";
 
 async function main() {
   let mintNFT: MintNFT;
   let eventManager: EventManager;
+  let secretPhraseVerifier: SecretPhraseVerifier;
 
   const ForwarderFactory = await ethers.getContractFactory(
     "MintRallyForwarder"
   );
   const forwarder = await ForwarderFactory.deploy();
   await forwarder.deployed();
+
+  const SecretPhraseVerifierFactory = await ethers.getContractFactory(
+    "SecretPhraseVerifier"
+  );
+  secretPhraseVerifier = await SecretPhraseVerifierFactory.deploy();
+  await secretPhraseVerifier.deployed();
+
   const MintNFTFactory = await ethers.getContractFactory("MintNFT");
   const deployedMintNFT: any = await upgrades.deployProxy(
     MintNFTFactory,
-    [forwarder.address],
+    [forwarder.address, secretPhraseVerifier.address],
     {
       initializer: "initialize",
     }
@@ -42,25 +50,29 @@ async function main() {
   await eventManager.setMintNFTAddr(mintNFT.address);
 
   console.log("forwarder address:", forwarder.address);
+  console.log("secretPhraseVerifier address:", secretPhraseVerifier.address);
   console.log("mintNFT address:", mintNFT.address);
   console.log("eventManager address:", eventManager.address, "\n");
   console.log("----------\nFor frontEnd\n----------");
   console.log(`NEXT_PUBLIC_FORWARDER_ADDRESS=${forwarder.address}`);
+  console.log(
+    `NEXT_PUBLIC_CONTRACT_SECRET_PHRASE_VERIFIER=${secretPhraseVerifier.address}`
+  );
   console.log(`NEXT_PUBLIC_CONTRACT_MINT_NFT_MANAGER=${mintNFT.address}`);
   console.log(`NEXT_PUBLIC_CONTRACT_EVENT_MANAGER=${eventManager.address}`);
 
-  writeFileSync(
-    "./scripts/deployed_contract_addr_stg.json",
-    JSON.stringify(
-      {
-        MintRallyFowarder: forwarder.address,
-        MintNFT: mintNFT.address,
-        EventManager: eventManager.address,
-      },
-      null,
-      2
-    )
-  );
+  // writeFileSync(
+  //   "./scripts/deployed_contract_addr_stg.json",
+  //   JSON.stringify(
+  //     {
+  //       MintRallyFowarder: forwarder.address,
+  //       MintNFT: mintNFT.address,
+  //       EventManager: eventManager.address,
+  //     },
+  //     null,
+  //     2
+  //   )
+  // );
 }
 
 // We recommend this pattern to be able to use async/await everywhere
