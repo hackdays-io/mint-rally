@@ -1,4 +1,8 @@
+import { NextPage } from "next";
+import Link from "next/link";
+import Image from "next/image";
 import {
+  Box,
   Button,
   Container,
   Flex,
@@ -7,14 +11,11 @@ import {
   Spinner,
   VStack,
 } from "@chakra-ui/react";
-import { NextPage } from "next";
-import Link from "next/link";
+
 import EventCard from "../../components/atoms/events/EventCard";
+import { Event } from "types/Event";
 import { useLocale } from "../../hooks/useLocale";
 import { useEvents } from "src/hooks/useEvent";
-import { Event } from "types/Event";
-import { Box } from "react-feather";
-import Image from "next/image";
 
 const Events: NextPage = () => {
   const { events, isLoading } = useEvents();
@@ -22,13 +23,16 @@ const Events: NextPage = () => {
 
   return (
     <>
-      <Box width="100%">
-        <Image
-          src="/images/events/image_17.jpg"
-          alt="banner image"
-          width={"100px"}
-          height={"20px"}
-        />
+      <Box width="100%" mb={6}>
+        <div>
+          <Image
+            src="/images/events/image_17.jpg"
+            alt="banner image"
+            width={"100%"}
+            height={"20px"}
+            layout="responsive"
+          />
+        </div>
       </Box>
       <Container maxW={800} paddingTop={6}>
         <Flex alignItems="bottom" paddingBottom={6}>

@@ -1,5 +1,6 @@
-import { Box, Divider, Flex, Heading, Text } from "@chakra-ui/react";
 import { FC } from "react";
+import { Box, Divider, Flex, Heading, Text } from "@chakra-ui/react";
+import { CalendarIcon } from '@chakra-ui/icons'
 
 type Props = {
   title: string;
@@ -37,8 +38,11 @@ const EventCard: FC<Props> = ({ title, description, date }) => {
           >
             {description}
           </Text>
-          <Flex>
-            <Text>📅</Text>
+          <Flex alignItems="center">
+            <CalendarIcon
+              color={"gray.700"}
+              mr={2}
+            />
             <Text
               fontSize={"sm"}
               color={"black"}
@@ -48,7 +52,7 @@ const EventCard: FC<Props> = ({ title, description, date }) => {
             </Text>
           </Flex>
         </Box>
-      </Box>
+      </Box >
     </>
   );
 };
