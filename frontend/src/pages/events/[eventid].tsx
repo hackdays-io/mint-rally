@@ -12,8 +12,8 @@ import {
 import { NFTItem } from "src/components/atoms/nft/NFTItem";
 import { Event } from "types/Event";
 import { useEventById } from "src/hooks/useEvent";
-import Link from "next/link";
 import OrganizerInfo from "src/components/atoms/events/OrganizerInfo";
+import { CalendarIcon } from "@chakra-ui/icons";
 
 const MintNFTSection: FC<{ event: Event.EventRecord }> = ({ event }) => {
   const address = useAddress();
@@ -67,7 +67,9 @@ const Event: FC = () => {
         {event && (
           <>
             <Heading>{event.name}</Heading>
-            <Text fontSize="24px">{event.date}</Text>
+            <Text fontSize="24px">
+              <CalendarIcon /> {event.date}
+            </Text>
 
             <Text fontSize="16px" mt={10}>
               {event.description
@@ -85,8 +87,30 @@ const Event: FC = () => {
               requiredChainID={+process.env.NEXT_PUBLIC_CHAIN_ID!}
               forbiddenText={t.SIGN_IN_TO_GET_NFT}
             >
-              <MintNFTSection event={event} />
+              <Box
+                borderWidth="3px"
+                rounded="lg"
+                overflow="hidden"
+                _hover={{ cursor: "pointer" }}
+                verticalAlign="center"
+                backgroundColor="blue.50"
+                padding="8"
+              >
+                <MintNFTSection event={event} />
+              </Box>
             </LoginRequired>
+            <br />
+            <Box
+              borderWidth="3px"
+              rounded="lg"
+              overflow="hidden"
+              _hover={{ cursor: "pointer" }}
+              verticalAlign="center"
+              backgroundColor="blue.50"
+              padding="8"
+            >
+              注意事項羅列
+            </Box>
           </>
         )}
       </Container>
