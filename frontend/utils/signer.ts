@@ -30,7 +30,6 @@ const getMetaTxTypeData = (chainId: number, verifyingContract: string) => {
 
 // TODO: do not use any type
 const signTypeData = async (signer: UserWallet, data: any) => {
-  console.log(data.message);
   return await signer.signTypedData(data.domain, data.types, data.message);
 };
 
