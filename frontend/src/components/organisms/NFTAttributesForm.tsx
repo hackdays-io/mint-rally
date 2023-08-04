@@ -19,6 +19,7 @@ import { useLocale } from "../../hooks/useLocale";
 import ErrorMessage from "../atoms/form/ErrorMessage";
 import ImageSelectorWithPreview from "../ImageSelectorWithPreview";
 import { NFT } from "types/NFT";
+import ordinal from "ordinal";
 
 type Props = {
   control: Control<any, any>;
@@ -28,7 +29,7 @@ type Props = {
 };
 
 const NFTAttributesForm: FC<Props> = ({ control, nfts, append, remove }) => {
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
 
   const validateUniqRequiredParticipateCount = (v: number) => {
     const vals = nfts.map((nft) => nft.requiredParticipateCount);
@@ -55,7 +56,7 @@ const NFTAttributesForm: FC<Props> = ({ control, nfts, append, remove }) => {
 
   return (
     <Box>
-      {nfts.map((_, index) => (
+      {nfts.map((nft, index) => (
         <Flex
           key={index}
           w="full"
@@ -169,8 +170,8 @@ const NFTAttributesForm: FC<Props> = ({ control, nfts, append, remove }) => {
                         <NumberInput
                           // 内部的に1回目の参加でMintさせたい場合は内部的には0と設定する必要があるが、利用者へ伝わらないので表示状が1となる様にする。
                           // その為、画面上に表示されているから1引いた値を内部値へ反映させる。
-                          value={value + 1} 
-                          min={1}
+                          value={value + 1}
+                          min={2}
                           onChange={(__, num) => {
                             // 内部的に1回目の参加でMintさせたい場合は内部的には0と設定する必要があるが、利用者へ伝わらないので表示状が1となる様にする。
                             // その為、画面上に表示されているから1引いた値を内部値へ反映させる。
@@ -193,9 +194,22 @@ const NFTAttributesForm: FC<Props> = ({ control, nfts, append, remove }) => {
                       </>
                     )}
                   />
+                  <Text mt={1} fontWeight="bold">
+                    {locale === "ja" ? (
+                      <>
+                        {nft.requiredParticipateCount + 1}
+                        回目参加する参加者に配布されます。
+                      </>
+                    ) : (
+                      <>
+                        It will be distributed to participants who attend a{" "}
+                        {ordinal(nft.requiredParticipateCount + 1)} time.
+                      </>
+                    )}
+                  </Text>
                 </>
               ) : (
-                <Text>{t.NFT_DEFAULT}</Text>
+                <Text fontWeight="bold">{t.NFT_DEFAULT}</Text>
               )}
             </Box>
           </Box>
@@ -223,7 +237,7 @@ const NFTAttributesForm: FC<Props> = ({ control, nfts, append, remove }) => {
               fileObject: null,
               // 内部的に1回目の参加でMintさせたい場合は内部的には0と設定する必要があるが、利用者へ伝わらないので表示状が1となる様にする。
               // 上記前提の元、入力欄を追加した時に利用者から見てキリの良い数字(10)が表示される事を目的に初期値を9としている。
-              requiredParticipateCount: 9,
+              requiredParticipateCount: 4,
             })
           }
         >
