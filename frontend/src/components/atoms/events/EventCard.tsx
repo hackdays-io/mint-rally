@@ -1,44 +1,50 @@
-import { Box, Flex, Heading, Text } from "@chakra-ui/react";
-import Image from "next/image";
 import { FC } from "react";
+import { Box, Divider, Flex, Heading, Text } from "@chakra-ui/react";
+import { CalendarIcon } from "@chakra-ui/icons";
 
 type Props = {
   title: string;
   description: string;
+  date: string;
 };
 
-const EventCard: FC<Props> = ({ title, description }) => {
+const EventCard: FC<Props> = ({ title, description, date }) => {
   return (
-    <Box
-      maxW="sm"
-      borderWidth="1px"
-      rounded="lg"
-      overflow="hidden"
-      _hover={{ cursor: "pointer" }}
-      verticalAlign="center"
-    >
-      <Box>
-        <Image
-          src="/images/events/default-thumb.png"
-          width="350"
-          height="160"
-        />
+    <>
+      <Divider borderColor="mint.bg" borderWidth={1.3} />
+      <Box
+        overflow="hidden"
+        _hover={{ cursor: "pointer" }}
+        verticalAlign="center"
+      >
+        <Box p={1}>
+          <Heading
+            fontSize={"xl"}
+            color={"black"}
+            justifyContent="center"
+            mt={5}
+            mb={1}
+          >
+            {title}
+          </Heading>
+          <Text
+            color={"black"}
+            overflow="hidden"
+            mb={2}
+            fontSize={"md"}
+            maxH="70px"
+          >
+            {description}
+          </Text>
+          <Flex alignItems="center">
+            <CalendarIcon color={"gray.700"} mr={3} />
+            <Text fontSize={"sm"} color={"black"} overflow="hidden">
+              {date}
+            </Text>
+          </Flex>
+        </Box>
       </Box>
-      <Box p={3} h={130}>
-        <Heading
-          size="md"
-          justifyContent="center"
-          mb={1}
-          height="50px"
-          overflow="hidden"
-        >
-          {title}
-        </Heading>
-        <Text height="50px" overflow="hidden">
-          {description}
-        </Text>
-      </Box>
-    </Box>
+    </>
   );
 };
 

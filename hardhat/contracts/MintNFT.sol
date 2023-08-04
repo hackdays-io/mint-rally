@@ -5,9 +5,10 @@ import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721Enumer
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import "./lib/Hashing.sol";
 import "@openzeppelin/contracts-upgradeable/metatx/MinimalForwarderUpgradeable.sol";
+import "./lib/Hashing.sol";
 import "./ERC2771ContextUpgradeable.sol";
+import "./IEvent.sol";
 
 contract MintNFT is
     ERC721EnumerableUpgradeable,
@@ -41,8 +42,11 @@ contract MintNFT is
     mapping(uint256 => uint256) private remainingEventNftCount;
     // secretPhrase via EventId
     mapping(uint256 => bytes32) private eventSecretPhrases;
+    // is mint locked via EventId
+    mapping(uint256 => bool) private isMintLocked;
 
     event MintedNFTAttributeURL(address indexed holder, string url);
+    event MintLocked(uint256 indexed eventId, bool isLocked);
 
     function initialize(
         MinimalForwarderUpgradeable trustedForwarder
@@ -140,7 +144,23 @@ contract MintNFT is
             "already minted"
         );
 
+        require(!isMintLocked[_eventId], "mint is locked");
+
         return true;
+    }
+
+    function changeMintLocked(uint256 _eventId, bool _locked) external {
+        IEventManager eventManager = IEventManager(eventManagerAddr);
+        require(
+            eventManager.isGroupOwnerByEventId(msg.sender, _eventId),
+            "you are not event group owner"
+        );
+        isMintLocked[_eventId] = _locked;
+        emit MintLocked(_eventId, _locked);
+    }
+
+    function getIsMintLocked(uint256 _eventId) external view returns (bool) {
+        return isMintLocked[_eventId];
     }
 
     function isHoldingEventNFTByAddress(
