@@ -14,7 +14,7 @@ export default {
   NFT_DESC: "NFT Description",
   TIMES_PARTICIPATE:
     "How many events do users need participate in to get this NFT?",
-  NFT_DEFAULT: "This NFT will be distributed to all participants",
+  NFT_DEFAULT: "This NFT will be default.",
   // Event group index
   CREATE_NEW_EVENT_GROUP: "Create new event group",
   NEW_EVENT_GROUP_NAME: "Event Group Name",
