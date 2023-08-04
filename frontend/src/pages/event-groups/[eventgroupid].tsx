@@ -49,6 +49,7 @@ const EventGroup = () => {
                             <EventCard
                               title={event.name}
                               description={event.description}
+                              date={event.date}
                             ></EventCard>
                           </a>
                         </Link>
