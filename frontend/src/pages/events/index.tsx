@@ -26,29 +26,22 @@ const Events: NextPage = () => {
       <Box width="100%" mb={6}>
         <div>
           <Image
-            src="/images/events/image_17.jpg"
+            src="/images/events/listpage_header.jpg"
             alt="banner image"
-            width={"100%"}
-            height={"20px"}
+            width={"1440px"}
+            height={"240px"}
             layout="responsive"
           />
         </div>
       </Box>
       <Container maxW={800} paddingTop={6}>
         <Flex alignItems="bottom" paddingBottom={6}>
-          <Heading
-            color={"black"}
-            fontSize={"3xl"}
-            mb={5}
-          >
+          <Heading color={"black"} fontSize={"3xl"} mb={5}>
             {t.EVENTS}
           </Heading>
           <Spacer></Spacer>
           <Link href="/events/new">
-            <Button
-              bg="#562406"
-              color="white"
-            >
+            <Button bg="#562406" color="white">
               {t.CREATE_NEW_EVENT}
             </Button>
           </Link>
@@ -69,7 +62,7 @@ const Events: NextPage = () => {
                         title={item.name}
                         description={item.description}
                         date={item.date}
-                      ></EventCard>
+                      />
                     </a>
                   </Link>
                 );

@@ -1,6 +1,6 @@
 import { FC } from "react";
 import { Box, Divider, Flex, Heading, Text } from "@chakra-ui/react";
-import { CalendarIcon } from '@chakra-ui/icons'
+import { CalendarIcon } from "@chakra-ui/icons";
 
 type Props = {
   title: string;
@@ -11,19 +11,15 @@ type Props = {
 const EventCard: FC<Props> = ({ title, description, date }) => {
   return (
     <>
-      <Divider
-        borderColor="mint.bg"
-        borderWidth={1.3}
-      />
+      <Divider borderColor="mint.bg" borderWidth={1.3} />
       <Box
-        maxW="sm"
         overflow="hidden"
         _hover={{ cursor: "pointer" }}
         verticalAlign="center"
       >
         <Box p={1}>
           <Heading
-            size="md"
+            fontSize={"xl"}
             color={"black"}
             justifyContent="center"
             mt={5}
@@ -35,24 +31,19 @@ const EventCard: FC<Props> = ({ title, description, date }) => {
             color={"black"}
             overflow="hidden"
             mb={2}
+            fontSize={"md"}
+            maxH="70px"
           >
             {description}
           </Text>
           <Flex alignItems="center">
-            <CalendarIcon
-              color={"gray.700"}
-              mr={3}
-            />
-            <Text
-              fontSize={"sm"}
-              color={"black"}
-              overflow="hidden"
-            >
+            <CalendarIcon color={"gray.700"} mr={3} />
+            <Text fontSize={"sm"} color={"black"} overflow="hidden">
               {date}
             </Text>
           </Flex>
         </Box>
-      </Box >
+      </Box>
     </>
   );
 };
