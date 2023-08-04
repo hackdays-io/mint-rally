@@ -1,7 +1,7 @@
 export default {
   TOP: "トップ",
   EVENTGROUPS: "イベントグループ",
-  EVENTS: "イベント",
+  EVENTS: "イベント一覧",
   RECENT_EVENTS: "最近のイベント",
   HELP: "ヘルプ",
   SIGN_IN: "ログイン",
