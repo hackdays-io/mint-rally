@@ -154,6 +154,8 @@ const NFTAttributesForm: FC<Props> = ({ control, nfts, append, remove }) => {
                     name={`nfts.${index}.requiredParticipateCount`}
                     rules={{
                       required: "Times participation is required",
+                      // 追加用のNFTは2回目の追加様なので、2回目以上の数字(内部値でいうと0)のみ設定可能とする。
+                      // 表示値ではなくて内部値でチェックするので2回目を意味する1よりも大きい数となる様にバリデーションを行っている。
                       min: 1,
                       validate: {
                         uniq: (v) => validateUniqRequiredParticipateCount(v),
@@ -165,10 +167,14 @@ const NFTAttributesForm: FC<Props> = ({ control, nfts, append, remove }) => {
                     }) => (
                       <>
                         <NumberInput
-                          value={value}
+                          // 内部的に1回目の参加でMintさせたい場合は内部的には0と設定する必要があるが、利用者へ伝わらないので表示状が1となる様にする。
+                          // その為、画面上に表示されているから1引いた値を内部値へ反映させる。
+                          value={value + 1} 
                           min={1}
                           onChange={(__, num) => {
-                            onChange(num);
+                            // 内部的に1回目の参加でMintさせたい場合は内部的には0と設定する必要があるが、利用者へ伝わらないので表示状が1となる様にする。
+                            // その為、画面上に表示されているから1引いた値を内部値へ反映させる。
+                            onChange(num - 1);
                           }}
                         >
                           <NumberInputField />
@@ -215,7 +221,9 @@ const NFTAttributesForm: FC<Props> = ({ control, nfts, append, remove }) => {
             append({
               description: "",
               fileObject: null,
-              requiredParticipateCount: 10,
+              // 内部的に1回目の参加でMintさせたい場合は内部的には0と設定する必要があるが、利用者へ伝わらないので表示状が1となる様にする。
+              // 上記前提の元、入力欄を追加した時に利用者から見てキリの良い数字(10)が表示される事を目的に初期値を9としている。
+              requiredParticipateCount: 9,
             })
           }
         >
