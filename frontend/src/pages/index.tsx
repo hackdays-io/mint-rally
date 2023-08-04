@@ -8,6 +8,7 @@ import {
   Spacer,
   Spinner,
   Text,
+  VStack,
 } from "@chakra-ui/react";
 import type { NextPage } from "next";
 import Image from "next/image";
@@ -244,7 +245,7 @@ const Home: NextPage = () => {
         {isLoading ? (
           <Spinner></Spinner>
         ) : (
-          <SimpleGrid columns={{ base: 2, md: 3 }} spacing={5}>
+          <VStack spacing={5} align="stretch">
             <>
               {events.slice(0, 6).map((item: any) => {
                 return (
@@ -256,13 +257,14 @@ const Home: NextPage = () => {
                       <EventCard
                         title={item.name}
                         description={item.description}
+                        date={item.date}
                       ></EventCard>
                     </a>
                   </Link>
                 );
               })}
             </>
-          </SimpleGrid>
+          </VStack>
         )}
       </Container>
 
