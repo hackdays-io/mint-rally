@@ -3,7 +3,6 @@
 //
 // When running the script with `npx hardhat run <script>` you'll find the Hardhat
 // Runtime Environment's members available in the global scope.
-import { writeFileSync } from "fs";
 import { ethers, upgrades } from "hardhat";
 import { MintNFT, EventManager, SecretPhraseVerifier } from "../typechain";
 
@@ -27,7 +26,7 @@ async function main() {
   const MintNFTFactory = await ethers.getContractFactory("MintNFT");
   const deployedMintNFT: any = await upgrades.deployProxy(
     MintNFTFactory,
-    [forwarder.address, secretPhraseVerifier.address],
+    [forwarder.address, secretPhraseVerifier.address, []],
     {
       initializer: "initialize",
     }
