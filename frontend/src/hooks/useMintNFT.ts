@@ -340,7 +340,15 @@ export const useMintParticipateNFT = (
     [event, forwarderContract, signer]
   );
 
-  return { mint, mintMTX, isLoading, error, status, mintedNFT };
+  return {
+    mint,
+    mintMTX,
+    isLoading,
+    error,
+    status,
+    mintedNFT,
+    isPreparingProof,
+  };
 };
 
 export const useIsHoldingEventNftByAddress = (
