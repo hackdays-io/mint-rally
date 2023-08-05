@@ -1,8 +1,11 @@
-import { ethers, upgrades } from "hardhat";
+import { ethers, network, upgrades } from "hardhat";
 import { SecretPhraseVerifier } from "../../../typechain";
+import { generateProof } from "../../helper/secret_phrase";
 const { buildPoseidon } = require("circomlibjs");
 
 async function main() {
+  if (network.name !== "local") throw new Error("wrong network");
+
   let secretPhraseVerifier: SecretPhraseVerifier;
   const SecretPhraseVerifierFactory = await ethers.getContractFactory(
     "SecretPhraseVerifier"
@@ -11,25 +14,27 @@ async function main() {
   await secretPhraseVerifier.deployed();
 
   const poseidon = await buildPoseidon();
-  const secretPhrases: string[] = [];
-  const hashedSecretPhrases = secretPhrases.map((secretPhrase) => {
+  const secretPhrases: string[] = ["LGTM", "LetsHack"];
+  const proofCalldataPromise = secretPhrases.map(async (secretPhrase) => {
     const hexSecretPhrase = ethers.utils.keccak256(
       ethers.utils.toUtf8Bytes(secretPhrase)
     );
-    const poseidonHash = poseidon([hexSecretPhrase]);
-    return poseidon.F.toString(poseidonHash);
+    const poseidonHash = poseidon.F.toString(poseidon([hexSecretPhrase]));
+    return await generateProof(poseidonHash, hexSecretPhrase);
   });
+  const proofCalldata = await Promise.all(proofCalldataPromise);
+
   const MintNFTFactory = await ethers.getContractFactory("MintNFT");
   const deployedMintNFT: any = await upgrades.upgradeProxy(
-    "0xC3894D90dF7EFCAe8CF34e300CF60FF29Db9a868",
+    "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9",
     MintNFTFactory,
     {
       call: {
         fn: "initialize",
         args: [
-          "0x5B38Da6a701c568545dCfcB03FcB875f56beddC4",
+          "0x5FbDB2315678afecb367f032d93F642f64180aa3",
           secretPhraseVerifier.address,
-          hashedSecretPhrases,
+          proofCalldata.map((proof) => proof.publicInputCalldata[0]),
         ],
       },
     }
@@ -38,7 +43,7 @@ async function main() {
 
   const EventManagerFactory = await ethers.getContractFactory("EventManager");
   const deployedEventManager: any = await upgrades.upgradeProxy(
-    "0x4fe4F50B719572b3a5A33516da59eC43F51F4A45",
+    "0x5FC8d32690cc91D4c39d9d3abcBD16989F875707",
     EventManagerFactory
   );
   await deployedEventManager.deployed();

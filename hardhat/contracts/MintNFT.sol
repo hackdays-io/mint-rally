@@ -108,7 +108,6 @@ contract MintNFT is
         ISecretPhraseVerifier secretPhraseVerifier = ISecretPhraseVerifier(
             secretPhraseVerifierAddr
         );
-        //これでいいんだっけ？成功チェックはどこでやるんだっけ？
         secretPhraseVerifier.submitProof(_proof, _eventId);
 
         isHoldingEventNFT[

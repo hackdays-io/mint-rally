@@ -14,3 +14,5 @@ build
 *.ptau
 *.wtns
 *.zkey
+
+/tmp
