@@ -45,6 +45,7 @@ export default {
     "既にこのイベントのNFTは取得済みです。ご参加ありがとうございました！",
   ENTER_SECRET_PHRASE:
     "イベント主催者から聞いた「あいことば」を入力し、NFT取得ボタンを押してください。",
+  PREPARING_PROOF: "あいことばを暗号化しています、10秒ほどかかります🤫",
   ENTER_SECRET_PHRASE_METAMASK:
     "Metamaskが立ち上がるので、「承認」ボタンを押してください。",
   CLAIM_NFT: "NFT取得！",
