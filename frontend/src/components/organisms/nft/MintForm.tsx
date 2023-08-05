@@ -30,6 +30,8 @@ export const MintForm: FC<Props> = ({ event, address }) => {
     spread: 80,
   });
 
+  console.log(isLoading);
+
   useEffect(() => {
     if (status == "success" && mintedNFT) {
       confettiReward();

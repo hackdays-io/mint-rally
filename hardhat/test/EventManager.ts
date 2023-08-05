@@ -2,7 +2,8 @@ import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { expect } from "chai";
 import { BigNumber } from "ethers";
 import { ethers, upgrades } from "hardhat";
-import { EventManager, MintNFT } from "../typechain";
+import { EventManager, MintNFT, SecretPhraseVerifier } from "../typechain";
+import { generateProof } from "./helper/secret_phrase";
 
 // ToDo requiredParticipateCountに重複がある場合エラーになってしまう。
 const attributes = [
@@ -22,15 +23,25 @@ const attributes = [
 
 describe("EventManager", function () {
   let mintNFT: MintNFT;
+  let secretPhraseVerifier: SecretPhraseVerifier;
   let organizer: SignerWithAddress;
   let participant1: SignerWithAddress;
   let relayer: SignerWithAddress;
+
   before(async () => {
     [organizer, participant1, relayer] = await ethers.getSigners();
+    const SecretPhraseVerifierFactory = await ethers.getContractFactory(
+      "SecretPhraseVerifier"
+    );
+    secretPhraseVerifier = await SecretPhraseVerifierFactory.deploy();
     const MintNFTFactory = await ethers.getContractFactory("MintNFT");
     const deployedMintNFT: any = await upgrades.deployProxy(
       MintNFTFactory,
-      ["0xdCb93093424447bF4FE9Df869750950922F1E30B"],
+      [
+        "0xdCb93093424447bF4FE9Df869750950922F1E30B",
+        secretPhraseVerifier.address,
+        [],
+      ],
       {
         initializer: "initialize",
       }
@@ -41,6 +52,7 @@ describe("EventManager", function () {
 
   describe("CreateEventRecord", () => {
     let eventManager: EventManager;
+    let publicInputCalldata: any;
     before(async () => {
       const eventManagerContractFactory = await ethers.getContractFactory(
         "EventManager"
@@ -55,6 +67,10 @@ describe("EventManager", function () {
       eventManager = await deployedEventManagerContract.deployed();
       await eventManager.setMintNFTAddr(mintNFT.address);
       await mintNFT.setEventManagerAddr(eventManager.address);
+
+      const { publicInputCalldata: _publicInputCalldata } =
+        await generateProof();
+      publicInputCalldata = _publicInputCalldata;
     });
 
     it("Should create", async () => {
@@ -78,7 +94,7 @@ describe("EventManager", function () {
         "2022-07-3O",
         100,
         false,
-        "hackdays",
+        publicInputCalldata[0],
         attributes
       );
       await txn2.wait();
@@ -111,7 +127,7 @@ describe("EventManager", function () {
           "2022-08-01",
           100,
           false,
-          "hackdays",
+          publicInputCalldata[0],
           attributes
         );
         await txn3.wait();
@@ -135,7 +151,7 @@ describe("EventManager", function () {
         "2022-07-3O",
         10,
         true,
-        "hackdays",
+        publicInputCalldata[0],
         attributes,
         { value: ethers.utils.parseUnits(String(250000 * 10 * 1.33), "gwei") }
       );

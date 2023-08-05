@@ -132,7 +132,7 @@ contract EventManager is OwnableUpgradeable {
         string memory _date,
         uint256 _mintLimit,
         bool _useMtx,
-        string memory _secretPhrase,
+        bytes32 _secretPhrase,
         IMintNFT.NFTAttribute[] memory _eventNFTAttributes
     ) external payable onlyGroupOwner(_groupId) {
         require(
@@ -161,12 +161,11 @@ contract EventManager is OwnableUpgradeable {
             })
         );
 
-        bytes32 encryptedSecretPhrase = keccak256(bytes(_secretPhrase));
         IMintNFT _mintNFT = IMintNFT(mintNFTAddr);
         _mintNFT.setEventInfo(
             _newEventId,
             _mintLimit,
-            encryptedSecretPhrase,
+            _secretPhrase,
             _eventNFTAttributes
         );
 

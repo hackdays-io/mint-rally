@@ -14,6 +14,9 @@ import { Event } from "types/Event";
 import { ethers } from "ethers";
 import { reverse } from "lodash";
 import { EVENT_BLACK_LIST } from "src/constants/event";
+import { useGenerateProof, useHashPoseidon } from "./useSecretPhrase";
+import axios from "axios";
+import { keccak256, toUtf8Bytes } from "ethers/lib/utils";
 
 export const useEventManagerContract = () => {
   const {
@@ -115,15 +118,28 @@ export const useEventGroups = () => {
 
 export const useCreateEvent = (address: string) => {
   const { eventManagerContract } = useEventManagerContract();
+  const {
+    isLoading: isPreparingProof,
+    error: preparingProofError,
+    generateProof,
+  } = useGenerateProof();
   const provider = useSDK()?.getProvider();
 
   const {
     mutateAsync,
-    isLoading: isCreating,
-    error: createError,
+    isLoading,
+    error,
     status: createStatus,
   } = useContractWrite(eventManagerContract, "createEventRecord");
   const fromBlock = useCurrentBlock();
+
+  const isCreating = useMemo(() => {
+    return isLoading || isPreparingProof;
+  }, [isLoading, isPreparingProof]);
+
+  const createError = useMemo(() => {
+    return error || preparingProofError;
+  }, [error, preparingProofError]);
 
   const { data } = useContractEvents(eventManagerContract, "CreateEvent", {
     queryFilter: {
@@ -157,13 +173,16 @@ export const useCreateEvent = (address: string) => {
   const createEvent = useCallback(
     async (params: Event.CreateEventRecordParams) => {
       if (!params || !provider) return;
+
       try {
+        const proof = await generateProof(params.secretPhrase);
+
         let value!: ethers.BigNumber;
         if (params.useMtx) {
           const gasPrice = (await provider.getGasPrice())?.toNumber();
           value = ethers.utils.parseEther(
             `${
-              gasPrice * params.mintLimit * 250000 * 2.1 * 0.000000000000000001
+              gasPrice * params.mintLimit * 560220 * 2.1 * 0.000000000000000001
             }`
           );
         }
@@ -178,7 +197,7 @@ export const useCreateEvent = (address: string) => {
             }`,
             params.mintLimit,
             params.useMtx,
-            params.secretPhrase,
+            proof?.publicInputCalldata[0],
             params.attributes,
           ],
           overrides: {

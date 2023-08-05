@@ -1,7 +1,12 @@
 import { expect } from "chai";
 import { ethers, upgrades } from "hardhat";
-import { MintNFT, EventManager } from "../typechain";
+import { MintNFT, EventManager, SecretPhraseVerifier } from "../typechain";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
+import {
+  generateProof,
+  hashPoseidon,
+  wrongProofCalldata,
+} from "./helper/secret_phrase";
 
 // ToDo requiredParticipateCountに重複がある場合エラーになってしまう。
 const attributes = [
@@ -22,6 +27,7 @@ const attributes = [
 describe("MintNFT", function () {
   let mintNFT: MintNFT;
   let eventManager: EventManager;
+  let secretPhraseVerifier: SecretPhraseVerifier;
 
   let createdGroupId: number;
   let createdEventIds: number[] = [];
@@ -34,11 +40,24 @@ describe("MintNFT", function () {
   before(async () => {
     [organizer, participant1, participant2, relayer] =
       await ethers.getSigners();
+
+    // generate proof
+    const { publicInputCalldata } = await generateProof();
+
+    // Deploy secret phrase verifier
+    const SecretPhraseVerifierFactory = await ethers.getContractFactory(
+      "SecretPhraseVerifier"
+    );
+    secretPhraseVerifier = await SecretPhraseVerifierFactory.deploy();
     //Deploy mintNFT and eventManager
     const MintNFTFactory = await ethers.getContractFactory("MintNFT");
     const deployedMintNFT: any = await upgrades.deployProxy(
       MintNFTFactory,
-      ["0xdCb93093424447bF4FE9Df869750950922F1E30B"],
+      [
+        "0xdCb93093424447bF4FE9Df869750950922F1E30B",
+        secretPhraseVerifier.address,
+        [],
+      ],
       {
         initializer: "initialize",
       }
@@ -63,6 +82,7 @@ describe("MintNFT", function () {
     await createGroupTxn.wait();
     const groupsList = await eventManager.getGroups();
     createdGroupId = groupsList[0].groupId.toNumber();
+
     const createEventTxn = await eventManager.createEventRecord(
       createdGroupId,
       "event1",
@@ -70,7 +90,7 @@ describe("MintNFT", function () {
       "2022-07-3O",
       10,
       false,
-      "hackdays",
+      publicInputCalldata[0],
       attributes
     );
     await createEventTxn.wait();
@@ -80,9 +100,10 @@ describe("MintNFT", function () {
 
   describe("mint NFT", () => {
     it("success to mint", async () => {
+      const { proofCalldata } = await generateProof();
       const mintNftTxn = await mintNFT
         .connect(organizer)
-        .mintParticipateNFT(createdGroupId, createdEventIds[0], "hackdays");
+        .mintParticipateNFT(createdGroupId, createdEventIds[0], proofCalldata);
       await mintNftTxn.wait();
 
       const nftAttribute = await mintNFT.tokenURI(0);
@@ -90,13 +111,14 @@ describe("MintNFT", function () {
     });
 
     it("fail to mint when event MintLocked", async () => {
+      const { proofCalldata } = await generateProof();
       await mintNFT
         .connect(organizer)
         .changeMintLocked(createdEventIds[0], true);
       await expect(
         mintNFT
           .connect(participant1)
-          .mintParticipateNFT(createdGroupId, createdEventIds[0], "hackdays")
+          .mintParticipateNFT(createdGroupId, createdEventIds[0], proofCalldata)
       ).to.be.revertedWith("mint is locked");
     });
   });
@@ -114,6 +136,7 @@ describe("MintNFT", function () {
 describe("nft revolution", () => {
   let mintNFT: MintNFT;
   let eventManager: EventManager;
+  let secretPhraseVerifier: SecretPhraseVerifier;
 
   let createdGroupId: number;
   let createdEventIds: number[] = [];
@@ -123,14 +146,29 @@ describe("nft revolution", () => {
   let participant2: SignerWithAddress;
   let relayer: SignerWithAddress;
 
+  let usedProofCalldata!: any;
+
   before(async () => {
     [organizer, participant1, participant2, relayer] =
       await ethers.getSigners();
+
+    // generate proof
+    const { publicInputCalldata } = await generateProof();
+
+    // Deploy secret phrase verifier
+    const SecretPhraseVerifierFactory = await ethers.getContractFactory(
+      "SecretPhraseVerifier"
+    );
+    secretPhraseVerifier = await SecretPhraseVerifierFactory.deploy();
     //Deploy mintNFT and eventManager
     const MintNFTFactory = await ethers.getContractFactory("MintNFT");
     const deployedMintNFT: any = await upgrades.deployProxy(
       MintNFTFactory,
-      ["0xdCb93093424447bF4FE9Df869750950922F1E30B"],
+      [
+        "0xdCb93093424447bF4FE9Df869750950922F1E30B",
+        secretPhraseVerifier.address,
+        [],
+      ],
       {
         initializer: "initialize",
       }
@@ -162,7 +200,7 @@ describe("nft revolution", () => {
       "2022-07-3O",
       10,
       false,
-      "hackdays",
+      publicInputCalldata[0],
       attributes
     );
     await createEventTxn1.wait();
@@ -174,25 +212,38 @@ describe("nft revolution", () => {
       "2022-07-3O",
       1,
       false,
-      "hackdays",
+      publicInputCalldata[0],
       attributes
     );
     await createEventTxn2.wait();
 
     const eventsList = await eventManager.getEventRecords();
     createdEventIds = eventsList.map((event) => event.eventRecordId.toNumber());
-  });
 
-  before(async () => {
+    const { proofCalldata: proofCalldata1 } = await generateProof();
     const mintTxn1 = await mintNFT
       .connect(organizer)
-      .mintParticipateNFT(createdGroupId, createdEventIds[0], "hackdays");
+      .mintParticipateNFT(createdGroupId, createdEventIds[0], proofCalldata1);
     await mintTxn1.wait();
+    usedProofCalldata = proofCalldata1;
 
+    const { proofCalldata: proofCalldata2 } = await generateProof();
     const mintTxn2 = await mintNFT
       .connect(organizer)
-      .mintParticipateNFT(createdGroupId, createdEventIds[1], "hackdays");
+      .mintParticipateNFT(createdGroupId, createdEventIds[1], proofCalldata2);
     await mintTxn2.wait();
+  });
+
+  it("doesn't mint NFT if proof is already used", async () => {
+    await expect(
+      mintNFT
+        .connect(organizer)
+        .mintParticipateNFT(
+          createdGroupId,
+          createdEventIds[0],
+          usedProofCalldata
+        )
+    ).to.be.revertedWith("invalid secret phrase");
   });
 
   it("mint different NFT by participate count", async () => {
@@ -209,18 +260,20 @@ describe("nft revolution", () => {
         createdEventIds[0]
       )
     ).equal(true);
+    const { proofCalldata } = await generateProof();
     await expect(
       mintNFT
         .connect(organizer)
-        .mintParticipateNFT(createdGroupId, createdEventIds[0], "hackdays")
+        .mintParticipateNFT(createdGroupId, createdEventIds[0], proofCalldata)
     ).to.be.revertedWith("already minted");
   });
 
   it("doesn't mint NFT if there are no remaining count", async () => {
+    const { proofCalldata } = await generateProof();
     await expect(
       mintNFT
         .connect(participant1)
-        .mintParticipateNFT(createdGroupId, createdEventIds[1], "hackdays")
+        .mintParticipateNFT(createdGroupId, createdEventIds[1], proofCalldata)
     ).to.be.revertedWith("remaining count is zero");
   });
 
@@ -231,7 +284,7 @@ describe("nft revolution", () => {
         .mintParticipateNFT(
           createdGroupId,
           createdEventIds[1],
-          "hackdays2secrettest"
+          wrongProofCalldata
         )
     ).to.be.revertedWith("invalid secret phrase");
   });
@@ -240,6 +293,7 @@ describe("nft revolution", () => {
 describe("mint locked flag", () => {
   let mintNFT: MintNFT;
   let eventManager: EventManager;
+  let secretPhraseVerifier: SecretPhraseVerifier;
 
   let createdGroupId: number;
   let createdEventIds: number[] = [];
@@ -252,11 +306,20 @@ describe("mint locked flag", () => {
   before(async () => {
     [organizer, participant1, participant2, relayer] =
       await ethers.getSigners();
+    //Deploy secretPhraseVerifier
+    const SecretPhraseVerifierFactory = await ethers.getContractFactory(
+      "SecretPhraseVerifier"
+    );
+    secretPhraseVerifier = await SecretPhraseVerifierFactory.deploy();
     //Deploy mintNFT and eventManager
     const MintNFTFactory = await ethers.getContractFactory("MintNFT");
     const deployedMintNFT: any = await upgrades.deployProxy(
       MintNFTFactory,
-      ["0xdCb93093424447bF4FE9Df869750950922F1E30B"],
+      [
+        "0xdCb93093424447bF4FE9Df869750950922F1E30B",
+        secretPhraseVerifier.address,
+        [],
+      ],
       {
         initializer: "initialize",
       }
@@ -292,7 +355,7 @@ describe("mint locked flag", () => {
         "2022-07-3O",
         10,
         false,
-        "hackdays",
+        "0x10c7da1d87ac3a86d34053a76768cc39c581d469b68863a9fba17bcdaa048f98",
         attributes
       );
     await createEventTxn.wait();
