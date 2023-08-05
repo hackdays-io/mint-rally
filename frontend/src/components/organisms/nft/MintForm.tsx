@@ -1,6 +1,6 @@
 import { Box, Button, Flex, Input, Text, VStack } from "@chakra-ui/react";
 import Link from "next/link";
-import { FC, useEffect, useState } from "react";
+import { FC, useCallback, useEffect, useState } from "react";
 import { useLocale } from "src/hooks/useLocale";
 import { useMintParticipateNFT } from "src/hooks/useMintNFT";
 import { Event } from "types/Event";
@@ -30,8 +30,6 @@ export const MintForm: FC<Props> = ({ event, address }) => {
     spread: 80,
   });
 
-  console.log(isLoading);
-
   useEffect(() => {
     if (status == "success" && mintedNFT) {
       confettiReward();
@@ -41,14 +39,14 @@ export const MintForm: FC<Props> = ({ event, address }) => {
 
   const [enteredSecretPhrase, setEnteredSecretPhrase] = useState("");
 
-  const claimMint = async () => {
+  const claimMint = useCallback(async () => {
     if (!event) return;
     if (event.useMtx) {
       await mintMTX(enteredSecretPhrase);
     } else {
       await mint(enteredSecretPhrase);
     }
-  };
+  }, [event, enteredSecretPhrase, mint, mintMTX]);
 
   return (
     <>

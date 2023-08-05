@@ -320,7 +320,7 @@ export const useMintParticipateNFT = (
         const data = mintNFTContract?.encoder.encode("mintParticipateNFT", [
           event?.groupId.toNumber(),
           event?.eventRecordId.toNumber(),
-          JSON.stringify(proof?.proofCalldata),
+          proof?.proofCalldata,
         ]);
         const request = await signMetaTxRequest(sdk.wallet, forwarderContract, {
           from,
