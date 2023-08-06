@@ -10,3 +10,9 @@ artifacts
 
 .openzeppelin/unknown-*.json
 build
+
+*.ptau
+*.wtns
+*.zkey
+
+/tmp
