@@ -18,8 +18,15 @@ export const MintForm: FC<Props> = ({ event, address }) => {
   const { t } = useLocale();
   const walletMetadata = useWallet()?.getMeta();
 
-  const { mint, mintMTX, isLoading, error, mintedNFT, status } =
-    useMintParticipateNFT(event, address, event.useMtx);
+  const {
+    mint,
+    mintMTX,
+    isLoading,
+    error,
+    mintedNFT,
+    status,
+    isPreparingProof,
+  } = useMintParticipateNFT(event, address, event.useMtx);
 
   const { reward: confettiReward } = useReward("confettiReward", "confetti", {
     elementCount: 100,
@@ -94,6 +101,9 @@ export const MintForm: FC<Props> = ({ event, address }) => {
       {error && <AlertMessage>{error.reason}</AlertMessage>}
       {status == "success" && !mintedNFT && (
         <AlertMessage status="success" mt={3} title={t.YOU_HAVE_CLAIMED_NFT} />
+      )}
+      {isPreparingProof && (
+        <AlertMessage status="success" mt={3} title={t.PREPARING_PROOF} />
       )}
       {mintedNFT && (
         <>

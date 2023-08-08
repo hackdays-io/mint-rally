@@ -50,6 +50,7 @@ export default {
   USE_MTX: "(without gas fee)",
   YOU_HAVE_CLAIMED_NFT:
     "You have claimed NFT! Please wait for mint your NFT... It will take tens of seconds.",
+  PREPARING_PROOF: "Encrypting a secret phrase, takes about 10 seconds🤫",
   YOU_HAVE_GOT_NFT: "You got NFT!!",
   INSTALL_METAMASK_TITLE: "Please install MetaMask",
   INPUT_SECRET_PHRASE: "Input Secret Phrase",
