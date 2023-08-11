@@ -181,9 +181,7 @@ export const useCreateEvent = (address: string) => {
         if (params.useMtx) {
           const gasPrice = (await provider.getGasPrice())?.toNumber();
           value = ethers.utils.parseEther(
-            `${
-              gasPrice * params.mintLimit * 560220 * 2.1 * 0.000000000000000001
-            }`
+            `${gasPrice * params.mintLimit * 660000 * 1 * 0.000000000000000001}`
           );
         }
 
