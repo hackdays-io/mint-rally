@@ -22,9 +22,14 @@ import { useLocale } from "../../hooks/useLocale";
 import Link from "next/link";
 import NFTAttributesForm from "./NFTAttributesForm";
 import { useIpfs } from "src/hooks/useIpfs";
-import { useCreateEvent, useOwnEventGroups } from "src/hooks/useEvent";
+import {
+  useCalcMtxGasFee,
+  useCreateEvent,
+  useOwnEventGroups,
+} from "src/hooks/useEvent";
 import { Event } from "types/Event";
 import { NFT } from "types/NFT";
+import { formatEther } from "ethers/lib/utils";
 
 type Props = {
   address: string;
@@ -77,6 +82,8 @@ const CreateEventForm: FC<Props> = ({ address }) => {
   });
 
   const { remove, append } = useFieldArray({ control, name: "nfts" });
+
+  const { gasFee } = useCalcMtxGasFee(watch("mintLimit"));
 
   // state for loading event groups
   const { groups, isLoading: isLoadingEventGroups } = useOwnEventGroups();
@@ -347,6 +354,16 @@ const CreateEventForm: FC<Props> = ({ address }) => {
                     </>
                   )}
                 />
+                {watch("useMtx") === "true" && (
+                  <Text mt={2} fontSize="sm">
+                    {t.EVENT_ESTIMATED_GAS_MTX}
+                    <br />
+                    <Box as="span" fontWeight="bold" fontSize="md" pr={1}>
+                      {formatEther(gasFee || 0)}
+                    </Box>
+                    MATIC
+                  </Text>
+                )}
               </FormControl>
 
               <FormControl mb={5}>
