@@ -36,6 +36,7 @@ export default {
   EVENT_USE_MTX: "Taking on gas fee for participants",
   EVENT_USE_MTX_TRUE: "Yes",
   EVENT_USE_MTX_FALSE: "No",
+  EVENT_ESTIMATED_GAS_MTX: "Estimated deposit amount required to take on",
   EVENT_SECRETPHRASE: "SecretPhrase to mint",
   EVENT_SECRETPHRASE_DESC:
     "Please do not forget this phrase. you can't get this phrase after submitting",
