@@ -11,7 +11,7 @@ import eventManagerABI from "../contracts/EventManager.json";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useCurrentBlock } from "./useBlockChain";
 import { Event } from "types/Event";
-import { ethers } from "ethers";
+import { BigNumber, ethers } from "ethers";
 import { reverse } from "lodash";
 import { EVENT_BLACK_LIST } from "src/constants/event";
 import { useGenerateProof, useHashPoseidon } from "./useSecretPhrase";
@@ -124,6 +124,7 @@ export const useCreateEvent = (address: string) => {
     generateProof,
   } = useGenerateProof();
   const provider = useSDK()?.getProvider();
+  const { getGasFee } = useCalcMtxGasFee();
 
   const {
     mutateAsync,
@@ -179,12 +180,7 @@ export const useCreateEvent = (address: string) => {
 
         let value!: ethers.BigNumber;
         if (params.useMtx) {
-          const gasPrice = (await provider.getGasPrice())?.toNumber();
-          value = ethers.utils.parseEther(
-            `${
-              gasPrice * params.mintLimit * 560220 * 2.1 * 0.000000000000000001
-            }`
-          );
+          value = (await getGasFee(params.mintLimit)) || BigNumber.from(0);
         }
 
         await mutateAsync({
@@ -206,7 +202,7 @@ export const useCreateEvent = (address: string) => {
         });
       } catch (_) {}
     },
-    [mutateAsync, provider]
+    [mutateAsync, provider, getGasFee]
   );
 
   return {
@@ -245,4 +241,38 @@ export const useEventById = (id: number) => {
   } = useContractRead(eventManagerContract, "getEventById", [id]);
 
   return { event, isLoading, error };
+};
+
+export const useCalcMtxGasFee = (mintLimit?: number) => {
+  const provider = useSDK()?.getProvider();
+  const [gasFee, setGasFee] = useState<BigNumber | null>(null);
+
+  useEffect(() => {
+    const fetch = async () => {
+      if (!provider || !mintLimit) return;
+
+      const gasPrice = (await provider.getGasPrice())?.toNumber();
+      const value = ethers.utils.parseEther(
+        `${gasPrice * mintLimit * 660000 * 1 * 0.000000000000000001}`
+      );
+      setGasFee(value);
+    };
+
+    fetch();
+  }, [provider, mintLimit]);
+
+  const getGasFee = useCallback(
+    async (_mintLimit: number) => {
+      if (!provider) return;
+
+      const gasPrice = (await provider.getGasPrice())?.toNumber();
+      const value = ethers.utils.parseEther(
+        `${gasPrice * _mintLimit * 660000 * 1 * 0.000000000000000001}`
+      );
+      return value;
+    },
+    [provider]
+  );
+
+  return { gasFee, getGasFee };
 };
