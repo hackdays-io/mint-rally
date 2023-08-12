@@ -1,10 +1,24 @@
-import { Box, Container, Heading, Text } from "@chakra-ui/react";
+import {
+  Box,
+  Container,
+  Flex,
+  Heading,
+  Text,
+  Image,
+  Link,
+  Table,
+  Tbody,
+  Tr,
+  Th,
+  Td,
+} from "@chakra-ui/react";
 import { BigNumber } from "ethers";
 import { GetServerSideProps } from "next";
 import { NextSeo } from "next-seo";
-import { useRouter } from "next/router";
 import { FC } from "react";
+import { ShareButtons } from "src/components/atoms/nft/ShareButtons";
 import {
+  getEventGroups,
   getNFTDataFromTokenID,
   getOwnerOfTokenId,
 } from "src/libs/contractMethods";
@@ -15,6 +29,7 @@ type Props = {
   address?: string;
   tokenid?: string;
   nft?: NFT.Metadata | null;
+  groupName?: string;
 };
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const address = context.query.address;
@@ -31,6 +46,11 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       const owner = await getOwnerOfTokenId(BigNumber.from(props.tokenid));
       if (owner) {
         props.address = owner;
+      }
+      const groups = await getEventGroups();
+      if (groups) {
+        const gid = BigNumber.from(props.nft?.traits.EventGroupId);
+        props.groupName = groups.find((group) => gid.eq(group.groupId))?.name;
       }
     } catch (e) {
       console.log(e);
@@ -69,8 +89,59 @@ const Entity: FC<Props> = (props: Props) => {
         <Heading as="h1" size="xl" color="mint.primary" fontWeight={700}>
           NFT
         </Heading>
-        <Text fontSize="lg">Token ID: {props.tokenid}</Text>
-        <Text fontSize="lg">Token Owner: {props.address}</Text>
+        {props.nft && (
+          <>
+            <Flex
+              justifyContent="center"
+              alignItems="center"
+              flexDirection="column"
+              p={4}
+            >
+              <Table maxWidth="100%" variant="simple">
+                <Tbody>
+                  <Tr>
+                    <Th>Owner: </Th>
+                    <Td overflowWrap="anywhere" whiteSpace="unset">
+                      {props.address}
+                    </Td>
+                  </Tr>
+                  <Tr>
+                    <Th>Event: </Th>
+                    <Td overflowWrap="anywhere">
+                      <Link
+                        href={`/event-groups/${props.nft.traits.EventGroupId}`}
+                      >
+                        {props.groupName} (
+                        {props.nft.traits.RequiredParticipateCount + 1} 回目)
+                      </Link>
+                    </Td>
+                  </Tr>
+                  <Tr>
+                    <Th>Name:</Th>
+                    <Td overflowWrap="anywhere"> {props.nft.name}</Td>
+                  </Tr>
+                  <Tr>
+                    <Th>Description:</Th>
+                    <Td overflowWrap="anywhere">
+                      {" "}
+                      {props.nft.description}aabbbbbbbababafgaertaeravasereba
+                    </Td>
+                  </Tr>
+                </Tbody>
+              </Table>
+              <Box>
+                <Image src={ipfs2http(props.nft.image)} alt={props.nft.name} />
+              </Box>
+              <Box width={"95%"} p={4}>
+                <ShareButtons
+                  tokenId={Number(props.tokenid)}
+                  address={props.address!}
+                  twitter={true}
+                />
+              </Box>
+            </Flex>
+          </>
+        )}
       </Box>
     </Container>
   );
