@@ -129,7 +129,11 @@ const Entity: FC<Props> = (props: Props) => {
                 </Tbody>
               </Table>
               <Box>
-                <Image src={ipfs2http(props.nft.image)} alt={props.nft.name} />
+                <Image
+                  p={4}
+                  src={ipfs2http(props.nft.image)}
+                  alt={props.nft.name}
+                />
               </Box>
               <Box width={"95%"} p={4}>
                 <ShareButtons
