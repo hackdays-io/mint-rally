@@ -22,17 +22,24 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     address: String(address),
   };
   if (context.query.tokenid) {
-    props.tokenid = String(context.query.tokenid);
-    const data = await getNFTDataFromTokenID(BigNumber.from(props.tokenid));
-    if (data) {
-      props.nft = data;
+    try {
+      props.tokenid = String(context.query.tokenid);
+      const data = await getNFTDataFromTokenID(BigNumber.from(props.tokenid));
+      if (data) {
+        props.nft = data;
+      }
+      const owner = await getOwnerOfTokenId(BigNumber.from(props.tokenid));
+      if (owner) {
+        props.address = owner;
+      }
+    } catch (e) {
+      console.log(e);
+      return {
+        notFound: true,
+      };
     }
-    const owner = await getOwnerOfTokenId(BigNumber.from(props.tokenid));
-    if (owner) {
-      props.address = owner;
-    }
+    console.log(props);
   }
-  console.log(props);
   return {
     props: props,
   };

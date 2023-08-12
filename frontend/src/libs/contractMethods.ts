@@ -20,6 +20,7 @@ export const getNFTDataFromTokenID = async (tokenId: BigNumber) => {
   if (!mintNFTManager)
     throw new Error("Cannot find mintNFTManager contract");
   const tokenURI = await mintNFTManager.tokenURI(tokenId);
+  if (tokenURI === "") throw new Error("Cannot find tokenURI");
   const path = ipfs2http(tokenURI);
   const { data } = await axios.get(path);
   return data as NFT.Metadata;
