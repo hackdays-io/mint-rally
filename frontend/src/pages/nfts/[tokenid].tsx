@@ -111,8 +111,7 @@ const Entity: FC<Props> = (props: Props) => {
                       <Link
                         href={`/event-groups/${props.nft.traits.EventGroupId}`}
                       >
-                        {props.groupName} (
-                        {props.nft.traits.RequiredParticipateCount + 1} 回目)
+                        {props.groupName}
                       </Link>
                     </Td>
                   </Tr>
