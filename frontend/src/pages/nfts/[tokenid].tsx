@@ -83,8 +83,8 @@ const Entity: FC<Props> = (props: Props) => {
           }}
         ></NextSeo>
       )}
-      <Box mt={10}>
-        <Heading as="h1" size="xl" color="mint.primary" fontWeight={700}>
+      <Box mt={{ base: 5, md: 10 }}>
+        <Heading as="h1" size="xl" color="mint.primary" fontWeight={700} mb={5}>
           NFT
         </Heading>
         {props.nft && (
@@ -134,10 +134,7 @@ const Entity: FC<Props> = (props: Props) => {
                   </Tr>
                   <Tr>
                     <Th>Description:</Th>
-                    <Td overflowWrap="anywhere">
-                      {" "}
-                      {props.nft.description}aabbbbbbbababafgaertaeravasereba
-                    </Td>
+                    <Td overflowWrap="anywhere">{props.nft.description}</Td>
                   </Tr>
                 </Tbody>
               </Table>
