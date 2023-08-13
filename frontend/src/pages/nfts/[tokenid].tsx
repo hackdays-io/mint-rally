@@ -3,8 +3,6 @@ import {
   Container,
   Flex,
   Heading,
-  Text,
-  Image,
   Link,
   Table,
   Tbody,
@@ -15,6 +13,7 @@ import {
 import { BigNumber } from "ethers";
 import { GetServerSideProps } from "next";
 import { NextSeo } from "next-seo";
+import Image from "next/image";
 import { FC } from "react";
 import { ShareButtons } from "src/components/atoms/nft/ShareButtons";
 import {
@@ -58,7 +57,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         notFound: true,
       };
     }
-    console.log(props);
   }
   return {
     props: props,
@@ -91,16 +89,31 @@ const Entity: FC<Props> = (props: Props) => {
         </Heading>
         {props.nft && (
           <>
-            <Flex
-              justifyContent="center"
-              alignItems="center"
-              flexDirection="column"
-              p={4}
-            >
+            <Flex justifyContent={{ md: "center" }} flexDirection="column">
+              <Box
+                width={{ md: 350 }}
+                textAlign={{ base: "center", md: "left" }}
+              >
+                <Image
+                  width={500}
+                  height={500}
+                  src={ipfs2http(props.nft.image)}
+                  alt={props.nft.name}
+                />
+              </Box>
+
+              <Flex justifyContent="center" pb={4} width={{ md: 350 }}>
+                <ShareButtons
+                  tokenId={Number(props.tokenid)}
+                  address={props.address!}
+                  twitter={true}
+                />
+              </Flex>
+
               <Table maxWidth="100%" variant="simple">
                 <Tbody>
                   <Tr>
-                    <Th>Owner: </Th>
+                    <Th width={100}>Owner: </Th>
                     <Td overflowWrap="anywhere" whiteSpace="unset">
                       {props.address}
                     </Td>
@@ -128,20 +141,6 @@ const Entity: FC<Props> = (props: Props) => {
                   </Tr>
                 </Tbody>
               </Table>
-              <Box>
-                <Image
-                  p={4}
-                  src={ipfs2http(props.nft.image)}
-                  alt={props.nft.name}
-                />
-              </Box>
-              <Box width={"95%"} p={4}>
-                <ShareButtons
-                  tokenId={Number(props.tokenid)}
-                  address={props.address!}
-                  twitter={true}
-                />
-              </Box>
             </Flex>
           </>
         )}
