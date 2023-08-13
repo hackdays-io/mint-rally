@@ -18,7 +18,7 @@ export const ShareButtons: FC<Props> = ({
   const copyClipBoard = () => {
     const copyText: any = document.getElementById("shareURL");
     copyText?.select();
-    navigator.clipboard.writeText(copyText.value);
+    navigator.clipboard.writeText(copyText.defaultValue);
   };
 
   return (
@@ -28,7 +28,7 @@ export const ShareButtons: FC<Props> = ({
       </Text>
       {twitter && (
         <TwitterShareButton
-          url={`https://mintrally.xyz/users/${address}?tokenid=${tokenId}`}
+          url={`https://mintrally.xyz/nfts/${tokenId}`}
           title={`Check out my NFT on Mintrally!`}
           hashtags={["MintRally"]}
         >
@@ -51,7 +51,7 @@ export const ShareButtons: FC<Props> = ({
         hidden={true}
         rows={2}
         p={1}
-        value={`https://mintrally.xyz/users/${address}?tokenid=${tokenId}`}
+        defaultValue={`https://mintrally.xyz/nfts/${tokenId}`}
       ></Textarea>
     </Flex>
   );

@@ -10,6 +10,7 @@ import {
 const Entity: FC<{ address: string }> = ({ address }) => {
   const { nfts, isLoading } = useGetOwnedNFTByAddress(address);
   const groupedNFTs = useSortNFTsByGroup(nfts);
+  // if groupedNFT has tokenid, get the nft
 
   return (
     <Container maxW="1000">

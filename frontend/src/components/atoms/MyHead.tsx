@@ -12,6 +12,9 @@ const MyHead: NextPage = () => {
       <DefaultSeo
         defaultTitle={siteName}
         description={description}
+        twitter={{
+          cardType: "summary",
+        }}
       ></DefaultSeo>
       <Head>
         <meta charSet="utf-8" />
