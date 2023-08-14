@@ -108,10 +108,19 @@ export const useOwnEventGroups = () => {
 
 export const useEventGroups = () => {
   const { eventManagerContract } = useEventManagerContract();
-  const { isLoading, data: groups } = useContractRead(
+  const { isLoading, data: _groups } = useContractRead(
     eventManagerContract,
     "getGroups"
   );
+
+  const groups = useMemo(() => {
+    return _groups?.filter((group: any) => {
+      const blackList = process.env.EVENT_GROUP_BLACK_LIST
+        ? JSON.parse(`[${process.env.EVENT_GROUP_BLACK_LIST}]`)
+        : [];
+      return blackList.includes(group.id.toNumber());
+    });
+  }, [_groups]);
 
   return { groups, isLoading };
 };
