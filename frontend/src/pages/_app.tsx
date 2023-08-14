@@ -15,6 +15,9 @@ import { GoogleAnalytics } from "nextjs-google-analytics";
 import { Localhost, Mumbai, Polygon } from "@thirdweb-dev/chains";
 import { useLocale } from "src/hooks/useLocale";
 import { useMemo } from "react";
+import NProgress from "nprogress";
+import "nprogress/nprogress.css";
+import { Router } from "next/router";
 
 config.autoAddCss = false;
 
@@ -38,8 +41,11 @@ const magicLinkConfig = magicLink({
 magicLinkConfig.meta.name = "メールアドレス";
 
 function MyApp({ Component, pageProps }: AppProps) {
-  const { t } = useLocale();
+  Router.events.on("routeChangeStart", () => NProgress.start());
+  Router.events.on("routeChangeComplete", () => NProgress.done());
+  Router.events.on("routeChangeError", () => NProgress.done());
 
+  const { t } = useLocale();
   const magicLinkConfig = useMemo(() => {
     const m_config = magicLink({
       apiKey: process.env.NEXT_PUBLIC_MAGIC_LINK_KEY!,
