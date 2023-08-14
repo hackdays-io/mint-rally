@@ -1,11 +1,4 @@
-import {
-  Container,
-  Heading,
-  SimpleGrid,
-  Spinner,
-  VStack,
-  Text,
-} from "@chakra-ui/react";
+import { Container, Heading, Spinner, VStack, Text } from "@chakra-ui/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useMemo } from "react";
