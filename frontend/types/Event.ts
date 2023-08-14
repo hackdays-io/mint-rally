@@ -4,6 +4,7 @@ export namespace Event {
   export interface EventGroup {
     groupId: BigNumber;
     name: string;
+    ownerAddress: string;
   }
   export interface EventRecord {
     eventRecordId: BigNumber;

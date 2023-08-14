@@ -4,6 +4,7 @@ import {
   SimpleGrid,
   Spinner,
   VStack,
+  Text,
 } from "@chakra-ui/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -38,6 +39,9 @@ const EventGroup = () => {
                   {findgroup.name}
                   {t.OWN_EVENTS}
                 </Heading>
+                <Text mb={6}>
+                  {t.ORGANIZER}: {findgroup.ownerAddress}
+                </Text>
                 {eventLoading ? (
                   <Spinner />
                 ) : (
