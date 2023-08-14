@@ -34,6 +34,7 @@
     "next-seo": "^5.5.0",
     "next-share": "^0.21.0",
     "nextjs-google-analytics": "^2.1.0",
+    "nprogress": "^0.2.0",
     "ordinal": "^1.0.3",
     "react": "18.2.0",
     "react-dom": "18.2.0",
@@ -48,6 +49,7 @@
   },
   "devDependencies": {
     "@types/node": "18.0.0",
+    "@types/nprogress": "^0.2.0",
     "@types/react": "18.0.14",
     "@types/react-dom": "18.0.5",
     "dotenv": "^16.0.1",
