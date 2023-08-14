@@ -18,6 +18,17 @@ import { useMemo } from "react";
 import NProgress from "nprogress";
 import "nprogress/nprogress.css";
 import { Router } from "next/router";
+import { createConfig, configureChains, mainnet, WagmiConfig } from "wagmi";
+import { publicProvider } from "wagmi/providers/public";
+const { chains, publicClient, webSocketPublicClient } = configureChains(
+  [mainnet],
+  [publicProvider()]
+);
+
+const wagmiConfig = createConfig({
+  publicClient,
+  webSocketPublicClient,
+});
 
 config.autoAddCss = false;
 
@@ -62,16 +73,18 @@ function MyApp({ Component, pageProps }: AppProps) {
   return (
     <>
       <GoogleAnalytics trackPageViews />
-      <ThirdwebProvider
-        activeChain={activeChain}
-        supportedWallets={[metamaskWallet(), safeWallet(), magicLinkConfig]}
-      >
-        <ChakraProvider theme={chakraTheme}>
-          <Layout>
-            <Component {...pageProps} />
-          </Layout>
-        </ChakraProvider>
-      </ThirdwebProvider>
+      <WagmiConfig config={wagmiConfig}>
+        <ThirdwebProvider
+          activeChain={activeChain}
+          supportedWallets={[metamaskWallet(), safeWallet(), magicLinkConfig]}
+        >
+          <ChakraProvider theme={chakraTheme}>
+            <Layout>
+              <Component {...pageProps} />
+            </Layout>
+          </ChakraProvider>
+        </ThirdwebProvider>
+      </WagmiConfig>
     </>
   );
 }

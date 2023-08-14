@@ -6,6 +6,7 @@ import EventCard from "../../components/atoms/events/EventCard";
 import { useLocale } from "../../hooks/useLocale";
 import { useEventGroups, useEvents } from "src/hooks/useEvent";
 import { Event } from "types/Event";
+import ENSName from "src/components/atoms/web3/ENSName";
 
 const EventGroup = () => {
   const router = useRouter();
@@ -33,7 +34,7 @@ const EventGroup = () => {
                   {t.OWN_EVENTS}
                 </Heading>
                 <Text mb={6}>
-                  {t.ORGANIZER}: {findgroup.ownerAddress}
+                  {t.ORGANIZER}: <ENSName address={findgroup.ownerAddress} />
                 </Text>
                 {eventLoading ? (
                   <Spinner />
