@@ -18,13 +18,18 @@ import { useMemo } from "react";
 import NProgress from "nprogress";
 import "nprogress/nprogress.css";
 import { Router } from "next/router";
-import { createConfig, configureChains, mainnet, WagmiConfig } from "wagmi";
+import { createConfig, configureChains, WagmiConfig } from "wagmi";
 import { publicProvider } from "wagmi/providers/public";
+import { alchemyProvider } from "wagmi/providers/alchemy";
+import { mainnet, polygon, polygonMumbai } from "wagmi/chains";
+// Create Wagmi config. This is used for NProgress.
 const { chains, publicClient, webSocketPublicClient } = configureChains(
-  [mainnet],
-  [publicProvider()]
+  [mainnet, polygon, polygonMumbai],
+  [
+    alchemyProvider({ apiKey: process.env.NEXT_PUBLIC_ALCHEMY_KEY! }),
+    publicProvider(),
+  ]
 );
-
 const wagmiConfig = createConfig({
   publicClient,
   webSocketPublicClient,
@@ -52,6 +57,7 @@ const magicLinkConfig = magicLink({
 magicLinkConfig.meta.name = "メールアドレス";
 
 function MyApp({ Component, pageProps }: AppProps) {
+  // Enable NProgress
   Router.events.on("routeChangeStart", () => NProgress.start());
   Router.events.on("routeChangeComplete", () => NProgress.done());
   Router.events.on("routeChangeError", () => NProgress.done());

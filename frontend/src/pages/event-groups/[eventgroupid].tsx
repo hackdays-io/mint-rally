@@ -34,7 +34,8 @@ const EventGroup = () => {
                   {t.OWN_EVENTS}
                 </Heading>
                 <Text mb={6}>
-                  {t.ORGANIZER}: <ENSName address={findgroup.ownerAddress} />
+                  {t.ORGANIZER}:{" "}
+                  <ENSName address={findgroup.ownerAddress} enableLink={true} />
                 </Text>
                 {eventLoading ? (
                   <Spinner />
