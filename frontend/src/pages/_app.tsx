@@ -20,15 +20,11 @@ import "nprogress/nprogress.css";
 import { Router } from "next/router";
 import { createConfig, configureChains, WagmiConfig } from "wagmi";
 import { publicProvider } from "wagmi/providers/public";
-import { alchemyProvider } from "wagmi/providers/alchemy";
 import { mainnet, polygon, polygonMumbai } from "wagmi/chains";
 // Create Wagmi config. This is used for NProgress.
 const { chains, publicClient, webSocketPublicClient } = configureChains(
   [mainnet, polygon, polygonMumbai],
-  [
-    alchemyProvider({ apiKey: process.env.NEXT_PUBLIC_ALCHEMY_KEY! }),
-    publicProvider(),
-  ]
+  [publicProvider()]
 );
 const wagmiConfig = createConfig({
   publicClient,
