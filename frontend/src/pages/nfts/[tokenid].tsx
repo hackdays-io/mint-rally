@@ -16,6 +16,7 @@ import { NextSeo } from "next-seo";
 import Image from "next/image";
 import { FC } from "react";
 import { ShareButtons } from "src/components/atoms/nft/ShareButtons";
+import ENSName from "src/components/atoms/web3/ENSName";
 import {
   getEventGroups,
   getNFTDataFromTokenID,
@@ -115,7 +116,7 @@ const Entity: FC<Props> = (props: Props) => {
                   <Tr>
                     <Th width={100}>Owner: </Th>
                     <Td overflowWrap="anywhere" whiteSpace="unset">
-                      {props.address}
+                      <ENSName address={props.address!} enableUserLink={true} />
                     </Td>
                   </Tr>
                   <Tr>

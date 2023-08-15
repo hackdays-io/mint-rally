@@ -1,10 +1,4 @@
-import {
-  Container,
-  Heading,
-  SimpleGrid,
-  Spinner,
-  VStack,
-} from "@chakra-ui/react";
+import { Container, Heading, Spinner, VStack, Text } from "@chakra-ui/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useMemo } from "react";
@@ -12,6 +6,7 @@ import EventCard from "../../components/atoms/events/EventCard";
 import { useLocale } from "../../hooks/useLocale";
 import { useEventGroups, useEvents } from "src/hooks/useEvent";
 import { Event } from "types/Event";
+import ENSName from "src/components/atoms/web3/ENSName";
 
 const EventGroup = () => {
   const router = useRouter();
@@ -38,6 +33,13 @@ const EventGroup = () => {
                   {findgroup.name}
                   {t.OWN_EVENTS}
                 </Heading>
+                <Text mb={6}>
+                  {t.ORGANIZER}:{" "}
+                  <ENSName
+                    address={findgroup.ownerAddress}
+                    enableEtherScanLink={true}
+                  />
+                </Text>
                 {eventLoading ? (
                   <Spinner />
                 ) : (
