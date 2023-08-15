@@ -35,7 +35,10 @@ const EventGroup = () => {
                 </Heading>
                 <Text mb={6}>
                   {t.ORGANIZER}:{" "}
-                  <ENSName address={findgroup.ownerAddress} enableLink={true} />
+                  <ENSName
+                    address={findgroup.ownerAddress}
+                    enableEtherScanLink={true}
+                  />
                 </Text>
                 {eventLoading ? (
                   <Spinner />
