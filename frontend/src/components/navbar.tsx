@@ -110,13 +110,15 @@ const Navbar = () => {
           pr={8}
         >
           <NextLink href="/">
-            <Image
-              src={"/images/logo.svg"}
-              height={75}
-              width={200}
-              objectFit="contain"
-              alt="Mint Rally Logo"
-            />
+            <a>
+              <Image
+                src={"/images/logo.svg"}
+                height={75}
+                width={200}
+                objectFit="contain"
+                alt="Mint Rally Logo"
+              />
+            </a>
           </NextLink>
         </Flex>
         <Box pr={4} display={{ base: "none", md: "block" }}>
