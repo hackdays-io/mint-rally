@@ -13,7 +13,7 @@ import { NFTItem } from "src/components/atoms/nft/NFTItem";
 import { Event } from "types/Event";
 import { useEventById } from "src/hooks/useEvent";
 import Link from "next/link";
-import LinkToOrganizer from "src/components/atoms/events/LinkToOrganizer";
+import OrganizerInfo from "src/components/atoms/events/OrganizerInfo";
 
 const MintNFTSection: FC<{ event: Event.EventRecord }> = ({ event }) => {
   const address = useAddress();
@@ -67,7 +67,6 @@ const Event: FC = () => {
         {event && (
           <>
             <Heading>{event.name}</Heading>
-            <LinkToOrganizer eventgroupid={event[1]} />
             <Text fontSize="24px">{event.date}</Text>
             <Text fontSize="16px" my={10}>
               {event.description
@@ -85,6 +84,7 @@ const Event: FC = () => {
             >
               <MintNFTSection event={event} />
             </LoginRequired>
+            <OrganizerInfo eventgroupid={event[1]} />
           </>
         )}
       </Container>
