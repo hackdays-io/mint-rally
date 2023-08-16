@@ -1,4 +1,4 @@
-import { Heading, Spinner, Text, Container, Box } from "@chakra-ui/react";
+import { Heading, Spinner, Text, Container, Box, Flex } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { FC, Fragment, useMemo } from "react";
 import LoginRequired from "../../components/atoms/web3/LoginRequired";
@@ -12,7 +12,11 @@ import {
 import { NFTItem } from "src/components/atoms/nft/NFTItem";
 import { Event } from "types/Event";
 import { useEventById } from "src/hooks/useEvent";
-import { CalendarIcon } from '@chakra-ui/icons'
+import { CalendarIcon } from "@chakra-ui/icons";
+import OrganizerInfo from "src/components/atoms/events/OrganizerInfo";
+import { MintGuide } from "src/components/atoms/form/MintGuide";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCircleInfo } from "@fortawesome/free-solid-svg-icons";
 
 const MintNFTSection: FC<{ event: Event.EventRecord }> = ({ event }) => {
   const address = useAddress();
@@ -66,8 +70,10 @@ const Event: FC = () => {
         {event && (
           <>
             <Heading>{event.name}</Heading>
-            <Text fontSize="24px"><CalendarIcon /> {event.date}</Text>
-
+            <Text fontSize="24px">
+              <CalendarIcon /> {event.date}
+            </Text>
+            <Text fontSize="24px">{event.date}</Text>
             <Text fontSize="16px" my={10}>
               {event.description
                 .split(/(\n)/)
@@ -86,7 +92,6 @@ const Event: FC = () => {
                 borderWidth="3px"
                 rounded="lg"
                 overflow="hidden"
-                _hover={{ cursor: "pointer" }}
                 verticalAlign="center"
                 backgroundColor="blue.50"
                 padding="8"
@@ -94,18 +99,23 @@ const Event: FC = () => {
                 <MintNFTSection event={event} />
               </Box>
             </LoginRequired>
-            <br/>
-              <Box
-                borderWidth="3px"
-                rounded="lg"
-                overflow="hidden"
-                _hover={{ cursor: "pointer" }}
-                verticalAlign="center"
-                backgroundColor="blue.50"
-                padding="8"
-              >
-                注意事項羅列
+            <br />
+            <OrganizerInfo eventgroupid={event[1]} />
+            <Flex
+              borderWidth="3px"
+              rounded="lg"
+              verticalAlign="top"
+              alignContent="top"
+              backgroundColor="blue.50"
+              padding="8"
+            >
+              <Box>
+                <FontAwesomeIcon icon={faCircleInfo} />
               </Box>
+              <Box>
+                <MintGuide />
+              </Box>
+            </Flex>
           </>
         )}
       </Container>
