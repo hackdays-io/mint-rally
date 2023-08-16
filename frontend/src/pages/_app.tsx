@@ -18,47 +18,15 @@ import { useMemo } from "react";
 import NProgress from "nprogress";
 import "nprogress/nprogress.css";
 import { Router } from "next/router";
+import { chainId, activeChain, useMagicLinkConfig } from "../libs/web3Config";
 
 config.autoAddCss = false;
-
-const chainId = process.env.NEXT_PUBLIC_CHAIN_ID!;
-const activeChain =
-  chainId === "80001"
-    ? Mumbai
-    : chainId === "137"
-    ? Polygon
-    : { ...Localhost, chainId: 31337 };
-
-const magicLinkConfig = magicLink({
-  apiKey: process.env.NEXT_PUBLIC_MAGIC_LINK_KEY!,
-  magicSdkConfiguration: {
-    locale: "ja",
-    network: activeChain as any,
-  },
-  smsLogin: false,
-});
-
-magicLinkConfig.meta.name = "メールアドレス";
 
 function MyApp({ Component, pageProps }: AppProps) {
   Router.events.on("routeChangeStart", () => NProgress.start());
   Router.events.on("routeChangeComplete", () => NProgress.done());
   Router.events.on("routeChangeError", () => NProgress.done());
-
-  const { t } = useLocale();
-  const magicLinkConfig = useMemo(() => {
-    const m_config = magicLink({
-      apiKey: process.env.NEXT_PUBLIC_MAGIC_LINK_KEY!,
-      magicSdkConfiguration: {
-        locale: "ja",
-        network: activeChain as any,
-      },
-      smsLogin: false,
-    });
-    m_config.meta.name = t.GET_VIA_EMAIL;
-    return m_config;
-  }, [t]);
-
+  const { magicLinkConfig } = useMagicLinkConfig();
   return (
     <>
       <GoogleAnalytics trackPageViews />
