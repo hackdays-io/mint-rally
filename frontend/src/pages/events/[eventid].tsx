@@ -13,7 +13,6 @@ import { NFTItem } from "src/components/atoms/nft/NFTItem";
 import { Event } from "types/Event";
 import { useEventById } from "src/hooks/useEvent";
 import { CalendarIcon } from "@chakra-ui/icons";
-import Link from "next/link";
 import OrganizerInfo from "src/components/atoms/events/OrganizerInfo";
 import { MintGuide } from "src/components/atoms/form/MintGuide";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
