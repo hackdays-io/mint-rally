@@ -1,5 +1,5 @@
 import { Localhost, Mumbai, Polygon } from "@thirdweb-dev/chains";
-import { magicLink } from "@thirdweb-dev/react";
+import { magicLink, metamaskWallet, safeWallet } from "@thirdweb-dev/react";
 import { useLocale } from "src/hooks/useLocale";
 import { useMemo } from "react";
 
@@ -27,5 +27,6 @@ export const useMagicLinkConfig = () => {
     m_config.meta.name = t.GET_VIA_EMAIL;
     return m_config;
   }, [t]);
-  return { magicLinkConfig }
+  const supportedWallets = [metamaskWallet(), safeWallet(), magicLinkConfig];
+  return { magicLinkConfig, supportedWallets }
 };
