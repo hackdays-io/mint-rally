@@ -81,6 +81,7 @@ export const MintForm: FC<Props> = ({ event, address }) => {
               onChange={(e) => setEnteredSecretPhrase(e.target.value)}
               pr={10}
               placeholder={t.INPUT_SECRET_PHRASE}
+              backgroundColor={"#fff"}
             />
           </Box>
           <Button
