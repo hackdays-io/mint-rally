@@ -15,7 +15,10 @@ import { GetServerSideProps } from "next";
 import { NextSeo } from "next-seo";
 import Image from "next/image";
 import { FC } from "react";
+import { OrganizerRows } from "src/components/atoms/events/OrganizerInfo";
 import { ShareButtons } from "src/components/atoms/nft/ShareButtons";
+import ENSName from "src/components/atoms/web3/ENSName";
+import { useLocale } from "src/hooks/useLocale";
 import {
   getEventGroups,
   getNFTDataFromTokenID,
@@ -64,6 +67,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 };
 
 const Entity: FC<Props> = (props: Props) => {
+  const { t } = useLocale();
   return (
     <Container maxW="1000">
       {props.nft && (
@@ -113,29 +117,20 @@ const Entity: FC<Props> = (props: Props) => {
               <Table maxWidth="100%" variant="simple">
                 <Tbody>
                   <Tr>
-                    <Th width={100}>Owner: </Th>
+                    <Th width={155}>{t.OWNER}: </Th>
                     <Td overflowWrap="anywhere" whiteSpace="unset">
-                      {props.address}
+                      <ENSName address={props.address!} enableUserLink={true} />
                     </Td>
                   </Tr>
                   <Tr>
-                    <Th>Event: </Th>
-                    <Td overflowWrap="anywhere">
-                      <Link
-                        href={`/event-groups/${props.nft.traits.EventGroupId}`}
-                      >
-                        {props.groupName}
-                      </Link>
-                    </Td>
-                  </Tr>
-                  <Tr>
-                    <Th>Name:</Th>
+                    <Th>{t.NFT_NAME}:</Th>
                     <Td overflowWrap="anywhere"> {props.nft.name}</Td>
                   </Tr>
                   <Tr>
-                    <Th>Description:</Th>
+                    <Th>{t.NFT_DESC}:</Th>
                     <Td overflowWrap="anywhere">{props.nft.description}</Td>
                   </Tr>
+                  <OrganizerRows eventgroupid={props.nft.traits.EventGroupId} />
                 </Tbody>
               </Table>
             </Flex>
