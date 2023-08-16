@@ -84,4 +84,5 @@ export default {
   CONTRIBUTORS_WANTED_DESC:
     "MintRally is an open source project being developed by members of the civic tech project Hackdays.<br/> We are looking for colleagues to help us make MintRally a better open source project while working to expand its functionality, improve usability, and address accessibility issues.",
   SHOW_NFT_ON_METAMASK: "How to show this NFT on MetaMask",
+  OWNER: "Owner",
 };

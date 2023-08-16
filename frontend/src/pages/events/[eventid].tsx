@@ -12,7 +12,9 @@ import {
 import { NFTItem } from "src/components/atoms/nft/NFTItem";
 import { Event } from "types/Event";
 import { useEventById } from "src/hooks/useEvent";
-import { CalendarIcon } from '@chakra-ui/icons'
+import { CalendarIcon } from "@chakra-ui/icons";
+import Link from "next/link";
+import OrganizerInfo from "src/components/atoms/events/OrganizerInfo";
 
 const MintNFTSection: FC<{ event: Event.EventRecord }> = ({ event }) => {
   const address = useAddress();
@@ -66,8 +68,10 @@ const Event: FC = () => {
         {event && (
           <>
             <Heading>{event.name}</Heading>
-            <Text fontSize="24px"><CalendarIcon /> {event.date}</Text>
-
+            <Text fontSize="24px">
+              <CalendarIcon /> {event.date}
+            </Text>
+            <Text fontSize="24px">{event.date}</Text>
             <Text fontSize="16px" my={10}>
               {event.description
                 .split(/(\n)/)
@@ -94,18 +98,19 @@ const Event: FC = () => {
                 <MintNFTSection event={event} />
               </Box>
             </LoginRequired>
-            <br/>
-              <Box
-                borderWidth="3px"
-                rounded="lg"
-                overflow="hidden"
-                _hover={{ cursor: "pointer" }}
-                verticalAlign="center"
-                backgroundColor="blue.50"
-                padding="8"
-              >
-                注意事項羅列
-              </Box>
+            <br />
+            <OrganizerInfo eventgroupid={event[1]} />
+            <Box
+              borderWidth="3px"
+              rounded="lg"
+              overflow="hidden"
+              _hover={{ cursor: "pointer" }}
+              verticalAlign="center"
+              backgroundColor="blue.50"
+              padding="8"
+            >
+              注意事項羅列
+            </Box>
           </>
         )}
       </Container>
