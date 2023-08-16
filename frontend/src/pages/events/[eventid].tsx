@@ -68,7 +68,8 @@ const Event: FC = () => {
           <>
             <Heading>{event.name}</Heading>
             <Text fontSize="24px">{event.date}</Text>
-            <Text fontSize="16px" my={10}>
+
+            <Text fontSize="16px" mt={10}>
               {event.description
                 .split(/(\n)/)
                 .map((item: any, index: number) => (
@@ -78,13 +79,14 @@ const Event: FC = () => {
                 ))}
             </Text>
 
+            <OrganizerInfo eventgroupid={event[1]} />
+
             <LoginRequired
               requiredChainID={+process.env.NEXT_PUBLIC_CHAIN_ID!}
               forbiddenText={t.SIGN_IN_TO_GET_NFT}
             >
               <MintNFTSection event={event} />
             </LoginRequired>
-            <OrganizerInfo eventgroupid={event[1]} />
           </>
         )}
       </Container>
