@@ -17,6 +17,7 @@ const MetamaskConnectButton: FC = () => {
   return (
     <>
       <Button
+        w={280}
         leftIcon={<MetamaskIcon />}
         style={{
           fontWeight: "bold",

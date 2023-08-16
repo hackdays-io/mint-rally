@@ -22,33 +22,54 @@ const LoginRequired: FC<Props> = ({
 
   const switchNetwork = useSwitchChain();
 
+  const MainForm = () => (
+    <>
+      <HStack justify="center">
+        <Heading as={"h2"} mb={2} fontSize={"lg"} alignContent="center">
+          {forbiddenText}
+        </Heading>
+        <Img src="/images/events/civitan.png" alt="civitan" />
+      </HStack>
+      <SelectMintWallet />
+    </>
+  );
+  const SwitchNetworkForm = () => (
+    <Text fontSize="xl">
+      <Button
+        onClick={() => switchNetwork(requiredChainID)}
+        style={{
+          fontWeight: "bold",
+          backgroundColor: "#562406",
+          color: "#fff",
+        }}
+      >
+        {t.SWITCH_NETWORK}
+      </Button>
+    </Text>
+  );
   return (
     <>
       {!address ? (
-        <>
-          <Box
-            background="linear-gradient(86.52deg, #B5DFDC 0%, #DDED6C 97.14%)"
-            borderRadius="16px"
-            width="100%"
-            p={6}
-            textAlign="center"
-          >
-            <HStack justify="center">
-              <Heading as={"h2"} mb={2} fontSize={"lg"} alignContent="center">
-                {forbiddenText}
-              </Heading>
-              <Img src="/images/events/civitan.png" alt="civitan" />
-            </HStack>
-            <Text mb={4}>{t.SELECT_WALLET}</Text>
-            <SelectMintWallet />
-          </Box>
-        </>
+        <Box
+          background="linear-gradient(86.52deg, #B5DFDC 0%, #DDED6C 97.14%)"
+          borderRadius="16px"
+          width="100%"
+          p={6}
+          textAlign="center"
+        >
+          <MainForm />
+        </Box>
       ) : chainId !== requiredChainID ? (
-        <Text fontSize="xl">
-          <Button onClick={() => switchNetwork(requiredChainID)}>
-            {t.SWITCH_NETWORK}
-          </Button>
-        </Text>
+        <Box
+          background="linear-gradient(86.52deg, #B5DFDC 0%, #DDED6C 97.14%)"
+          borderRadius="16px"
+          width="100%"
+          p={6}
+          textAlign="center"
+        >
+          {t.PLEASE_SWITCH_NETWORK}
+          <SwitchNetworkForm />
+        </Box>
       ) : (
         children
       )}

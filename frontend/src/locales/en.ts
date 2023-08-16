@@ -6,8 +6,10 @@ export default {
   HELP: "HELP",
   SIGN_IN: "Sign In",
   SIGN_OUT: "Sign Out",
+  CONNECT: "Connect",
   GET_VIA_EMAIL: "Connect with Email",
   SWITCH_NETWORK: "Switch Network",
+  PLEASE_SWITCH_NETWORK: "Please switch network to the correct network.",
   PLEASE_SIGN_IN: "Please sign in first!",
   // NFT
   NFT_NAME: "NFT Name",
@@ -43,6 +45,10 @@ export default {
   // Event page
   SIGN_IN_TO_GET_NFT: "Sign in to get NFT!",
   GET_NFT_USING_METAMASK: "Get NFT using Metamask",
+  GET_NFT_USING_EMAIL: "Get NFT using Email address",
+  EMAIL_ADDRESS: "Email address",
+  PLEASE_ENTER_EMAIL_ADDRESS: "Please enter your email address and connect.",
+
   SELECT_WALLET: "Please select which wallet you use to get NFT.",
   YOU_ALREADY_HAVE_THIS_NFT:
     "You already have this Event's NFT. Thank you for your participation!",
