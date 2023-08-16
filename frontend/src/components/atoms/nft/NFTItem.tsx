@@ -50,7 +50,12 @@ export const NFTItem: FC<Props> = ({
           </NextLink>
         </Flex>
         {showShareButtons && (
-          <ShareButtons tokenId={tokenId} address={address} twitter={true} />
+          <ShareButtons
+            tokenId={tokenId}
+            address={address}
+            twitter={true}
+            facebook={true}
+          />
         )}
       </Flex>
     </>
