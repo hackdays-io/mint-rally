@@ -41,7 +41,8 @@ export default {
   EVENT_SECRETPHRASE_DESC:
     "ひみつの「あいことば」は忘れないようにしてください。あとから確認することはできません。",
   // Event page
-  SIGN_IN_TO_GET_NFT: "NFTを取得するにはログインしてください",
+  SIGN_IN_TO_GET_NFT: "NFTを Get しよう！！",
+  SELECT_WALLET: "NFTの取得方法を下記から選択してください。",
   YOU_ALREADY_HAVE_THIS_NFT:
     "既にこのイベントのNFTは取得済みです。ご参加ありがとうございました！",
   ENTER_SECRET_PHRASE:
