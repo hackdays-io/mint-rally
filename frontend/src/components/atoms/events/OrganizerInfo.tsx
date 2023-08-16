@@ -34,7 +34,7 @@ export const OrganizerRows: FC<Props> = ({ eventgroupid }: Props) => {
             <Td overflowWrap="anywhere">
               {" "}
               <Link href={`/event-groups/${findgroup.groupId}`}>
-                <a>
+                <a style={{ textDecoration: "underline" }}>
                   <Text fontSize="16px">{findgroup.name}</Text>
                 </a>
               </Link>

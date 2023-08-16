@@ -19,7 +19,7 @@ const ENSName: FC<Props> = ({
     <>
       {enableUserLink ? (
         <Link href={`/users/${address}`}>
-          <a>{ensName || address}</a>
+          <a style={{ textDecoration: "underline" }}>{ensName || address}</a>
         </Link>
       ) : (
         <>{ensName || address}</>

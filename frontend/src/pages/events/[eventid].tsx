@@ -1,4 +1,4 @@
-import { Heading, Spinner, Text, Container, Box } from "@chakra-ui/react";
+import { Heading, Spinner, Text, Container, Box, Flex } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { FC, Fragment, useMemo } from "react";
 import LoginRequired from "../../components/atoms/web3/LoginRequired";
@@ -15,6 +15,9 @@ import { useEventById } from "src/hooks/useEvent";
 import { CalendarIcon } from "@chakra-ui/icons";
 import Link from "next/link";
 import OrganizerInfo from "src/components/atoms/events/OrganizerInfo";
+import { MintGuide } from "src/components/atoms/form/MintGuide";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCircleInfo } from "@fortawesome/free-solid-svg-icons";
 
 const MintNFTSection: FC<{ event: Event.EventRecord }> = ({ event }) => {
   const address = useAddress();
@@ -90,7 +93,6 @@ const Event: FC = () => {
                 borderWidth="3px"
                 rounded="lg"
                 overflow="hidden"
-                _hover={{ cursor: "pointer" }}
                 verticalAlign="center"
                 backgroundColor="blue.50"
                 padding="8"
@@ -100,17 +102,21 @@ const Event: FC = () => {
             </LoginRequired>
             <br />
             <OrganizerInfo eventgroupid={event[1]} />
-            <Box
+            <Flex
               borderWidth="3px"
               rounded="lg"
-              overflow="hidden"
-              _hover={{ cursor: "pointer" }}
-              verticalAlign="center"
+              verticalAlign="top"
+              alignContent="top"
               backgroundColor="blue.50"
               padding="8"
             >
-              注意事項羅列
-            </Box>
+              <Box>
+                <FontAwesomeIcon icon={faCircleInfo} />
+              </Box>
+              <Box>
+                <MintGuide />
+              </Box>
+            </Flex>
           </>
         )}
       </Container>
