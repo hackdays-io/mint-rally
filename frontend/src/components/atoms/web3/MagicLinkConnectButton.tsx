@@ -1,5 +1,5 @@
-import { Button, HStack, Heading, Img, Input } from "@chakra-ui/react";
-import { magicLink, useConnect } from "@thirdweb-dev/react";
+import { Button, HStack, Img, Input } from "@chakra-ui/react";
+import { useConnect } from "@thirdweb-dev/react";
 import { FC, useState } from "react";
 import { useLocale } from "src/hooks/useLocale";
 import { chainId, useMagicLinkConfig } from "src/libs/web3Config";
