@@ -73,7 +73,7 @@ const Event: FC = () => {
             <Text fontSize="24px">
               <CalendarIcon /> {event.date}
             </Text>
-
+            <Text fontSize="24px">{event.date}</Text>
             <Text fontSize="16px" mt={10}>
               {event.description
                 .split(/(\n)/)
