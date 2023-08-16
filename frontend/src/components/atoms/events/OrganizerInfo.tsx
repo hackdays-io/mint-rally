@@ -30,7 +30,7 @@ export const OrganizerRows: FC<Props> = ({ eventgroupid }: Props) => {
       {findgroup && (
         <>
           <Tr>
-            <Th pl={0} width="130px" color="primary.400">
+            <Th pl={0} width="140px" color="primary.400">
               {t.EVENTGROUPS}
             </Th>
             <Td pl={0} overflowWrap="anywhere">
@@ -42,7 +42,7 @@ export const OrganizerRows: FC<Props> = ({ eventgroupid }: Props) => {
             </Td>
           </Tr>
           <Tr>
-            <Th pl={0} width="130px" color="primary.400">
+            <Th pl={0} width="140px" color="primary.400">
               {t.ORGANIZER}
             </Th>
             <Td pl={0} overflowWrap="anywhere">

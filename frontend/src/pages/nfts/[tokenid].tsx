@@ -120,7 +120,7 @@ const Entity: FC<Props> = (props: Props) => {
               <Table maxWidth="100%" variant="simple" wordBreak="break-all">
                 <Tbody>
                   <Tr>
-                    <Th pl={0} width="130px" color="primary.400">
+                    <Th pl={0} width="140px" color="primary.400">
                       {t.OWNER}
                     </Th>
                     <Td pl={0} overflowWrap="anywhere" whiteSpace="unset">
@@ -128,7 +128,7 @@ const Entity: FC<Props> = (props: Props) => {
                     </Td>
                   </Tr>
                   <Tr>
-                    <Th pl={0} width="130px" color="primary.400">
+                    <Th pl={0} width="140px" color="primary.400">
                       {t.NFT_NAME}
                     </Th>
                     <Td pl={0} overflowWrap="anywhere">
@@ -136,7 +136,7 @@ const Entity: FC<Props> = (props: Props) => {
                     </Td>
                   </Tr>
                   <Tr>
-                    <Th pl={0} width="130px" color="primary.400">
+                    <Th pl={0} width="140px" color="primary.400">
                       {t.NFT_DESC}
                     </Th>
                     <Td pl={0} overflowWrap="anywhere">
