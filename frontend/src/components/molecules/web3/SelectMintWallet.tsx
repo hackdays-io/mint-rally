@@ -1,8 +1,8 @@
-import { Button } from "@chakra-ui/react";
+import MetamaskConnectButton from "src/components/atoms/web3/MetamaskConnectButton";
 import { FC } from "react";
 
 const SelectMintWallet: FC = () => {
-  return <Button>Connect Wallet</Button>;
+  return <MetamaskConnectButton />;
 };
 
 export default SelectMintWallet;

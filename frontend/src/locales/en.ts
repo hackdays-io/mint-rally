@@ -42,6 +42,7 @@ export default {
     "Please do not forget this phrase. you can't get this phrase after submitting",
   // Event page
   SIGN_IN_TO_GET_NFT: "Sign in to get NFT!",
+  GET_NFT_USING_METAMASK: "Get NFT using Metamask",
   SELECT_WALLET: "Please select which wallet you use to get NFT.",
   YOU_ALREADY_HAVE_THIS_NFT:
     "You already have this Event's NFT. Thank you for your participation!",

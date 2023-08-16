@@ -39,7 +39,7 @@ const LoginRequired: FC<Props> = ({
               </Heading>
               <Img src="/images/events/civitan.png" alt="civitan" />
             </HStack>
-            <Text>{t.SELECT_WALLET}</Text>
+            <Text mb={4}>{t.SELECT_WALLET}</Text>
             <SelectMintWallet />
           </Box>
         </>

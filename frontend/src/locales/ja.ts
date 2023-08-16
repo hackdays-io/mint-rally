@@ -43,6 +43,7 @@ export default {
   // Event page
   SIGN_IN_TO_GET_NFT: "NFTを Get しよう！！",
   SELECT_WALLET: "NFTの取得方法を下記から選択してください。",
+  GET_NFT_USING_METAMASK: "Metamask で受け取る",
   YOU_ALREADY_HAVE_THIS_NFT:
     "既にこのイベントのNFTは取得済みです。ご参加ありがとうございました！",
   ENTER_SECRET_PHRASE:
