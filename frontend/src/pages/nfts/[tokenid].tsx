@@ -111,6 +111,7 @@ const Entity: FC<Props> = (props: Props) => {
                   tokenId={Number(props.tokenid)}
                   address={props.address!}
                   twitter={true}
+                  facebook={true}
                 />
               </Flex>
 
