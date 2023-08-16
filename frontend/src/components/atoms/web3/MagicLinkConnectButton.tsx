@@ -13,12 +13,15 @@ const MagicLinkConnectButton: FC<Props> = ({ selected }) => {
   const { magicLinkConfig } = useMagicLinkConfig();
   const connect = useConnect();
   const [isSelected, setSelected] = useState<boolean>(false);
+  const [isLoading, setLoading] = useState<boolean>(false);
   const [enteredEmailAddress, setEnteredEmailAddress] = useState("");
   const handleConnect = async () => {
+    setLoading(true);
     await connect(magicLinkConfig, {
       email: enteredEmailAddress,
       chainId: Number(chainId),
     });
+    setLoading(false);
   };
   const EmailIcon = () => (
     <Img src="/images/email.png" alt="email icon" width="24px" />
@@ -52,6 +55,7 @@ const MagicLinkConnectButton: FC<Props> = ({ selected }) => {
               onChange={(e) => setEnteredEmailAddress(e.target.value)}
               pr={10}
               placeholder={t.EMAIL_ADDRESS}
+              disabled={isLoading}
             />
             <Button
               w={260}
@@ -63,6 +67,8 @@ const MagicLinkConnectButton: FC<Props> = ({ selected }) => {
               onClick={() => {
                 handleConnect();
               }}
+              loadingText="Loading..."
+              isLoading={isLoading}
             >
               {t.CONNECT}
             </Button>{" "}
