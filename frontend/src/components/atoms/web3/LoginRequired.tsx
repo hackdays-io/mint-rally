@@ -22,31 +22,6 @@ const LoginRequired: FC<Props> = ({
 
   const switchNetwork = useSwitchChain();
 
-  const MainForm = () => (
-    <>
-      <HStack justify="center">
-        <Heading as={"h2"} mb={2} fontSize={"lg"} alignContent="center">
-          {forbiddenText}
-        </Heading>
-        <Img src="/images/events/civitan.png" alt="civitan" />
-      </HStack>
-      <SelectMintWallet />
-    </>
-  );
-  const SwitchNetworkForm = () => (
-    <Text fontSize="xl">
-      <Button
-        onClick={() => switchNetwork(requiredChainID)}
-        style={{
-          fontWeight: "bold",
-          backgroundColor: "#562406",
-          color: "#fff",
-        }}
-      >
-        {t.SWITCH_NETWORK}
-      </Button>
-    </Text>
-  );
   return (
     <>
       {!address ? (
@@ -57,7 +32,13 @@ const LoginRequired: FC<Props> = ({
           p={6}
           textAlign="center"
         >
-          <MainForm />
+          <HStack justify="center">
+            <Heading as={"h2"} mb={2} fontSize={"lg"} alignContent="center">
+              {forbiddenText}
+            </Heading>
+            <Img src="/images/events/civitan.png" alt="civitan" />
+          </HStack>
+          <SelectMintWallet />
         </Box>
       ) : chainId !== requiredChainID ? (
         <Box
@@ -68,7 +49,18 @@ const LoginRequired: FC<Props> = ({
           textAlign="center"
         >
           {t.PLEASE_SWITCH_NETWORK}
-          <SwitchNetworkForm />
+          <Text fontSize="xl">
+            <Button
+              onClick={() => switchNetwork(requiredChainID)}
+              style={{
+                fontWeight: "bold",
+                backgroundColor: "#562406",
+                color: "#fff",
+              }}
+            >
+              {t.SWITCH_NETWORK}
+            </Button>
+          </Text>
         </Box>
       ) : (
         children
