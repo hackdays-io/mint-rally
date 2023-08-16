@@ -23,7 +23,6 @@ export const useMagicLinkConfig = () => {
       },
       smsLogin: false,
     });
-    console.log(m_config);
     m_config.meta.name = t.GET_VIA_EMAIL;
     return m_config;
   }, [t]);
