@@ -107,7 +107,8 @@ const Event: FC = () => {
               verticalAlign="top"
               alignContent="top"
               backgroundColor="blue.50"
-              padding="8"
+              padding={8}
+              mt={4}
             >
               <Box>
                 <FontAwesomeIcon icon={faCircleInfo} />
