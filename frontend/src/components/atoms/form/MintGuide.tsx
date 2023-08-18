@@ -4,10 +4,6 @@ import { useLocale } from "src/hooks/useLocale";
 export const MintGuide = () => {
   const { t } = useLocale();
   const guide = t.MINTGUIDE;
-  console.log(guide);
-  guide.forEach((item) => {
-    console.log(item);
-  });
   return (
     <>
       <UnorderedList pl={4}>
