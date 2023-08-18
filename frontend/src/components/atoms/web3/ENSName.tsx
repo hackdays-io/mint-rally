@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { FC } from "react";
 import { useEnsName } from "../../../hooks/useEnsName";
-import { Tooltip, position, Text } from "@chakra-ui/react";
+import { Tooltip, Link as ChakraUILink } from "@chakra-ui/react";
 import { User } from "react-feather";
 type Props = {
   address: string;
@@ -20,7 +20,7 @@ const ENSName: FC<Props> = ({
     <>
       {enableUserLink ? (
         <Link href={`/users/${address}`}>
-          <a>{ensName || address}</a>
+          <ChakraUILink color="mint.subtle1">{ensName || address}</ChakraUILink>
         </Link>
       ) : (
         <>{ensName || address}</>
