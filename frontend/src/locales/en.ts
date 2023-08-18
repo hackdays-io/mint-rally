@@ -6,6 +6,7 @@ export default {
   RECENT_EVENTS: "Recent Events",
   HELP: "HELP",
   SIGN_IN: "Sign In",
+  SELECT_WALLET: "Choose your wallet",
   SIGN_OUT: "Sign Out",
   CONNECT: "Connect",
   GET_VIA_EMAIL: "Connect with Email",
@@ -50,7 +51,7 @@ export default {
   EMAIL_ADDRESS: "Email address",
   PLEASE_ENTER_EMAIL_ADDRESS: "Please enter your email address and connect.",
 
-  SELECT_WALLET: "Please select which wallet you use to get NFT.",
+  SELECT_WALLET_NFT: "Please select which wallet you use to get NFT.",
   YOU_ALREADY_HAVE_THIS_NFT:
     "You already have this Event's NFT. Thank you for your participation!",
   ENTER_SECRET_PHRASE: "Enter Secret Phrase. Event organaizers will tell you.",

@@ -13,7 +13,7 @@ const SelectMintWallet: FC = () => {
     <VStack>
       {!magicLinkSelected && (
         <>
-          <Text mb={4}>{t.SELECT_WALLET}</Text>
+          <Text mb={4}>{t.SELECT_WALLET_NFT}</Text>
           <MetamaskConnectButton />
         </>
       )}

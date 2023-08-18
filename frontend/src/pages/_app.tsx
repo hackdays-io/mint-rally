@@ -10,7 +10,11 @@ import { GoogleAnalytics } from "nextjs-google-analytics";
 import NProgress from "nprogress";
 import "nprogress/nprogress.css";
 import { Router } from "next/router";
-import { activeChain, useMagicLinkConfig } from "../libs/web3Config";
+import {
+  activeChain,
+  useMagicLinkConfig,
+  thirdweb_client_id,
+} from "../libs/web3Config";
 
 config.autoAddCss = false;
 
@@ -25,6 +29,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       <ThirdwebProvider
         activeChain={activeChain}
         supportedWallets={supportedWallets}
+        clientId={thirdweb_client_id}
       >
         <ChakraProvider theme={chakraTheme}>
           <Layout>

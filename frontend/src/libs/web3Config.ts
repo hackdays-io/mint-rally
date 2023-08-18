@@ -20,7 +20,6 @@ export const useMagicLinkConfig = () => {
       apiKey: process.env.NEXT_PUBLIC_MAGIC_LINK_KEY!,
       magicSdkConfiguration: {
         locale: locale === "ja" ? "ja" : "en",
-        network: activeChain as any,
       },
       smsLogin: false,
     });

@@ -6,6 +6,7 @@ export default {
   RECENT_EVENTS: "最近のイベント",
   HELP: "ヘルプ",
   SIGN_IN: "ログイン",
+  SELECT_WALLET: "Walletを選択してください",
   CONNECT: "接続",
   SIGN_OUT: "ログアウト",
   GET_VIA_EMAIL: "メールアドレスで接続",
@@ -45,7 +46,7 @@ export default {
     "ひみつの「あいことば」は忘れないようにしてください。あとから確認することはできません。",
   // Event page
   SIGN_IN_TO_GET_NFT: "NFTを Get しよう！！",
-  SELECT_WALLET: "NFTの取得方法を下記から選択してください。",
+  SELECT_WALLET_NFT: "NFTの取得方法を下記から選択してください。",
   GET_NFT_USING_METAMASK: "Metamask で受け取る",
   GET_NFT_USING_EMAIL: "メールアドレスで受け取る",
   EMAIL_ADDRESS: "メールアドレス",

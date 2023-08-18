@@ -74,6 +74,7 @@ const Navbar = () => {
             theme="light"
             btnTitle={t.SIGN_IN}
             style={{ fontWeight: "bold", backgroundColor: "#562406" }}
+            modalTitle={t.SELECT_WALLET}
           />
         )}
         {address && (
