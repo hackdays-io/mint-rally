@@ -1,9 +1,10 @@
 import { Localhost, Mumbai, Polygon } from "@thirdweb-dev/chains";
-import { magicLink, metamaskWallet, safeWallet } from "@thirdweb-dev/react";
+import { magicLink, metamaskWallet, safeWallet, walletConnect } from "@thirdweb-dev/react";
 import { useLocale } from "src/hooks/useLocale";
 import { useMemo } from "react";
 
 export const chainId = process.env.NEXT_PUBLIC_CHAIN_ID!;
+export const thirdweb_client_id = process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID!;
 export const activeChain =
   chainId === "80001"
     ? Mumbai
