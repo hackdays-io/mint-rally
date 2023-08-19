@@ -57,7 +57,7 @@ const LoginRequired: FC<Props> = ({
           {t.PLEASE_SWITCH_NETWORK}
           <Text fontSize="xl">
             <Button
-              onClick={() => switchChain(Mumbai.chainId)}
+              onClick={() => switchChain(requiredChainID)}
               style={{
                 fontWeight: "bold",
                 backgroundColor: "#562406",

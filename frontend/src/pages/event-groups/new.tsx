@@ -19,7 +19,7 @@ const NewEventGroupPage: NextPage = () => {
         {t.CREATE_NEW_EVENT_GROUP}
       </Heading>
       <LoginRequired
-        requiredChainID={+process.env.NEXT_PUBLIC_CHAIN_ID!}
+        requiredChainID={Number(process.env.NEXT_PUBLIC_CHAIN_ID!)}
         forbiddenText={t.PLEASE_SIGN_IN}
       >
         {address && <CreateEventGroupForm address={address} />}

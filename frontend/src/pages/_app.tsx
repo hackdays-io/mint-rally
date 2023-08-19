@@ -28,7 +28,7 @@ function MyApp({ Component, pageProps }: AppProps) {
     <>
       <GoogleAnalytics trackPageViews />
       <ThirdwebProvider
-        activeChain={Mumbai}
+        activeChain={activeChain}
         supportedWallets={supportedWallets}
         clientId={thirdwebClientID}
       >
