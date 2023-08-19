@@ -74,7 +74,8 @@ const Event: FC = () => {
               <CalendarIcon /> {event.date}
             </Text>
             <Text fontSize="24px">{event.date}</Text>
-            <Text fontSize="16px" my={10}>
+
+            <Text fontSize="16px" mt={10}>
               {event.description
                 .split(/(\n)/)
                 .map((item: any, index: number) => (
@@ -83,6 +84,8 @@ const Event: FC = () => {
                   </Fragment>
                 ))}
             </Text>
+
+            <OrganizerInfo eventgroupid={event[1]} />
 
             <LoginRequired
               requiredChainID={Number(process.env.NEXT_PUBLIC_CHAIN_ID!)}

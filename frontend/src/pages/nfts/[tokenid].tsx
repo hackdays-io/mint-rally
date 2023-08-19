@@ -9,6 +9,7 @@ import {
   Tr,
   Th,
   Td,
+  Grid,
 } from "@chakra-ui/react";
 import { BigNumber } from "ethers";
 import { GetServerSideProps } from "next";
@@ -93,47 +94,59 @@ const Entity: FC<Props> = (props: Props) => {
         </Heading>
         {props.nft && (
           <>
-            <Flex justifyContent={{ md: "center" }} flexDirection="column">
-              <Box
-                width={{ md: 350 }}
-                textAlign={{ base: "center", md: "left" }}
-              >
-                <Image
-                  width={500}
-                  height={500}
-                  src={ipfs2http(props.nft.image)}
-                  alt={props.nft.name}
-                />
+            <Grid gridTemplateColumns={{ base: "auto", md: "400px 1fr" }}>
+              <Box>
+                <Box
+                  width={{ md: 350 }}
+                  textAlign={{ base: "center", md: "left" }}
+                >
+                  <Image
+                    width={500}
+                    height={500}
+                    src={ipfs2http(props.nft.image)}
+                    alt={props.nft.name}
+                  />
+                </Box>
+
+                <Flex justifyContent="center" pb={4} width={{ md: 350 }}>
+                  <ShareButtons
+                    tokenId={Number(props.tokenid)}
+                    address={props.address!}
+                    twitter={true}
+                  />
+                </Flex>
               </Box>
 
-              <Flex justifyContent="center" pb={4} width={{ md: 350 }}>
-                <ShareButtons
-                  tokenId={Number(props.tokenid)}
-                  address={props.address!}
-                  twitter={true}
-                />
-              </Flex>
-
-              <Table maxWidth="100%" variant="simple">
+              <Table maxWidth="100%" variant="simple" wordBreak="break-all">
                 <Tbody>
                   <Tr>
-                    <Th width={155}>{t.OWNER}: </Th>
-                    <Td overflowWrap="anywhere" whiteSpace="unset">
+                    <Th pl={0} width="140px" color="primary.400">
+                      {t.OWNER}
+                    </Th>
+                    <Td pl={0} overflowWrap="anywhere" whiteSpace="unset">
                       <ENSName address={props.address!} enableUserLink={true} />
                     </Td>
                   </Tr>
                   <Tr>
-                    <Th>{t.NFT_NAME}:</Th>
-                    <Td overflowWrap="anywhere"> {props.nft.name}</Td>
+                    <Th pl={0} width="140px" color="primary.400">
+                      {t.NFT_NAME}
+                    </Th>
+                    <Td pl={0} overflowWrap="anywhere">
+                      {props.nft.name}
+                    </Td>
                   </Tr>
                   <Tr>
-                    <Th>{t.NFT_DESC}:</Th>
-                    <Td overflowWrap="anywhere">{props.nft.description}</Td>
+                    <Th pl={0} width="140px" color="primary.400">
+                      {t.NFT_DESC}
+                    </Th>
+                    <Td pl={0} overflowWrap="anywhere">
+                      {props.nft.description}
+                    </Td>
                   </Tr>
                   <OrganizerRows eventgroupid={props.nft.traits.EventGroupId} />
                 </Tbody>
               </Table>
-            </Flex>
+            </Grid>
           </>
         )}
       </Box>

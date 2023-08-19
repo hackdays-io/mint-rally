@@ -14,6 +14,7 @@ const ENSName: FC<Props> = ({
   enableEtherScanLink,
   enableUserLink,
 }) => {
+  const chainId = process.env.NEXT_PUBLIC_CHAIN_ID!;
   const { ensName } = useEnsName(address);
   const UserName = (
     <>
@@ -32,7 +33,12 @@ const ENSName: FC<Props> = ({
       {UserName}{" "}
       {enableEtherScanLink && (
         <>
-          <Link href={`https://polygonscan.com/address/${address}`} passHref>
+          <Link
+            href={`https://${
+              chainId === "137" ? "polygonscan.com" : "mumbai.polygonscan.com"
+            }/address/${address}`}
+            passHref
+          >
             <a target="_blank">
               <Tooltip
                 label="View on PolygonScan"

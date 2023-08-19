@@ -30,9 +30,10 @@ export const OrganizerRows: FC<Props> = ({ eventgroupid }: Props) => {
       {findgroup && (
         <>
           <Tr>
-            <Th> {t.EVENTGROUPS}:</Th>
-            <Td overflowWrap="anywhere">
-              {" "}
+            <Th pl={0} width="140px" color="primary.400">
+              {t.EVENTGROUPS}
+            </Th>
+            <Td pl={0} overflowWrap="anywhere">
               <Link href={`/event-groups/${findgroup.groupId}`}>
                 <a style={{ textDecoration: "underline" }}>
                   <Text fontSize="16px">{findgroup.name}</Text>
@@ -41,8 +42,10 @@ export const OrganizerRows: FC<Props> = ({ eventgroupid }: Props) => {
             </Td>
           </Tr>
           <Tr>
-            <Th>{t.ORGANIZER}</Th>
-            <Td overflowWrap="anywhere">
+            <Th pl={0} width="140px" color="primary.400">
+              {t.ORGANIZER}
+            </Th>
+            <Td pl={0} overflowWrap="anywhere">
               <ENSName address={findgroup.ownerAddress} enableEtherScanLink />
             </Td>
           </Tr>
@@ -54,7 +57,7 @@ export const OrganizerRows: FC<Props> = ({ eventgroupid }: Props) => {
 const OrganizerInfo: FC<Props> = ({ eventgroupid }) => {
   return (
     <>
-      <Table maxWidth="100%" variant="simple" mt={8}>
+      <Table maxWidth="100%" variant="simple" mt={5} mb={10}>
         <Tbody>
           <OrganizerRows eventgroupid={eventgroupid} />
         </Tbody>
