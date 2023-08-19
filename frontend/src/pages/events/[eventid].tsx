@@ -101,8 +101,6 @@ const Event: FC = () => {
                 <MintNFTSection event={event} />
               </Box>
             </LoginRequired>
-            <br />
-            <OrganizerInfo eventgroupid={event[1]} />
             <Flex
               borderWidth="3px"
               rounded="lg"
