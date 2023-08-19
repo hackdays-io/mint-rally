@@ -13,8 +13,9 @@ import { Router } from "next/router";
 import {
   activeChain,
   useMagicLinkConfig,
-  thirdweb_client_id,
+  thirdwebClientID,
 } from "../libs/web3Config";
+import { Mumbai } from "@thirdweb-dev/chains";
 
 config.autoAddCss = false;
 
@@ -22,14 +23,14 @@ function MyApp({ Component, pageProps }: AppProps) {
   Router.events.on("routeChangeStart", () => NProgress.start());
   Router.events.on("routeChangeComplete", () => NProgress.done());
   Router.events.on("routeChangeError", () => NProgress.done());
-  const { magicLinkConfig, supportedWallets } = useMagicLinkConfig();
+  const { supportedWallets } = useMagicLinkConfig();
   return (
     <>
       <GoogleAnalytics trackPageViews />
       <ThirdwebProvider
-        activeChain={activeChain}
+        activeChain={Mumbai}
         supportedWallets={supportedWallets}
-        clientId={thirdweb_client_id}
+        clientId={thirdwebClientID}
       >
         <ChakraProvider theme={chakraTheme}>
           <Layout>

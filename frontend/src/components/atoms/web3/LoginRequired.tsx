@@ -1,8 +1,14 @@
 import { Box, Button, HStack, Heading, Img, Text } from "@chakra-ui/react";
 import { FC, ReactNode } from "react";
-import { useAddress, useChainId, useSwitchChain } from "@thirdweb-dev/react";
+import {
+  useAddress,
+  useChainId,
+  useSwitchChain,
+  useNetworkMismatch,
+} from "@thirdweb-dev/react";
 import { useLocale } from "../../../hooks/useLocale";
 import SelectMintWallet from "src/components/molecules/web3/SelectMintWallet";
+import { Mumbai } from "@thirdweb-dev/chains";
 
 type Props = {
   children: ReactNode;
@@ -16,11 +22,11 @@ const LoginRequired: FC<Props> = ({
   forbiddenText,
 }) => {
   const address = useAddress();
-  const chainId = useChainId()!;
 
   const { t } = useLocale();
+  const isMismatched = useNetworkMismatch();
 
-  const switchNetwork = useSwitchChain();
+  const switchChain = useSwitchChain();
 
   return (
     <>
@@ -40,7 +46,7 @@ const LoginRequired: FC<Props> = ({
           </HStack>
           <SelectMintWallet />
         </Box>
-      ) : chainId !== requiredChainID ? (
+      ) : isMismatched ? (
         <Box
           background="linear-gradient(86.52deg, #B5DFDC 0%, #DDED6C 97.14%)"
           borderRadius="16px"
@@ -51,7 +57,7 @@ const LoginRequired: FC<Props> = ({
           {t.PLEASE_SWITCH_NETWORK}
           <Text fontSize="xl">
             <Button
-              onClick={() => switchNetwork(requiredChainID)}
+              onClick={() => switchChain(Mumbai.chainId)}
               style={{
                 fontWeight: "bold",
                 backgroundColor: "#562406",

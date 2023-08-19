@@ -4,7 +4,8 @@ import { useLocale } from "src/hooks/useLocale";
 import { useMemo } from "react";
 
 export const chainId = process.env.NEXT_PUBLIC_CHAIN_ID!;
-export const thirdweb_client_id = process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID!;
+export const thirdwebClientID = process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID!;
+export const walletConnectProjectID = process.env.NEXT_PUBLIC_WALETCONNECT_PROJECT_ID!;
 export const activeChain =
   chainId === "80001"
     ? Mumbai
@@ -24,8 +25,10 @@ export const useMagicLinkConfig = () => {
       smsLogin: false,
     });
     m_config.meta.name = t.GET_VIA_EMAIL;
-    return m_config;
+    return m_config
   }, [t]);
-  const supportedWallets = [metamaskWallet(), safeWallet(), magicLinkConfig];
+
+
+  const supportedWallets = [metamaskWallet(), safeWallet(), magicLinkConfig, walletConnect({ projectId: walletConnectProjectID })];
   return { magicLinkConfig, supportedWallets }
 };
