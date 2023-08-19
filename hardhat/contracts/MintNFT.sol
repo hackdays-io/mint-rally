@@ -5,9 +5,11 @@ import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721Enumer
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import "./lib/Hashing.sol";
 import "@openzeppelin/contracts-upgradeable/metatx/MinimalForwarderUpgradeable.sol";
+import "./lib/Hashing.sol";
 import "./ERC2771ContextUpgradeable.sol";
+import "./IEvent.sol";
+import "./ISecretPhraseVerifier.sol";
 
 contract MintNFT is
     ERC721EnumerableUpgradeable,
@@ -41,15 +43,26 @@ contract MintNFT is
     mapping(uint256 => uint256) private remainingEventNftCount;
     // secretPhrase via EventId
     mapping(uint256 => bytes32) private eventSecretPhrases;
+    // is mint locked via EventId
+    mapping(uint256 => bool) private isMintLocked;
+
+    address private secretPhraseVerifierAddr;
 
     event MintedNFTAttributeURL(address indexed holder, string url);
+    event MintLocked(uint256 indexed eventId, bool isLocked);
 
     function initialize(
-        MinimalForwarderUpgradeable trustedForwarder
-    ) public initializer {
+        MinimalForwarderUpgradeable trustedForwarder,
+        address _secretPhraseVerifierAddr,
+        bytes32[] memory _eventSecretPhrases
+    ) public reinitializer(2) {
         __ERC721_init("MintRally", "MR");
         __Ownable_init();
         __ERC2771Context_init(address(trustedForwarder));
+        secretPhraseVerifierAddr = _secretPhraseVerifierAddr;
+        for (uint i = 0; i < _eventSecretPhrases.length; i++) {
+            eventSecretPhrases[i + 1] = _eventSecretPhrases[i];
+        }
     }
 
     function _msgSender()
@@ -87,10 +100,15 @@ contract MintNFT is
     function mintParticipateNFT(
         uint256 _groupId,
         uint256 _eventId,
-        string memory _secretPhrase
+        uint256[24] memory _proof
     ) external {
-        canMint(_eventId, _secretPhrase);
+        canMint(_eventId, _proof);
         remainingEventNftCount[_eventId] = remainingEventNftCount[_eventId] - 1;
+
+        ISecretPhraseVerifier secretPhraseVerifier = ISecretPhraseVerifier(
+            secretPhraseVerifierAddr
+        );
+        secretPhraseVerifier.submitProof(_proof, _eventId);
 
         isHoldingEventNFT[
             Hashing.hashingAddressUint256(_msgSender(), _eventId)
@@ -124,12 +142,9 @@ contract MintNFT is
 
     function canMint(
         uint256 _eventId,
-        string memory _secretPhrase
+        uint256[24] memory _proof
     ) public view returns (bool) {
-        require(
-            verifySecretPhrase(_secretPhrase, _eventId),
-            "invalid secret phrase"
-        );
+        require(verifySecretPhrase(_proof, _eventId), "invalid secret phrase");
         require(
             remainingEventNftCount[_eventId] != 0,
             "remaining count is zero"
@@ -140,7 +155,23 @@ contract MintNFT is
             "already minted"
         );
 
+        require(!isMintLocked[_eventId], "mint is locked");
+
         return true;
+    }
+
+    function changeMintLocked(uint256 _eventId, bool _locked) external {
+        IEventManager eventManager = IEventManager(eventManagerAddr);
+        require(
+            eventManager.isGroupOwnerByEventId(msg.sender, _eventId),
+            "you are not event group owner"
+        );
+        isMintLocked[_eventId] = _locked;
+        emit MintLocked(_eventId, _locked);
+    }
+
+    function getIsMintLocked(uint256 _eventId) external view returns (bool) {
+        return isMintLocked[_eventId];
     }
 
     function isHoldingEventNFTByAddress(
@@ -188,11 +219,18 @@ contract MintNFT is
     }
 
     function verifySecretPhrase(
-        string memory _secretPhrase,
+        uint256[24] memory _proof,
         uint256 _eventId
     ) internal view returns (bool) {
-        bytes32 encryptedSecretPhrase = keccak256(bytes(_secretPhrase));
-        bool result = eventSecretPhrases[_eventId] == encryptedSecretPhrase;
+        ISecretPhraseVerifier secretPhraseVerifier = ISecretPhraseVerifier(
+            secretPhraseVerifierAddr
+        );
+        uint256[1] memory publicInput = [uint256(eventSecretPhrases[_eventId])];
+        bool result = secretPhraseVerifier.verifyProof(
+            _proof,
+            publicInput,
+            _eventId
+        );
         return result;
     }
 }

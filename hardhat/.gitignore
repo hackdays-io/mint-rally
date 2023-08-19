@@ -6,8 +6,13 @@ typechain
 
 #Hardhat files
 cache
-artifacts/@openzeppelin
-artifacts/build-info
+artifacts
 
 .openzeppelin/unknown-*.json
 build
+
+*.ptau
+*.wtns
+*.zkey
+
+/tmp

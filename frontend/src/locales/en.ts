@@ -1,7 +1,7 @@
 export default {
   TOP: "TOP",
   EVENTGROUPS: "Event Groups",
-  EVENTS: "Recent Events",
+  EVENTS: "Recent Events List",
   RECENT_EVENTS: "Recent Events",
   HELP: "HELP",
   SIGN_IN: "Sign In",
@@ -14,7 +14,7 @@ export default {
   NFT_DESC: "NFT Description",
   TIMES_PARTICIPATE:
     "How many events do users need participate in to get this NFT?",
-  NFT_DEFAULT: "This NFT will be distributed to all participants",
+  NFT_DEFAULT: "This NFT will be default.",
   // Event group index
   CREATE_NEW_EVENT_GROUP: "Create new event group",
   NEW_EVENT_GROUP_NAME: "Event Group Name",
@@ -36,6 +36,7 @@ export default {
   EVENT_USE_MTX: "Taking on gas fee for participants",
   EVENT_USE_MTX_TRUE: "Yes",
   EVENT_USE_MTX_FALSE: "No",
+  EVENT_ESTIMATED_GAS_MTX: "Estimated deposit amount required to take on",
   EVENT_SECRETPHRASE: "SecretPhrase to mint",
   EVENT_SECRETPHRASE_DESC:
     "Please do not forget this phrase. you can't get this phrase after submitting",
@@ -50,6 +51,7 @@ export default {
   USE_MTX: "(without gas fee)",
   YOU_HAVE_CLAIMED_NFT:
     "You have claimed NFT! Please wait for mint your NFT... It will take tens of seconds.",
+  PREPARING_PROOF: "Encrypting a secret phrase, takes about 10 seconds🤫",
   YOU_HAVE_GOT_NFT: "You got NFT!!",
   INSTALL_METAMASK_TITLE: "Please install MetaMask",
   INPUT_SECRET_PHRASE: "Input Secret Phrase",
@@ -86,4 +88,5 @@ export default {
   ERROR_CREATING_EVENT_GROUP:
     "An error occurred when creating your new event group",
   ERROR_MINTING_PARTICIPATION_NFT: "An error occurred when minting your NFT",
+  OWNER: "Owner",
 };

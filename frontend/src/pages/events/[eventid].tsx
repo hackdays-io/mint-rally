@@ -12,6 +12,8 @@ import {
 import { NFTItem } from "src/components/atoms/nft/NFTItem";
 import { Event } from "types/Event";
 import { useEventById } from "src/hooks/useEvent";
+import Link from "next/link";
+import OrganizerInfo from "src/components/atoms/events/OrganizerInfo";
 
 const MintNFTSection: FC<{ event: Event.EventRecord }> = ({ event }) => {
   const address = useAddress();
@@ -67,7 +69,7 @@ const Event: FC = () => {
             <Heading>{event.name}</Heading>
             <Text fontSize="24px">{event.date}</Text>
 
-            <Text fontSize="16px" my={10}>
+            <Text fontSize="16px" mt={10}>
               {event.description
                 .split(/(\n)/)
                 .map((item: any, index: number) => (
@@ -76,6 +78,8 @@ const Event: FC = () => {
                   </Fragment>
                 ))}
             </Text>
+
+            <OrganizerInfo eventgroupid={event[1]} />
 
             <LoginRequired
               requiredChainID={+process.env.NEXT_PUBLIC_CHAIN_ID!}

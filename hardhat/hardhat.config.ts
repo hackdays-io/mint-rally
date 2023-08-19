@@ -32,7 +32,7 @@ const config: HardhatUserConfig = {
     // https://livdir.com/polygongaspricechart/ja/
     polygon: {
       url: process.env.MAINNET_ALCHEMY_KEY || "",
-      accounts: [String(process.env.MAINNET_PRIVATE_KEY)]
+      accounts: [String(process.env.MAINNET_PRIVATE_KEY)],
     },
     mumbai: {
       url: process.env.STAGING_ALCHEMY_KEY || "",
@@ -51,6 +51,9 @@ const config: HardhatUserConfig = {
   },
   etherscan: {
     apiKey: process.env.ETHERSCAN_API_KEY,
+  },
+  mocha: {
+    timeout: 600000,
   },
 };
 

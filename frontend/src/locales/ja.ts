@@ -1,7 +1,7 @@
 export default {
   TOP: "トップ",
   EVENTGROUPS: "イベントグループ",
-  EVENTS: "イベント",
+  EVENTS: "イベント一覧",
   RECENT_EVENTS: "最近のイベント",
   HELP: "ヘルプ",
   SIGN_IN: "ログイン",
@@ -36,6 +36,7 @@ export default {
     "ガス代を肩代わりして、参加者が無料でNFTを受け取れるようにする。",
   EVENT_USE_MTX_TRUE: "肩代わりする",
   EVENT_USE_MTX_FALSE: "肩代わりしない",
+  EVENT_ESTIMATED_GAS_MTX: "肩代わりに必要な予想デポジット金額",
   EVENT_SECRETPHRASE: "NFT受け取りのひみつの「あいことば」",
   EVENT_SECRETPHRASE_DESC:
     "ひみつの「あいことば」は忘れないようにしてください。あとから確認することはできません。",
@@ -45,6 +46,7 @@ export default {
     "既にこのイベントのNFTは取得済みです。ご参加ありがとうございました！",
   ENTER_SECRET_PHRASE:
     "イベント主催者から聞いた「あいことば」を入力し、NFT取得ボタンを押してください。",
+  PREPARING_PROOF: "あいことばを暗号化しています、10秒ほどかかります🤫",
   ENTER_SECRET_PHRASE_METAMASK:
     "Metamaskが立ち上がるので、「承認」ボタンを押してください。",
   CLAIM_NFT: "NFT取得！",
@@ -85,4 +87,5 @@ export default {
   ERROR_CREATING_EVENT: "イベントを作成中にエラーが発生しました",
   ERROR_CREATING_EVENT_GROUP: "イベントグループを作成中にエラーが発生しました",
   ERROR_MINTING_PARTICIPATION_NFT: "NFTをミント中にエラーが発生しました",
+  OWNER: "所有者",
 };
