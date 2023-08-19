@@ -113,20 +113,11 @@ const Entity: FC<Props> = (props: Props) => {
                   <ShareButtons
                     tokenId={Number(props.tokenid)}
                     address={props.address!}
-                    twitter={true}
+                    twitter
+                    facebook
                   />
                 </Flex>
               </Box>
-
-              <Flex justifyContent="center" pb={4} width={{ md: 350 }}>
-                <ShareButtons
-                  tokenId={Number(props.tokenid)}
-                  address={props.address!}
-                  twitter={true}
-                  facebook={true}
-                />
-              </Flex>
-
               <Table maxWidth="100%" variant="simple" wordBreak="break-all">
                 <Tbody>
                   <Tr>
