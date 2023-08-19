@@ -94,7 +94,7 @@ export default {
     "MintRally is an open source project being developed by members of the civic tech project Hackdays.<br/> We are looking for colleagues to help us make MintRally a better open source project while working to expand its functionality, improve usability, and address accessibility issues.",
   SHOW_NFT_ON_METAMASK: "How to show this NFT on MetaMask",
   OWNER: "Owner",
-  MINTGUIDE: guide
+  MINTGUIDE: guide,
   ERROR_CREATING_EVENT: "An error occurred when creating your new event",
   ERROR_CREATING_EVENT_GROUP:
     "An error occurred when creating your new event group",
