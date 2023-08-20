@@ -1,3 +1,4 @@
+import { guide } from './guide-ja'
 export default {
   TOP: "トップ",
   EVENTGROUPS: "イベントグループ",
@@ -92,4 +93,5 @@ export default {
     "MintRallyはシビックテックプロジェクトHackdaysのメンバーで開発しているオープンソースプロジェクトです。<br />機能拡充やユーザビリティの向上、アクセシビリティへの対応などに取り組みながら、よりよいオープンソースプロジェクトにしていくための仲間を探しています。",
   SHOW_NFT_ON_METAMASK: "入手したNFTをメタマスクでも見れるようにする方法",
   OWNER: "所有者",
+  MINTGUIDE: guide
 };
