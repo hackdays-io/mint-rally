@@ -10250,9 +10250,3 @@ zustand@^4.0.0:
   integrity sha512-h4F3WMqsZgvvaE0n3lThx4MM81Ls9xebjvrABNzf5+jb3/03YjNTSgZXeyrvXDArMeV9untvWXRw1tY+ntPYbA==
   dependencies:
     use-sync-external-store "1.2.0"
-
-"　　　　　@fortawesome/react-fontawesome":
-  version "0.2.0"
-  resolved "https://codeload.github.com/fortawesome/react-fontawesome/tar.gz/528e230cdcb7451a53fee6fc6364722918c902a7"
-  dependencies:
-    prop-types "^15.8.1"

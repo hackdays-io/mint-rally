@@ -1,20 +1,32 @@
 // SNS share buttons for NFTs
-import { Box, Flex, Text, Textarea, Icon, IconButton } from "@chakra-ui/react";
-import { FC } from "react";
-import { TwitterShareButton, TwitterIcon } from "next-share";
+import { Flex, Text, Textarea, Icon } from "@chakra-ui/react";
+import { FC, useMemo } from "react";
+import {
+  TwitterShareButton,
+  TwitterIcon,
+  FacebookShareButton,
+  FacebookIcon,
+} from "next-share";
 import { CopyIcon } from "@chakra-ui/icons";
+import { useRouter } from "next/router";
 
 type Props = {
   tokenId: number;
   address: string;
   twitter?: boolean;
+  facebook?: boolean;
 };
 
 export const ShareButtons: FC<Props> = ({
   tokenId,
   address,
   twitter = null,
+  facebook = null,
 }) => {
+  const router = useRouter();
+  const shareUrl = useMemo(() => {
+    return `https://mintrally.xyz/${router.locale}/nfts/${tokenId}`;
+  }, [router.locale, tokenId]);
   const copyClipBoard = () => {
     const copyText: any = document.getElementById("shareURL");
     copyText?.select();
@@ -28,12 +40,22 @@ export const ShareButtons: FC<Props> = ({
       </Text>
       {twitter && (
         <TwitterShareButton
-          url={`https://mintrally.xyz/nfts/${tokenId}`}
+          url={shareUrl}
           title={`Check out my NFT on Mintrally!`}
           hashtags={["MintRally"]}
+          style={{ marginRight: "5px" }}
         >
           <TwitterIcon size={32} round />
         </TwitterShareButton>
+      )}
+      {facebook && (
+        <FacebookShareButton
+          url={shareUrl}
+          quote={`Check out my NFT on Mintrally!`}
+          hashtag="#MintRally"
+        >
+          <FacebookIcon size={32} round />
+        </FacebookShareButton>
       )}
       <Icon
         as={CopyIcon}
@@ -51,7 +73,7 @@ export const ShareButtons: FC<Props> = ({
         hidden={true}
         rows={2}
         p={1}
-        defaultValue={`https://mintrally.xyz/nfts/${tokenId}`}
+        defaultValue={shareUrl}
       ></Textarea>
     </Flex>
   );

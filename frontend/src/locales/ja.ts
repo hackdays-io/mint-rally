@@ -1,3 +1,4 @@
+import { guide } from './guide-ja'
 export default {
   TOP: "トップ",
   EVENTGROUPS: "イベントグループ",
@@ -5,9 +6,11 @@ export default {
   RECENT_EVENTS: "最近のイベント",
   HELP: "ヘルプ",
   SIGN_IN: "ログイン",
+  CONNECT: "接続",
   SIGN_OUT: "ログアウト",
   GET_VIA_EMAIL: "メールアドレスで接続",
   SWITCH_NETWORK: "ネットワーク切替",
+  PLEASE_SWITCH_NETWORK: "正しいネットワークに切り替えてください。",
   PLEASE_SIGN_IN: "ログインしてください。",
   // NFT
   NFT_NAME: "NFT名",
@@ -41,7 +44,12 @@ export default {
   EVENT_SECRETPHRASE_DESC:
     "ひみつの「あいことば」は忘れないようにしてください。あとから確認することはできません。",
   // Event page
-  SIGN_IN_TO_GET_NFT: "NFTを取得するにはログインしてください",
+  SIGN_IN_TO_GET_NFT: "NFTを Get しよう！！",
+  SELECT_WALLET: "NFTの取得方法を下記から選択してください。",
+  GET_NFT_USING_METAMASK: "Metamask で受け取る",
+  GET_NFT_USING_EMAIL: "メールアドレスで受け取る",
+  EMAIL_ADDRESS: "メールアドレス",
+  PLEASE_ENTER_EMAIL_ADDRESS: "接続用のメールアドレスを入力しログインしてください。",
   YOU_ALREADY_HAVE_THIS_NFT:
     "既にこのイベントのNFTは取得済みです。ご参加ありがとうございました！",
   ENTER_SECRET_PHRASE:
@@ -85,4 +93,8 @@ export default {
     "MintRallyはシビックテックプロジェクトHackdaysのメンバーで開発しているオープンソースプロジェクトです。<br />機能拡充やユーザビリティの向上、アクセシビリティへの対応などに取り組みながら、よりよいオープンソースプロジェクトにしていくための仲間を探しています。",
   SHOW_NFT_ON_METAMASK: "入手したNFTをメタマスクでも見れるようにする方法",
   OWNER: "所有者",
+  MINTGUIDE: guide,
+  ERROR_CREATING_EVENT: "イベントを作成中にエラーが発生しました",
+  ERROR_CREATING_EVENT_GROUP: "イベントグループを作成中にエラーが発生しました",
+  ERROR_MINTING_PARTICIPATION_NFT: "NFTをミント中にエラーが発生しました",
 };

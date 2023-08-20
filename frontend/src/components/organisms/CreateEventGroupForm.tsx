@@ -76,7 +76,7 @@ export const CreateEventGroupForm: FC<Props> = ({ address }) => {
       </Button>
 
       {errorMessage && (
-        <AlertMessage>
+        <AlertMessage title={t.ERROR_CREATING_EVENT_GROUP}>
           {errorMessage?.reason || errorMessage?.message}
         </AlertMessage>
       )}

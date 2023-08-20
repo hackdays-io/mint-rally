@@ -3,7 +3,6 @@ import {
   Container,
   Flex,
   Heading,
-  Link,
   Table,
   Tbody,
   Tr,
@@ -42,15 +41,17 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   if (context.query.tokenid) {
     try {
       props.tokenid = String(context.query.tokenid);
-      const data = await getNFTDataFromTokenID(BigNumber.from(props.tokenid));
+      const [data, owner, groups] = await Promise.all([
+        getNFTDataFromTokenID(BigNumber.from(props.tokenid)),
+        getOwnerOfTokenId(BigNumber.from(props.tokenid)),
+        getEventGroups(),
+      ]);
       if (data) {
         props.nft = data;
       }
-      const owner = await getOwnerOfTokenId(BigNumber.from(props.tokenid));
       if (owner) {
         props.address = owner;
       }
-      const groups = await getEventGroups();
       if (groups) {
         const gid = BigNumber.from(props.nft?.traits.EventGroupId);
         props.groupName = groups.find((group) => gid.eq(group.groupId))?.name;
@@ -112,11 +113,11 @@ const Entity: FC<Props> = (props: Props) => {
                   <ShareButtons
                     tokenId={Number(props.tokenid)}
                     address={props.address!}
-                    twitter={true}
+                    twitter
+                    facebook
                   />
                 </Flex>
               </Box>
-
               <Table maxWidth="100%" variant="simple" wordBreak="break-all">
                 <Tbody>
                   <Tr>

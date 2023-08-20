@@ -1,4 +1,4 @@
-import { Heading, Spinner, Text, Container, Box } from "@chakra-ui/react";
+import { Heading, Spinner, Text, Container, Box, Flex } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { FC, Fragment, useMemo } from "react";
 import LoginRequired from "../../components/atoms/web3/LoginRequired";
@@ -12,8 +12,11 @@ import {
 import { NFTItem } from "src/components/atoms/nft/NFTItem";
 import { Event } from "types/Event";
 import { useEventById } from "src/hooks/useEvent";
-import Link from "next/link";
 import OrganizerInfo from "src/components/atoms/events/OrganizerInfo";
+import { CalendarIcon } from "@chakra-ui/icons";
+import { MintGuide } from "src/components/atoms/form/MintGuide";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCircleInfo } from "@fortawesome/free-solid-svg-icons";
 
 const MintNFTSection: FC<{ event: Event.EventRecord }> = ({ event }) => {
   const address = useAddress();
@@ -67,8 +70,10 @@ const Event: FC = () => {
         {event && (
           <>
             <Heading>{event.name}</Heading>
+            <Text fontSize="24px">
+              <CalendarIcon /> {event.date}
+            </Text>
             <Text fontSize="24px">{event.date}</Text>
-
             <Text fontSize="16px" mt={10}>
               {event.description
                 .split(/(\n)/)
@@ -85,8 +90,33 @@ const Event: FC = () => {
               requiredChainID={+process.env.NEXT_PUBLIC_CHAIN_ID!}
               forbiddenText={t.SIGN_IN_TO_GET_NFT}
             >
-              <MintNFTSection event={event} />
+              <Box
+                borderWidth="3px"
+                rounded="lg"
+                overflow="hidden"
+                verticalAlign="center"
+                backgroundColor="blue.50"
+                padding="8"
+              >
+                <MintNFTSection event={event} />
+              </Box>
             </LoginRequired>
+            <Flex
+              borderWidth="3px"
+              rounded="lg"
+              verticalAlign="top"
+              alignContent="top"
+              backgroundColor="blue.50"
+              padding={8}
+              mt={4}
+            >
+              <Box>
+                <FontAwesomeIcon icon={faCircleInfo} />
+              </Box>
+              <Box>
+                <MintGuide />
+              </Box>
+            </Flex>
           </>
         )}
       </Container>

@@ -1,4 +1,13 @@
-import { Spinner, Table, Tbody, Td, Text, Th, Tr } from "@chakra-ui/react";
+import {
+  Link as ChakraUILink,
+  Spinner,
+  Table,
+  Tbody,
+  Td,
+  Text,
+  Th,
+  Tr,
+} from "@chakra-ui/react";
 import Link from "next/link";
 import { FC, useMemo } from "react";
 import { useEventGroups } from "src/hooks/useEvent";
@@ -35,14 +44,14 @@ export const OrganizerRows: FC<Props> = ({ eventgroupid }: Props) => {
             </Th>
             <Td pl={0} overflowWrap="anywhere">
               <Link href={`/event-groups/${findgroup.groupId}`}>
-                <a>
+                <ChakraUILink color="mint.subtle1">
                   <Text fontSize="16px">{findgroup.name}</Text>
-                </a>
+                </ChakraUILink>
               </Link>
             </Td>
           </Tr>
           <Tr>
-            <Th pl={0} width="140px" color="primary.400">
+            <Th pl={0} width="130px" color="primary.400">
               {t.ORGANIZER}
             </Th>
             <Td pl={0} overflowWrap="anywhere">
