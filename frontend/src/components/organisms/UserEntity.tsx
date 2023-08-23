@@ -18,8 +18,8 @@ export const UserEntity: FC<{ address: string }> = ({ address }) => {
         <Heading as="h1" size="xl" color="mint.primary" fontWeight={700}>
           NFT Collection
         </Heading>
-        <Text fontSize="lg">
-          User: <ENSName address={address} enableEtherScanLink />
+        <Text fontSize="lg" wordBreak="break-all">
+          <ENSName address={address} enableEtherScanLink />
         </Text>
 
         {isLoading ? (

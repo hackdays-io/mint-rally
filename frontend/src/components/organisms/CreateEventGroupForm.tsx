@@ -44,7 +44,9 @@ export const CreateEventGroupForm: FC<Props> = ({ address }) => {
     <>
       <Box mb={5}>{t.EVENT_GROUP_CREATED}🎉</Box>
       <Link href={`/events/new?group_id=${createdGroupId}`}>
-        <Button>{t.CREATE_NEW_EVENT}</Button>
+        <Button backgroundColor="mintGreen.300" size="md">
+          {t.CREATE_NEW_EVENT}
+        </Button>
       </Link>
     </>
   ) : (

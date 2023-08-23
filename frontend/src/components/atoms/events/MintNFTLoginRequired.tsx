@@ -1,10 +1,9 @@
 import { Box, Button, HStack, Heading, Text } from "@chakra-ui/react";
-import { FC, ReactNode, useState } from "react";
+import { FC, ReactNode } from "react";
 import { useAddress, useChainId, useSwitchChain } from "@thirdweb-dev/react";
 import { useLocale } from "../../../hooks/useLocale";
-import SelectMintWallet from "src/components/molecules/web3/SelectMintWallet";
 import Image from "next/image";
-import SelectConnectWallet from "src/components/molecules/web3/SelectConnectWallet";
+import SelectMintWallet from "./SelectMintWallet";
 
 type Props = {
   children: ReactNode;
@@ -12,14 +11,13 @@ type Props = {
   forbiddenText: string;
 };
 
-const LoginRequired: FC<Props> = ({
+const MintNFTLoginRequired: FC<Props> = ({
   children,
   requiredChainID,
   forbiddenText,
 }) => {
   const address = useAddress();
   const chainId = useChainId()!;
-  const [connecting, setConnecting] = useState(false);
 
   const { t } = useLocale();
 
@@ -27,7 +25,7 @@ const LoginRequired: FC<Props> = ({
 
   return (
     <>
-      {!address || connecting ? (
+      {!address ? (
         <Box
           background="linear-gradient(86.52deg, #B5DFDC 0%, #DDED6C 97.14%)"
           borderRadius="16px"
@@ -46,7 +44,7 @@ const LoginRequired: FC<Props> = ({
               alt="civitan"
             />
           </HStack>
-          <SelectConnectWallet setConnecting={setConnecting} />
+          <SelectMintWallet />
         </Box>
       ) : chainId !== requiredChainID ? (
         <Box
@@ -56,17 +54,19 @@ const LoginRequired: FC<Props> = ({
           p={6}
           textAlign="center"
         >
-          <Text mb={5}>{t.PLEASE_SWITCH_NETWORK}</Text>
-          <Button
-            onClick={() => switchNetwork(requiredChainID)}
-            style={{
-              fontWeight: "bold",
-              backgroundColor: "#562406",
-              color: "#fff",
-            }}
-          >
-            {t.SWITCH_NETWORK}
-          </Button>
+          {t.PLEASE_SWITCH_NETWORK}
+          <Text fontSize="xl">
+            <Button
+              onClick={() => switchNetwork(requiredChainID)}
+              style={{
+                fontWeight: "bold",
+                backgroundColor: "#562406",
+                color: "#fff",
+              }}
+            >
+              {t.SWITCH_NETWORK}
+            </Button>
+          </Text>
         </Box>
       ) : (
         children
@@ -75,4 +75,4 @@ const LoginRequired: FC<Props> = ({
   );
 };
 
-export default LoginRequired;
+export default MintNFTLoginRequired;

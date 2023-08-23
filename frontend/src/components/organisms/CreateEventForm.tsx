@@ -401,7 +401,7 @@ const CreateEventForm: FC<Props> = ({ address }) => {
 
               <Box border="1px solid lightgrey" borderRadius={4} p={5} mt={10}>
                 <Text fontSize="18px" fontWeight="bold" mb={5}>
-                  イベントで配布するNFT
+                  {t.EVENT_DISTRIBUTED_NFT}
                 </Text>
                 <NFTAttributesForm
                   control={control}

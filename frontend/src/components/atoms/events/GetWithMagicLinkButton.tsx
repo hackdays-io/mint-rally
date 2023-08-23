@@ -27,7 +27,6 @@ const MagicLinkConnectButton: FC<Props> = ({ selected }) => {
   const [isSelected, setSelected] = useState<boolean>(false);
   const [isNotValid, setIsNotValid] = useState<boolean>(true);
   const [enteredEmailAddress, setEnteredEmailAddress] = useState("");
-
   const handleConnect = async () => {
     try {
       await connect(magicLinkConfig, {
@@ -55,7 +54,7 @@ const MagicLinkConnectButton: FC<Props> = ({ selected }) => {
             selected(true);
           }}
         >
-          {t.GET_NFT_USING_EMAIL}
+          {t.CONNECT_WITH_EMAIL}
         </Button>
       ) : (
         <>
@@ -69,7 +68,7 @@ const MagicLinkConnectButton: FC<Props> = ({ selected }) => {
             alignContent={"center"}
             justify={"center"}
           >
-            <HStack mb={{ base: 2, md: 0 }}>
+            <HStack mb={{ base: 2, md: 0 }} maxW="100%">
               <Button
                 leftIcon={<FontAwesomeIcon icon={faArrowLeft} />}
                 p={0}
@@ -104,12 +103,12 @@ const MagicLinkConnectButton: FC<Props> = ({ selected }) => {
               onClick={() => {
                 handleConnect();
               }}
+              isLoading={["connecting"].includes(connectionStatus)}
               disabled={
                 ["unknown", "connecting", "connected"].includes(
                   connectionStatus
                 ) || isNotValid
               }
-              isLoading={["connecting"].includes(connectionStatus)}
             >
               {t.CONNECT}
             </Button>
