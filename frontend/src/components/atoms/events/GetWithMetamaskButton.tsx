@@ -21,7 +21,6 @@ const GetWithMetamaskButton: FC = () => {
       window.location.href = `https://metamask.app.link/dapp/${
         process.env.NEXT_PUBLIC_CHAIN_ID === "137" ? "" : "staging."
       }mintrally.xyz/${locale}${asPath}`;
-      window.location.href = "https://metamask.io/";
       return;
     }
     await connect(metamaskConfig, { chainId: Number(chainId) });
