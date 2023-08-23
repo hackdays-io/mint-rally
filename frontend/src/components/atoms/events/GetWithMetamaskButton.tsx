@@ -4,17 +4,24 @@ import {
   useConnect,
   useConnectionStatus,
 } from "@thirdweb-dev/react";
+import { useRouter } from "next/router";
 import { FC } from "react";
 import { useLocale } from "src/hooks/useLocale";
 import { chainId } from "src/libs/web3Config";
 
 const GetWithMetamaskButton: FC = () => {
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
   const metamaskConfig = metamaskWallet();
   const connect = useConnect();
   const connectingStatus = useConnectionStatus();
+  const { asPath } = useRouter();
 
   const handleConnect = async () => {
+    if (!window.ethereum) {
+      window.location.href = `https://metamask.app.link/dapp/staging.mintrally.xyz/${locale}${asPath}`;
+      window.location.href = "https://metamask.io/";
+      return;
+    }
     await connect(metamaskConfig, { chainId: Number(chainId) });
   };
   const MetamaskIcon = () => (

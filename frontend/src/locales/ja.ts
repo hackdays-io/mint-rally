@@ -51,7 +51,7 @@ export default {
   EVENT_DISTRIBUTED_NFT: "イベントで配布されるNFT",
   // Event page
   SIGN_IN_TO_GET_NFT: "NFTをGetしよう！",
-  SELECT_WALLET: "NFTの取得方法を下記から選択してください。",
+  SELECT_WALLET: "NFTの取得方法を選択してください",
   GET_NFT_USING_METAMASK: "Metamask で受け取る",
   GET_NFT_USING_EMAIL: "メールアドレスで受け取る",
   EMAIL_ADDRESS: "メールアドレス",

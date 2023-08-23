@@ -55,7 +55,7 @@ const MagicLinkConnectButton: FC<Props> = ({ selected }) => {
             selected(true);
           }}
         >
-          {t.GET_NFT_USING_EMAIL}
+          {t.CONNECT_WITH_EMAIL}
         </Button>
       ) : (
         <>

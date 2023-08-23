@@ -1,8 +1,8 @@
 import { FC, useState } from "react";
 import { VStack } from "@chakra-ui/react";
 import MetamaskConnectButton from "src/components/atoms/web3/MetamaskConnectButton";
-import MagicLinkConnectButton from "src/components/atoms/events/GetWithMagicLinkButton";
 import SafeConnectButton from "src/components/atoms/web3/SafeConnectButton";
+import MagicLinkConnectButton from "src/components/atoms/web3/MagicLinkConnectButton";
 
 type Props = {
   setConnecting: (connecting: boolean) => void;
