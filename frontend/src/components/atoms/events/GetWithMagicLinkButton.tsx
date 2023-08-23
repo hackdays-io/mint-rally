@@ -1,12 +1,4 @@
-import {
-  Button,
-  FormLabel,
-  HStack,
-  Img,
-  Input,
-  Spacer,
-  Stack,
-} from "@chakra-ui/react";
+import { Button, FormLabel, HStack, Input, Stack } from "@chakra-ui/react";
 import { faArrowLeft, faEnvelope } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useConnect, useConnectionStatus } from "@thirdweb-dev/react";
@@ -18,7 +10,7 @@ type Props = {
   selected: (selected: boolean) => void;
 };
 
-const MagicLinkConnectButton: FC<Props> = ({ selected }) => {
+const GetWithMagicLinkButton: FC<Props> = ({ selected }) => {
   const { t } = useLocale();
   const { magicLinkConfig } = useMagicLinkConfig();
   const connect = useConnect();
@@ -54,7 +46,7 @@ const MagicLinkConnectButton: FC<Props> = ({ selected }) => {
             selected(true);
           }}
         >
-          {t.CONNECT_WITH_EMAIL}
+          {t.GET_NFT_USING_EMAIL}
         </Button>
       ) : (
         <>
@@ -118,4 +110,4 @@ const MagicLinkConnectButton: FC<Props> = ({ selected }) => {
     </>
   );
 };
-export default MagicLinkConnectButton;
+export default GetWithMagicLinkButton;
