@@ -18,7 +18,9 @@ const GetWithMetamaskButton: FC = () => {
 
   const handleConnect = async () => {
     if (!window.ethereum) {
-      window.location.href = `https://metamask.app.link/dapp/staging.mintrally.xyz/${locale}${asPath}`;
+      window.location.href = `https://metamask.app.link/dapp/${
+        process.env.NEXT_PUBLIC_CHAIN_ID === "137" ? "" : "staging."
+      }mintrally.xyz/${locale}${asPath}`;
       window.location.href = "https://metamask.io/";
       return;
     }
