@@ -44,7 +44,7 @@ export const OrganizerRows: FC<Props> = ({ eventgroupid }: Props) => {
             </Th>
             <Td pl={0} overflowWrap="anywhere">
               <Link href={`/event-groups/${findgroup.groupId}`}>
-                <ChakraUILink color="mint.subtle1">
+                <ChakraUILink color="yellow.800">
                   <Text fontSize="16px">{findgroup.name}</Text>
                 </ChakraUILink>
               </Link>
@@ -54,7 +54,7 @@ export const OrganizerRows: FC<Props> = ({ eventgroupid }: Props) => {
             <Th pl={0} width="130px" color="primary.400">
               {t.ORGANIZER}
             </Th>
-            <Td pl={0} overflowWrap="anywhere">
+            <Td pl={0} overflowWrap="anywhere" wordBreak="break-all">
               <ENSName address={findgroup.ownerAddress} enableEtherScanLink />
             </Td>
           </Tr>
@@ -66,7 +66,7 @@ export const OrganizerRows: FC<Props> = ({ eventgroupid }: Props) => {
 const OrganizerInfo: FC<Props> = ({ eventgroupid }) => {
   return (
     <>
-      <Table maxWidth="100%" variant="simple" mt={5} mb={10}>
+      <Table maxWidth="100%" variant="simple" mt={5} mb={10} color="text.black">
         <Tbody>
           <OrganizerRows eventgroupid={eventgroupid} />
         </Tbody>

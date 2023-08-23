@@ -15,7 +15,7 @@ const NewEventGroupPage: NextPage = () => {
 
   return (
     <Container maxW={800}>
-      <Heading as="h1" mt={4} mb={6}>
+      <Heading as="h1" fontSize="3xl" my={6}>
         {t.CREATE_NEW_EVENT_GROUP}
       </Heading>
       <LoginRequired

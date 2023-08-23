@@ -12,6 +12,11 @@ export default {
   SWITCH_NETWORK: "Switch Network",
   PLEASE_SWITCH_NETWORK: "Please switch network to the correct network.",
   PLEASE_SIGN_IN: "Please sign in first!",
+  //Connect Wallet
+  CONNECT_WITH_METAMASK: "Connect with Metamask",
+  CONNECT_WITH_EMAIL: "Connect with Email",
+  CONNECT_WITH_SAFE: "Connect with Safe",
+  INPUT_SAFE_WALLET_ADDRESS: "Input Safe Wallet Address",
   // NFT
   NFT_NAME: "NFT Name",
   NFT_DESC: "NFT Description",
@@ -43,10 +48,11 @@ export default {
   EVENT_SECRETPHRASE: "SecretPhrase to mint",
   EVENT_SECRETPHRASE_DESC:
     "Please do not forget this phrase. you can't get this phrase after submitting",
+  EVENT_DISTRIBUTED_NFT: "NFTs to be distributed at the event",
   // Event page
   SIGN_IN_TO_GET_NFT: "Sign in to get NFT!",
-  GET_NFT_USING_METAMASK: "Get NFT using Metamask",
-  GET_NFT_USING_EMAIL: "Get NFT using Email address",
+  GET_NFT_USING_METAMASK: "Get NFT with Metamask",
+  GET_NFT_USING_EMAIL: "Get NFT with Email",
   EMAIL_ADDRESS: "Email address",
   PLEASE_ENTER_EMAIL_ADDRESS: "Please enter your email address and connect.",
 
@@ -99,8 +105,4 @@ export default {
   ERROR_MINTING_PARTICIPATION_NFT: "An error occurred when minting your NFT",
   OWNER: "Owner",
   MINTGUIDE: guide,
-  ERROR_CREATING_EVENT: "An error occurred when creating your new event",
-  ERROR_CREATING_EVENT_GROUP:
-    "An error occurred when creating your new event group",
-  ERROR_MINTING_PARTICIPATION_NFT: "An error occurred when minting your NFT",
 };

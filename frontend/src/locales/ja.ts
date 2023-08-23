@@ -1,4 +1,4 @@
-import { guide } from './guide-ja'
+import { guide } from "./guide-ja";
 export default {
   TOP: "トップ",
   EVENTGROUPS: "イベントグループ",
@@ -17,6 +17,11 @@ export default {
   NFT_DESC: "NFT説明",
   NFT_DEFAULT: "このNFTは一般参加者に配布されます。",
   TIMES_PARTICIPATE: "このNFTを取得するために必要なイベント参加回数",
+  // Connect Wallet
+  CONNECT_WITH_METAMASK: "Metamaskで接続",
+  CONNECT_WITH_EMAIL: "メールアドレスで接続",
+  CONNECT_WITH_SAFE: "Safeで接続",
+  INPUT_SAFE_WALLET_ADDRESS: "Safeのウォレットアドレスを入力",
   // Event group index
   CREATE_NEW_EVENT_GROUP: "イベントグループを作成",
   NEW_EVENT_GROUP_NAME: "イベントグループ名",
@@ -43,13 +48,15 @@ export default {
   EVENT_SECRETPHRASE: "NFT受け取りのひみつの「あいことば」",
   EVENT_SECRETPHRASE_DESC:
     "ひみつの「あいことば」は忘れないようにしてください。あとから確認することはできません。",
+  EVENT_DISTRIBUTED_NFT: "イベントで配布されるNFT",
   // Event page
-  SIGN_IN_TO_GET_NFT: "NFTを Get しよう！！",
+  SIGN_IN_TO_GET_NFT: "NFTをGetしよう！",
   SELECT_WALLET: "NFTの取得方法を下記から選択してください。",
   GET_NFT_USING_METAMASK: "Metamask で受け取る",
   GET_NFT_USING_EMAIL: "メールアドレスで受け取る",
   EMAIL_ADDRESS: "メールアドレス",
-  PLEASE_ENTER_EMAIL_ADDRESS: "接続用のメールアドレスを入力しログインしてください。",
+  PLEASE_ENTER_EMAIL_ADDRESS:
+    "接続用のメールアドレスを入力しログインしてください。",
   YOU_ALREADY_HAVE_THIS_NFT:
     "既にこのイベントのNFTは取得済みです。ご参加ありがとうございました！",
   ENTER_SECRET_PHRASE:
@@ -97,7 +104,4 @@ export default {
   ERROR_MINTING_PARTICIPATION_NFT: "NFTをミント中にエラーが発生しました",
   OWNER: "所有者",
   MINTGUIDE: guide,
-  ERROR_CREATING_EVENT: "イベントを作成中にエラーが発生しました",
-  ERROR_CREATING_EVENT_GROUP: "イベントグループを作成中にエラーが発生しました",
-  ERROR_MINTING_PARTICIPATION_NFT: "NFTをミント中にエラーが発生しました",
 };
