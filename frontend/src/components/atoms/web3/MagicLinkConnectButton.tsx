@@ -12,7 +12,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useConnect, useConnectionStatus } from "@thirdweb-dev/react";
 import { FC, useState } from "react";
 import { useLocale } from "src/hooks/useLocale";
-import { chainId, useMagicLinkConfig } from "src/libs/web3Config";
+import { chainId, useWeb3WalletConfig } from "src/libs/web3Config";
 
 type Props = {
   selected: (selected: boolean) => void;
@@ -20,7 +20,7 @@ type Props = {
 
 const MagicLinkConnectButton: FC<Props> = ({ selected }) => {
   const { t } = useLocale();
-  const { magicLinkConfig } = useMagicLinkConfig();
+  const { magicLinkConfig } = useWeb3WalletConfig();
   const connect = useConnect();
   const connectionStatus = useConnectionStatus();
 
