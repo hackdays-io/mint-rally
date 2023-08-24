@@ -8,10 +8,10 @@ export const activeChain =
   chainId === "80001"
     ? Mumbai
     : chainId === "137"
-      ? Polygon
-      : { ...Localhost, chainId: 31337 };
+    ? Polygon
+    : { ...Localhost, chainId: 31337 };
 
-export const useMagicLinkConfig = () => {
+export const useWeb3WalletConfig = () => {
   const { t, locale } = useLocale();
 
   const magicLinkConfig = useMemo(() => {
@@ -24,8 +24,21 @@ export const useMagicLinkConfig = () => {
       smsLogin: false,
     });
     m_config.meta.name = t.GET_VIA_EMAIL;
+    m_config.meta.iconURL = "/images/magiclink.svg";
     return m_config;
   }, [t]);
-  const supportedWallets = [metamaskWallet(), safeWallet(), magicLinkConfig];
-  return { magicLinkConfig, supportedWallets }
+
+  const safeWalletConfig = useMemo(() => {
+    const s_config = safeWallet();
+    s_config.meta.iconURL = "/images/safe_black.png";
+    return s_config;
+  }, []);
+
+  const supportedWallets = [
+    metamaskWallet(),
+    safeWalletConfig,
+    magicLinkConfig,
+  ];
+
+  return { magicLinkConfig, supportedWallets };
 };

@@ -10,7 +10,7 @@ import { GoogleAnalytics } from "nextjs-google-analytics";
 import NProgress from "nprogress";
 import "nprogress/nprogress.css";
 import { Router } from "next/router";
-import { activeChain, useMagicLinkConfig } from "../libs/web3Config";
+import { activeChain, useWeb3WalletConfig } from "../libs/web3Config";
 
 config.autoAddCss = false;
 
@@ -18,7 +18,8 @@ function MyApp({ Component, pageProps }: AppProps) {
   Router.events.on("routeChangeStart", () => NProgress.start());
   Router.events.on("routeChangeComplete", () => NProgress.done());
   Router.events.on("routeChangeError", () => NProgress.done());
-  const { magicLinkConfig, supportedWallets } = useMagicLinkConfig();
+  const { supportedWallets } = useWeb3WalletConfig();
+
   return (
     <>
       <GoogleAnalytics trackPageViews />
