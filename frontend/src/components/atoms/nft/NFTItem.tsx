@@ -1,10 +1,8 @@
 import { Box, Flex, Image, Text } from "@chakra-ui/react";
-import { useRouter } from "next/router";
 import { FC } from "react";
 import { NFT } from "types/NFT";
 import { ipfs2http } from "utils/ipfs2http";
 import { ShareButtons } from "./ShareButtons";
-import { useLocale } from "src/hooks/useLocale";
 import NextLink from "next/link";
 
 type Props = {
@@ -24,8 +22,6 @@ export const NFTItem: FC<Props> = ({
   address = "",
   showShareButtons = false,
 }) => {
-  const { tokenid } = useRouter().query;
-  const { t } = useLocale();
   return (
     <>
       <Flex justifyContent="center" alignItems="center" flexDirection="column">
@@ -39,10 +35,15 @@ export const NFTItem: FC<Props> = ({
           <NextLink href={`/nfts/${nft.tokenId}`} passHref>
             <a>
               <Box>
-                <Image src={ipfs2http(nft.image)} alt={nft.name} />
+                <Image
+                  width={500}
+                  style={{ objectFit: "cover" }}
+                  src={ipfs2http(nft.image)}
+                  alt={nft.name}
+                />
               </Box>
               <Box>
-                <Text fontSize="md" fontWeight="bold" mt={2}>
+                <Text fontSize="md" fontWeight="bold" mt={2} textAlign="center">
                   {nft.name}
                 </Text>
               </Box>
@@ -50,7 +51,12 @@ export const NFTItem: FC<Props> = ({
           </NextLink>
         </Flex>
         {showShareButtons && (
-          <ShareButtons tokenId={tokenId} address={address} twitter={true} />
+          <ShareButtons
+            tokenId={tokenId}
+            address={address}
+            twitter={true}
+            facebook={true}
+          />
         )}
       </Flex>
     </>

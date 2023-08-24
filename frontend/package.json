@@ -44,8 +44,7 @@
     "snarkjs": "^0.7.0",
     "wagmi": "^0.6.5",
     "web3.storage": "^4.3.0",
-    "web3modal": "^1.9.8",
-    "　　　　　": "fortawesome/react-fontawesome"
+    "web3modal": "^1.9.8"
   },
   "devDependencies": {
     "@types/node": "18.0.0",
