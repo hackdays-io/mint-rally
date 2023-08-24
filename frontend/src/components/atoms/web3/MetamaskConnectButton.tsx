@@ -6,6 +6,7 @@ import {
 } from "@thirdweb-dev/react";
 import { FC } from "react";
 import { useLocale } from "src/hooks/useLocale";
+import { useDeeplink2Metamask } from "src/hooks/useWallet";
 import { chainId } from "src/libs/web3Config";
 
 const MetamaskConnectButton: FC = () => {
@@ -13,8 +14,13 @@ const MetamaskConnectButton: FC = () => {
   const metamaskConfig = metamaskWallet();
   const connect = useConnect();
   const connectionStatus = useConnectionStatus();
+  const deeplink = useDeeplink2Metamask();
 
   const handleConnect = async () => {
+    if (!window.ethereum) {
+      deeplink();
+      return;
+    }
     await connect(metamaskConfig, { chainId: Number(chainId) });
   };
 
