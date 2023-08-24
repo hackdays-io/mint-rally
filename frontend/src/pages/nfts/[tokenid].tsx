@@ -3,19 +3,22 @@ import {
   Container,
   Flex,
   Heading,
-  Link,
   Table,
   Tbody,
   Tr,
   Th,
   Td,
+  Grid,
 } from "@chakra-ui/react";
 import { BigNumber } from "ethers";
 import { GetServerSideProps } from "next";
 import { NextSeo } from "next-seo";
 import Image from "next/image";
 import { FC } from "react";
+import { OrganizerRows } from "src/components/atoms/events/OrganizerInfo";
 import { ShareButtons } from "src/components/atoms/nft/ShareButtons";
+import ENSName from "src/components/atoms/web3/ENSName";
+import { useLocale } from "src/hooks/useLocale";
 import {
   getEventGroups,
   getNFTDataFromTokenID,
@@ -38,15 +41,17 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   if (context.query.tokenid) {
     try {
       props.tokenid = String(context.query.tokenid);
-      const data = await getNFTDataFromTokenID(BigNumber.from(props.tokenid));
+      const [data, owner, groups] = await Promise.all([
+        getNFTDataFromTokenID(BigNumber.from(props.tokenid)),
+        getOwnerOfTokenId(BigNumber.from(props.tokenid)),
+        getEventGroups(),
+      ]);
       if (data) {
         props.nft = data;
       }
-      const owner = await getOwnerOfTokenId(BigNumber.from(props.tokenid));
       if (owner) {
         props.address = owner;
       }
-      const groups = await getEventGroups();
       if (groups) {
         const gid = BigNumber.from(props.nft?.traits.EventGroupId);
         props.groupName = groups.find((group) => gid.eq(group.groupId))?.name;
@@ -64,6 +69,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 };
 
 const Entity: FC<Props> = (props: Props) => {
+  const { t } = useLocale();
   return (
     <Container maxW="1000">
       {props.nft && (
@@ -89,56 +95,59 @@ const Entity: FC<Props> = (props: Props) => {
         </Heading>
         {props.nft && (
           <>
-            <Flex justifyContent={{ md: "center" }} flexDirection="column">
-              <Box
-                width={{ md: 350 }}
-                textAlign={{ base: "center", md: "left" }}
-              >
-                <Image
-                  width={500}
-                  height={500}
-                  src={ipfs2http(props.nft.image)}
-                  alt={props.nft.name}
-                />
+            <Grid gridTemplateColumns={{ base: "auto", md: "400px 1fr" }}>
+              <Box>
+                <Box
+                  width={{ md: 350 }}
+                  textAlign={{ base: "center", md: "left" }}
+                >
+                  <Image
+                    width={500}
+                    height={500}
+                    src={ipfs2http(props.nft.image)}
+                    alt={props.nft.name}
+                  />
+                </Box>
+
+                <Flex justifyContent="center" pb={4} width={{ md: 350 }}>
+                  <ShareButtons
+                    tokenId={Number(props.tokenid)}
+                    address={props.address!}
+                    twitter
+                    facebook
+                  />
+                </Flex>
               </Box>
-
-              <Flex justifyContent="center" pb={4} width={{ md: 350 }}>
-                <ShareButtons
-                  tokenId={Number(props.tokenid)}
-                  address={props.address!}
-                  twitter={true}
-                />
-              </Flex>
-
-              <Table maxWidth="100%" variant="simple">
+              <Table maxWidth="100%" variant="simple" wordBreak="break-all">
                 <Tbody>
                   <Tr>
-                    <Th width={100}>Owner: </Th>
-                    <Td overflowWrap="anywhere" whiteSpace="unset">
-                      {props.address}
+                    <Th pl={0} width="140px" color="primary.400">
+                      {t.OWNER}
+                    </Th>
+                    <Td pl={0} overflowWrap="anywhere" whiteSpace="unset">
+                      <ENSName address={props.address!} enableUserLink={true} />
                     </Td>
                   </Tr>
                   <Tr>
-                    <Th>Event: </Th>
-                    <Td overflowWrap="anywhere">
-                      <Link
-                        href={`/event-groups/${props.nft.traits.EventGroupId}`}
-                      >
-                        {props.groupName}
-                      </Link>
+                    <Th pl={0} width="140px" color="primary.400">
+                      {t.NFT_NAME}
+                    </Th>
+                    <Td pl={0} overflowWrap="anywhere">
+                      {props.nft.name}
                     </Td>
                   </Tr>
                   <Tr>
-                    <Th>Name:</Th>
-                    <Td overflowWrap="anywhere"> {props.nft.name}</Td>
+                    <Th pl={0} width="140px" color="primary.400">
+                      {t.NFT_DESC}
+                    </Th>
+                    <Td pl={0} overflowWrap="anywhere">
+                      {props.nft.description}
+                    </Td>
                   </Tr>
-                  <Tr>
-                    <Th>Description:</Th>
-                    <Td overflowWrap="anywhere">{props.nft.description}</Td>
-                  </Tr>
+                  <OrganizerRows eventgroupid={props.nft.traits.EventGroupId} />
                 </Tbody>
               </Table>
-            </Flex>
+            </Grid>
           </>
         )}
       </Box>

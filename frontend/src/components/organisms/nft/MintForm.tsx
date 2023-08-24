@@ -63,8 +63,9 @@ export const MintForm: FC<Props> = ({ event, address }) => {
           justifyContent="space-between"
           alignItems="end"
           flexWrap="wrap"
+          color="text.black"
         >
-          <Text mb={2}>
+          <Text mb={3}>
             {t.ENTER_SECRET_PHRASE}
             {walletMetadata?.name === "MetaMask" &&
               t.ENTER_SECRET_PHRASE_METAMASK}
@@ -81,6 +82,7 @@ export const MintForm: FC<Props> = ({ event, address }) => {
               onChange={(e) => setEnteredSecretPhrase(e.target.value)}
               pr={10}
               placeholder={t.INPUT_SECRET_PHRASE}
+              backgroundColor={"#fff"}
             />
           </Box>
           <Button
@@ -92,13 +94,17 @@ export const MintForm: FC<Props> = ({ event, address }) => {
             rounded="full"
           >
             {t.CLAIM_NFT}
-            <Text as="span" fontSize="10px">
+            <Text as="span" fontSize="10px" ml={event.useMtx ? 2 : 0}>
               {event.useMtx ? t.USE_MTX : ""}
             </Text>
           </Button>
         </Flex>
       )}
-      {error && <AlertMessage>{error.reason}</AlertMessage>}
+      {error && (
+        <AlertMessage title={t.ERROR_MINTING_PARTICIPATION_NFT}>
+          {error.reason}
+        </AlertMessage>
+      )}
       {status == "success" && !mintedNFT && (
         <AlertMessage status="success" mt={3} title={t.YOU_HAVE_CLAIMED_NFT} />
       )}
@@ -108,8 +114,8 @@ export const MintForm: FC<Props> = ({ event, address }) => {
       {mintedNFT && (
         <>
           <AlertMessage status="success" mt={3} title={t.YOU_HAVE_GOT_NFT} />
-          <VStack justify="center" mt={5}>
-            <Box maxW={250}>
+          <VStack justify="center" mt={5} zIndex={5} position="relative">
+            <Box maxW={350}>
               <NFTItem
                 nft={mintedNFT}
                 tokenId={mintedNFT.tokenId || 0}
@@ -124,9 +130,9 @@ export const MintForm: FC<Props> = ({ event, address }) => {
             <span id="balloonsReward" />
           </VStack>
           <VStack justify="center" mt={10}>
-            <Text>{t.GO_SURVEY}</Text>
+            <Text fontSize="sm">{t.GO_SURVEY}</Text>
             <Link href={"https://forms.gle/kx7VykmGwRqhJiQ16"} target="_blank">
-              <Button>{t.SURVEY_BUTTON}</Button>
+              <Button size="sm">{t.SURVEY_BUTTON}</Button>
             </Link>
           </VStack>
         </>

@@ -1,4 +1,4 @@
-import { Heading, Spinner, Text, Container, Box } from "@chakra-ui/react";
+import { Heading, Spinner, Text, Container, Box, Flex } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { FC, Fragment, useMemo } from "react";
 import LoginRequired from "../../components/atoms/web3/LoginRequired";
@@ -12,6 +12,12 @@ import {
 import { NFTItem } from "src/components/atoms/nft/NFTItem";
 import { Event } from "types/Event";
 import { useEventById } from "src/hooks/useEvent";
+import OrganizerInfo from "src/components/atoms/events/OrganizerInfo";
+import { CalendarIcon } from "@chakra-ui/icons";
+import { MintGuide } from "src/components/atoms/form/MintGuide";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCircleInfo } from "@fortawesome/free-solid-svg-icons";
+import MintNFTLoginRequired from "src/components/atoms/events/MintNFTLoginRequired";
 
 const MintNFTSection: FC<{ event: Event.EventRecord }> = ({ event }) => {
   const address = useAddress();
@@ -34,7 +40,7 @@ const MintNFTSection: FC<{ event: Event.EventRecord }> = ({ event }) => {
       {isLoading || checkHoldingNFTs || !address ? (
         <Spinner />
       ) : isHoldingEventNft && holdingNFT ? (
-        <Box maxW={200} mx="auto" cursor="pointer">
+        <Box mx="auto" cursor="pointer" mb={10} maxW={350}>
           <NFTItem
             shareURL={false}
             nft={holdingNFT}
@@ -45,7 +51,16 @@ const MintNFTSection: FC<{ event: Event.EventRecord }> = ({ event }) => {
           />
         </Box>
       ) : (
-        <MintForm event={event} address={address} />
+        <Box
+          rounded="lg"
+          overflow="hidden"
+          verticalAlign="center"
+          backgroundColor="blue.50"
+          py={{ md: 8, base: 5 }}
+          px={{ md: 10, base: 5 }}
+        >
+          <MintForm event={event} address={address} />
+        </Box>
       )}
     </>
   );
@@ -64,10 +79,21 @@ const Event: FC = () => {
         {isLoading && <Spinner />}
         {event && (
           <>
-            <Heading>{event.name}</Heading>
-            <Text fontSize="24px">{event.date}</Text>
+            <Heading fontSize="3xl" mb={2} color="text.black">
+              {event.name}
+            </Heading>
+            <Text
+              fontSize="md"
+              mb={6}
+              display="flex"
+              alignItems="center"
+              gap={2}
+              color="yellow.900"
+            >
+              <CalendarIcon /> {event.date}
+            </Text>
 
-            <Text fontSize="16px" my={10}>
+            <Text fontSize="md" color="text.black">
               {event.description
                 .split(/(\n)/)
                 .map((item: any, index: number) => (
@@ -77,12 +103,32 @@ const Event: FC = () => {
                 ))}
             </Text>
 
-            <LoginRequired
+            <OrganizerInfo eventgroupid={event[1]} />
+
+            <MintNFTLoginRequired
               requiredChainID={+process.env.NEXT_PUBLIC_CHAIN_ID!}
               forbiddenText={t.SIGN_IN_TO_GET_NFT}
             >
               <MintNFTSection event={event} />
-            </LoginRequired>
+            </MintNFTLoginRequired>
+
+            <Box
+              rounded="lg"
+              verticalAlign="top"
+              alignContent="top"
+              backgroundColor="blue.50"
+              py={{ md: 8, base: 5 }}
+              px={{ md: 10, base: 5 }}
+              mt={4}
+              display={{ base: "block", md: "flex" }}
+            >
+              <Box color="blue.500" fontSize="lg">
+                <FontAwesomeIcon icon={faCircleInfo} />
+              </Box>
+              <Box>
+                <MintGuide />
+              </Box>
+            </Box>
           </>
         )}
       </Container>

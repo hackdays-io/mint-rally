@@ -1,4 +1,4 @@
-import { Container, Heading, SimpleGrid, Spinner } from "@chakra-ui/react";
+import { Container, Heading, Spinner, VStack, Text } from "@chakra-ui/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useMemo } from "react";
@@ -6,6 +6,7 @@ import EventCard from "../../components/atoms/events/EventCard";
 import { useLocale } from "../../hooks/useLocale";
 import { useEventGroups, useEvents } from "src/hooks/useEvent";
 import { Event } from "types/Event";
+import ENSName from "src/components/atoms/web3/ENSName";
 
 const EventGroup = () => {
   const router = useRouter();
@@ -32,30 +33,40 @@ const EventGroup = () => {
                   {findgroup.name}
                   {t.OWN_EVENTS}
                 </Heading>
-                {eventLoading && <Spinner></Spinner>}
-                <SimpleGrid columns={3} spacing={5}>
-                  {events
-                    .filter(
-                      (findgroup: Event.EventRecord) =>
-                        findgroup.groupId.toString() == eventgroupid
-                    )
-                    .map((event: Event.EventRecord) => {
-                      return (
-                        <Link
-                          href={"/events/" + event.eventRecordId}
-                          key={event.eventRecordId.toString()}
-                        >
-                          <a>
-                            <EventCard
-                              title={event.name}
-                              description={event.description}
-                              date={event.date}
-                            ></EventCard>
-                          </a>
-                        </Link>
-                      );
-                    })}
-                </SimpleGrid>
+                <Text mb={6}>
+                  {t.ORGANIZER}:{" "}
+                  <ENSName
+                    address={findgroup.ownerAddress}
+                    enableEtherScanLink={true}
+                  />
+                </Text>
+                {eventLoading ? (
+                  <Spinner />
+                ) : (
+                  <VStack spacing={5} align="stretch">
+                    {events
+                      ?.filter(
+                        (findgroup: Event.EventRecord) =>
+                          findgroup.groupId.toString() == eventgroupid
+                      )
+                      ?.map((event: Event.EventRecord) => {
+                        return (
+                          <Link
+                            href={"/events/" + event.eventRecordId}
+                            key={event.eventRecordId.toString()}
+                          >
+                            <a>
+                              <EventCard
+                                title={event.name}
+                                description={event.description}
+                                date={event.date}
+                              ></EventCard>
+                            </a>
+                          </Link>
+                        );
+                      })}
+                  </VStack>
+                )}
               </>
             )}
           </>

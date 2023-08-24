@@ -1,3 +1,4 @@
+import { guide } from "./guide-en";
 export default {
   TOP: "TOP",
   EVENTGROUPS: "Event Groups",
@@ -6,9 +7,16 @@ export default {
   HELP: "HELP",
   SIGN_IN: "Sign In",
   SIGN_OUT: "Sign Out",
+  CONNECT: "Connect",
   GET_VIA_EMAIL: "Connect with Email",
   SWITCH_NETWORK: "Switch Network",
+  PLEASE_SWITCH_NETWORK: "Please switch network to the correct network.",
   PLEASE_SIGN_IN: "Please sign in first!",
+  //Connect Wallet
+  CONNECT_WITH_METAMASK: "Connect with Metamask",
+  CONNECT_WITH_EMAIL: "Connect with Email",
+  CONNECT_WITH_SAFE: "Connect with Safe",
+  INPUT_SAFE_WALLET_ADDRESS: "Input Safe Wallet Address",
   // NFT
   NFT_NAME: "NFT Name",
   NFT_DESC: "NFT Description",
@@ -40,8 +48,15 @@ export default {
   EVENT_SECRETPHRASE: "SecretPhrase to mint",
   EVENT_SECRETPHRASE_DESC:
     "Please do not forget this phrase. you can't get this phrase after submitting",
+  EVENT_DISTRIBUTED_NFT: "NFTs to be distributed at the event",
   // Event page
   SIGN_IN_TO_GET_NFT: "Sign in to get NFT!",
+  GET_NFT_USING_METAMASK: "Get NFT with Metamask",
+  GET_NFT_USING_EMAIL: "Get NFT with Email",
+  EMAIL_ADDRESS: "Email address",
+  PLEASE_ENTER_EMAIL_ADDRESS: "Please enter your email address and connect.",
+
+  SELECT_WALLET: "Please select which wallet you use.",
   YOU_ALREADY_HAVE_THIS_NFT:
     "You already have this Event's NFT. Thank you for your participation!",
   ENTER_SECRET_PHRASE: "Enter Secret Phrase. Event organaizers will tell you.",
@@ -84,4 +99,10 @@ export default {
   CONTRIBUTORS_WANTED_DESC:
     "MintRally is an open source project being developed by members of the civic tech project Hackdays.<br/> We are looking for colleagues to help us make MintRally a better open source project while working to expand its functionality, improve usability, and address accessibility issues.",
   SHOW_NFT_ON_METAMASK: "How to show this NFT on MetaMask",
+  ERROR_CREATING_EVENT: "An error occurred when creating your new event",
+  ERROR_CREATING_EVENT_GROUP:
+    "An error occurred when creating your new event group",
+  ERROR_MINTING_PARTICIPATION_NFT: "An error occurred when minting your NFT",
+  OWNER: "Owner",
+  MINTGUIDE: guide,
 };
