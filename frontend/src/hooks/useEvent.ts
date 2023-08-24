@@ -13,10 +13,7 @@ import { useCurrentBlock } from "./useBlockChain";
 import { Event } from "types/Event";
 import { BigNumber, ethers } from "ethers";
 import { reverse } from "lodash";
-import { EVENT_BLACK_LIST } from "src/constants/event";
-import { useGenerateProof, useHashPoseidon } from "./useSecretPhrase";
-import axios from "axios";
-import { keccak256, toUtf8Bytes } from "ethers/lib/utils";
+import { useGenerateProof } from "./useSecretPhrase";
 
 export const useEventManagerContract = () => {
   const {
@@ -99,9 +96,18 @@ export const useOwnEventGroups = () => {
   const address = useAddress();
   const {
     isLoading,
-    data: groups,
+    data: _groups,
     error,
   } = useContractRead(eventManagerContract, "getOwnGroups", [address]);
+
+  const groups = useMemo(() => {
+    return _groups?.filter((group: any) => {
+      const blackList = process.env.NEXT_PUBLIC_EVENT_GROUP_BLACK_LIST
+        ? JSON.parse(`[${process.env.NEXT_PUBLIC_EVENT_GROUP_BLACK_LIST}]`)
+        : [];
+      return !blackList.includes(group.groupId.toNumber());
+    });
+  }, [_groups]);
 
   return { groups, isLoading, error };
 };
@@ -115,10 +121,10 @@ export const useEventGroups = () => {
 
   const groups = useMemo(() => {
     return _groups?.filter((group: any) => {
-      const blackList = process.env.EVENT_GROUP_BLACK_LIST
-        ? JSON.parse(`[${process.env.EVENT_GROUP_BLACK_LIST}]`)
+      const blackList = process.env.NEXT_PUBLIC_EVENT_GROUP_BLACK_LIST
+        ? JSON.parse(`[${process.env.NEXT_PUBLIC_EVENT_GROUP_BLACK_LIST}]`)
         : [];
-      return blackList.includes(group.id.toNumber());
+      return !blackList.includes(group.groupId.toNumber());
     });
   }, [_groups]);
 
@@ -231,10 +237,11 @@ export const useEvents = () => {
   );
 
   const events = useMemo(() => {
+    const blackList = process.env.NEXT_PUBLIC_EVENT_BLACK_LIST
+      ? JSON.parse(`[${process.env.NEXT_PUBLIC_EVENT_BLACK_LIST}]`)
+      : [];
     return reverse(
-      data?.filter(
-        (e: any) => !EVENT_BLACK_LIST.includes(e.eventRecordId.toNumber())
-      )
+      data?.filter((e: any) => blackList.includes(e.eventRecordId.toNumber()))
     );
   }, [data]);
 
