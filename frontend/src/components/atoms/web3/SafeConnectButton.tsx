@@ -22,6 +22,7 @@ import {
 } from "@thirdweb-dev/react";
 import { FC, useCallback, useState } from "react";
 import { useLocale } from "src/hooks/useLocale";
+import { useDeeplink2Metamask } from "src/hooks/useWallet";
 import { chainId } from "src/libs/web3Config";
 
 type Props = {
@@ -36,16 +37,20 @@ const SafeConnectButton: FC<Props> = ({ selected, setConnecting }) => {
   const connect = useConnect();
   const disconnect = useDisconnect();
   const connectionStatus = useConnectionStatus();
-
-  const [isSelected, setSelected] = useState<boolean>(false);
-
-  const [safeAddress, setSafeAddress] = useState("");
-
   const personalWallet = useWallet();
 
+  const deeplink = useDeeplink2Metamask();
+
+  const [isSelected, setSelected] = useState<boolean>(false);
+  const [safeAddress, setSafeAddress] = useState("");
+
   const handleMetamaskConnect = useCallback(async () => {
+    if (!window.ethereum) {
+      deeplink();
+      return;
+    }
     await connect(metamaskConfig, { chainId: Number(chainId) });
-  }, [metamaskConfig, connect]);
+  }, [metamaskConfig, connect, deeplink]);
 
   const handleBack = useCallback(async () => {
     if (personalWallet) {

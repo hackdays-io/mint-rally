@@ -4,27 +4,28 @@ import {
   useConnect,
   useConnectionStatus,
 } from "@thirdweb-dev/react";
-import { useRouter } from "next/router";
 import { FC } from "react";
 import { useLocale } from "src/hooks/useLocale";
+import { useDeeplink2Metamask } from "src/hooks/useWallet";
 import { chainId } from "src/libs/web3Config";
 
 const GetWithMetamaskButton: FC = () => {
-  const { t, locale } = useLocale();
+  const { t } = useLocale();
   const metamaskConfig = metamaskWallet();
   const connect = useConnect();
   const connectingStatus = useConnectionStatus();
-  const { asPath } = useRouter();
+
+  const deeplink = useDeeplink2Metamask();
 
   const handleConnect = async () => {
     if (!window.ethereum) {
-      window.location.href = `https://metamask.app.link/dapp/${
-        process.env.NEXT_PUBLIC_CHAIN_ID === "137" ? "" : "staging."
-      }mintrally.xyz/${locale}${asPath}`;
+      deeplink();
       return;
     }
+
     await connect(metamaskConfig, { chainId: Number(chainId) });
   };
+
   const MetamaskIcon = () => (
     <Img src="/images/metamask.png" alt="metamask" width="20px" />
   );
