@@ -50,19 +50,26 @@ contract MintNFT is
 
     event MintedNFTAttributeURL(address indexed holder, string url);
     event MintLocked(uint256 indexed eventId, bool isLocked);
+    event ResetSecretPhrase(address indexed executor, uint256 indexed eventId);
 
+    modifier onlyGroupOwner(uint256 _eventId) {
+        IEventManager eventManager = IEventManager(eventManagerAddr);
+        require(
+            eventManager.isGroupOwnerByEventId(msg.sender, _eventId),
+            "you are not event group owner"
+        );
+        _;
+    }
+
+    // Currently, reinitializer(2) was executed as constructor.
     function initialize(
         MinimalForwarderUpgradeable trustedForwarder,
-        address _secretPhraseVerifierAddr,
-        bytes32[] memory _eventSecretPhrases
+        address _secretPhraseVerifierAddr
     ) public reinitializer(2) {
         __ERC721_init("MintRally", "MR");
         __Ownable_init();
         __ERC2771Context_init(address(trustedForwarder));
         secretPhraseVerifierAddr = _secretPhraseVerifierAddr;
-        for (uint i = 0; i < _eventSecretPhrases.length; i++) {
-            eventSecretPhrases[i + 1] = _eventSecretPhrases[i];
-        }
     }
 
     function _msgSender()
@@ -160,14 +167,20 @@ contract MintNFT is
         return true;
     }
 
-    function changeMintLocked(uint256 _eventId, bool _locked) external {
-        IEventManager eventManager = IEventManager(eventManagerAddr);
-        require(
-            eventManager.isGroupOwnerByEventId(msg.sender, _eventId),
-            "you are not event group owner"
-        );
+    function changeMintLocked(
+        uint256 _eventId,
+        bool _locked
+    ) external onlyGroupOwner(_eventId) {
         isMintLocked[_eventId] = _locked;
         emit MintLocked(_eventId, _locked);
+    }
+
+    function resetSecretPhrase(
+        uint256 _eventId,
+        bytes32 _secretPhrase
+    ) external onlyGroupOwner(_eventId) {
+        eventSecretPhrases[_eventId] = _secretPhrase;
+        emit ResetSecretPhrase(_msgSender(), _eventId);
     }
 
     function getIsMintLocked(uint256 _eventId) external view returns (bool) {

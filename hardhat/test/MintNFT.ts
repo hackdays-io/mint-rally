@@ -2,11 +2,7 @@ import { expect } from "chai";
 import { ethers, upgrades } from "hardhat";
 import { MintNFT, EventManager, SecretPhraseVerifier } from "../typechain";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
-import {
-  generateProof,
-  hashPoseidon,
-  wrongProofCalldata,
-} from "./helper/secret_phrase";
+import { generateProof, wrongProofCalldata } from "./helper/secret_phrase";
 
 // ToDo requiredParticipateCountに重複がある場合エラーになってしまう。
 const attributes = [
@@ -56,7 +52,6 @@ describe("MintNFT", function () {
       [
         "0xdCb93093424447bF4FE9Df869750950922F1E30B",
         secretPhraseVerifier.address,
-        [],
       ],
       {
         initializer: "initialize",
@@ -167,7 +162,6 @@ describe("nft revolution", () => {
       [
         "0xdCb93093424447bF4FE9Df869750950922F1E30B",
         secretPhraseVerifier.address,
-        [],
       ],
       {
         initializer: "initialize",
@@ -300,12 +294,10 @@ describe("mint locked flag", () => {
 
   let organizer: SignerWithAddress;
   let participant1: SignerWithAddress;
-  let participant2: SignerWithAddress;
   let relayer: SignerWithAddress;
 
   before(async () => {
-    [organizer, participant1, participant2, relayer] =
-      await ethers.getSigners();
+    [organizer, participant1, relayer] = await ethers.getSigners();
     //Deploy secretPhraseVerifier
     const SecretPhraseVerifierFactory = await ethers.getContractFactory(
       "SecretPhraseVerifier"
@@ -318,7 +310,6 @@ describe("mint locked flag", () => {
       [
         "0xdCb93093424447bF4FE9Df869750950922F1E30B",
         secretPhraseVerifier.address,
-        [],
       ],
       {
         initializer: "initialize",
@@ -377,6 +368,99 @@ describe("mint locked flag", () => {
   it("No one but the owner should be able to change mintable flag", async () => {
     await expect(
       mintNFT.connect(participant1).changeMintLocked(1, false)
+    ).to.be.revertedWith("you are not event group owner");
+  });
+});
+
+describe("reset secret phrase", () => {
+  let mintNFT: MintNFT;
+  let eventManager: EventManager;
+  let secretPhraseVerifier: SecretPhraseVerifier;
+
+  let createdGroupId: number;
+  let createdEventIds: number[] = [];
+
+  let organizer: SignerWithAddress;
+  let participant1: SignerWithAddress;
+  let relayer: SignerWithAddress;
+
+  let correctProofCalldata!: any;
+
+  before(async () => {
+    [organizer, participant1, relayer] = await ethers.getSigners();
+    //Deploy secretPhraseVerifier
+    const SecretPhraseVerifierFactory = await ethers.getContractFactory(
+      "SecretPhraseVerifier"
+    );
+    secretPhraseVerifier = await SecretPhraseVerifierFactory.deploy();
+    //Deploy mintNFT and eventManager
+    const MintNFTFactory = await ethers.getContractFactory("MintNFT");
+    const deployedMintNFT: any = await upgrades.deployProxy(
+      MintNFTFactory,
+      [
+        "0xdCb93093424447bF4FE9Df869750950922F1E30B",
+        secretPhraseVerifier.address,
+      ],
+      {
+        initializer: "initialize",
+      }
+    );
+    mintNFT = deployedMintNFT;
+    await mintNFT.deployed();
+    const EventManager = await ethers.getContractFactory("EventManager");
+    const deployedEventManager: any = await upgrades.deployProxy(
+      EventManager,
+      [relayer.address, 250000, 1000000],
+      {
+        initializer: "initialize",
+      }
+    );
+    eventManager = deployedEventManager;
+    await eventManager.deployed();
+    await mintNFT.setEventManagerAddr(eventManager.address);
+    await eventManager.setMintNFTAddr(mintNFT.address);
+
+    // generate proof
+    const { publicInputCalldata } = await generateProof();
+    correctProofCalldata = publicInputCalldata[0];
+
+    //Create a Group and an Event
+    const createGroupTxn = await eventManager
+      .connect(organizer)
+      .createGroup("First Group");
+    await createGroupTxn.wait();
+    const groupsList = await eventManager.getGroups();
+    createdGroupId = groupsList[0].groupId.toNumber();
+    const createEventTxn = await eventManager
+      .connect(organizer)
+      .createEventRecord(
+        createdGroupId,
+        "event1",
+        "event1 description",
+        "2022-07-3O",
+        10,
+        false,
+        correctProofCalldata,
+        attributes
+      );
+    await createEventTxn.wait();
+    const eventsList = await eventManager.getEventRecords();
+    createdEventIds.push(eventsList[0].eventRecordId.toNumber());
+  });
+
+  it("should reset secret phrase", async () => {
+    const newProofCalldata =
+      "0x1f376ca3150d51a164c711287cff6e77e2127d635a1534b41d5624472f000000";
+    await expect(
+      mintNFT.connect(organizer).resetSecretPhrase(1, newProofCalldata)
+    ).to.emit(mintNFT, "ResetSecretPhrase");
+  });
+
+  it("cannot change by non-owner", async () => {
+    const newProofCalldata =
+      "0x1f376ca3150d51a164c711287cff6e77e2127d635a1534b41d5624472f000000";
+    await expect(
+      mintNFT.connect(participant1).resetSecretPhrase(1, newProofCalldata)
     ).to.be.revertedWith("you are not event group owner");
   });
 });
