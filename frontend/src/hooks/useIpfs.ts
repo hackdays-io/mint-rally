@@ -25,56 +25,61 @@ export const useIpfs = () => {
     setLoading(true);
     setErrors(null);
     setNftAttributes([]);
-    const imageUpdatedNfts = nfts.filter((nft) => nft.fileObject);
-    let baseNftAttributes = nfts.filter((nft) => !nft.fileObject);
-    const uploader = new ipfsUploader();
-    const uploadResult = await uploader.uploadNFTsToIpfs(imageUpdatedNfts);
-    if (uploadResult) {
-      const nftAttributes: NFT.NFTImage[] = uploadResult.renamedFiles.map(
-        ({ name, fileObject, description, requiredParticipateCount }) => ({
-          name: name,
-          image: `ipfs://${uploadResult.rootCid}/${fileObject.name}`,
-          description: description,
-          requiredParticipateCount,
+    try {
+      const imageUpdatedNfts = nfts.filter((nft) => nft.fileObject);
+      let baseNftAttributes = nfts.filter((nft) => !nft.fileObject);
+      const uploader = new ipfsUploader();
+      const uploadResult = await uploader.uploadNFTsToIpfs(imageUpdatedNfts);
+      if (uploadResult) {
+        const nftAttributes: NFT.NFTImage[] = uploadResult.renamedFiles.map(
+          ({ name, fileObject, description, requiredParticipateCount }) => ({
+            name: name,
+            image: `ipfs://${uploadResult.rootCid}/${fileObject.name}`,
+            description: description,
+            requiredParticipateCount,
+          })
+        );
+        baseNftAttributes = nftAttributes.concat(baseNftAttributes);
+      }
+
+      const metadataFiles: File[] = [];
+      for (const nftAttribute of baseNftAttributes) {
+        const attribute: NFT.Metadata = {
+          name: nftAttribute.name,
+          image: nftAttribute.image,
+          description: nftAttribute.description,
+          external_link: "https://mintrally.xyz",
+          traits: {
+            EventGroupId: groupId,
+            EventName: eventName,
+            RequiredParticipateCount: nftAttribute.requiredParticipateCount,
+          },
+        };
+        metadataFiles.push(
+          new File(
+            [JSON.stringify(attribute)],
+            `${nftAttribute.requiredParticipateCount}.json`,
+            { type: "text/json" }
+          )
+        );
+      }
+      const metaDataRootCid = await uploader.uploadMetadataFilesToIpfs(
+        metadataFiles,
+        encodeURI(`${groupId}-${eventName}`)
+      );
+      setLoading(false);
+      setNftAttributes(
+        baseNftAttributes.map((attribute) => {
+          return {
+            requiredParticipateCount: attribute.requiredParticipateCount,
+            metaDataURL: `ipfs://${metaDataRootCid}/${attribute.requiredParticipateCount}.json`,
+          };
         })
       );
-      baseNftAttributes = nftAttributes.concat(baseNftAttributes);
+    } catch (error: any) {
+      setErrors(error);
+      setLoading(false);
     }
-
-    const metadataFiles: File[] = [];
-    for (const nftAttribute of baseNftAttributes) {
-      const attribute: NFT.Metadata = {
-        name: nftAttribute.name,
-        image: nftAttribute.image,
-        description: nftAttribute.description,
-        external_link: "https://mintrally.xyz",
-        traits: {
-          EventGroupId: groupId,
-          EventName: eventName,
-          RequiredParticipateCount: nftAttribute.requiredParticipateCount,
-        },
-      };
-      metadataFiles.push(
-        new File(
-          [JSON.stringify(attribute)],
-          `${nftAttribute.requiredParticipateCount}.json`,
-          { type: "text/json" }
-        )
-      );
-    }
-    const metaDataRootCid = await uploader.uploadMetadataFilesToIpfs(
-      metadataFiles,
-      `${groupId}_${eventName}`
-    );
-    setLoading(false);
-    setNftAttributes(
-      baseNftAttributes.map((attribute) => {
-        return {
-          requiredParticipateCount: attribute.requiredParticipateCount,
-          metaDataURL: `ipfs://${metaDataRootCid}/${attribute.requiredParticipateCount}.json`,
-        };
-      })
-    );
   };
 
   return { loading, errors, nftAttributes, saveNFTMetadataOnIPFS };
