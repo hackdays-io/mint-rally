@@ -5,12 +5,14 @@ import { useIsMintLocked, useMintLock } from "src/hooks/useMintNFT";
 import AlertMessage from "../atoms/form/AlertMessage";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLock, faLockOpen } from "@fortawesome/free-solid-svg-icons";
+import { useLocale } from "src/hooks/useLocale";
 
 type Props = {
   eventId: BigNumber;
 };
 
 const EventMintLock: FC<Props> = ({ eventId }) => {
+  const { t } = useLocale();
   const { isMintLocked, isLoading, refetch } = useIsMintLocked(eventId);
 
   const {
@@ -27,9 +29,9 @@ const EventMintLock: FC<Props> = ({ eventId }) => {
 
   return (
     <>
-      <Text fontWeight="bold">Mintロック設定</Text>
+      <Text fontWeight="bold">{t.EVENT_MINTLOCK_SETTING}</Text>
       <Text color="grey.600" fontSize="sm" mb={3}>
-        ロック中は、NFTのMint（参加証明の受け取り）ができなくなります。
+        {t.EVENT_MINTLOCK_SETTING_DESC}
       </Text>
       {isLoading ? (
         <Spinner />
@@ -58,12 +60,14 @@ const EventMintLock: FC<Props> = ({ eventId }) => {
               </Box>
               <Box>
                 <Text fontSize="sm" color="yellow.800">
-                  {isMintLocked ? "ロック中" : "ロックされていません"}
+                  {isMintLocked
+                    ? t.EVENT_ISLOCKED_TRUE
+                    : t.EVENT_ISLOCKED_FALSE}
                 </Text>
                 <Text fontSize="xs" color="gray.600">
                   {isMintLocked
-                    ? "NFTの配布をストップしています。"
-                    : "NFTをMintすることが可能です。"}
+                    ? t.EVENT_ISLOCKED_TRUE_DESC
+                    : t.EVENT_ISLOCKED_FALSE_DESC}
                 </Text>
               </Box>
             </Flex>
@@ -78,13 +82,13 @@ const EventMintLock: FC<Props> = ({ eventId }) => {
               borderColor="yellow.800"
               color="yellow.800"
             >
-              変更する
+              {t.EVENT_ADMIN_SUBMIT}
             </Button>
           </Flex>
         </Box>
       )}
       {error && (
-        <AlertMessage title="MintLock中にエラーが発生しました">
+        <AlertMessage title={t.EVENT_MINTLOCK_FAIL}>
           {(error as any).reason}
         </AlertMessage>
       )}
