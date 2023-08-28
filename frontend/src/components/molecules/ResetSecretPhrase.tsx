@@ -4,6 +4,7 @@ import { FC } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useResetSecretPhrase } from "src/hooks/useMintNFT";
 import AlertMessage from "../atoms/form/AlertMessage";
+import { useLocale } from "src/hooks/useLocale";
 
 type Props = {
   eventId: BigNumber;
@@ -14,6 +15,7 @@ type FormData = {
 };
 
 const ResetSecretPhrase: FC<Props> = ({ eventId }) => {
+  const { t } = useLocale();
   const { reset, error, isReseting, isSuccess } = useResetSecretPhrase(eventId);
 
   const { control, handleSubmit } = useForm<FormData>({
@@ -30,10 +32,10 @@ const ResetSecretPhrase: FC<Props> = ({ eventId }) => {
       <Box>
         <form onSubmit={handleSubmit(submit)}>
           <Text fontWeight="bold" mb={2}>
-            あいことばのリセット
+            {t.SECRET_PHRASE_RESET}
           </Text>
           <FormLabel fontWeight="bold" fontSize="sm">
-            新しいあいことば
+            {t.SECRET_PHRASE_RESET_NEW}
           </FormLabel>
           <Flex alignItems="center">
             <Controller
@@ -45,7 +47,7 @@ const ResetSecretPhrase: FC<Props> = ({ eventId }) => {
                   maxW={300}
                   value={field.value}
                   onChange={field.onChange}
-                  placeholder="新しいあいことばを入力"
+                  placeholder={t.SECRET_PHRASE_RESET_NEW}
                 />
               )}
             />
@@ -60,17 +62,17 @@ const ResetSecretPhrase: FC<Props> = ({ eventId }) => {
               isLoading={isReseting}
               disabled={isReseting}
             >
-              変更する
+              {t.EVENT_ADMIN_SUBMIT}
             </Button>
           </Flex>
         </form>
       </Box>
       {isSuccess && (
-        <AlertMessage status="success" title="あいことばをリセットしました" />
+        <AlertMessage status="success" title={t.SECRET_PHRASE_RESET_SUCCESS} />
       )}
 
       {error && (
-        <AlertMessage title="あいことばのリセット中にエラーが発生しました">
+        <AlertMessage title={t.SECRET_PHRASE_RESET_FAIL}>
           {(error as any).reason}
         </AlertMessage>
       )}

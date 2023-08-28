@@ -77,6 +77,22 @@ export default {
   GO_SURVEY:
     "Did you enjoy minting? Please let us know your experience by 1-2 mins survey🙏",
   SURVEY_BUTTON: "Open survey form",
+  // event edit for admin
+  EVENT_ADMIN_MENU: "Admin Menu",
+  EVENT_MINTLOCK_SETTING: "MintLock Setting",
+  EVENT_MINTLOCK_SETTING_DESC:
+    "While locked, participants will not be able to Mint (receive proof of participation) for NFT.",
+  EVENT_ISLOCKED_TRUE: "Locked",
+  EVENT_ISLOCKED_FALSE: "Unlocked",
+  EVENT_ISLOCKED_TRUE_DESC: "NFT cannot be Minted.",
+  EVENT_ISLOCKED_FALSE_DESC: "NFT can be Minted.",
+  EVENT_MINTLOCK_FAIL: "Failed to change MintLock.",
+  EVENT_ADMIN_SUBMIT: "Confirm",
+  SECRET_PHRASE_RESET: "Reset Secret Phrase",
+  SECRET_PHRASE_RESET_NEW: "New secret phrase",
+  SECRET_PHRASE_RESET_NEW_PLACEHOLDER: "Input new secret phrase",
+  SECRET_PHRASE_RESET_SUCCESS: "Successfully reset secret phrase.",
+  SECRET_PHRASE_RESET_FAIL: "Failed to reset secret phrase.",
 
   FEATUE: "FEATURES",
   FEATUE_DESC_1:

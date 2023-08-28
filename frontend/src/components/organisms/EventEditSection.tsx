@@ -4,12 +4,14 @@ import { useOwnEventGroups } from "src/hooks/useEvent";
 import { Event } from "types/Event";
 import EventMintLock from "../molecules/EventMintLock";
 import ResetSecretPhrase from "../molecules/ResetSecretPhrase";
+import { useLocale } from "src/hooks/useLocale";
 
 type Props = {
   event: Event.EventRecord;
 };
 
 const EventEditSection: FC<Props> = ({ event }) => {
+  const { t } = useLocale();
   const { groups } = useOwnEventGroups();
 
   const isOrganizer = useMemo(() => {
@@ -30,7 +32,7 @@ const EventEditSection: FC<Props> = ({ event }) => {
           backgroundColor="red.50"
         >
           <Heading as="h3" mb={2} fontSize="lg">
-            管理者メニュー
+            {t.EVENT_ADMIN_MENU}
           </Heading>
 
           <Divider my={3} />

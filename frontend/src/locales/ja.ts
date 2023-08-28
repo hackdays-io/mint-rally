@@ -78,6 +78,22 @@ export default {
   GO_SURVEY:
     "NFT取得体験はどうでしたか? もしよろしければ、2〜3分で終わるアンケートにお答えください！🙏",
   SURVEY_BUTTON: "アンケートフォームを開く",
+  // event edit for admin
+  EVENT_ADMIN_MENU: "管理者メニュー",
+  EVENT_MINTLOCK_SETTING: "Mintロック設定",
+  EVENT_MINTLOCK_SETTING_DESC:
+    "ロック中は、NFTのMint（参加証明の受け取り）ができなくなります。",
+  EVENT_ISLOCKED_TRUE: "ロック中",
+  EVENT_ISLOCKED_FALSE: "ロックされていません",
+  EVENT_ISLOCKED_TRUE_DESC: "NFTの配布をストップしています。",
+  EVENT_ISLOCKED_FALSE_DESC: "NFTをMintすることが可能です。",
+  EVENT_MINTLOCK_FAIL: "MintLock中にエラーが発生しました",
+  SECRET_PHRASE_RESET: "あいことばのリセット",
+  SECRET_PHRASE_RESET_NEW: "新しいあいことば",
+  SECRET_PHRASE_RESET_NEW_PLACEHOLDER: "新しいあいことばを入力",
+  SECRET_PHRASE_RESET_SUCCESS: "あいことばをリセットしました",
+  SECRET_PHRASE_RESET_FAIL: "あいことばのリセット中にエラーが発生しました",
+  EVENT_ADMIN_SUBMIT: "変更する",
 
   FEATUE: "特徴",
   FEATUE_DESC_1: "大切なイベントに参加した記録を残すことができます",
