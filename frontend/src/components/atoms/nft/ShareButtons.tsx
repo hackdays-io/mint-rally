@@ -9,6 +9,8 @@ import {
 } from "next-share";
 import { CopyIcon } from "@chakra-ui/icons";
 import { useRouter } from "next/router";
+import { XIcon } from '../icons/TwitterXicon/TwitterXIcon.';
+
 
 type Props = {
   tokenId: number;
