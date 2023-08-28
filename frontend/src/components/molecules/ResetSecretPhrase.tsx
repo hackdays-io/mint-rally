@@ -62,17 +62,16 @@ const ResetSecretPhrase: FC<Props> = ({ eventId }) => {
             変更する
           </Button>
         </Flex>
+        {isSuccess && (
+          <AlertMessage status="success" title="あいことばをリセットしました" />
+        )}
+
+        {error && (
+          <AlertMessage title="あいことばのリセット中にエラーが発生しました">
+            {(error as any).reason}
+          </AlertMessage>
+        )}
       </form>
-
-      {isSuccess && (
-        <AlertMessage status="success" title="あいことばをリセットしました" />
-      )}
-
-      {error && (
-        <AlertMessage title="あいことばのリセット中にエラーが発生しました">
-          {(error as any).reason}
-        </AlertMessage>
-      )}
     </Box>
   );
 };
