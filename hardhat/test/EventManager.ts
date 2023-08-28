@@ -40,7 +40,6 @@ describe("EventManager", function () {
       [
         "0xdCb93093424447bF4FE9Df869750950922F1E30B",
         secretPhraseVerifier.address,
-        [],
       ],
       {
         initializer: "initialize",

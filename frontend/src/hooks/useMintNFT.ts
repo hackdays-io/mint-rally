@@ -364,3 +364,110 @@ export const useIsHoldingEventNftByAddress = (
 
   return { isHoldingEventNft: data, isLoading };
 };
+
+export const useIsMintLocked = (eventId: number | BigNumber) => {
+  const { mintNFTContract } = useMintNFTContract();
+  const { data, isLoading, refetch } = useContractRead(
+    mintNFTContract,
+    "getIsMintLocked",
+    [eventId]
+  );
+
+  return { isMintLocked: data, isLoading, refetch };
+};
+
+export const useMintLock = (eventId: number | BigNumber, locked: boolean) => {
+  const { mintNFTContract } = useMintNFTContract();
+  const { mutateAsync, isLoading, error, status } = useContractWrite(
+    mintNFTContract,
+    "changeMintLocked"
+  );
+
+  const fromBlock = useCurrentBlock();
+  const { data } = useContractEvents(mintNFTContract, "MintLocked", {
+    queryFilter: {
+      filters: {
+        eventId: eventId,
+        fromBlock,
+      },
+    },
+    subscribe: true,
+  });
+
+  const lock = useCallback(async () => {
+    try {
+      await mutateAsync({ args: [eventId, locked] });
+    } catch (_) {}
+  }, [eventId, locked, mutateAsync]);
+
+  const isSuccess = useMemo(() => {
+    const includesEvent = (data: ContractEvent<Record<string, any>>[]) => {
+      if (!fromBlock) return false;
+      return data.some((event) => {
+        return event.transaction.blockNumber > fromBlock;
+      });
+    };
+    if (status !== "success" || !data || !includesEvent(data)) return false;
+    return true;
+  }, [data, status, eventId, locked]);
+
+  return { lock, isLoading, error, status, isSuccess };
+};
+
+export const useResetSecretPhrase = (eventId: number | BigNumber) => {
+  const { mintNFTContract } = useMintNFTContract();
+  const {
+    mutateAsync,
+    isLoading,
+    error: transactionError,
+    status,
+  } = useContractWrite(mintNFTContract, "resetSecretPhrase");
+
+  const fromBlock = useCurrentBlock();
+  const { data } = useContractEvents(mintNFTContract, "ResetSecretPhrase", {
+    queryFilter: {
+      filters: {
+        eventId: eventId,
+        fromBlock,
+      },
+    },
+    subscribe: true,
+  });
+
+  const {
+    isLoading: isPreparingProof,
+    error: preparingProofError,
+    generateProof,
+  } = useGenerateProof();
+
+  const isReseting = useMemo(() => {
+    return isLoading || isPreparingProof;
+  }, [isLoading, isPreparingProof]);
+
+  const error = useMemo(() => {
+    return transactionError || preparingProofError;
+  }, [transactionError, preparingProofError]);
+
+  const isSuccess = useMemo(() => {
+    const includesEvent = (data: ContractEvent<Record<string, any>>[]) => {
+      if (!fromBlock) return false;
+      return data.some((event) => {
+        return event.transaction.blockNumber > fromBlock;
+      });
+    };
+    if (status !== "success" || !data || !includesEvent(data)) return false;
+    return true;
+  }, [data, status, eventId]);
+
+  const reset = useCallback(
+    async (newSecretPhrase: string) => {
+      try {
+        const proof = await generateProof(newSecretPhrase);
+        await mutateAsync({ args: [eventId, proof?.publicInputCalldata[0]] });
+      } catch (_) {}
+    },
+    [mutateAsync, eventId]
+  );
+
+  return { reset, isReseting, error, isSuccess };
+};

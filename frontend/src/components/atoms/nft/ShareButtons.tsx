@@ -9,6 +9,7 @@ import {
 } from "next-share";
 import { CopyIcon } from "@chakra-ui/icons";
 import { useRouter } from "next/router";
+import { XIcon } from "../icons/TwitterXicon/TwitterXicon";
 
 type Props = {
   tokenId: number;
@@ -38,7 +39,7 @@ export const ShareButtons: FC<Props> = ({
       <Text mb={1} mr={5}>
         Share on
       </Text>
-      {twitter && (
+      {/* {twitter && (
         <TwitterShareButton
           url={shareUrl}
           title={`Check out my NFT on Mintrally!`}
@@ -47,7 +48,20 @@ export const ShareButtons: FC<Props> = ({
         >
           <TwitterIcon size={32} round />
         </TwitterShareButton>
+      )} */}
+
+      {/* TwitterX icon  */}
+      {twitter && (
+        <TwitterShareButton
+          url={shareUrl}
+          title={`Check out my NFT on Mintrally!`}
+          hashtags={["MintRally"]}
+          style={{ marginRight: "8px" }}
+        >
+          <XIcon color="black" />
+        </TwitterShareButton>
       )}
+
       {facebook && (
         <FacebookShareButton
           url={shareUrl}
