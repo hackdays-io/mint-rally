@@ -24,6 +24,7 @@ export const useGenerateProof = () => {
   const generateProof = useCallback(
     async (secretPhrase: string) => {
       setIsLoading(true);
+      setError(null);
       try {
         const hashedSecretPhrase = await hash(secretPhrase);
         const {

@@ -18,6 +18,7 @@ import { MintGuide } from "src/components/atoms/form/MintGuide";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleInfo } from "@fortawesome/free-solid-svg-icons";
 import MintNFTLoginRequired from "src/components/atoms/events/MintNFTLoginRequired";
+import EventEditSection from "src/components/organisms/EventEditSection";
 
 const MintNFTSection: FC<{ event: Event.EventRecord }> = ({ event }) => {
   const address = useAddress();
@@ -110,6 +111,7 @@ const Event: FC = () => {
               forbiddenText={t.SIGN_IN_TO_GET_NFT}
             >
               <MintNFTSection event={event} />
+              <EventEditSection event={event} />
             </MintNFTLoginRequired>
 
             <Box
