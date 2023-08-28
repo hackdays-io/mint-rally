@@ -26,53 +26,55 @@ const ResetSecretPhrase: FC<Props> = ({ eventId }) => {
   };
 
   return (
-    <Box>
-      <form onSubmit={handleSubmit(submit)}>
-        <Text fontWeight="bold" mb={2}>
-          あいことばのリセット
-        </Text>
-        <FormLabel fontWeight="bold" fontSize="sm">
-          新しいあいことば
-        </FormLabel>
-        <Flex alignItems="center">
-          <Controller
-            control={control}
-            name="secretPhrase"
-            render={({ field }) => (
-              <Input
-                backgroundColor="white"
-                maxW={300}
-                value={field.value}
-                onChange={field.onChange}
-                placeholder="新しいあいことばを入力"
-              />
-            )}
-          />
-          <Button
-            ml={3}
-            size="sm"
-            backgroundColor="transparent"
-            border="1px solid"
-            borderColor="yellow.800"
-            color="yellow.800"
-            type="submit"
-            isLoading={isReseting}
-            disabled={isReseting}
-          >
-            変更する
-          </Button>
-        </Flex>
-        {isSuccess && (
-          <AlertMessage status="success" title="あいことばをリセットしました" />
-        )}
+    <>
+      <Box>
+        <form onSubmit={handleSubmit(submit)}>
+          <Text fontWeight="bold" mb={2}>
+            あいことばのリセット
+          </Text>
+          <FormLabel fontWeight="bold" fontSize="sm">
+            新しいあいことば
+          </FormLabel>
+          <Flex alignItems="center">
+            <Controller
+              control={control}
+              name="secretPhrase"
+              render={({ field }) => (
+                <Input
+                  backgroundColor="white"
+                  maxW={300}
+                  value={field.value}
+                  onChange={field.onChange}
+                  placeholder="新しいあいことばを入力"
+                />
+              )}
+            />
+            <Button
+              ml={3}
+              size="sm"
+              backgroundColor="transparent"
+              border="1px solid"
+              borderColor="yellow.800"
+              color="yellow.800"
+              type="submit"
+              isLoading={isReseting}
+              disabled={isReseting}
+            >
+              変更する
+            </Button>
+          </Flex>
+        </form>
+      </Box>
+      {isSuccess && (
+        <AlertMessage status="success" title="あいことばをリセットしました" />
+      )}
 
-        {error && (
-          <AlertMessage title="あいことばのリセット中にエラーが発生しました">
-            {(error as any).reason}
-          </AlertMessage>
-        )}
-      </form>
-    </Box>
+      {error && (
+        <AlertMessage title="あいことばのリセット中にエラーが発生しました">
+          {(error as any).reason}
+        </AlertMessage>
+      )}
+    </>
   );
 };
 
