@@ -222,6 +222,10 @@ describe("EventManager", function () {
         expect(_events.length).to.equal(1);
         expect(_events[0].name).to.equal("event-1");
       });
+      it("should return specified number of records by pagenation", async () => {
+        const _events = await eventManager.getEventRecords(50, 0);
+        expect(_events.length).to.equal(50);
+      });
     });
   });
 
