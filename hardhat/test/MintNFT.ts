@@ -26,7 +26,7 @@ describe("MintNFT", function () {
   let secretPhraseVerifier: SecretPhraseVerifier;
 
   let createdGroupId: number;
-  let createdEventIds: number[] = [];
+  const createdEventIds: number[] = [];
 
   let organizer: SignerWithAddress;
   let participant1: SignerWithAddress;
@@ -45,7 +45,7 @@ describe("MintNFT", function () {
       "SecretPhraseVerifier"
     );
     secretPhraseVerifier = await SecretPhraseVerifierFactory.deploy();
-    //Deploy mintNFT and eventManager
+    // Deploy mintNFT and eventManager
     const MintNFTFactory = await ethers.getContractFactory("MintNFT");
     const deployedMintNFT: any = await upgrades.deployProxy(
       MintNFTFactory,
@@ -72,7 +72,7 @@ describe("MintNFT", function () {
     await mintNFT.setEventManagerAddr(eventManager.address);
     await eventManager.setMintNFTAddr(mintNFT.address);
 
-    //Create a Group and an Event
+    // Create a Group and an Event
     const createGroupTxn = await eventManager.createGroup("First Group");
     await createGroupTxn.wait();
     const groupsList = await eventManager.getGroups();
@@ -89,7 +89,7 @@ describe("MintNFT", function () {
       attributes
     );
     await createEventTxn.wait();
-    const eventsList = await eventManager.getEventRecords();
+    const eventsList = await eventManager.getEventRecords(0, 0);
     createdEventIds.push(eventsList[0].eventRecordId.toNumber());
   });
 
@@ -155,7 +155,7 @@ describe("nft revolution", () => {
       "SecretPhraseVerifier"
     );
     secretPhraseVerifier = await SecretPhraseVerifierFactory.deploy();
-    //Deploy mintNFT and eventManager
+    // Deploy mintNFT and eventManager
     const MintNFTFactory = await ethers.getContractFactory("MintNFT");
     const deployedMintNFT: any = await upgrades.deployProxy(
       MintNFTFactory,
@@ -182,7 +182,7 @@ describe("nft revolution", () => {
     await mintNFT.setEventManagerAddr(eventManager.address);
     await eventManager.setMintNFTAddr(mintNFT.address);
 
-    //Create a Group and an Event
+    // Create a Group and an Event
     const createGroupTxn = await eventManager.createGroup("First Group");
     await createGroupTxn.wait();
     const groupsList = await eventManager.getGroups();
@@ -211,7 +211,7 @@ describe("nft revolution", () => {
     );
     await createEventTxn2.wait();
 
-    const eventsList = await eventManager.getEventRecords();
+    const eventsList = await eventManager.getEventRecords(0, 0);
     createdEventIds = eventsList.map((event) => event.eventRecordId.toNumber());
 
     const { proofCalldata: proofCalldata1 } = await generateProof();
@@ -290,7 +290,7 @@ describe("mint locked flag", () => {
   let secretPhraseVerifier: SecretPhraseVerifier;
 
   let createdGroupId: number;
-  let createdEventIds: number[] = [];
+  const createdEventIds: number[] = [];
 
   let organizer: SignerWithAddress;
   let participant1: SignerWithAddress;
@@ -298,12 +298,12 @@ describe("mint locked flag", () => {
 
   before(async () => {
     [organizer, participant1, relayer] = await ethers.getSigners();
-    //Deploy secretPhraseVerifier
+    // Deploy secretPhraseVerifier
     const SecretPhraseVerifierFactory = await ethers.getContractFactory(
       "SecretPhraseVerifier"
     );
     secretPhraseVerifier = await SecretPhraseVerifierFactory.deploy();
-    //Deploy mintNFT and eventManager
+    // Deploy mintNFT and eventManager
     const MintNFTFactory = await ethers.getContractFactory("MintNFT");
     const deployedMintNFT: any = await upgrades.deployProxy(
       MintNFTFactory,
@@ -330,7 +330,7 @@ describe("mint locked flag", () => {
     await mintNFT.setEventManagerAddr(eventManager.address);
     await eventManager.setMintNFTAddr(mintNFT.address);
 
-    //Create a Group and an Event
+    // Create a Group and an Event
     const createGroupTxn = await eventManager
       .connect(organizer)
       .createGroup("First Group");
@@ -350,7 +350,7 @@ describe("mint locked flag", () => {
         attributes
       );
     await createEventTxn.wait();
-    const eventsList = await eventManager.getEventRecords();
+    const eventsList = await eventManager.getEventRecords(0, 0);
     createdEventIds.push(eventsList[0].eventRecordId.toNumber());
   });
 
@@ -378,7 +378,7 @@ describe("reset secret phrase", () => {
   let secretPhraseVerifier: SecretPhraseVerifier;
 
   let createdGroupId: number;
-  let createdEventIds: number[] = [];
+  const createdEventIds: number[] = [];
 
   let organizer: SignerWithAddress;
   let participant1: SignerWithAddress;
@@ -388,12 +388,12 @@ describe("reset secret phrase", () => {
 
   before(async () => {
     [organizer, participant1, relayer] = await ethers.getSigners();
-    //Deploy secretPhraseVerifier
+    // Deploy secretPhraseVerifier
     const SecretPhraseVerifierFactory = await ethers.getContractFactory(
       "SecretPhraseVerifier"
     );
     secretPhraseVerifier = await SecretPhraseVerifierFactory.deploy();
-    //Deploy mintNFT and eventManager
+    // Deploy mintNFT and eventManager
     const MintNFTFactory = await ethers.getContractFactory("MintNFT");
     const deployedMintNFT: any = await upgrades.deployProxy(
       MintNFTFactory,
@@ -424,7 +424,7 @@ describe("reset secret phrase", () => {
     const { publicInputCalldata } = await generateProof();
     correctProofCalldata = publicInputCalldata[0];
 
-    //Create a Group and an Event
+    // Create a Group and an Event
     const createGroupTxn = await eventManager
       .connect(organizer)
       .createGroup("First Group");
@@ -444,7 +444,7 @@ describe("reset secret phrase", () => {
         attributes
       );
     await createEventTxn.wait();
-    const eventsList = await eventManager.getEventRecords();
+    const eventsList = await eventManager.getEventRecords(0, 0);
     createdEventIds.push(eventsList[0].eventRecordId.toNumber());
   });
 
