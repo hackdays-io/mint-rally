@@ -160,7 +160,7 @@ describe("EventManager", function () {
         BigNumber.from("10000003325000000000000")
       );
     });
-    describe("Create 500 events", () => {
+    describe("Create 500 events for testing pagenation", () => {
       it("Should create 500 events", async () => {
         const txn1 = await eventManager.createGroup("group2");
         await txn1.wait();
@@ -187,6 +187,16 @@ describe("EventManager", function () {
       });
       it("should return total record count", async () => {
         expect(await eventManager.getEventRecordCount()).to.equal(502);
+      });
+      it("should throw error when offset is too lerge", async () => {
+        await expect(eventManager.getEventRecords(100, 600)).to.be.revertedWith(
+          "offset is too large"
+        );
+      });
+      it("should throw error when limit is too lerge", async () => {
+        await expect(eventManager.getEventRecords(200, 0)).to.be.revertedWith(
+          "limit is too large"
+        );
       });
       it("should return first 100 records by pagenation", async () => {
         expect((await eventManager.getEventRecords(0, 0)).length).equal(100);

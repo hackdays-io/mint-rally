@@ -189,6 +189,7 @@ contract EventManager is OwnableUpgradeable {
             _limit = 100; // default limit
         }
         require(_limit <= 100, "limit is too large");
+        require(_offset <= _numberOfEventRecords, "offset is too large");
         // if limit is over the number of events, set limit to the number of events
         if (_limit + _offset > _numberOfEventRecords) {
             _limit = _numberOfEventRecords - _offset;
