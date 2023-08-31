@@ -22,6 +22,12 @@ $ yarn
 $ yarn build:circuit
 ```
 
+## .env の準備
+
+```
+$ cp .env.example .env
+```
+
 ## コンパイルとテストの実行
 
 ```
