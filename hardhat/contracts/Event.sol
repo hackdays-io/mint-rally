@@ -5,6 +5,7 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "./IMintNFT.sol";
+import "hardhat/console.sol";
 
 contract EventManager is OwnableUpgradeable {
     struct Group {

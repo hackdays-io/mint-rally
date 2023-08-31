@@ -201,6 +201,10 @@ describe("EventManager", function () {
         expect(_events[0].name).to.equal("event399");
         expect(_events[99].name).to.equal("event300");
       });
+      it("should return last 2 records by pagenation", async () => {
+        const _events = await eventManager.getEventRecords(100, 500);
+        expect(_events.length).to.equal(2);
+      });
     });
   });
 
