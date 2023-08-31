@@ -160,34 +160,47 @@ describe("EventManager", function () {
         BigNumber.from("10000003325000000000000")
       );
     });
-
-    it("Should create 500 events", async () => {
-      const txn1 = await eventManager.createGroup("group2");
-      await txn1.wait();
-      const groupsAfterCreate = await eventManager.getGroups();
-      for (let i = 0; i < 500; i++) {
-        const txn = await eventManager.createEventRecord(
-          groupsAfterCreate[1].groupId.toNumber(),
-          `event${i}`,
-          `event${i} description`,
-          "2022-07-3O",
-          11 + i,
-          true,
-          publicInputCalldata[0],
-          attributes,
-          {
-            value: ethers.utils.parseUnits(
-              String(25000000 * 10 * 1.33),
-              "gwei"
-            ),
-          }
-        );
-        await txn.wait();
-      }
-      // it should return total record count
-      expect(await eventManager.getEventRecordCount()).to.equal(502);
-      // it should return first 100 records by pagenation
-      expect((await eventManager.getEventRecords(0, 0)).length).equal(100);
+    describe("Create 500 events", () => {
+      it("Should create 500 events", async () => {
+        const txn1 = await eventManager.createGroup("group2");
+        await txn1.wait();
+        const groupsAfterCreate = await eventManager.getGroups();
+        for (let i = 0; i < 500; i++) {
+          const txn = await eventManager.createEventRecord(
+            groupsAfterCreate[1].groupId.toNumber(),
+            `event${i}`,
+            `event${i} description`,
+            "2022-07-3O",
+            11 + i,
+            true,
+            publicInputCalldata[0],
+            attributes,
+            {
+              value: ethers.utils.parseUnits(
+                String(25000000 * 10 * 1.33),
+                "gwei"
+              ),
+            }
+          );
+          await txn.wait();
+        }
+      });
+      it("should return total record count", async () => {
+        expect(await eventManager.getEventRecordCount()).to.equal(502);
+      });
+      it("should return first 100 records by pagenation", async () => {
+        expect((await eventManager.getEventRecords(0, 0)).length).equal(100);
+      });
+      it("should return from last events", async () => {
+        const _events = await eventManager.getEventRecords(0, 0);
+        expect(_events[0].name).to.equal("event499");
+        expect(_events[99].name).to.equal("event400");
+      });
+      it("should return next 100 records by pagenation", async () => {
+        const _events = await eventManager.getEventRecords(100, 100);
+        expect(_events[0].name).to.equal("event399");
+        expect(_events[99].name).to.equal("event300");
+      });
     });
   });
 
