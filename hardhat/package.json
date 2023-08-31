@@ -17,7 +17,7 @@
     "upload:prd": "yarn build && node scripts/upload_prd.js",
     "upload:stg": "yarn build && node scripts/upload_stg.js",
     "verify": "npx hardhat verify",
-    "build:circuit": "circom ./circuits/SecretPhrase.circom --sym --wasm --r1cs -o circuits"
+    "build:circuit": "sh scripts/circuits/build_circuit.sh"
   },
   "devDependencies": {
     "@ethereumjs/util": "^8.1.0",

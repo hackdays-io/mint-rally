@@ -9,10 +9,12 @@ cache
 artifacts
 
 .openzeppelin/unknown-*.json
-build
 
-*.ptau
-*.wtns
-*.zkey
+/circuits/**/*.ptau
+/circuits/**/*.zkey
+/circuits/**/*.r1cs
+/circuits/**/*.sym
+/circuits/**/*.wasm
+/circuits/**/*_js
 
 /tmp
