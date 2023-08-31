@@ -273,4 +273,84 @@ describe("EventManager", function () {
       expect(ownGroups2[1].name).to.equal("group3");
     });
   });
+  describe("GetOwnEvents", async () => {
+    let eventManager: EventManager;
+    let publicInputCalldata: any;
+    before(async () => {
+      const eventManagerContractFactory = await ethers.getContractFactory(
+        "EventManager"
+      );
+      const deployedEventManagerContract: any = await upgrades.deployProxy(
+        eventManagerContractFactory,
+        [relayer.address, 250000, 1000000],
+        {
+          initializer: "initialize",
+        }
+      );
+      eventManager = await deployedEventManagerContract.deployed();
+      await eventManager.setMintNFTAddr(mintNFT.address);
+      await mintNFT.setEventManagerAddr(eventManager.address);
+
+      const { publicInputCalldata: _publicInputCalldata } =
+        await generateProof();
+      publicInputCalldata = _publicInputCalldata;
+    });
+    it("Should get own event records", async () => {
+      // create group by address1
+      const txn1 = await eventManager.connect(organizer).createGroup("group1");
+      await txn1.wait();
+
+      // create group by address2
+      const txn2 = await eventManager
+        .connect(participant1)
+        .createGroup("group2");
+      await txn2.wait();
+
+      // get all groups
+      const allGroups = await eventManager.getGroups();
+      expect(allGroups.length).to.equal(2);
+
+      // get group by address1
+      const ownGroups = await eventManager
+        .connect(organizer)
+        .getOwnGroups(organizer.address);
+      // get group by address2
+      const otherGroups = await eventManager
+        .connect(participant1)
+        .getOwnGroups(participant1.address);
+      // create events record by address1
+      for (let i = 0; i < 3; i++) {
+        const _txn = await eventManager.createEventRecord(
+          ownGroups[0].groupId.toNumber(),
+          `event${i}`,
+          `event${i} description`,
+          "2023-07-3O",
+          100,
+          false,
+          publicInputCalldata[0],
+          attributes,
+          { value: ethers.utils.parseUnits(String(250000 * 10 * 1.33), "gwei") }
+        );
+        await _txn.wait();
+      }
+      // create event record by address2
+      const txn3 = await eventManager.createEventRecord(
+        otherGroups[0].groupId.toNumber(),
+        `event_x`,
+        `event_x description`,
+        "2023-07-3O",
+        100,
+        false,
+        publicInputCalldata[0],
+        attributes,
+        { value: ethers.utils.parseUnits(String(250000 * 10 * 1.33), "gwei") }
+      );
+      await txn3.wait();
+      // get own event records by group id
+      const ownEventRecords = await eventManager.getEventsByGroupId(
+        ownGroups[0].groupId.toNumber()
+      );
+      expect(ownEventRecords.length).to.equal(3);
+    });
+  });
 });
