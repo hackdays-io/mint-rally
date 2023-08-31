@@ -208,6 +208,23 @@ contract EventManager is OwnableUpgradeable {
         return _eventRecords;
     }
 
+    function getEventRecordsByGroupId(
+        uint256 _groupId
+    ) public view returns (EventRecord[] memory) {
+        eventIdsByGroupId[_groupId];
+        uint256 _numberOfEventRecords = eventIdsByGroupId[_groupId].length;
+        EventRecord[] memory _eventRecords = new EventRecord[](
+            _numberOfEventRecords
+        );
+        for (uint256 _i = 0; _i < _numberOfEventRecords; _i++) {
+            uint256 _eventId = eventIdsByGroupId[_groupId][
+                _numberOfEventRecords - _i - 1
+            ];
+            _eventRecords[_i] = eventRecords[_eventId - 1];
+        }
+        return _eventRecords;
+    }
+
     function getEventById(
         uint256 _eventId
     ) external view returns (EventRecord memory) {

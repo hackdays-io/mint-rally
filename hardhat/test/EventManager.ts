@@ -334,23 +334,29 @@ describe("EventManager", function () {
         await _txn.wait();
       }
       // create event record by address2
-      const txn3 = await eventManager.createEventRecord(
-        otherGroups[0].groupId.toNumber(),
-        `event_x`,
-        `event_x description`,
-        "2023-07-3O",
-        100,
-        false,
-        publicInputCalldata[0],
-        attributes,
-        { value: ethers.utils.parseUnits(String(250000 * 10 * 1.33), "gwei") }
-      );
+      const txn3 = await eventManager
+        .connect(participant1)
+        .createEventRecord(
+          otherGroups[0].groupId.toNumber(),
+          `event_x`,
+          `event_x description`,
+          "2023-07-3O",
+          100,
+          false,
+          publicInputCalldata[0],
+          attributes,
+          { value: ethers.utils.parseUnits(String(250000 * 10 * 1.33), "gwei") }
+        );
       await txn3.wait();
       // get own event records by group id
-      const ownEventRecords = await eventManager.getEventsByGroupId(
+      const ownEventRecords = await eventManager.getEventRecordsByGroupId(
         ownGroups[0].groupId.toNumber()
       );
       expect(ownEventRecords.length).to.equal(3);
+      // should return reverse order
+      expect(ownEventRecords[0].name).to.equal("event2");
+      expect(ownEventRecords[1].name).to.equal("event1");
+      expect(ownEventRecords[2].name).to.equal("event0");
     });
   });
 });
