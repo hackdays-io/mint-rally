@@ -88,8 +88,8 @@ describe("EventManager", function () {
 
       const txn2 = await eventManager.createEventRecord(
         groupsAfterCreate[0].groupId.toNumber(),
-        "event1",
-        "event1 description",
+        "event-1",
+        "event-1 description",
         "2022-07-3O",
         100,
         false,
@@ -102,9 +102,9 @@ describe("EventManager", function () {
       expect(eventRecordsAfterCreate[0].groupId).to.equal(
         groupsAfterCreate[0].groupId.toNumber()
       );
-      expect(eventRecordsAfterCreate[0].name).to.equal("event1");
+      expect(eventRecordsAfterCreate[0].name).to.equal("event-1");
       expect(eventRecordsAfterCreate[0].description).to.equal(
-        "event1 description"
+        "event-1 description"
       );
       expect(eventRecordsAfterCreate[0].date).to.equal("2022-07-3O");
 
@@ -214,6 +214,13 @@ describe("EventManager", function () {
       it("should return last 2 records by pagenation", async () => {
         const _events = await eventManager.getEventRecords(100, 500);
         expect(_events.length).to.equal(2);
+        expect(_events[0].name).to.equal("event1");
+        expect(_events[1].name).to.equal("event-1");
+      });
+      it("should return last one records by pagenation", async () => {
+        const _events = await eventManager.getEventRecords(100, 501);
+        expect(_events.length).to.equal(1);
+        expect(_events[0].name).to.equal("event-1");
       });
     });
   });
