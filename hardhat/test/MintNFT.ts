@@ -217,14 +217,14 @@ describe("nft revolution", () => {
     const { proofCalldata: proofCalldata1 } = await generateProof();
     const mintTxn1 = await mintNFT
       .connect(organizer)
-      .mintParticipateNFT(createdGroupId, createdEventIds[0], proofCalldata1);
+      .mintParticipateNFT(createdGroupId, createdEventIds[1], proofCalldata1);
     await mintTxn1.wait();
     usedProofCalldata = proofCalldata1;
 
     const { proofCalldata: proofCalldata2 } = await generateProof();
     const mintTxn2 = await mintNFT
       .connect(organizer)
-      .mintParticipateNFT(createdGroupId, createdEventIds[1], proofCalldata2);
+      .mintParticipateNFT(createdGroupId, createdEventIds[0], proofCalldata2);
     await mintTxn2.wait();
   });
 
@@ -234,7 +234,7 @@ describe("nft revolution", () => {
         .connect(organizer)
         .mintParticipateNFT(
           createdGroupId,
-          createdEventIds[0],
+          createdEventIds[1],
           usedProofCalldata
         )
     ).to.be.revertedWith("invalid secret phrase");
@@ -251,14 +251,14 @@ describe("nft revolution", () => {
     expect(
       await mintNFT.isHoldingEventNFTByAddress(
         organizer.address,
-        createdEventIds[0]
+        createdEventIds[1]
       )
     ).equal(true);
     const { proofCalldata } = await generateProof();
     await expect(
       mintNFT
         .connect(organizer)
-        .mintParticipateNFT(createdGroupId, createdEventIds[0], proofCalldata)
+        .mintParticipateNFT(createdGroupId, createdEventIds[1], proofCalldata)
     ).to.be.revertedWith("already minted");
   });
 
@@ -267,7 +267,7 @@ describe("nft revolution", () => {
     await expect(
       mintNFT
         .connect(participant1)
-        .mintParticipateNFT(createdGroupId, createdEventIds[1], proofCalldata)
+        .mintParticipateNFT(createdGroupId, createdEventIds[0], proofCalldata)
     ).to.be.revertedWith("remaining count is zero");
   });
 
@@ -277,7 +277,7 @@ describe("nft revolution", () => {
         .connect(participant2)
         .mintParticipateNFT(
           createdGroupId,
-          createdEventIds[1],
+          createdEventIds[0],
           wrongProofCalldata
         )
     ).to.be.revertedWith("invalid secret phrase");
