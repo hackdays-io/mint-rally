@@ -299,7 +299,7 @@ describe("EventManager", function () {
         await generateProof();
       publicInputCalldata = _publicInputCalldata;
     });
-    it("Should get own event records", async () => {
+    it("Should return own event records", async () => {
       // create group by address1
       const txn1 = await eventManager.connect(organizer).createGroup("group1");
       await txn1.wait();
