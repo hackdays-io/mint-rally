@@ -246,24 +246,28 @@ const Home: NextPage = () => {
           <Spinner></Spinner>
         ) : (
           <VStack spacing={5} align="stretch">
-            <>
-              {events.slice(0, 6).map((item: any) => {
-                return (
-                  <Link
-                    href={"/events/" + item.eventRecordId}
-                    key={item.eventRecordId.toString()}
-                  >
-                    <a>
-                      <EventCard
-                        title={item.name}
-                        description={item.description}
-                        date={item.date}
-                      ></EventCard>
-                    </a>
-                  </Link>
-                );
-              })}
-            </>
+            {events ? (
+              <>
+                {events.slice(0, 6).map((item: any) => {
+                  return (
+                    <Link
+                      href={"/events/" + item.eventRecordId}
+                      key={item.eventRecordId.toString()}
+                    >
+                      <a>
+                        <EventCard
+                          title={item.name}
+                          description={item.description}
+                          date={item.date}
+                        ></EventCard>
+                      </a>
+                    </Link>
+                  );
+                })}
+              </>
+            ) : (
+              <Text>{t.NO_EVENTS_AVAILABLE}</Text>
+            )}
           </VStack>
         )}
       </Container>
