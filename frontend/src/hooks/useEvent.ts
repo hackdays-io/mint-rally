@@ -227,12 +227,14 @@ export const useCreateEvent = (address: string) => {
     createError,
   };
 };
-
-export const useEvents = () => {
-  const COUNT_PER_PAGE = 50;
+type UseEventOption = {
+  countPerPage?: number
+}
+export const useEvents = (option?: UseEventOption) => {
+  const COUNT_PER_PAGE = option?.countPerPage || 50;
   const { eventManagerContract } = useEventManagerContract();
   const [nextCursor, setNextCursor] = useState<number | null>(null);
-  const [currentCursor, setCurrentCursor] = useState<number>(0);
+  const [currentCursor, setCurrentCursor] = useState<number | null>(null);
   const [prevCursor, setPrevCursor] = useState<number | null>(null);
   const { isLoading: isLodingCount, data: countData, error: countError } = useContractRead(
     eventManagerContract,
@@ -244,7 +246,7 @@ export const useEvents = () => {
 
   // read record data
   useEffect(() => {
-    if (eventManagerContract === undefined || isLoading || currentCursor === null) return;
+    if (eventManagerContract === undefined || currentCursor === null) return;
     setIsLoading(true)
     eventManagerContract?.call("getEventRecords", [COUNT_PER_PAGE, currentCursor]).then((res: any) => {
       setEventData(res)
@@ -257,7 +259,7 @@ export const useEvents = () => {
 
   const events = useMemo(() => {
     // return empty if both data is not set
-    if (data === null || countData === undefined) return [];
+    if (data === null || countData === undefined || currentCursor === null) return [];
     // set cursors for pagenation
     if (countData > data.length + currentCursor) { setNextCursor(currentCursor + data.length) } else { setNextCursor(null) }
     if (currentCursor > 0) { setPrevCursor(currentCursor - data.length) } else { setPrevCursor(null) }
@@ -267,7 +269,7 @@ export const useEvents = () => {
     return data?.filter((e: any) => !blackList.includes(e.eventRecordId.toNumber()))
   }, [data, countData]);
 
-  return { events, isLoading, error, countData, nextCursor, prevCursor, setCurrentCursor };
+  return { events, isLoading, error, countData, nextCursor, prevCursor, setCurrentCursor, COUNT_PER_PAGE };
 };
 
 export const useEventById = (id: number) => {

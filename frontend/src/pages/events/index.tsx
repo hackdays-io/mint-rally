@@ -16,8 +16,12 @@ import EventCard from "../../components/atoms/events/EventCard";
 import { Event } from "types/Event";
 import { useLocale } from "../../hooks/useLocale";
 import { useEvents } from "src/hooks/useEvent";
+import { useRouter } from "next/router";
+import { useEffect } from "react";
 
 const Events: NextPage = () => {
+  const router = useRouter();
+  const { t } = useLocale();
   const {
     events,
     isLoading,
@@ -25,8 +29,17 @@ const Events: NextPage = () => {
     nextCursor,
     countData,
     setCurrentCursor,
+    COUNT_PER_PAGE,
   } = useEvents();
-  const { t } = useLocale();
+  useEffect(() => {
+    if (router.isReady) {
+      if (router.query?.page) {
+        setCurrentCursor((Number(router.query.page) - 1) * COUNT_PER_PAGE);
+      } else {
+        setCurrentCursor(0);
+      }
+    }
+  }, [router.query?.page]);
 
   return (
     <>
