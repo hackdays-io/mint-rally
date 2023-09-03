@@ -17,7 +17,8 @@
     "upload:prd": "yarn build && node scripts/upload_prd.js",
     "upload:stg": "yarn build && node scripts/upload_stg.js",
     "verify": "npx hardhat verify",
-    "build:circuit": "sh scripts/circuits/build_circuit.sh"
+    "build:circuit": "sh scripts/circuits/build_circuit.sh",
+    "create:testdata": "npx hardhat run scripts/utils/create_test_events.ts --network localhost"
   },
   "devDependencies": {
     "@ethereumjs/util": "^8.1.0",
