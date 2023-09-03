@@ -1,7 +1,6 @@
 import { Heading, Spinner, Text, Container, Box, Flex } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { FC, Fragment, useMemo } from "react";
-import LoginRequired from "../../components/atoms/web3/LoginRequired";
 import { useLocale } from "../../hooks/useLocale";
 import { MintForm } from "src/components/organisms/nft/MintForm";
 import { useAddress } from "@thirdweb-dev/react";
