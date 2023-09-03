@@ -62,7 +62,7 @@ class EventCreator {
         this.publicInputCalldata[0],
         event.attributes,
         {
-          gasLimit: 30000000,
+          gasLimit: 3000000,
           from: this.organizer!.address,
         }
       );
