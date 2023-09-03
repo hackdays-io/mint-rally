@@ -35,6 +35,7 @@ const Events: NextPage = () => {
         setCurrentPage(Number(router.query.page));
         setCurrentCursor((Number(router.query.page) - 1) * COUNT_PER_PAGE);
       } else {
+        setCurrentPage(1);
         setCurrentCursor(0);
       }
     }
