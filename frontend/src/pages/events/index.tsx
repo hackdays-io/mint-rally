@@ -17,7 +17,8 @@ import { Event } from "types/Event";
 import { useLocale } from "../../hooks/useLocale";
 import { useEvents } from "src/hooks/useEvent";
 import { useRouter } from "next/router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import Paginate from "src/components/atoms/events/Paginate";
 
 const Events: NextPage = () => {
   const router = useRouter();
@@ -31,9 +32,14 @@ const Events: NextPage = () => {
     setCurrentCursor,
     COUNT_PER_PAGE,
   } = useEvents();
+  const [currentPage, setCurrentPage] = useState<number | null>(null);
+  const pageChanged = (page: number) => {
+    router.push("/events?page=" + page);
+  };
   useEffect(() => {
     if (router.isReady) {
       if (router.query?.page) {
+        setCurrentPage(Number(router.query.page));
         setCurrentCursor((Number(router.query.page) - 1) * COUNT_PER_PAGE);
       } else {
         setCurrentCursor(0);
@@ -71,6 +77,12 @@ const Events: NextPage = () => {
         ) : (
           <VStack spacing={5} align="stretch">
             <>
+              <Paginate
+                pageCount={Math.ceil(countData / COUNT_PER_PAGE)}
+                pageRangeDisplayed={COUNT_PER_PAGE}
+                currentPage={currentPage!}
+                pageChanged={pageChanged}
+              />
               {events.map((item: Event.EventRecord) => {
                 return (
                   <Link
