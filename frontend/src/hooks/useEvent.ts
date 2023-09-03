@@ -267,7 +267,7 @@ export const useEvents = () => {
     return data?.filter((e: any) => !blackList.includes(e.eventRecordId.toNumber()))
   }, [data, countData]);
 
-  return { events, isLoading, error, nextCursor, prevCursor, setCurrentCursor };
+  return { events, isLoading, error, countData, nextCursor, prevCursor, setCurrentCursor };
 };
 
 export const useEventById = (id: number) => {
