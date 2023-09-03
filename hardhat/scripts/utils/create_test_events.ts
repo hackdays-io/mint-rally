@@ -28,6 +28,9 @@ class EventCreator {
     [this.organizer, this.relayer] = await ethers.getSigners();
     console.log("relayer address:", this.relayer.address);
     console.log("organizer address:", this.organizer.address);
+    if (!process.env.LOCAL_CONTRACT_EVENT_MANAGER_ADDRESS) {
+      throw new Error("LOCAL_CONTRACT_EVENT_MANAGER_ADDRESS is undefined");
+    }
     this.eventManager = await ethers.getContractAt(
       "EventManager",
       process.env.LOCAL_CONTRACT_EVENT_MANAGER_ADDRESS!
