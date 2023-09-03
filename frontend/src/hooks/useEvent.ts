@@ -74,7 +74,7 @@ export const useCreateEventGroup = (address: string) => {
       if (!params.groupName) return;
       try {
         await mutateAsync({ args: [params.groupName] });
-      } catch (_) {}
+      } catch (_) { }
     },
     [mutateAsync]
   );
@@ -203,8 +203,7 @@ export const useCreateEvent = (address: string) => {
             params.groupId,
             params.eventName,
             params.description,
-            `${params.date.toLocaleDateString()} ${params.startTime}~${
-              params.endTime
+            `${params.date.toLocaleDateString()} ${params.startTime}~${params.endTime
             }`,
             params.mintLimit,
             params.useMtx,
@@ -215,7 +214,7 @@ export const useCreateEvent = (address: string) => {
             value: params.useMtx ? value : 0,
           },
         });
-      } catch (_) {}
+      } catch (_) { }
     },
     [mutateAsync, provider, getGasFee]
   );
@@ -233,7 +232,7 @@ export const useEvents = () => {
   const { eventManagerContract } = useEventManagerContract();
   const { isLoading, data, error } = useContractRead(
     eventManagerContract,
-    "getEventRecords"
+    "getEventRecords", [100, 0]
   );
 
   const events = useMemo(() => {
@@ -269,7 +268,7 @@ export const useCalcMtxGasFee = (mintLimit?: number) => {
 
       const gasPrice = (await provider.getGasPrice())?.toNumber();
       const value = ethers.utils.parseEther(
-        `${gasPrice * mintLimit * 660000 * 1 * 0.000000000000000001}`
+        `${(gasPrice * mintLimit * (660000 * 1 * 0.000000000000000001)).toFixed(6)}`
       );
       setGasFee(value);
     };
@@ -280,10 +279,9 @@ export const useCalcMtxGasFee = (mintLimit?: number) => {
   const getGasFee = useCallback(
     async (_mintLimit: number) => {
       if (!provider) return;
-
       const gasPrice = (await provider.getGasPrice())?.toNumber();
       const value = ethers.utils.parseEther(
-        `${gasPrice * _mintLimit * 660000 * 1 * 0.000000000000000001}`
+        `${(gasPrice * _mintLimit * 660000 * 1 * 0.000000000000000001).toFixed(6)}`
       );
       return value;
     },
