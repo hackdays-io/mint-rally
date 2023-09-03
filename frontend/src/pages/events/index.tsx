@@ -26,6 +26,7 @@ const Events: NextPage = () => {
   const { events, isLoading, countData, setCurrentCursor, COUNT_PER_PAGE } =
     useEvents();
   const [currentPage, setCurrentPage] = useState<number | null>(null);
+  // function called when page is changed
   const pageChanged = (page: number) => {
     router.push("/events?page=" + page);
   };
