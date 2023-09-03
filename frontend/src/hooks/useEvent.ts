@@ -229,20 +229,45 @@ export const useCreateEvent = (address: string) => {
 };
 
 export const useEvents = () => {
+  const COUNT_PER_PAGE = 50;
   const { eventManagerContract } = useEventManagerContract();
-  const { isLoading, data, error } = useContractRead(
+  const [nextCursor, setNextCursor] = useState<number | null>(null);
+  const [currentCursor, setCurrentCursor] = useState<number>(0);
+  const [prevCursor, setPrevCursor] = useState<number | null>(null);
+  const { isLoading: isLodingCount, data: countData, error: countError } = useContractRead(
     eventManagerContract,
-    "getEventRecords", [100, 0]
+    "getEventRecordCount"
   );
+  const [data, setEventData] = useState<any>(null)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [error, setError] = useState<any>(null)
+
+  // read record data
+  useEffect(() => {
+    if (eventManagerContract === undefined || isLoading || currentCursor === null) return;
+    setIsLoading(true)
+    eventManagerContract?.call("getEventRecords", [COUNT_PER_PAGE, currentCursor]).then((res: any) => {
+      setEventData(res)
+    }).catch((err: any) => {
+      setError(err)
+    }).finally(() => {
+      setIsLoading(false)
+    })
+  }, [currentCursor, eventManagerContract])
 
   const events = useMemo(() => {
+    // return empty if both data is not set
+    if (data === null || countData === undefined) return [];
+    // set cursors for pagenation
+    if (countData > data.length + currentCursor) { setNextCursor(currentCursor + data.length) } else { setNextCursor(null) }
+    if (currentCursor > 0) { setPrevCursor(currentCursor - data.length) } else { setPrevCursor(null) }
     const blackList = process.env.NEXT_PUBLIC_EVENT_BLACK_LIST
       ? JSON.parse(`[${process.env.NEXT_PUBLIC_EVENT_BLACK_LIST}]`)
       : [];
     return data?.filter((e: any) => !blackList.includes(e.eventRecordId.toNumber()))
-  }, [data]);
+  }, [data, countData]);
 
-  return { events, isLoading, error };
+  return { events, isLoading, error, nextCursor, prevCursor, setCurrentCursor };
 };
 
 export const useEventById = (id: number) => {

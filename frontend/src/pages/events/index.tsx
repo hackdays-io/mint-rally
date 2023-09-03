@@ -18,7 +18,8 @@ import { useLocale } from "../../hooks/useLocale";
 import { useEvents } from "src/hooks/useEvent";
 
 const Events: NextPage = () => {
-  const { events, isLoading } = useEvents();
+  const { events, isLoading, prevCursor, nextCursor, setCurrentCursor } =
+    useEvents();
   const { t } = useLocale();
 
   return (
