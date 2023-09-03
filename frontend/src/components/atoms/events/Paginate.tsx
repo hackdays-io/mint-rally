@@ -1,5 +1,4 @@
 import { Link as ChakraUILink, Box, HStack } from "@chakra-ui/react";
-import Link from "next/link";
 
 type PaginateProps = {
   pageCount: number;
