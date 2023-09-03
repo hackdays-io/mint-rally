@@ -239,9 +239,7 @@ export const useEvents = () => {
     const blackList = process.env.NEXT_PUBLIC_EVENT_BLACK_LIST
       ? JSON.parse(`[${process.env.NEXT_PUBLIC_EVENT_BLACK_LIST}]`)
       : [];
-    return reverse(
-      data?.filter((e: any) => !blackList.includes(e.eventRecordId.toNumber()))
-    );
+    return data?.filter((e: any) => !blackList.includes(e.eventRecordId.toNumber()))
   }, [data]);
 
   return { events, isLoading, error };
