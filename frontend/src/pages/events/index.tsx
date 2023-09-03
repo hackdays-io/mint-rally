@@ -23,15 +23,8 @@ import Paginate from "src/components/atoms/events/Paginate";
 const Events: NextPage = () => {
   const router = useRouter();
   const { t } = useLocale();
-  const {
-    events,
-    isLoading,
-    prevCursor,
-    nextCursor,
-    countData,
-    setCurrentCursor,
-    COUNT_PER_PAGE,
-  } = useEvents();
+  const { events, isLoading, countData, setCurrentCursor, COUNT_PER_PAGE } =
+    useEvents();
   const [currentPage, setCurrentPage] = useState<number | null>(null);
   const pageChanged = (page: number) => {
     router.push("/events?page=" + page);
