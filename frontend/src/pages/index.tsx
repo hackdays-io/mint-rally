@@ -19,7 +19,10 @@ import { useEvents } from "src/hooks/useEvent";
 
 const Home: NextPage = () => {
   const { t, locale } = useLocale();
-  const { events, isLoading } = useEvents();
+  const { events, isLoading } = useEvents({
+    initialCursor: 0,
+    countPerPage: 6,
+  });
   const filename = locale === "ja" ? "mainImg-ja" : "mainImg";
   return (
     <Box>

@@ -229,6 +229,7 @@ export const useCreateEvent = (address: string) => {
 };
 type UseEventOption = {
   countPerPage?: number
+  initialCursor?: number
 }
 export const useEvents = (option?: UseEventOption) => {
   const COUNT_PER_PAGE = option?.countPerPage || 50;
@@ -256,6 +257,9 @@ export const useEvents = (option?: UseEventOption) => {
       setIsLoading(false)
     })
   }, [currentCursor, eventManagerContract])
+  if (option?.initialCursor !== undefined && currentCursor === null) {
+    setCurrentCursor(option?.initialCursor)
+  }
 
   const events = useMemo(() => {
     // return empty if both data is not set
