@@ -115,6 +115,20 @@ describe("MintNFT", function () {
           .connect(participant1)
           .mintParticipateNFT(createdGroupId, createdEventIds[0], proofCalldata)
       ).to.be.revertedWith("mint is locked");
+      await mintNFT
+        .connect(organizer)
+        .changeMintLocked(createdEventIds[0], false);
+    });
+
+    it("fail to mint when paused", async () => {
+      const { proofCalldata } = await generateProof();
+      await mintNFT.connect(organizer).pause();
+      await expect(
+        mintNFT
+          .connect(participant1)
+          .mintParticipateNFT(createdGroupId, createdEventIds[0], proofCalldata)
+      ).to.be.revertedWith("Pausable: paused");
+      await mintNFT.connect(organizer).unpause();
     });
   });
 
@@ -126,6 +140,28 @@ describe("MintNFT", function () {
   //   await mintNftTxn.wait();
   //   expect(mintNftTxn).to.throw();
   // });
+
+  describe("burn", () => {
+    it("success to burn", async () => {
+      const { proofCalldata } = await generateProof();
+      const mintNftTxn = await mintNFT
+        .connect(participant1)
+        .mintParticipateNFT(createdGroupId, createdEventIds[0], proofCalldata);
+      await mintNftTxn.wait();
+
+      expect(await mintNFT.balanceOf(organizer.address)).equal(1);
+
+      // revert if paused
+      await mintNFT.connect(organizer).pause();
+      await expect(mintNFT.connect(organizer).burn(0)).to.be.revertedWith(
+        "Pausable: paused"
+      );
+      await mintNFT.connect(organizer).unpause();
+
+      await mintNFT.connect(organizer).burn(0);
+      expect(await mintNFT.balanceOf(organizer.address)).equal(0);
+    });
+  });
 });
 
 describe("nft revolution", () => {
@@ -370,6 +406,14 @@ describe("mint locked flag", () => {
       mintNFT.connect(participant1).changeMintLocked(1, false)
     ).to.be.revertedWith("you are not event group owner");
   });
+
+  it("should not change if paused", async () => {
+    await mintNFT.connect(organizer).pause();
+    await expect(
+      mintNFT.connect(organizer).changeMintLocked(1, false)
+    ).to.be.revertedWith("Pausable: paused");
+    await mintNFT.connect(organizer).unpause();
+  });
 });
 
 describe("reset secret phrase", () => {
@@ -462,5 +506,114 @@ describe("reset secret phrase", () => {
     await expect(
       mintNFT.connect(participant1).resetSecretPhrase(1, newProofCalldata)
     ).to.be.revertedWith("you are not event group owner");
+  });
+
+  it("cannot change if paused", async () => {
+    const newProofCalldata =
+      "0x1f376ca3150d51a164c711287cff6e77e2127d635a1534b41d5624472f000000";
+    await mintNFT.connect(organizer).pause();
+    await expect(
+      mintNFT.connect(organizer).resetSecretPhrase(1, newProofCalldata)
+    ).to.be.revertedWith("Pausable: paused");
+    await mintNFT.connect(organizer).unpause();
+  });
+});
+
+describe("Pause and Unpause", () => {
+  let mintNFT: MintNFT;
+  let eventManager: EventManager;
+  let secretPhraseVerifier: SecretPhraseVerifier;
+
+  let createdGroupId: number;
+  const createdEventIds: number[] = [];
+
+  let organizer: SignerWithAddress;
+  let participant1: SignerWithAddress;
+  let relayer: SignerWithAddress;
+
+  let correctProofCalldata!: any;
+
+  before(async () => {
+    [organizer, participant1, relayer] = await ethers.getSigners();
+    // Deploy secretPhraseVerifier
+    const SecretPhraseVerifierFactory = await ethers.getContractFactory(
+      "SecretPhraseVerifier"
+    );
+    secretPhraseVerifier = await SecretPhraseVerifierFactory.deploy();
+    // Deploy mintNFT and eventManager
+    const MintNFTFactory = await ethers.getContractFactory("MintNFT");
+    const deployedMintNFT: any = await upgrades.deployProxy(
+      MintNFTFactory,
+      [
+        "0xdCb93093424447bF4FE9Df869750950922F1E30B",
+        secretPhraseVerifier.address,
+      ],
+      {
+        initializer: "initialize",
+      }
+    );
+    mintNFT = deployedMintNFT;
+    await mintNFT.deployed();
+    const EventManager = await ethers.getContractFactory("EventManager");
+    const deployedEventManager: any = await upgrades.deployProxy(
+      EventManager,
+      [relayer.address, 250000, 1000000],
+      {
+        initializer: "initialize",
+      }
+    );
+    eventManager = deployedEventManager;
+    await eventManager.deployed();
+    await mintNFT.setEventManagerAddr(eventManager.address);
+    await eventManager.setMintNFTAddr(mintNFT.address);
+
+    // generate proof
+    const { publicInputCalldata } = await generateProof();
+    correctProofCalldata = publicInputCalldata[0];
+
+    // Create a Group and an Event
+    const createGroupTxn = await eventManager
+      .connect(organizer)
+      .createGroup("First Group");
+    await createGroupTxn.wait();
+    const groupsList = await eventManager.getGroups();
+    createdGroupId = groupsList[0].groupId.toNumber();
+    const createEventTxn = await eventManager
+      .connect(organizer)
+      .createEventRecord(
+        createdGroupId,
+        "event1",
+        "event1 description",
+        "2022-07-3O",
+        10,
+        false,
+        correctProofCalldata,
+        attributes
+      );
+    await createEventTxn.wait();
+    const eventsList = await eventManager.getEventRecords();
+    createdEventIds.push(eventsList[0].eventRecordId.toNumber());
+  });
+
+  it("should pause and unpause", async () => {
+    expect(await eventManager.paused()).to.equal(false);
+
+    await eventManager.connect(organizer).pause();
+    expect(await eventManager.paused()).to.equal(true);
+
+    await eventManager.connect(organizer).unpause();
+    expect(await eventManager.paused()).to.equal(false);
+  });
+
+  it("should not pause if not owner", async () => {
+    await expect(eventManager.connect(participant1).pause()).to.be.revertedWith(
+      "Ownable: caller is not the owner"
+    );
+  });
+
+  it("should not unpause if not owner", async () => {
+    await expect(
+      eventManager.connect(participant1).unpause()
+    ).to.be.revertedWith("Ownable: caller is not the owner");
   });
 });

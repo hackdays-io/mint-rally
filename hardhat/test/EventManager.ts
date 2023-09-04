@@ -95,7 +95,7 @@ describe("EventManager", function () {
       const eventRecordsBeforeCreate = await eventManager.getEventRecords(0, 0);
       expect(eventRecordsBeforeCreate.length).to.equal(0);
 
-      // revert if paused
+      // revert if EventManager is paused
       await eventManager.connect(organizer).pause();
       await expect(
         eventManager.createEventRecord(
@@ -110,6 +110,22 @@ describe("EventManager", function () {
         )
       ).to.be.revertedWith("Pausable: paused");
       await eventManager.connect(organizer).unpause();
+
+      // revert if MintNFT is paused
+      await mintNFT.connect(organizer).pause();
+      await expect(
+        eventManager.createEventRecord(
+          groupsAfterCreate[0].groupId.toNumber(),
+          "event1",
+          "event1 description",
+          "2022-07-3O",
+          100,
+          false,
+          publicInputCalldata[0],
+          attributes
+        )
+      ).to.be.revertedWith("Pausable: paused");
+      await mintNFT.connect(organizer).unpause();
 
       const txn2 = await eventManager.createEventRecord(
         groupsAfterCreate[0].groupId.toNumber(),
