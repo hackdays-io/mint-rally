@@ -5,7 +5,6 @@ import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721Enumer
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/metatx/MinimalForwarderUpgradeable.sol";
 import "./lib/Hashing.sol";
 import "./ERC2771ContextUpgradeable.sol";
@@ -15,8 +14,7 @@ import "./ISecretPhraseVerifier.sol";
 contract MintNFT is
     ERC721EnumerableUpgradeable,
     ERC2771ContextUpgradeable,
-    OwnableUpgradeable,
-    PausableUpgradeable
+    OwnableUpgradeable
 {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
@@ -50,9 +48,13 @@ contract MintNFT is
 
     address private secretPhraseVerifierAddr;
 
+    bool private isPaused;
+
     event MintedNFTAttributeURL(address indexed holder, string url);
     event MintLocked(uint256 indexed eventId, bool isLocked);
     event ResetSecretPhrase(address indexed executor, uint256 indexed eventId);
+    event Paused(address account);
+    event Unpaused(address account);
 
     modifier onlyGroupOwner(uint256 _eventId) {
         IEventManager eventManager = IEventManager(eventManagerAddr);
@@ -60,6 +62,11 @@ contract MintNFT is
             eventManager.isGroupOwnerByEventId(msg.sender, _eventId),
             "you are not event group owner"
         );
+        _;
+    }
+
+    modifier whenNotPaused() {
+        require(!paused(), "Paused");
         _;
     }
 
@@ -72,7 +79,6 @@ contract MintNFT is
         __Ownable_init();
         __ERC2771Context_init(address(trustedForwarder));
         secretPhraseVerifierAddr = _secretPhraseVerifierAddr;
-        __Pausable_init();
     }
 
     function _msgSender()
@@ -250,11 +256,17 @@ contract MintNFT is
         return result;
     }
 
-    function pause() external onlyOwner {
-        _pause();
+    function paused() public view returns (bool) {
+        return isPaused;
     }
 
-    function unpause() external onlyOwner {
-        _unpause();
+    function pause() public onlyOwner {
+        isPaused = true;
+        emit Paused(msg.sender);
+    }
+
+    function unpause() public onlyOwner {
+        isPaused = false;
+        emit Unpaused(msg.sender);
     }
 }

@@ -127,7 +127,7 @@ describe("MintNFT", function () {
         mintNFT
           .connect(participant1)
           .mintParticipateNFT(createdGroupId, createdEventIds[0], proofCalldata)
-      ).to.be.revertedWith("Pausable: paused");
+      ).to.be.revertedWith("Paused");
       await mintNFT.connect(organizer).unpause();
     });
   });
@@ -154,7 +154,7 @@ describe("MintNFT", function () {
       // revert if paused
       await mintNFT.connect(organizer).pause();
       await expect(mintNFT.connect(organizer).burn(0)).to.be.revertedWith(
-        "Pausable: paused"
+        "Paused"
       );
       await mintNFT.connect(organizer).unpause();
 
@@ -411,7 +411,7 @@ describe("mint locked flag", () => {
     await mintNFT.connect(organizer).pause();
     await expect(
       mintNFT.connect(organizer).changeMintLocked(1, false)
-    ).to.be.revertedWith("Pausable: paused");
+    ).to.be.revertedWith("Paused");
     await mintNFT.connect(organizer).unpause();
   });
 });
@@ -514,7 +514,7 @@ describe("reset secret phrase", () => {
     await mintNFT.connect(organizer).pause();
     await expect(
       mintNFT.connect(organizer).resetSecretPhrase(1, newProofCalldata)
-    ).to.be.revertedWith("Pausable: paused");
+    ).to.be.revertedWith("Paused");
     await mintNFT.connect(organizer).unpause();
   });
 });
@@ -596,24 +596,28 @@ describe("Pause and Unpause", () => {
   });
 
   it("should pause and unpause", async () => {
-    expect(await eventManager.paused()).to.equal(false);
+    expect(await mintNFT.paused()).to.equal(false);
 
-    await eventManager.connect(organizer).pause();
-    expect(await eventManager.paused()).to.equal(true);
+    await expect(mintNFT.connect(organizer).pause())
+      .to.emit(mintNFT, "Paused")
+      .withArgs(organizer.address);
+    expect(await mintNFT.paused()).to.equal(true);
 
-    await eventManager.connect(organizer).unpause();
-    expect(await eventManager.paused()).to.equal(false);
+    await expect(mintNFT.connect(organizer).unpause())
+      .to.emit(mintNFT, "Unpaused")
+      .withArgs(organizer.address);
+    expect(await mintNFT.paused()).to.equal(false);
   });
 
   it("should not pause if not owner", async () => {
-    await expect(eventManager.connect(participant1).pause()).to.be.revertedWith(
+    await expect(mintNFT.connect(participant1).pause()).to.be.revertedWith(
       "Ownable: caller is not the owner"
     );
   });
 
   it("should not unpause if not owner", async () => {
-    await expect(
-      eventManager.connect(participant1).unpause()
-    ).to.be.revertedWith("Ownable: caller is not the owner");
+    await expect(mintNFT.connect(participant1).unpause()).to.be.revertedWith(
+      "Ownable: caller is not the owner"
+    );
   });
 });
