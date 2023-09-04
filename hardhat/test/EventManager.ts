@@ -79,6 +79,13 @@ describe("EventManager", function () {
       const groupsBeforeCreate = await eventManager.getGroups();
       expect(groupsBeforeCreate.length).to.equal(0);
 
+      // revert if paused
+      await eventManager.connect(organizer).pause();
+      await expect(eventManager.createGroup("group1")).to.be.revertedWith(
+        "Pausable: paused"
+      );
+      await eventManager.connect(organizer).unpause();
+
       const txn1 = await eventManager.createGroup("group1");
       await txn1.wait();
       const groupsAfterCreate = await eventManager.getGroups();
@@ -87,6 +94,22 @@ describe("EventManager", function () {
 
       const eventRecordsBeforeCreate = await eventManager.getEventRecords(0, 0);
       expect(eventRecordsBeforeCreate.length).to.equal(0);
+
+      // revert if paused
+      await eventManager.connect(organizer).pause();
+      await expect(
+        eventManager.createEventRecord(
+          groupsAfterCreate[0].groupId.toNumber(),
+          "event1",
+          "event1 description",
+          "2022-07-3O",
+          100,
+          false,
+          publicInputCalldata[0],
+          attributes
+        )
+      ).to.be.revertedWith("Pausable: paused");
+      await eventManager.connect(organizer).unpause();
 
       const txn2 = await eventManager.createEventRecord(
         groupsAfterCreate[0].groupId.toNumber(),
@@ -161,35 +184,6 @@ describe("EventManager", function () {
       expect(await relayer.getBalance()).equal(
         BigNumber.from("10000003325000000000000")
       );
-    });
-
-    it("Should not create group if paused", async () => {
-      await eventManager.connect(organizer).pause();
-
-      await expect(eventManager.createGroup("group3")).to.be.revertedWith(
-        "Pausable: paused"
-      );
-    });
-
-    it("Should not create event record if paused", async () => {
-      const txn1 = await eventManager.createGroup("group4");
-      await txn1.wait();
-      const groupsAfterCreate = await eventManager.getGroups();
-
-      await eventManager.connect(organizer).pause();
-
-      await expect(
-        eventManager.createEventRecord(
-          groupsAfterCreate[0].groupId.toNumber(),
-          "event1",
-          "event1 description",
-          "2022-07-3O",
-          100,
-          false,
-          publicInputCalldata[0],
-          attributes
-        )
-      ).to.be.revertedWith("Pausable: paused");
     });
 
     describe("Create 500 events for testing pagenation", () => {
