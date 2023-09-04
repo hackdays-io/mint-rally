@@ -4,10 +4,11 @@ pragma solidity ^0.8.4;
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "./IMintNFT.sol";
 import "hardhat/console.sol";
 
-contract EventManager is OwnableUpgradeable {
+contract EventManager is OwnableUpgradeable, PausableUpgradeable {
     struct Group {
         uint256 groupId;
         address ownerAddress;
@@ -77,11 +78,12 @@ contract EventManager is OwnableUpgradeable {
     event CreateGroup(address indexed owner, uint256 groupId);
     event CreateEvent(address indexed owner, uint256 eventId);
 
+    // Currently, reinitializer(2) was executed as constructor.
     function initialize(
         address _relayerAddr,
         uint256 _mtxPrice,
         uint256 _maxMintLimit
-    ) public initializer {
+    ) public reinitializer(2) {
         __Ownable_init();
         _groupIds.increment();
         _eventRecordIds.increment();
@@ -90,7 +92,7 @@ contract EventManager is OwnableUpgradeable {
         setMaxMintLimit(_maxMintLimit);
     }
 
-    function createGroup(string memory _name) external {
+    function createGroup(string memory _name) external whenNotPaused {
         uint256 _newGroupId = _groupIds.current();
         _groupIds.increment();
 
@@ -135,7 +137,7 @@ contract EventManager is OwnableUpgradeable {
         bool _useMtx,
         bytes32 _secretPhrase,
         IMintNFT.NFTAttribute[] memory _eventNFTAttributes
-    ) external payable onlyGroupOwner(_groupId) {
+    ) external payable onlyGroupOwner(_groupId) whenNotPaused {
         require(
             _mintLimit > 0 && _mintLimit <= maxMintLimit,
             "mint limit is invalid"
@@ -245,5 +247,13 @@ contract EventManager is OwnableUpgradeable {
             }
         }
         return isGroupOwner;
+    }
+
+    function pause() public onlyOwner {
+        _pause();
+    }
+
+    function unpause() public onlyOwner {
+        _unpause();
     }
 }
