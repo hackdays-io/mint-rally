@@ -104,3 +104,17 @@ NEXT_PUBLIC_CONTRACT_MINT_NFT_MANAGER=0x5FbDB2315678afecb367f032d93F642f64180aa3
 ### Run frontend
 
 If you don't build frontend development environment, please follow [this doc (Frontend)](./frontend.md)
+
+## Create test data for front-end testing
+
+Set the Contract address of the EventManager as LOCAL_CONTRACT_EVENT_MANAGER_ADDRESS in the hardhat/.env file.
+
+```.env
+LOCAL_CONTRACT_EVENT_MANAGER_ADDRESS=0x0165878A594ca255338adfa4d4....
+```
+
+The following command then creates one new event group and 150 event data in the localnode.
+
+```
+yarn create:testdata
+```

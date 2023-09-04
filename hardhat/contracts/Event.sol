@@ -5,6 +5,7 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "./IMintNFT.sol";
+import "hardhat/console.sol";
 
 contract EventManager is OwnableUpgradeable {
     struct Group {
@@ -175,13 +176,52 @@ contract EventManager is OwnableUpgradeable {
         emit CreateEvent(msg.sender, _newEventId);
     }
 
-    function getEventRecords() public view returns (EventRecord[] memory) {
+    function getEventRecordCount() public view returns (uint256) {
+        return eventRecords.length;
+    }
+
+    function getEventRecords(
+        uint256 _limit,
+        uint256 _offset
+    ) public view returns (EventRecord[] memory) {
         uint256 _numberOfEventRecords = eventRecords.length;
+        if (_limit == 0) {
+            _limit = 100; // default limit
+        }
+        require(_limit <= 100, "limit is too large");
+        require(_offset <= _numberOfEventRecords, "offset is too large");
+        // if limit is over the number of events, set limit to the number of events
+        if (_limit + _offset > _numberOfEventRecords) {
+            _limit = _numberOfEventRecords - _offset;
+        }
         // create array of events
+        EventRecord[] memory _eventRecords = new EventRecord[](_limit);
+
+        // slice array of events by offset and limit
+        for (uint256 i = 0; i < _limit; i++) {
+            if (_numberOfEventRecords - (_offset + i + 1) >= 0) {
+                _eventRecords[i] = eventRecords[
+                    _numberOfEventRecords - (_offset + i + 1)
+                ];
+            }
+        }
+        return _eventRecords;
+    }
+
+    function getEventRecordsByGroupId(
+        uint256 _groupId
+    ) public view returns (EventRecord[] memory) {
+        eventIdsByGroupId[_groupId];
+        uint256 _numberOfEventRecords = eventIdsByGroupId[_groupId].length;
         EventRecord[] memory _eventRecords = new EventRecord[](
             _numberOfEventRecords
         );
-        _eventRecords = eventRecords;
+        for (uint256 _i = 0; _i < _numberOfEventRecords; _i++) {
+            uint256 _eventId = eventIdsByGroupId[_groupId][
+                _numberOfEventRecords - _i - 1
+            ];
+            _eventRecords[_i] = eventRecords[_eventId - 1];
+        }
         return _eventRecords;
     }
 

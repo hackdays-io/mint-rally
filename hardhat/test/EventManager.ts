@@ -2,7 +2,9 @@ import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { expect } from "chai";
 import { BigNumber } from "ethers";
 import { ethers, upgrades } from "hardhat";
+// eslint-disable-next-line node/no-missing-import
 import { EventManager, MintNFT, SecretPhraseVerifier } from "../typechain";
+// eslint-disable-next-line node/no-missing-import
 import { generateProof } from "./helper/secret_phrase";
 
 // ToDo requiredParticipateCountに重複がある場合エラーになってしまう。
@@ -83,13 +85,13 @@ describe("EventManager", function () {
       expect(groupsAfterCreate.length).to.equal(1);
       expect(groupsAfterCreate[0].name).to.equal("group1");
 
-      const eventRecordsBeforeCreate = await eventManager.getEventRecords();
+      const eventRecordsBeforeCreate = await eventManager.getEventRecords(0, 0);
       expect(eventRecordsBeforeCreate.length).to.equal(0);
 
       const txn2 = await eventManager.createEventRecord(
         groupsAfterCreate[0].groupId.toNumber(),
-        "event1",
-        "event1 description",
+        "event-1",
+        "event-1 description",
         "2022-07-3O",
         100,
         false,
@@ -97,14 +99,14 @@ describe("EventManager", function () {
         attributes
       );
       await txn2.wait();
-      const eventRecordsAfterCreate = await eventManager.getEventRecords();
+      const eventRecordsAfterCreate = await eventManager.getEventRecords(0, 0);
       expect(eventRecordsAfterCreate.length).to.equal(1);
       expect(eventRecordsAfterCreate[0].groupId).to.equal(
         groupsAfterCreate[0].groupId.toNumber()
       );
-      expect(eventRecordsAfterCreate[0].name).to.equal("event1");
+      expect(eventRecordsAfterCreate[0].name).to.equal("event-1");
       expect(eventRecordsAfterCreate[0].description).to.equal(
-        "event1 description"
+        "event-1 description"
       );
       expect(eventRecordsAfterCreate[0].date).to.equal("2022-07-3O");
 
@@ -134,7 +136,7 @@ describe("EventManager", function () {
         // nothing to do
       }
       const eventRecordsAfterCreateWithInvalidGroupId =
-        await eventManager.getEventRecords();
+        await eventManager.getEventRecords(0, 0);
       expect(eventRecordsAfterCreateWithInvalidGroupId.length).to.equal(1);
     });
 
@@ -159,6 +161,73 @@ describe("EventManager", function () {
       expect(await relayer.getBalance()).equal(
         BigNumber.from("10000003325000000000000")
       );
+    });
+    describe("Create 500 events for testing pagenation", () => {
+      it("Should create 500 events", async () => {
+        const txn1 = await eventManager.createGroup("group2");
+        await txn1.wait();
+        const groupsAfterCreate = await eventManager.getGroups();
+        for (let i = 0; i < 500; i++) {
+          const txn = await eventManager.createEventRecord(
+            groupsAfterCreate[1].groupId.toNumber(),
+            `event${i}`,
+            `event${i} description`,
+            "2022-07-3O",
+            11 + i,
+            true,
+            publicInputCalldata[0],
+            attributes,
+            {
+              value: ethers.utils.parseUnits(
+                String(25000000 * 10 * 1.33),
+                "gwei"
+              ),
+            }
+          );
+          await txn.wait();
+        }
+      });
+      it("should return total record count", async () => {
+        expect(await eventManager.getEventRecordCount()).to.equal(502);
+      });
+      it("should throw error when offset is too lerge", async () => {
+        await expect(eventManager.getEventRecords(100, 600)).to.be.revertedWith(
+          "offset is too large"
+        );
+      });
+      it("should throw error when limit is too lerge", async () => {
+        await expect(eventManager.getEventRecords(200, 0)).to.be.revertedWith(
+          "limit is too large"
+        );
+      });
+      it("should return first 100 records by pagenation", async () => {
+        expect((await eventManager.getEventRecords(0, 0)).length).equal(100);
+      });
+      it("should return from last events", async () => {
+        const _events = await eventManager.getEventRecords(0, 0);
+        expect(_events[0].name).to.equal("event499");
+        expect(_events[99].name).to.equal("event400");
+      });
+      it("should return next 100 records by pagenation", async () => {
+        const _events = await eventManager.getEventRecords(100, 100);
+        expect(_events[0].name).to.equal("event399");
+        expect(_events[99].name).to.equal("event300");
+      });
+      it("should return last 2 records by pagenation", async () => {
+        const _events = await eventManager.getEventRecords(100, 500);
+        expect(_events.length).to.equal(2);
+        expect(_events[0].name).to.equal("event1");
+        expect(_events[1].name).to.equal("event-1");
+      });
+      it("should return last one records by pagenation", async () => {
+        const _events = await eventManager.getEventRecords(100, 501);
+        expect(_events.length).to.equal(1);
+        expect(_events[0].name).to.equal("event-1");
+      });
+      it("should return specified number of records by pagenation", async () => {
+        const _events = await eventManager.getEventRecords(50, 0);
+        expect(_events.length).to.equal(50);
+      });
     });
   });
 
@@ -208,6 +277,92 @@ describe("EventManager", function () {
       expect(ownGroups2.length).to.equal(2);
       expect(ownGroups2[0].name).to.equal("group1");
       expect(ownGroups2[1].name).to.equal("group3");
+    });
+  });
+  describe("GetOwnEvents", async () => {
+    let eventManager: EventManager;
+    let publicInputCalldata: any;
+    before(async () => {
+      const eventManagerContractFactory = await ethers.getContractFactory(
+        "EventManager"
+      );
+      const deployedEventManagerContract: any = await upgrades.deployProxy(
+        eventManagerContractFactory,
+        [relayer.address, 250000, 1000000],
+        {
+          initializer: "initialize",
+        }
+      );
+      eventManager = await deployedEventManagerContract.deployed();
+      await eventManager.setMintNFTAddr(mintNFT.address);
+      await mintNFT.setEventManagerAddr(eventManager.address);
+
+      const { publicInputCalldata: _publicInputCalldata } =
+        await generateProof();
+      publicInputCalldata = _publicInputCalldata;
+    });
+    it("Should return own event records", async () => {
+      // create group by address1
+      const txn1 = await eventManager.connect(organizer).createGroup("group1");
+      await txn1.wait();
+
+      // create group by address2
+      const txn2 = await eventManager
+        .connect(participant1)
+        .createGroup("group2");
+      await txn2.wait();
+
+      // get all groups
+      const allGroups = await eventManager.getGroups();
+      expect(allGroups.length).to.equal(2);
+
+      // get group by address1
+      const ownGroups = await eventManager
+        .connect(organizer)
+        .getOwnGroups(organizer.address);
+      // get group by address2
+      const otherGroups = await eventManager
+        .connect(participant1)
+        .getOwnGroups(participant1.address);
+      // create events record by address1
+      for (let i = 0; i < 3; i++) {
+        const _txn = await eventManager.createEventRecord(
+          ownGroups[0].groupId.toNumber(),
+          `event${i}`,
+          `event${i} description`,
+          "2023-07-3O",
+          100,
+          false,
+          publicInputCalldata[0],
+          attributes,
+          { value: ethers.utils.parseUnits(String(250000 * 10 * 1.33), "gwei") }
+        );
+        await _txn.wait();
+      }
+      // create event record by address2
+      const txn3 = await eventManager
+        .connect(participant1)
+        .createEventRecord(
+          otherGroups[0].groupId.toNumber(),
+          `event_x`,
+          `event_x description`,
+          "2023-07-3O",
+          100,
+          false,
+          publicInputCalldata[0],
+          attributes,
+          { value: ethers.utils.parseUnits(String(250000 * 10 * 1.33), "gwei") }
+        );
+      await txn3.wait();
+      // get own event records by group id
+      const ownEventRecords = await eventManager.getEventRecordsByGroupId(
+        ownGroups[0].groupId.toNumber()
+      );
+      expect(ownEventRecords.length).to.equal(3);
+      // should return reverse order
+      expect(ownEventRecords[0].name).to.equal("event2");
+      expect(ownEventRecords[1].name).to.equal("event1");
+      expect(ownEventRecords[2].name).to.equal("event0");
     });
   });
 });

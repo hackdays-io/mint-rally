@@ -19,7 +19,10 @@ import { useEvents } from "src/hooks/useEvent";
 
 const Home: NextPage = () => {
   const { t, locale } = useLocale();
-  const { events, isLoading } = useEvents();
+  const { events, isLoading } = useEvents({
+    initialCursor: 0,
+    countPerPage: 6,
+  });
   const filename = locale === "ja" ? "mainImg-ja" : "mainImg";
   return (
     <Box>
@@ -246,24 +249,28 @@ const Home: NextPage = () => {
           <Spinner></Spinner>
         ) : (
           <VStack spacing={5} align="stretch">
-            <>
-              {events.slice(0, 6).map((item: any) => {
-                return (
-                  <Link
-                    href={"/events/" + item.eventRecordId}
-                    key={item.eventRecordId.toString()}
-                  >
-                    <a>
-                      <EventCard
-                        title={item.name}
-                        description={item.description}
-                        date={item.date}
-                      ></EventCard>
-                    </a>
-                  </Link>
-                );
-              })}
-            </>
+            {events ? (
+              <>
+                {events.slice(0, 6).map((item: any) => {
+                  return (
+                    <Link
+                      href={"/events/" + item.eventRecordId}
+                      key={item.eventRecordId.toString()}
+                    >
+                      <a>
+                        <EventCard
+                          title={item.name}
+                          description={item.description}
+                          date={item.date}
+                        ></EventCard>
+                      </a>
+                    </Link>
+                  );
+                })}
+              </>
+            ) : (
+              <Text>{t.NO_EVENTS_AVAILABLE}</Text>
+            )}
           </VStack>
         )}
       </Container>

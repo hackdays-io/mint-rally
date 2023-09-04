@@ -24,6 +24,7 @@ export default {
     "How many events do users need participate in to get this NFT?",
   NFT_DEFAULT: "This NFT will be default.",
   // Event group index
+  NO_EVENTS_AVAILABLE: "No events available",
   CREATE_NEW_EVENT_GROUP: "Create new event group",
   NEW_EVENT_GROUP_NAME: "Event Group Name",
   EVENT_GROUP_NFT_TITLE: "NFTs (You can edit in each event.)",
