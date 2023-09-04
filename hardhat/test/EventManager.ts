@@ -162,6 +162,36 @@ describe("EventManager", function () {
         BigNumber.from("10000003325000000000000")
       );
     });
+
+    it("Should not create group if paused", async () => {
+      await eventManager.connect(organizer).pause();
+
+      await expect(eventManager.createGroup("group3")).to.be.revertedWith(
+        "Pausable: paused"
+      );
+    });
+
+    it("Should not create event record if paused", async () => {
+      const txn1 = await eventManager.createGroup("group4");
+      await txn1.wait();
+      const groupsAfterCreate = await eventManager.getGroups();
+
+      await eventManager.connect(organizer).pause();
+
+      await expect(
+        eventManager.createEventRecord(
+          groupsAfterCreate[0].groupId.toNumber(),
+          "event1",
+          "event1 description",
+          "2022-07-3O",
+          100,
+          false,
+          publicInputCalldata[0],
+          attributes
+        )
+      ).to.be.revertedWith("Pausable: paused");
+    });
+
     describe("Create 500 events for testing pagenation", () => {
       it("Should create 500 events", async () => {
         const txn1 = await eventManager.createGroup("group2");
@@ -363,6 +393,47 @@ describe("EventManager", function () {
       expect(ownEventRecords[0].name).to.equal("event2");
       expect(ownEventRecords[1].name).to.equal("event1");
       expect(ownEventRecords[2].name).to.equal("event0");
+    });
+  });
+
+  describe("Pause and Unpause", async () => {
+    let eventManager: EventManager;
+    before(async () => {
+      const eventManagerContractFactory = await ethers.getContractFactory(
+        "EventManager"
+      );
+      const deployedEventManagerContract: any = await upgrades.deployProxy(
+        eventManagerContractFactory,
+        [relayer.address, 250000, 1000000],
+        {
+          initializer: "initialize",
+        }
+      );
+      eventManager = await deployedEventManagerContract.deployed();
+      await eventManager.setMintNFTAddr(mintNFT.address);
+      await mintNFT.setEventManagerAddr(eventManager.address);
+    });
+
+    it("Should pause and unpause", async () => {
+      expect(await eventManager.paused()).to.equal(false);
+
+      await eventManager.connect(organizer).pause();
+      expect(await eventManager.paused()).to.equal(true);
+
+      await eventManager.connect(organizer).unpause();
+      expect(await eventManager.paused()).to.equal(false);
+    });
+
+    it("Should not pause if not owner", async () => {
+      await expect(
+        eventManager.connect(participant1).pause()
+      ).to.be.revertedWith("Ownable: caller is not the owner");
+    });
+
+    it("Should not unpause if not owner", async () => {
+      await expect(
+        eventManager.connect(participant1).unpause()
+      ).to.be.revertedWith("Ownable: caller is not the owner");
     });
   });
 });
