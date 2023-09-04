@@ -275,6 +275,24 @@ export const useEvents = (option?: UseEventOption) => {
 
   return { events, isLoading, error, countData, nextCursor, prevCursor, setCurrentCursor, COUNT_PER_PAGE };
 };
+export const useEventsByGroupId = () => {
+  const { eventManagerContract } = useEventManagerContract();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [events, setEvents] = useState<Event.EventRecord[] | null>(null);
+  const [error, setError] = useState<any>(null);
+  const getEventsByGroupId = (groupId: number) => {
+    console.log("getEventsByGroupId", groupId)
+    setIsLoading(true)
+    eventManagerContract?.call("getEventRecordsByGroupId", [groupId]).then((res: any) => {
+      setEvents(res)
+    }).catch((err: any) => {
+      setError(err)
+    }).finally(() => {
+      setIsLoading(false)
+    })
+  }
+  return { events, isLoading, error, getEventsByGroupId };
+};
 
 export const useEventById = (id: number) => {
   const { eventManagerContract } = useEventManagerContract();
