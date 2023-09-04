@@ -2,7 +2,9 @@ import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { expect } from "chai";
 import { BigNumber } from "ethers";
 import { ethers, upgrades } from "hardhat";
+// eslint-disable-next-line node/no-missing-import
 import { EventManager, MintNFT, SecretPhraseVerifier } from "../typechain";
+// eslint-disable-next-line node/no-missing-import
 import { generateProof } from "./helper/secret_phrase";
 
 // ToDo requiredParticipateCountに重複がある場合エラーになってしまう。
