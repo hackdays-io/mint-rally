@@ -82,7 +82,7 @@ describe("EventManager", function () {
       // revert if paused
       await eventManager.connect(organizer).pause();
       await expect(eventManager.createGroup("group1")).to.be.revertedWith(
-        "Pausable: paused"
+        "Paused"
       );
       await eventManager.connect(organizer).unpause();
 
@@ -108,7 +108,7 @@ describe("EventManager", function () {
           publicInputCalldata[0],
           attributes
         )
-      ).to.be.revertedWith("Pausable: paused");
+      ).to.be.revertedWith("Paused");
       await eventManager.connect(organizer).unpause();
 
       // revert if MintNFT is paused
@@ -124,7 +124,7 @@ describe("EventManager", function () {
           publicInputCalldata[0],
           attributes
         )
-      ).to.be.revertedWith("Pausable: paused");
+      ).to.be.revertedWith("Paused");
       await mintNFT.connect(organizer).unpause();
 
       const txn2 = await eventManager.createEventRecord(
@@ -427,10 +427,14 @@ describe("EventManager", function () {
     it("Should pause and unpause", async () => {
       expect(await eventManager.paused()).to.equal(false);
 
-      await eventManager.connect(organizer).pause();
+      await expect(eventManager.connect(organizer).pause())
+        .to.emit(eventManager, "Paused")
+        .withArgs(organizer.address);
       expect(await eventManager.paused()).to.equal(true);
 
-      await eventManager.connect(organizer).unpause();
+      await expect(eventManager.connect(organizer).unpause())
+        .to.emit(eventManager, "Unpaused")
+        .withArgs(organizer.address);
       expect(await eventManager.paused()).to.equal(false);
     });
 

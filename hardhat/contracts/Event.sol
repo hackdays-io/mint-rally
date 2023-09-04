@@ -4,11 +4,10 @@ pragma solidity ^0.8.4;
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "./IMintNFT.sol";
 import "hardhat/console.sol";
 
-contract EventManager is OwnableUpgradeable, PausableUpgradeable {
+contract EventManager is OwnableUpgradeable {
     struct Group {
         uint256 groupId;
         address ownerAddress;
@@ -45,6 +44,8 @@ contract EventManager is OwnableUpgradeable, PausableUpgradeable {
     // max mint limit
     uint256 private maxMintLimit;
 
+    bool private isPaused;
+
     modifier onlyGroupOwner(uint256 _groupId) {
         bool _isGroupOwner = false;
         for (uint256 _i = 0; _i < ownGroupIds[msg.sender].length; _i++) {
@@ -53,6 +54,11 @@ contract EventManager is OwnableUpgradeable, PausableUpgradeable {
             }
         }
         require(_isGroupOwner, "You are not group owner");
+        _;
+    }
+
+    modifier whenNotPaused() {
+        require(!paused(), "Paused");
         _;
     }
 
@@ -77,6 +83,8 @@ contract EventManager is OwnableUpgradeable, PausableUpgradeable {
 
     event CreateGroup(address indexed owner, uint256 groupId);
     event CreateEvent(address indexed owner, uint256 eventId);
+    event Paused(address account);
+    event Unpaused(address account);
 
     // Currently, reinitializer(2) was executed as constructor.
     function initialize(
@@ -249,11 +257,17 @@ contract EventManager is OwnableUpgradeable, PausableUpgradeable {
         return isGroupOwner;
     }
 
+    function paused() public view returns (bool) {
+        return isPaused;
+    }
+
     function pause() public onlyOwner {
-        _pause();
+        isPaused = true;
+        emit Paused(msg.sender);
     }
 
     function unpause() public onlyOwner {
-        _unpause();
+        isPaused = false;
+        emit Unpaused(msg.sender);
     }
 }
