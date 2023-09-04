@@ -17,7 +17,7 @@ import { Event } from "types/Event";
 import { useLocale } from "../../hooks/useLocale";
 import { useEvents } from "src/hooks/useEvent";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Paginate from "src/components/atoms/events/Paginate";
 
 const Events: NextPage = () => {
@@ -26,10 +26,14 @@ const Events: NextPage = () => {
   const { events, isLoading, countData, setCurrentCursor, COUNT_PER_PAGE } =
     useEvents();
   const [currentPage, setCurrentPage] = useState<number | null>(null);
-  // function called when page is changed
-  const pageChanged = (page: number) => {
-    router.push("/events?page=" + page);
-  };
+
+  const pageChanged = useCallback(
+    (page: number) => {
+      router.push("/events?page=" + page);
+    },
+    [router]
+  );
+
   useEffect(() => {
     if (router.isReady) {
       if (router.query?.page) {
@@ -74,7 +78,6 @@ const Events: NextPage = () => {
             <>
               <Paginate
                 pageCount={Math.ceil(countData / COUNT_PER_PAGE)}
-                pageRangeDisplayed={COUNT_PER_PAGE}
                 currentPage={currentPage!}
                 pageChanged={pageChanged}
               />
@@ -94,6 +97,11 @@ const Events: NextPage = () => {
                   </Link>
                 );
               })}
+              <Paginate
+                pageCount={Math.ceil(countData / COUNT_PER_PAGE)}
+                currentPage={currentPage!}
+                pageChanged={pageChanged}
+              />
             </>
           </VStack>
         )}

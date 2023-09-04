@@ -1,36 +1,63 @@
-import { Link as ChakraUILink, Box, HStack } from "@chakra-ui/react";
+import { Link as ChakraUILink, Box, HStack, Flex } from "@chakra-ui/react";
+import { FC, useCallback } from "react";
 
 type PaginateProps = {
   pageCount: number;
-  pageRangeDisplayed: number;
   currentPage: number;
   pageChanged: (page: number) => void;
 };
-const Paginate = (props: PaginateProps) => {
-  const pageChanged = (page: number) => {
-    return () => {
-      props.pageChanged(page);
-    };
-  };
+
+const Paginate: FC<PaginateProps> = ({
+  pageCount,
+  currentPage,
+  pageChanged,
+}) => {
+  const handleClick = useCallback(
+    (page: number) => {
+      pageChanged(page);
+    },
+    [pageChanged]
+  );
+
   return (
     <>
-      {props && props.pageCount > 1 && (
+      {pageCount > 1 && (
         <HStack>
           <Box>Page:</Box>
-          {new Array(props.pageCount).fill(null).map((_, index) => (
+          {new Array(pageCount).fill(null).map((_, index) => (
             <>
-              {index + 1 === props.currentPage ? (
-                <Box>{index + 1}</Box>
-              ) : (
-                <a
-                  className="renderlinkunderline"
+              {index + 1 === currentPage ? (
+                <Flex
                   key={index}
-                  onClick={pageChanged(index + 1)}
+                  width="30px"
+                  height="30px"
+                  justifyContent="center"
+                  alignItems="center"
+                  borderRadius={5}
+                  backgroundColor="mintGreen.400"
+                  color="white"
+                  fontWeight="bold"
                 >
-                  <ChakraUILink color="yellow.800">
-                    <Box>{index + 1}</Box>
-                  </ChakraUILink>
-                </a>
+                  {index + 1}
+                </Flex>
+              ) : (
+                <Flex
+                  key={index}
+                  width="30px"
+                  height="30px"
+                  justifyContent="center"
+                  alignItems="center"
+                  borderRadius={5}
+                  backgroundColor="mintGreen.100"
+                  color="yellow.900"
+                  onClick={() => handleClick(index + 1)}
+                  cursor="pointer"
+                  _hover={{
+                    backgroundColor: "yellow.400",
+                  }}
+                >
+                  {index + 1}
+                </Flex>
               )}
             </>
           ))}
@@ -39,4 +66,5 @@ const Paginate = (props: PaginateProps) => {
     </>
   );
 };
+
 export default Paginate;
