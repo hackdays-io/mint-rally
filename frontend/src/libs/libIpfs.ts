@@ -1,22 +1,11 @@
 import { NFT } from "types/NFT";
-import { IIpfsClient, IPFS_CLIENT_TYPE } from "./ipfsClient";
+import { IIpfsClient } from "./ipfsClient";
 import { PinataClient } from "./pinataClient";
-import { Web3StorageClient } from "./web3StorageClient";
-
-export const getIpfsClient = (type: IPFS_CLIENT_TYPE): IIpfsClient => {
-  if (process.env.NEXT_PUBLIC_PINATA_JWT) {
-    return new PinataClient();
-  } else {
-    return new Web3StorageClient();
-  }
-};
 
 export class ipfsUploader {
   ipfsClient: IIpfsClient;
   constructor() {
-    this.ipfsClient = getIpfsClient(
-      IPFS_CLIENT_TYPE.IPFS_CLIENT_TYPE_WEB3CLIENT
-    );
+    this.ipfsClient = new PinataClient();
   }
   renameFile(file: File, newFilename: string) {
     const { type, lastModified } = file;
@@ -24,27 +13,36 @@ export class ipfsUploader {
   }
 
   async uploadNFTsToIpfs(nfts: NFT.NFTImage[]) {
-    if (nfts.length === 0) return;
-    const renamedFiles = nfts.map(
-      ({ name, fileObject, description, requiredParticipateCount }) => ({
-        name: name,
-        fileObject: this.renameFile(
-          fileObject!,
-          `${requiredParticipateCount}.png`
-        ),
-        description,
-        requiredParticipateCount,
-      })
-    );
+    try {
+      if (nfts.length === 0) return;
+      const renamedFiles = nfts.map(
+        ({ name, fileObject, description, requiredParticipateCount }) => ({
+          name: name,
+          fileObject: this.renameFile(
+            fileObject!,
+            `${requiredParticipateCount}.png`
+          ),
+          description,
+          requiredParticipateCount,
+        })
+      );
 
-    const rootCid = await this.ipfsClient.put(
-      renamedFiles.map((f) => f.fileObject),
-      new Date().toISOString()
-    );
-    return { rootCid, renamedFiles };
+      const rootCid = await this.ipfsClient.put(
+        renamedFiles.map((f) => f.fileObject),
+        new Date().toISOString()
+      );
+      return { rootCid, renamedFiles };
+    } catch (error) {
+      throw error;
+    }
   }
+
   async uploadMetadataFilesToIpfs(files: File[], fileName: string) {
-    const metaDataRootCid = await this.ipfsClient.put(files, fileName);
-    return metaDataRootCid;
+    try {
+      const metaDataRootCid = await this.ipfsClient.put(files, fileName);
+      return metaDataRootCid;
+    } catch (error) {
+      throw error;
+    }
   }
 }
