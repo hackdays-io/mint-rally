@@ -591,7 +591,7 @@ describe("Pause and Unpause", () => {
         attributes
       );
     await createEventTxn.wait();
-    const eventsList = await eventManager.getEventRecords();
+    const eventsList = await eventManager.getEventRecords(0, 0);
     createdEventIds.push(eventsList[0].eventRecordId.toNumber());
   });
 
