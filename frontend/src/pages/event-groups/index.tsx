@@ -33,6 +33,10 @@ const EventGroups: NextPage = () => {
         </Flex>
         {isLoading ? (
           <Spinner></Spinner>
+        ) : groups == null ? (
+          <Heading size="md" color="gray.500">
+            {t.NO_EVENTGROUPS_AVAILABLE}
+          </Heading>
         ) : (
           <SimpleGrid columns={{ base: 2, md: 3 }} spacing={5}>
             <>

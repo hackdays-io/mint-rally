@@ -23,6 +23,7 @@ export default {
   CONNECT_WITH_SAFE: "Safeで接続",
   INPUT_SAFE_WALLET_ADDRESS: "Safeのウォレットアドレスを入力",
   // Event group index
+  NO_EVENTGROUPS_AVAILABLE: "イベントグループがありません",
   NO_EVENTS_AVAILABLE: "イベントがありません",
   CREATE_NEW_EVENT_GROUP: "イベントグループを作成",
   NEW_EVENT_GROUP_NAME: "イベントグループ名",
