@@ -4,11 +4,7 @@ import { useRouter } from "next/router";
 import { useEffect, useMemo } from "react";
 import EventCard from "../../components/atoms/events/EventCard";
 import { useLocale } from "../../hooks/useLocale";
-import {
-  useEventGroups,
-  useEvents,
-  useEventsByGroupId,
-} from "src/hooks/useEvent";
+import { useEventGroups, useEventsByGroupId } from "src/hooks/useEvent";
 import { Event } from "types/Event";
 import ENSName from "src/components/atoms/web3/ENSName";
 
