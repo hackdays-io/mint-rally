@@ -33,7 +33,7 @@ const EventGroups: NextPage = () => {
         </Flex>
         {isLoading ? (
           <Spinner></Spinner>
-        ) : groups == null ? (
+        ) : groups == null || groups.length == 0 ? (
           <Heading size="md" color="gray.500">
             {t.NO_EVENTGROUPS_AVAILABLE}
           </Heading>
