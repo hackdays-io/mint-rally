@@ -108,6 +108,7 @@ const Event: FC = () => {
             <MintNFTLoginRequired
               requiredChainID={+process.env.NEXT_PUBLIC_CHAIN_ID!}
               forbiddenText={t.SIGN_IN_TO_GET_NFT}
+              allowMagicLink={!event.useMtx}
             >
               <MintNFTSection event={event} />
               <EventEditSection event={event} />

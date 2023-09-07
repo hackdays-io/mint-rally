@@ -1,4 +1,11 @@
-import { Button, FormLabel, HStack, Input, Stack } from "@chakra-ui/react";
+import {
+  Button,
+  FormLabel,
+  HStack,
+  Input,
+  Stack,
+  Text,
+} from "@chakra-ui/react";
 import { faArrowLeft, faEnvelope } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useConnect, useConnectionStatus } from "@thirdweb-dev/react";
@@ -8,9 +15,10 @@ import { chainId, useWeb3WalletConfig } from "src/libs/web3Config";
 
 type Props = {
   selected: (selected: boolean) => void;
+  disabled?: boolean;
 };
 
-const GetWithMagicLinkButton: FC<Props> = ({ selected }) => {
+const GetWithMagicLinkButton: FC<Props> = ({ selected, disabled }) => {
   const { t } = useLocale();
   const { magicLinkConfig } = useWeb3WalletConfig();
   const connect = useConnect();
@@ -33,21 +41,25 @@ const GetWithMagicLinkButton: FC<Props> = ({ selected }) => {
   return (
     <>
       {!isSelected ? (
-        <Button
-          w={280}
-          leftIcon={<FontAwesomeIcon icon={faEnvelope} />}
-          style={{
-            fontWeight: "bold",
-            backgroundColor: "#562406",
-            color: "#fff",
-          }}
-          onClick={() => {
-            setSelected(true);
-            selected(true);
-          }}
-        >
-          {t.GET_NFT_USING_EMAIL}
-        </Button>
+        <>
+          <Button
+            w={280}
+            leftIcon={<FontAwesomeIcon icon={faEnvelope} />}
+            style={{
+              fontWeight: "bold",
+              backgroundColor: "#562406",
+              color: "#fff",
+            }}
+            onClick={() => {
+              setSelected(true);
+              selected(true);
+            }}
+            disabled={disabled}
+          >
+            {t.GET_NFT_USING_EMAIL}
+          </Button>
+          {disabled && <Text>{t.NOT_ALLOWED_MAGIC_LINK}</Text>}
+        </>
       ) : (
         <>
           <FormLabel color="yellow.900">

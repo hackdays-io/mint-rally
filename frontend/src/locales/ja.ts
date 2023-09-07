@@ -22,6 +22,7 @@ export default {
   CONNECT_WITH_EMAIL: "メールアドレスで接続",
   CONNECT_WITH_SAFE: "Safeで接続",
   INPUT_SAFE_WALLET_ADDRESS: "Safeのウォレットアドレスを入力",
+  NOT_ALLOWED_MAGIC_LINK: "このイベントのNFTはメールアドレスでは受け取れません。",
   // Event group index
   NO_EVENTS_AVAILABLE: "イベントがありません",
   CREATE_NEW_EVENT_GROUP: "イベントグループを作成",
