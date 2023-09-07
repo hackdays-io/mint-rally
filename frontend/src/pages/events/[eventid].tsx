@@ -1,4 +1,4 @@
-import { Heading, Spinner, Text, Container, Box, Flex } from "@chakra-ui/react";
+import { Heading, Spinner, Text, Container, Box } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { FC, Fragment, useMemo } from "react";
 import { useLocale } from "../../hooks/useLocale";
