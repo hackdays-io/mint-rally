@@ -17,7 +17,8 @@ export default {
   CONNECT_WITH_EMAIL: "Connect with Email",
   CONNECT_WITH_SAFE: "Connect with Safe",
   INPUT_SAFE_WALLET_ADDRESS: "Input Safe Wallet Address",
-  NOT_ALLOWED_MAGIC_LINK: "This event's NFT is not allowed to get via email.",
+  NOT_ALLOWED_MAGIC_LINK: "This event is not supported email login.",
+  MAGICLINK_IS_NOT_SUPPORTED_USE_OTHERS: "This event is not supported email login. Please logout and select another wallet.",
   // NFT
   NFT_NAME: "NFT Name",
   NFT_DESC: "NFT Description",

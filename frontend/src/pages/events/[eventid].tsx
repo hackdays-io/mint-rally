@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import { FC, Fragment, useMemo } from "react";
 import { useLocale } from "../../hooks/useLocale";
 import { MintForm } from "src/components/organisms/nft/MintForm";
-import { useAddress } from "@thirdweb-dev/react";
+import { useAddress, useWallet, magicLink } from "@thirdweb-dev/react";
 import {
   useGetOwnedNFTByAddress,
   useIsHoldingEventNftByAddress,
@@ -21,6 +21,8 @@ import EventEditSection from "src/components/organisms/EventEditSection";
 
 const MintNFTSection: FC<{ event: Event.EventRecord }> = ({ event }) => {
   const address = useAddress();
+  const walletInstance = useWallet();
+  const { t } = useLocale();
   const { isHoldingEventNft, isLoading } = useIsHoldingEventNftByAddress(
     address,
     event.eventRecordId
@@ -34,7 +36,6 @@ const MintNFTSection: FC<{ event: Event.EventRecord }> = ({ event }) => {
         nft.traits.EventGroupId === event?.groupId.toString()
     );
   }, [nfts, address]);
-
   return (
     <>
       {isLoading || checkHoldingNFTs || !address ? (
@@ -59,7 +60,11 @@ const MintNFTSection: FC<{ event: Event.EventRecord }> = ({ event }) => {
           py={{ md: 8, base: 5 }}
           px={{ md: 10, base: 5 }}
         >
-          <MintForm event={event} address={address} />
+          {walletInstance?.walletId == "magicLink" && !event.useMtx ? (
+            <Text>{t.MAGICLINK_IS_NOT_SUPPORTED_USE_OTHERS}</Text>
+          ) : (
+            <MintForm event={event} address={address} />
+          )}
         </Box>
       )}
     </>
@@ -72,7 +77,6 @@ const Event: FC = () => {
   const { event, isLoading } = useEventById(Number(eventid));
 
   const { t } = useLocale();
-
   return (
     <>
       <Container maxW={800} py={6} pb="120px">
@@ -108,7 +112,7 @@ const Event: FC = () => {
             <MintNFTLoginRequired
               requiredChainID={+process.env.NEXT_PUBLIC_CHAIN_ID!}
               forbiddenText={t.SIGN_IN_TO_GET_NFT}
-              allowMagicLink={!event.useMtx}
+              allowMagicLink={event.useMtx == true}
             >
               <MintNFTSection event={event} />
               <EventEditSection event={event} />
