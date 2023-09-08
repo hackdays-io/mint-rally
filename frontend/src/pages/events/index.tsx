@@ -16,10 +16,35 @@ import EventCard from "../../components/atoms/events/EventCard";
 import { Event } from "types/Event";
 import { useLocale } from "../../hooks/useLocale";
 import { useEvents } from "src/hooks/useEvent";
+import { useRouter } from "next/router";
+import { useCallback, useEffect, useState } from "react";
+import Paginate from "src/components/atoms/events/Paginate";
 
 const Events: NextPage = () => {
-  const { events, isLoading } = useEvents();
+  const router = useRouter();
   const { t } = useLocale();
+  const { events, isLoading, countData, setCurrentCursor, COUNT_PER_PAGE } =
+    useEvents();
+  const [currentPage, setCurrentPage] = useState<number | null>(null);
+
+  const pageChanged = useCallback(
+    (page: number) => {
+      router.push("/events?page=" + page);
+    },
+    [router]
+  );
+
+  useEffect(() => {
+    if (router.isReady) {
+      if (router.query?.page) {
+        setCurrentPage(Number(router.query.page));
+        setCurrentCursor((Number(router.query.page) - 1) * COUNT_PER_PAGE);
+      } else {
+        setCurrentPage(1);
+        setCurrentCursor(0);
+      }
+    }
+  }, [router.query?.page]);
 
   return (
     <>
@@ -51,6 +76,11 @@ const Events: NextPage = () => {
         ) : (
           <VStack spacing={5} align="stretch">
             <>
+              <Paginate
+                pageCount={Math.ceil(countData / COUNT_PER_PAGE)}
+                currentPage={currentPage!}
+                pageChanged={pageChanged}
+              />
               {events.map((item: Event.EventRecord) => {
                 return (
                   <Link
@@ -67,6 +97,11 @@ const Events: NextPage = () => {
                   </Link>
                 );
               })}
+              <Paginate
+                pageCount={Math.ceil(countData / COUNT_PER_PAGE)}
+                currentPage={currentPage!}
+                pageChanged={pageChanged}
+              />
             </>
           </VStack>
         )}

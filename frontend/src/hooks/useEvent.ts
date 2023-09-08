@@ -74,7 +74,7 @@ export const useCreateEventGroup = (address: string) => {
       if (!params.groupName) return;
       try {
         await mutateAsync({ args: [params.groupName] });
-      } catch (_) {}
+      } catch (_) { }
     },
     [mutateAsync]
   );
@@ -203,8 +203,7 @@ export const useCreateEvent = (address: string) => {
             params.groupId,
             params.eventName,
             params.description,
-            `${params.date.toLocaleDateString()} ${params.startTime}~${
-              params.endTime
+            `${params.date.toLocaleDateString()} ${params.startTime}~${params.endTime
             }`,
             params.mintLimit,
             params.useMtx,
@@ -215,7 +214,7 @@ export const useCreateEvent = (address: string) => {
             value: params.useMtx ? value : 0,
           },
         });
-      } catch (_) {}
+      } catch (_) { }
     },
     [mutateAsync, provider, getGasFee]
   );
@@ -228,24 +227,71 @@ export const useCreateEvent = (address: string) => {
     createError,
   };
 };
-
-export const useEvents = () => {
+type UseEventOption = {
+  countPerPage?: number
+  initialCursor?: number
+}
+export const useEvents = (option?: UseEventOption) => {
+  const COUNT_PER_PAGE = option?.countPerPage || 50;
   const { eventManagerContract } = useEventManagerContract();
-  const { isLoading, data, error } = useContractRead(
+  const [nextCursor, setNextCursor] = useState<number | null>(null);
+  const [currentCursor, setCurrentCursor] = useState<number | null>(null);
+  const [prevCursor, setPrevCursor] = useState<number | null>(null);
+  const { isLoading: isLodingCount, data: countData, error: countError } = useContractRead(
     eventManagerContract,
-    "getEventRecords"
+    "getEventRecordCount"
   );
+  const [data, setEventData] = useState<any>(null)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [error, setError] = useState<any>(null)
+
+  // read record data
+  useEffect(() => {
+    if (eventManagerContract === undefined || currentCursor === null) return;
+    setIsLoading(true)
+    eventManagerContract?.call("getEventRecords", [COUNT_PER_PAGE, currentCursor]).then((res: any) => {
+      setEventData(res)
+    }).catch((err: any) => {
+      setError(err)
+    }).finally(() => {
+      setIsLoading(false)
+    })
+  }, [currentCursor, eventManagerContract])
+  if (option?.initialCursor !== undefined && currentCursor === null) {
+    setCurrentCursor(option?.initialCursor)
+  }
 
   const events = useMemo(() => {
+    // return empty if both data is not set
+    if (data === null || countData === undefined || currentCursor === null) return [];
+    // set cursors for pagenation
+    if (countData > data.length + currentCursor) { setNextCursor(currentCursor + data.length) } else { setNextCursor(null) }
+    if (currentCursor > 0) { setPrevCursor(currentCursor - data.length) } else { setPrevCursor(null) }
     const blackList = process.env.NEXT_PUBLIC_EVENT_BLACK_LIST
       ? JSON.parse(`[${process.env.NEXT_PUBLIC_EVENT_BLACK_LIST}]`)
       : [];
-    return reverse(
-      data?.filter((e: any) => !blackList.includes(e.eventRecordId.toNumber()))
-    );
-  }, [data]);
+    return data?.filter((e: any) => !blackList.includes(e.eventRecordId.toNumber()))
+  }, [data, countData]);
 
-  return { events, isLoading, error };
+  return { events, isLoading, error, countData, nextCursor, prevCursor, setCurrentCursor, COUNT_PER_PAGE };
+};
+export const useEventsByGroupId = () => {
+  const { eventManagerContract } = useEventManagerContract();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [events, setEvents] = useState<Event.EventRecord[] | null>(null);
+  const [error, setError] = useState<any>(null);
+  const getEventsByGroupId = (groupId: number) => {
+    console.log("getEventsByGroupId", groupId)
+    setIsLoading(true)
+    eventManagerContract?.call("getEventRecordsByGroupId", [groupId]).then((res: any) => {
+      setEvents(res)
+    }).catch((err: any) => {
+      setError(err)
+    }).finally(() => {
+      setIsLoading(false)
+    })
+  }
+  return { events, isLoading, error, getEventsByGroupId };
 };
 
 export const useEventById = (id: number) => {
@@ -269,7 +315,7 @@ export const useCalcMtxGasFee = (mintLimit?: number) => {
 
       const gasPrice = (await provider.getGasPrice())?.toNumber();
       const value = ethers.utils.parseEther(
-        `${gasPrice * mintLimit * 660000 * 1 * 0.000000000000000001}`
+        `${(gasPrice * mintLimit * (660000 * 1 * 0.000000000000000001)).toFixed(6)}`
       );
       setGasFee(value);
     };
@@ -280,10 +326,9 @@ export const useCalcMtxGasFee = (mintLimit?: number) => {
   const getGasFee = useCallback(
     async (_mintLimit: number) => {
       if (!provider) return;
-
       const gasPrice = (await provider.getGasPrice())?.toNumber();
       const value = ethers.utils.parseEther(
-        `${gasPrice * _mintLimit * 660000 * 1 * 0.000000000000000001}`
+        `${(gasPrice * _mintLimit * 660000 * 1 * 0.000000000000000001).toFixed(6)}`
       );
       return value;
     },

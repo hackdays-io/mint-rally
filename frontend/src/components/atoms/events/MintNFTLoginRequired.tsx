@@ -9,12 +9,14 @@ type Props = {
   children: ReactNode;
   requiredChainID: number;
   forbiddenText: string;
+  allowMagicLink: boolean;
 };
 
 const MintNFTLoginRequired: FC<Props> = ({
   children,
   requiredChainID,
   forbiddenText,
+  allowMagicLink,
 }) => {
   const address = useAddress();
   const chainId = useChainId()!;
@@ -44,7 +46,7 @@ const MintNFTLoginRequired: FC<Props> = ({
               alt="civitan"
             />
           </HStack>
-          <SelectMintWallet />
+          <SelectMintWallet allowMagicLink={allowMagicLink} />
         </Box>
       ) : chainId !== requiredChainID ? (
         <Box

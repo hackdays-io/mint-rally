@@ -2,7 +2,6 @@ import { Box, Button, HStack, Heading, Text } from "@chakra-ui/react";
 import { FC, ReactNode, useState } from "react";
 import { useAddress, useChainId, useSwitchChain } from "@thirdweb-dev/react";
 import { useLocale } from "../../../hooks/useLocale";
-import SelectMintWallet from "src/components/molecules/web3/SelectMintWallet";
 import Image from "next/image";
 import SelectConnectWallet from "src/components/molecules/web3/SelectConnectWallet";
 

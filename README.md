@@ -17,13 +17,14 @@ Solves the problem of organizers struggling with event retention rates.
 ## Technology used
 
 - frontend: Next.js, TypeScript
-- contract: Solidity, ERC721Enumerable, Hardhat
+- contract: Solidity, ERC721Enumerable, Hardhat, circom
 - image: IPFS, Pinata
 
 ## Development
 
 - [Frontend](docs/frontend.md)
-- [Contracts](docs/localnode.md)
+- [Contract](docs/contract.md)
+- [Run Localnode](docs/localnode.md)
 
 ## Deployment
 

@@ -4,8 +4,11 @@ import { Text } from "@chakra-ui/react";
 import { useLocale } from "src/hooks/useLocale";
 import GetWithMetamaskButton from "./GetWithMetamaskButton";
 import GetWithMagicLinkButton from "./GetWithMagicLinkButton";
+type Props = {
+  allowMagicLink: boolean;
+};
 
-const SelectMintWallet: FC = () => {
+const SelectMintWallet: FC<Props> = ({ allowMagicLink }) => {
   const [magicLinkSelected, setMagicLinkSelected] = useState<boolean>(false);
   const { t } = useLocale();
 
@@ -19,7 +22,10 @@ const SelectMintWallet: FC = () => {
           <GetWithMetamaskButton />
         </>
       )}
-      <GetWithMagicLinkButton selected={setMagicLinkSelected} />
+      <GetWithMagicLinkButton
+        selected={setMagicLinkSelected}
+        disabled={!allowMagicLink}
+      />
     </VStack>
   );
 };
