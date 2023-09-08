@@ -22,6 +22,8 @@ export default {
   CONNECT_WITH_EMAIL: "メールアドレスで接続",
   CONNECT_WITH_SAFE: "Safeで接続",
   INPUT_SAFE_WALLET_ADDRESS: "Safeのウォレットアドレスを入力",
+  NOT_ALLOWED_MAGIC_LINK: "このイベントはメールアドレスログインをサポートしていません。",
+  MAGICLINK_IS_NOT_SUPPORTED_USE_OTHERS: "このイベントはメールアドレスログインをサポートしていません。ログアウトの上違うWalletを選択してください。",
   // Event group index
   NO_EVENTGROUPS_AVAILABLE: "イベントグループがありません",
   NO_EVENTS_AVAILABLE: "イベントがありません",
