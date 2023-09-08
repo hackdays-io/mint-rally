@@ -30,6 +30,7 @@ import {
 import { Event } from "types/Event";
 import { NFT } from "types/NFT";
 import { formatEther } from "ethers/lib/utils";
+import { useRouter } from "next/router";
 
 type Props = {
   address: string;
@@ -57,12 +58,14 @@ const CreateEventForm: FC<Props> = ({ address }) => {
     saveNFTMetadataOnIPFS,
   } = useIpfs();
   const [formData, setFormData] = useState<EventFormData | null>(null);
-
+  const router = useRouter();
   const {
     control,
     handleSubmit,
     formState: { isSubmitting },
     watch,
+    register,
+    setValue,
   } = useForm<EventFormData>({
     mode: "all",
     defaultValues: {
@@ -116,6 +119,19 @@ const CreateEventForm: FC<Props> = ({ address }) => {
     create();
   }, [nftAttributes]);
 
+  useEffect(() => {
+    if (router.isReady && groups) {
+      const groupId = router.query.group_id;
+      if (typeof groupId === "string") {
+        const eventGroupId = groupId;
+        if (eventGroupId) {
+          // select eventGroupId
+          setValue("eventGroupId", eventGroupId);
+        }
+      }
+    }
+  }, [router.query.group_id, groups]);
+
   const errorMessage = useMemo(() => {
     if (createError || errors) {
       return (createError || errors) as any;
@@ -148,6 +164,7 @@ const CreateEventForm: FC<Props> = ({ address }) => {
             <FormLabel htmlFor="eventGroupId">{t.EVENT_GROUP}</FormLabel>
             <Controller
               control={control}
+              {...register("eventGroupId")}
               name="eventGroupId"
               render={({ field: { onChange, value } }) => (
                 <Select
