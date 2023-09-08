@@ -51,3 +51,10 @@ export const getEventGroups = async () => {
   const eventGroups: Array<Event.EventGroup> = await eventManager.getGroups();
   return eventGroups;
 }
+export const getNFTHoldersOfEvent = async (eventid: BigNumber) => {
+  const mintNFTManager = getMintNFTManagerContract();
+  if (!mintNFTManager)
+    throw new Error("Cannot find v contract");
+  const nfts: Array<NFT.Metadata> = await mintNFTManager.getNFTHoldersOfEvent(eventid);
+  return nfts;
+}
