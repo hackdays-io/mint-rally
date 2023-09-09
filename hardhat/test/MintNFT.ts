@@ -204,7 +204,7 @@ describe("MintNFT", function () {
         await mintNftTxn.wait();
         const { proofCalldata: proofCalldata2 } = await generateProof();
         const mintNftTxn2 = await mintNFT
-          .connect(participant1)
+          .connect(participant2)
           .mintParticipateNFT(
             createdGroupId,
             createdEventIds[0],
