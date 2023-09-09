@@ -221,6 +221,16 @@ describe("MintNFT", function () {
           );
         await mintNftTxn3.wait();
       });
+      it("get NFT holders of the event", async () => {
+        const nftholdersTxn = await mintNFT.getNFTHoldersOfEvent(
+          createdEventIds[0]
+        );
+        const nftholders = await nftholdersTxn.wait();
+        expect(nftholders.length).equal(3);
+        expect(nftholders[0].address).equal(organizer.address);
+        expect(nftholders[1].address).equal(participant1.address);
+        expect(nftholders[2].address).equal(participant2.address);
+      });
     });
   });
 
