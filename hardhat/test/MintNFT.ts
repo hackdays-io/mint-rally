@@ -1,7 +1,9 @@
 import { expect } from "chai";
 import { ethers, upgrades } from "hardhat";
+// eslint-disable-next-line node/no-missing-import
 import { MintNFT, EventManager, SecretPhraseVerifier } from "../typechain";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
+// eslint-disable-next-line node/no-missing-import
 import { generateProof, wrongProofCalldata } from "./helper/secret_phrase";
 
 // ToDo requiredParticipateCountに重複がある場合エラーになってしまう。
@@ -30,6 +32,7 @@ describe("MintNFT", function () {
 
   let organizer: SignerWithAddress;
   let participant1: SignerWithAddress;
+  // eslint-disable-next-line no-unused-vars
   let participant2: SignerWithAddress;
   let relayer: SignerWithAddress;
 
