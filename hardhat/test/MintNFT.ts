@@ -204,7 +204,7 @@ describe("MintNFT", function () {
         await mintNftTxn.wait();
         const { proofCalldata: proofCalldata2 } = await generateProof();
         const mintNftTxn2 = await mintNFT
-          .connect(participant2)
+          .connect(participant1)
           .mintParticipateNFT(
             createdGroupId,
             createdEventIds[0],
@@ -213,7 +213,7 @@ describe("MintNFT", function () {
         await mintNftTxn2.wait();
         const { proofCalldata: proofCalldata3 } = await generateProof();
         const mintNftTxn3 = await mintNFT
-          .connect(participant1)
+          .connect(participant2)
           .mintParticipateNFT(
             createdGroupId,
             createdEventIds[0],
@@ -222,14 +222,16 @@ describe("MintNFT", function () {
         await mintNftTxn3.wait();
       });
       it("get NFT holders of the event", async () => {
-        const nftholdersTxn = await mintNFT.getNFTHoldersOfEvent(
+        const nftholders = await mintNFT.getNFTHoldersByEvent(
           createdEventIds[0]
         );
-        const nftholders = await nftholdersTxn.wait();
         expect(nftholders.length).equal(3);
-        expect(nftholders[0].address).equal(organizer.address);
-        expect(nftholders[1].address).equal(participant1.address);
-        expect(nftholders[2].address).equal(participant2.address);
+        expect(nftholders[0].holderAddress).equal(organizer.address);
+        expect(nftholders[1].holderAddress).equal(participant1.address);
+        expect(nftholders[2].holderAddress).equal(participant2.address);
+        expect(Number(nftholders[0].tokenId)).equal(0);
+        expect(Number(nftholders[1].tokenId)).equal(1);
+        expect(Number(nftholders[2].tokenId)).equal(2);
       });
     });
   });

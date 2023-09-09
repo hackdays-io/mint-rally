@@ -30,6 +30,10 @@ contract MintNFT is
         string metaDataURL;
         uint256 requiredParticipateCount;
     }
+    struct NFTHolder {
+        address holderAddress;
+        uint256 tokenId;
+    }
 
     // NFT meta data url via tokenId
     mapping(uint256 => string) private nftMetaDataURL;
@@ -45,6 +49,8 @@ contract MintNFT is
     mapping(uint256 => bytes32) private eventSecretPhrases;
     // is mint locked via EventId
     mapping(uint256 => bool) private isMintLocked;
+    // Create a mapping to store NFT holders by event ID
+    mapping(uint256 => NFTHolder[]) private nftHoldersByEvent;
 
     address private secretPhraseVerifierAddr;
 
@@ -143,6 +149,14 @@ contract MintNFT is
 
         nftMetaDataURL[_tokenIds.current()] = metaDataURL;
         _safeMint(_msgSender(), _tokenIds.current());
+
+        // Store NFT holder information in the mapping
+        NFTHolder memory holder = NFTHolder({
+            holderAddress: _msgSender(),
+            tokenId: _tokenIds.current()
+        });
+        nftHoldersByEvent[_eventId].push(holder);
+
         _tokenIds.increment();
         emit MintedNFTAttributeURL(_msgSender(), metaDataURL);
     }
@@ -245,5 +259,12 @@ contract MintNFT is
             _eventId
         );
         return result;
+    }
+
+    // Function to return a list of NFT holders for a specific event ID
+    function getNFTHoldersByEvent(
+        uint256 _eventId
+    ) public view returns (NFTHolder[] memory) {
+        return nftHoldersByEvent[_eventId];
     }
 }
