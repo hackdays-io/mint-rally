@@ -32,13 +32,10 @@ describe("MintNFT", function () {
 
   let organizer: SignerWithAddress;
   let participant1: SignerWithAddress;
-  // eslint-disable-next-line no-unused-vars
-  let participant2: SignerWithAddress;
   let relayer: SignerWithAddress;
 
   before(async () => {
-    [organizer, participant1, participant2, relayer] =
-      await ethers.getSigners();
+    [organizer, participant1, relayer] = await ethers.getSigners();
 
     // generate proof
     const { publicInputCalldata } = await generateProof();
@@ -118,6 +115,112 @@ describe("MintNFT", function () {
           .connect(participant1)
           .mintParticipateNFT(createdGroupId, createdEventIds[0], proofCalldata)
       ).to.be.revertedWith("mint is locked");
+    });
+  });
+
+  describe("get NFT holders of the event", () => {
+    let mintNFT: MintNFT;
+    let eventManager: EventManager;
+    let secretPhraseVerifier: SecretPhraseVerifier;
+
+    let createdGroupId: number;
+    const createdEventIds: number[] = [];
+
+    let organizer: SignerWithAddress;
+    let participant1: SignerWithAddress;
+    let participant2: SignerWithAddress;
+    let relayer: SignerWithAddress;
+
+    before(async () => {
+      [organizer, participant1, participant2, relayer] =
+        await ethers.getSigners();
+
+      // generate proof
+      const { publicInputCalldata } = await generateProof();
+
+      // Deploy secret phrase verifier
+      const SecretPhraseVerifierFactory = await ethers.getContractFactory(
+        "SecretPhraseVerifier"
+      );
+      secretPhraseVerifier = await SecretPhraseVerifierFactory.deploy();
+      // Deploy mintNFT and eventManager
+      const MintNFTFactory = await ethers.getContractFactory("MintNFT");
+      const deployedMintNFT: any = await upgrades.deployProxy(
+        MintNFTFactory,
+        [
+          "0xdCb93093424447bF4FE9Df869750950922F1E30B",
+          secretPhraseVerifier.address,
+        ],
+        {
+          initializer: "initialize",
+        }
+      );
+      mintNFT = deployedMintNFT;
+      await mintNFT.deployed();
+      const EventManager = await ethers.getContractFactory("EventManager");
+      const deployedEventManager: any = await upgrades.deployProxy(
+        EventManager,
+        [relayer.address, 250000, 1000000],
+        {
+          initializer: "initialize",
+        }
+      );
+      eventManager = deployedEventManager;
+      await eventManager.deployed();
+      await mintNFT.setEventManagerAddr(eventManager.address);
+      await eventManager.setMintNFTAddr(mintNFT.address);
+
+      // Create a Group and an Event
+      const createGroupTxn = await eventManager.createGroup("First Group");
+      await createGroupTxn.wait();
+      const groupsList = await eventManager.getGroups();
+      createdGroupId = groupsList[0].groupId.toNumber();
+
+      const createEventTxn = await eventManager.createEventRecord(
+        createdGroupId,
+        "event1",
+        "event1 description",
+        "2022-07-3O",
+        10,
+        false,
+        publicInputCalldata[0],
+        attributes
+      );
+      await createEventTxn.wait();
+      const eventsList = await eventManager.getEventRecords(0, 0);
+      createdEventIds.push(eventsList[0].eventRecordId.toNumber());
+    });
+
+    describe("mint NFT", () => {
+      it("mint three times", async () => {
+        const { proofCalldata } = await generateProof();
+        const mintNftTxn = await mintNFT
+          .connect(organizer)
+          .mintParticipateNFT(
+            createdGroupId,
+            createdEventIds[0],
+            proofCalldata
+          );
+        await mintNftTxn.wait();
+        const { proofCalldata: proofCalldata2 } = await generateProof();
+        const mintNftTxn2 = await mintNFT
+          .connect(participant1)
+          .mintParticipateNFT(
+            createdGroupId,
+            createdEventIds[0],
+            proofCalldata2
+          );
+        await mintNftTxn2.wait();
+        const { proofCalldata: proofCalldata3 } = await generateProof();
+        const mintNftTxn3 = await mintNFT
+          .connect(participant1)
+          .mintParticipateNFT(
+            createdGroupId,
+            createdEventIds[0],
+            proofCalldata3
+          );
+        await mintNftTxn3.wait();
+      });
     });
   });
 
