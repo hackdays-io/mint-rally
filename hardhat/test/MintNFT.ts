@@ -191,7 +191,8 @@ describe("MintNFT", function () {
     let mintNFT: MintNFT;
     let eventManager: EventManager;
 
-    let createdGroupId: number;
+    let createdGroupId1: number;
+    let createdGroupId2: number;
     const createdEventIds: number[] = [];
 
     let organizer: SignerWithAddress;
@@ -211,11 +212,13 @@ describe("MintNFT", function () {
 
       // Create a Group and an Event
       await createGroup(eventManager, "First Group");
+      await createGroup(eventManager, "Second Group");
       const groupsList = await eventManager.getGroups();
-      createdGroupId = groupsList[0].groupId.toNumber();
+      createdGroupId1 = groupsList[0].groupId.toNumber();
+      createdGroupId2 = groupsList[1].groupId.toNumber();
 
       await createEventRecord(eventManager, {
-        groupId: createdGroupId,
+        groupId: createdGroupId1,
         name: "event1",
         description: "event1 description",
         date: "2022-07-3O",
@@ -227,7 +230,7 @@ describe("MintNFT", function () {
       const eventsList = await eventManager.getEventRecords(0, 0);
       createdEventIds.push(eventsList[0].eventRecordId.toNumber());
       await createEventRecord(eventManager, {
-        groupId: createdGroupId,
+        groupId: createdGroupId1,
         name: "event2",
         description: "event2 description",
         date: "2022-07-3O",
@@ -238,6 +241,18 @@ describe("MintNFT", function () {
       });
       const eventsList2 = await eventManager.getEventRecords(0, 0);
       createdEventIds.push(eventsList2[0].eventRecordId.toNumber());
+      await createEventRecord(eventManager, {
+        groupId: createdGroupId2,
+        name: "event3",
+        description: "event3 description",
+        date: "2022-07-3O",
+        mintLimit: 10,
+        useMtx: false,
+        secretPhrase: publicInputCalldata[0],
+        eventNFTAttributes: attributes,
+      });
+      const eventsList3 = await eventManager.getEventRecords(0, 0);
+      createdEventIds.push(eventsList3[0].eventRecordId.toNumber());
     });
 
     describe("mint NFT", () => {
@@ -246,7 +261,7 @@ describe("MintNFT", function () {
         const mintNftTxn = await mintNFT
           .connect(organizer)
           .mintParticipateNFT(
-            createdGroupId,
+            createdGroupId1,
             createdEventIds[0],
             proofCalldata
           );
@@ -255,7 +270,7 @@ describe("MintNFT", function () {
         const mintNftTxn2 = await mintNFT
           .connect(participant1)
           .mintParticipateNFT(
-            createdGroupId,
+            createdGroupId1,
             createdEventIds[0],
             proofCalldata2
           );
@@ -264,7 +279,7 @@ describe("MintNFT", function () {
         const mintNftTxn3 = await mintNFT
           .connect(participant2)
           .mintParticipateNFT(
-            createdGroupId,
+            createdGroupId1,
             createdEventIds[0],
             proofCalldata3
           );
@@ -273,11 +288,20 @@ describe("MintNFT", function () {
         const mintNftTxn4 = await mintNFT
           .connect(participant1)
           .mintParticipateNFT(
-            createdGroupId,
+            createdGroupId1,
             createdEventIds[1],
             proofCalldata4
           );
         await mintNftTxn4.wait();
+        const { proofCalldata: proofCalldata5 } = await generateProof();
+        const mintNftTxn5 = await mintNFT
+          .connect(participant1)
+          .mintParticipateNFT(
+            createdGroupId2,
+            createdEventIds[2],
+            proofCalldata5
+          );
+        await mintNftTxn5.wait();
       });
       it("get NFT holders of the event", async () => {
         const nftholders = await mintNFT.getNFTHoldersByEvent(
