@@ -54,10 +54,11 @@ contract MintNFT is
     mapping(uint256 => bytes32) private eventSecretPhrases;
     // is mint locked via EventId
     mapping(uint256 => bool) private isMintLocked;
-    // Create a mapping to store NFT holders by event ID
-    mapping(uint256 => uint256[]) private tokenIdsByEvent;
 
     address private secretPhraseVerifierAddr;
+
+    // Create a mapping to store NFT holders by event ID
+    mapping(uint256 => uint256[]) private tokenIdsByEvent;
 
     event MintedNFTAttributeURL(address indexed holder, string url);
     event MintLocked(uint256 indexed eventId, bool isLocked);
@@ -72,15 +73,20 @@ contract MintNFT is
         _;
     }
 
-    // Currently, reinitializer(2) was executed as constructor.
+    // Currently, reinitializer(3) was executed as constructor.
     function initialize(
         MinimalForwarderUpgradeable trustedForwarder,
-        address _secretPhraseVerifierAddr
-    ) public reinitializer(2) {
+        address _secretPhraseVerifierAddr,
+        uint256[] calldata _eventIds
+    ) public reinitializer(3) {
         __ERC721_init("MintRally", "MR");
         __Ownable_init();
         __ERC2771Context_init(address(trustedForwarder));
         secretPhraseVerifierAddr = _secretPhraseVerifierAddr;
+        for (uint256 index = 0; index < _eventIds.length; index++) {
+            uint256 eventId = _eventIds[index];
+            tokenIdsByEvent[eventId].push(index);
+        }
     }
 
     function _msgSender()
@@ -153,10 +159,8 @@ contract MintNFT is
         }
 
         nftMetaDataURL[_tokenIds.current()] = metaDataURL;
+        // tokenIdsByEvent[_eventId].push(_tokenIds.current());
         _safeMint(_msgSender(), _tokenIds.current());
-
-        // Store tokenID information in the mapping
-        tokenIdsByEvent[_eventId].push(_tokenIds.current());
 
         _tokenIds.increment();
         emit MintedNFTAttributeURL(_msgSender(), metaDataURL);

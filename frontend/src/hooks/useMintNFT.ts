@@ -471,3 +471,18 @@ export const useResetSecretPhrase = (eventId: number | BigNumber) => {
 
   return { reset, isReseting, error, isSuccess };
 };
+
+export const useHoldersOfEvent = (eventId: number | BigNumber) => {
+  const { mintNFTContract } = useMintNFTContract();
+
+  const { data, isLoading } = useContractRead(
+    mintNFTContract,
+    "getNFTHoldersByEvent",
+    [eventId]
+  );
+
+  return {
+    holders: data as { holderAddress: string; tokenId: BigNumber }[],
+    isLoading,
+  };
+};

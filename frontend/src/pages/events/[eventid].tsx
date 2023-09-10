@@ -18,6 +18,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleInfo } from "@fortawesome/free-solid-svg-icons";
 import MintNFTLoginRequired from "src/components/atoms/events/MintNFTLoginRequired";
 import EventEditSection from "src/components/organisms/EventEditSection";
+import { HoldersOfEvent } from "src/components/molecules/HoldersOfEvent";
 
 const MintNFTSection: FC<{ event: Event.EventRecord }> = ({ event }) => {
   const address = useAddress();
@@ -117,6 +118,8 @@ const Event: FC = () => {
               <MintNFTSection event={event} />
               <EventEditSection event={event} />
             </MintNFTLoginRequired>
+
+            <HoldersOfEvent eventId={Number(eventid)} />
 
             <Box
               rounded="lg"
