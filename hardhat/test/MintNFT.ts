@@ -303,6 +303,16 @@ describe("MintNFT", function () {
           );
         await mintNftTxn5.wait();
       });
+      it("get owners of the tokens", async () => {
+        const tokens = [0, 1, 2, 3, 4];
+        const owners = await mintNFT.ownerOfTokens(tokens);
+        expect(owners.length).equal(5);
+        expect(owners[0].holderAddress).equal(organizer.address);
+        expect(owners[1].holderAddress).equal(participant1.address);
+        expect(owners[2].holderAddress).equal(participant2.address);
+        expect(owners[3].holderAddress).equal(participant1.address);
+        expect(owners[4].holderAddress).equal(participant1.address);
+      });
       it("get NFT holders of the event", async () => {
         const nftholders = await mintNFT.getNFTHoldersByEvent(
           createdEventIds[0]

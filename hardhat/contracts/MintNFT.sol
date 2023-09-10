@@ -50,7 +50,7 @@ contract MintNFT is
     // is mint locked via EventId
     mapping(uint256 => bool) private isMintLocked;
     // Create a mapping to store NFT holders by event ID
-    mapping(uint256 => NFTHolder[]) private nftHoldersByEvent;
+    mapping(uint256 => uint256[]) private tokenIdsByEvent;
 
     address private secretPhraseVerifierAddr;
 
@@ -150,12 +150,8 @@ contract MintNFT is
         nftMetaDataURL[_tokenIds.current()] = metaDataURL;
         _safeMint(_msgSender(), _tokenIds.current());
 
-        // Store NFT holder information in the mapping
-        NFTHolder memory holder = NFTHolder({
-            holderAddress: _msgSender(),
-            tokenId: _tokenIds.current()
-        });
-        nftHoldersByEvent[_eventId].push(holder);
+        // Store tokenID information in the mapping
+        tokenIdsByEvent[_eventId].push(_tokenIds.current());
 
         _tokenIds.increment();
         emit MintedNFTAttributeURL(_msgSender(), metaDataURL);
@@ -261,10 +257,24 @@ contract MintNFT is
         return result;
     }
 
+    // Function to return a list of owners from an array of token IDs
+    function ownerOfTokens(
+        uint256[] memory _tokenIdArray
+    ) public view returns (NFTHolder[] memory) {
+        NFTHolder[] memory holders = new NFTHolder[](_tokenIdArray.length);
+        for (uint256 index = 0; index < _tokenIdArray.length; index++) {
+            holders[index] = NFTHolder(
+                ownerOf(_tokenIdArray[index]),
+                _tokenIdArray[index]
+            );
+        }
+        return holders;
+    }
+
     // Function to return a list of NFT holders for a specific event ID
     function getNFTHoldersByEvent(
         uint256 _eventId
     ) public view returns (NFTHolder[] memory) {
-        return nftHoldersByEvent[_eventId];
+        return ownerOfTokens(tokenIdsByEvent[_eventId]);
     }
 }
