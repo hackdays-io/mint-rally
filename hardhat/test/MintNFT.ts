@@ -325,6 +325,24 @@ describe("MintNFT", function () {
         expect(Number(nftholders[1].tokenId)).equal(1);
         expect(Number(nftholders[2].tokenId)).equal(2);
       });
+      it("get NFT holders of the event group", async () => {
+        const nftholders = await mintNFT.getNFTHoldersByEventGroup(
+          createdGroupId1
+        );
+        expect(nftholders.length).equal(4);
+        expect(nftholders[0].holderAddress).equal(organizer.address);
+        expect(nftholders[1].holderAddress).equal(participant1.address);
+        expect(nftholders[2].holderAddress).equal(participant2.address);
+        expect(nftholders[3].holderAddress).equal(participant1.address);
+        expect(Number(nftholders[0].tokenId)).equal(0);
+        expect(Number(nftholders[1].tokenId)).equal(1);
+        expect(Number(nftholders[2].tokenId)).equal(2);
+        expect(Number(nftholders[3].tokenId)).equal(3);
+        expect(Number(nftholders[0].eventId)).equal(0);
+        expect(Number(nftholders[1].eventId)).equal(0);
+        expect(Number(nftholders[2].eventId)).equal(0);
+        expect(Number(nftholders[3].eventId)).equal(1);
+      });
     });
   });
 
