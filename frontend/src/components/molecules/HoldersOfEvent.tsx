@@ -83,7 +83,7 @@ export const HoldersOfEvent: FC<Props> = ({ eventId }) => {
       ) : (
         <>
           <Divider my={4} />
-          <Flex>
+          <Flex flexWrap="wrap" columnGap={1} rowGap={1}>
             {holders?.map((holder) => (
               <Tooltip
                 label={holder.holderAddress}
