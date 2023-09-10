@@ -22,15 +22,22 @@ const attributes = [
   },
 ];
 // deploy functions
+/**
+ * deploy secretPhraseVerifier
+ * @returns deployed secretPhraseVerifier
+ */
 const deploySecretPhraseVerifier = async () => {
-  // Deploy secretPhraseVerifier
   const SecretPhraseVerifierFactory = await ethers.getContractFactory(
     "SecretPhraseVerifier"
   );
   return await SecretPhraseVerifierFactory.deploy();
 };
+/**
+ * deploy mintNFT
+ * @param secretPhraseVerifier
+ * @returns deployed mintNFT
+ */
 const deployMintNFT = async (secretPhraseVerifier: SecretPhraseVerifier) => {
-  // Deploy mintNFT and eventManager
   const MintNFTFactory = await ethers.getContractFactory("MintNFT");
   const deployedMintNFT: any = await upgrades.deployProxy(
     MintNFTFactory,
@@ -44,6 +51,11 @@ const deployMintNFT = async (secretPhraseVerifier: SecretPhraseVerifier) => {
   );
   return deployedMintNFT.deployed();
 };
+/**
+ * deploy evetManager
+ * @param relayer address
+ * @returns deployed eventManager
+ */
 const deployEventManager = async (relayer: SignerWithAddress) => {
   const EventManager = await ethers.getContractFactory("EventManager");
   const deployedEventManager: any = await upgrades.deployProxy(
@@ -55,6 +67,11 @@ const deployEventManager = async (relayer: SignerWithAddress) => {
   );
   return deployedEventManager.deployed();
 };
+/**
+ * deploy all contracts
+ * @param relayer address
+ * @returns deployed contracts array
+ */
 const deployAll = async (relayer: SignerWithAddress) => {
   const secretPhraseVerifier = await deploySecretPhraseVerifier();
   const mintNFT = await deployMintNFT(secretPhraseVerifier);
@@ -63,6 +80,7 @@ const deployAll = async (relayer: SignerWithAddress) => {
   await eventManager.setMintNFTAddr(mintNFT.address);
   return [secretPhraseVerifier, mintNFT, eventManager];
 };
+
 describe("MintNFT", function () {
   let mintNFT: MintNFT;
   let eventManager: EventManager;
