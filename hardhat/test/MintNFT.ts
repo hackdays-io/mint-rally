@@ -5,6 +5,7 @@ import { MintNFT, EventManager, SecretPhraseVerifier } from "../typechain";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 // eslint-disable-next-line node/no-missing-import
 import { generateProof, wrongProofCalldata } from "./helper/secret_phrase";
+import { BigNumberish, BytesLike, Signer } from "ethers";
 
 // ToDo requiredParticipateCountに重複がある場合エラーになってしまう。
 const attributes = [
@@ -80,6 +81,48 @@ const deployAll = async (relayer: SignerWithAddress) => {
   await eventManager.setMintNFTAddr(mintNFT.address);
   return [secretPhraseVerifier, mintNFT, eventManager];
 };
+type eventGroupParams = {
+  groupId: BigNumberish;
+  name: string;
+  description: string;
+  date: string;
+  mintLimit: BigNumberish;
+  useMtx: boolean;
+  secretPhrase: BytesLike;
+  eventNFTAttributes: {
+    metaDataURL: string;
+    requiredParticipateCount: BigNumberish;
+  }[];
+};
+const createGroup = async (
+  eventManager: EventManager,
+  groupName: string,
+  signer?: string | Signer
+) => {
+  const createGroupTxn = signer
+    ? await eventManager.connect(signer).createGroup(groupName)
+    : await eventManager.createGroup(groupName);
+  await createGroupTxn.wait();
+};
+
+const createEventRecord = async (
+  eventManager: EventManager,
+  params: eventGroupParams,
+  signer?: string | Signer
+) => {
+  const manager = signer ? await eventManager.connect(signer) : eventManager;
+  const createEventTxn = await manager.createEventRecord(
+    params.groupId,
+    params.name,
+    params.description,
+    params.date,
+    params.mintLimit,
+    params.useMtx,
+    params.secretPhrase,
+    params.eventNFTAttributes
+  );
+  await createEventTxn.wait();
+};
 
 describe("MintNFT", function () {
   let mintNFT: MintNFT;
@@ -100,8 +143,7 @@ describe("MintNFT", function () {
     // Deploy all contracts
     [, mintNFT, eventManager] = await deployAll(relayer);
     // Create a Group and an Event
-    const createGroupTxn = await eventManager.createGroup("First Group");
-    await createGroupTxn.wait();
+    await createGroup(eventManager, "First Group");
     const groupsList = await eventManager.getGroups();
     createdGroupId = groupsList[0].groupId.toNumber();
 
@@ -168,22 +210,20 @@ describe("MintNFT", function () {
       [, mintNFT, eventManager] = await deployAll(relayer);
 
       // Create a Group and an Event
-      const createGroupTxn = await eventManager.createGroup("First Group");
-      await createGroupTxn.wait();
+      await createGroup(eventManager, "First Group");
       const groupsList = await eventManager.getGroups();
       createdGroupId = groupsList[0].groupId.toNumber();
 
-      const createEventTxn = await eventManager.createEventRecord(
-        createdGroupId,
-        "event1",
-        "event1 description",
-        "2022-07-3O",
-        10,
-        false,
-        publicInputCalldata[0],
-        attributes
-      );
-      await createEventTxn.wait();
+      await createEventRecord(eventManager, {
+        groupId: createdGroupId,
+        name: "event1",
+        description: "event1 description",
+        date: "2022-07-3O",
+        mintLimit: 10,
+        useMtx: false,
+        secretPhrase: publicInputCalldata[0],
+        eventNFTAttributes: attributes,
+      });
       const eventsList = await eventManager.getEventRecords(0, 0);
       createdEventIds.push(eventsList[0].eventRecordId.toNumber());
     });
@@ -267,33 +307,29 @@ describe("nft revolution", () => {
     [, mintNFT, eventManager] = await deployAll(relayer);
 
     // Create a Group and an Event
-    const createGroupTxn = await eventManager.createGroup("First Group");
-    await createGroupTxn.wait();
+    await createGroup(eventManager, "First Group");
     const groupsList = await eventManager.getGroups();
     createdGroupId = groupsList[0].groupId.toNumber();
-    const createEventTxn1 = await eventManager.createEventRecord(
-      createdGroupId,
-      "event1",
-      "event1 description",
-      "2022-07-3O",
-      10,
-      false,
-      publicInputCalldata[0],
-      attributes
-    );
-    await createEventTxn1.wait();
-
-    const createEventTxn2 = await eventManager.createEventRecord(
-      createdGroupId,
-      "event2",
-      "event2 description",
-      "2022-07-3O",
-      1,
-      false,
-      publicInputCalldata[0],
-      attributes
-    );
-    await createEventTxn2.wait();
+    await createEventRecord(eventManager, {
+      groupId: createdGroupId,
+      name: "event1",
+      description: "event1 description",
+      date: "2022-07-3O",
+      mintLimit: 10,
+      useMtx: false,
+      secretPhrase: publicInputCalldata[0],
+      eventNFTAttributes: attributes,
+    });
+    await createEventRecord(eventManager, {
+      groupId: createdGroupId,
+      name: "event2",
+      description: "event2 description",
+      date: "2022-07-3O",
+      mintLimit: 1,
+      useMtx: false,
+      secretPhrase: publicInputCalldata[0],
+      eventNFTAttributes: attributes,
+    });
 
     const eventsList = await eventManager.getEventRecords(0, 0);
     createdEventIds = eventsList.map((event) => event.eventRecordId.toNumber());
@@ -384,25 +420,24 @@ describe("mint locked flag", () => {
     [, mintNFT, eventManager] = await deployAll(relayer);
 
     // Create a Group and an Event
-    const createGroupTxn = await eventManager
-      .connect(organizer)
-      .createGroup("First Group");
-    await createGroupTxn.wait();
+    await createGroup(eventManager, "First Group", organizer);
     const groupsList = await eventManager.getGroups();
     createdGroupId = groupsList[0].groupId.toNumber();
-    const createEventTxn = await eventManager
-      .connect(organizer)
-      .createEventRecord(
-        createdGroupId,
-        "event1",
-        "event1 description",
-        "2022-07-3O",
-        10,
-        false,
-        "0x10c7da1d87ac3a86d34053a76768cc39c581d469b68863a9fba17bcdaa048f98",
-        attributes
-      );
-    await createEventTxn.wait();
+    await createEventRecord(
+      eventManager,
+      {
+        groupId: createdGroupId,
+        name: "event1",
+        description: "event1 description",
+        date: "2022-07-3O",
+        mintLimit: 10,
+        useMtx: false,
+        secretPhrase:
+          "0x10c7da1d87ac3a86d34053a76768cc39c581d469b68863a9fba17bcdaa048f98",
+        eventNFTAttributes: attributes,
+      },
+      organizer
+    );
     const eventsList = await eventManager.getEventRecords(0, 0);
     createdEventIds.push(eventsList[0].eventRecordId.toNumber());
   });
@@ -447,25 +482,23 @@ describe("reset secret phrase", () => {
     correctProofCalldata = publicInputCalldata[0];
 
     // Create a Group and an Event
-    const createGroupTxn = await eventManager
-      .connect(organizer)
-      .createGroup("First Group");
-    await createGroupTxn.wait();
+    await createGroup(eventManager, "First Group", organizer);
     const groupsList = await eventManager.getGroups();
     createdGroupId = groupsList[0].groupId.toNumber();
-    const createEventTxn = await eventManager
-      .connect(organizer)
-      .createEventRecord(
-        createdGroupId,
-        "event1",
-        "event1 description",
-        "2022-07-3O",
-        10,
-        false,
-        correctProofCalldata,
-        attributes
-      );
-    await createEventTxn.wait();
+    await createEventRecord(
+      eventManager,
+      {
+        groupId: createdGroupId,
+        name: "event1",
+        description: "event1 description",
+        date: "2022-07-3O",
+        mintLimit: 10,
+        useMtx: false,
+        secretPhrase: correctProofCalldata,
+        eventNFTAttributes: attributes,
+      },
+      organizer
+    );
     const eventsList = await eventManager.getEventRecords(0, 0);
     createdEventIds.push(eventsList[0].eventRecordId.toNumber());
   });
