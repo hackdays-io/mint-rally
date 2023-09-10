@@ -226,6 +226,18 @@ describe("MintNFT", function () {
       });
       const eventsList = await eventManager.getEventRecords(0, 0);
       createdEventIds.push(eventsList[0].eventRecordId.toNumber());
+      await createEventRecord(eventManager, {
+        groupId: createdGroupId,
+        name: "event2",
+        description: "event2 description",
+        date: "2022-07-3O",
+        mintLimit: 10,
+        useMtx: false,
+        secretPhrase: publicInputCalldata[0],
+        eventNFTAttributes: attributes,
+      });
+      const eventsList2 = await eventManager.getEventRecords(0, 0);
+      createdEventIds.push(eventsList2[0].eventRecordId.toNumber());
     });
 
     describe("mint NFT", () => {
@@ -257,6 +269,15 @@ describe("MintNFT", function () {
             proofCalldata3
           );
         await mintNftTxn3.wait();
+        const { proofCalldata: proofCalldata4 } = await generateProof();
+        const mintNftTxn4 = await mintNFT
+          .connect(participant1)
+          .mintParticipateNFT(
+            createdGroupId,
+            createdEventIds[1],
+            proofCalldata4
+          );
+        await mintNftTxn4.wait();
       });
       it("get NFT holders of the event", async () => {
         const nftholders = await mintNFT.getNFTHoldersByEvent(
