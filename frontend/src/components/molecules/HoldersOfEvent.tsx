@@ -90,6 +90,7 @@ export const HoldersOfEvent: FC<Props> = ({ eventId }) => {
                 backgroundColor="white"
                 color="yellow.900"
                 fontSize="xs"
+                key={`${holder.holderAddress}-${holder.tokenId}`}
               >
                 <Box
                   as="span"
