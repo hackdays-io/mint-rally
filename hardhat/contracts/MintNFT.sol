@@ -34,6 +34,11 @@ contract MintNFT is
         address holderAddress;
         uint256 tokenId;
     }
+    struct NFTHolderWithEventId {
+        address holderAddress;
+        uint256 eventId;
+        uint256 tokenId;
+    }
 
     // NFT meta data url via tokenId
     mapping(uint256 => string) private nftMetaDataURL;
@@ -276,5 +281,44 @@ contract MintNFT is
         uint256 _eventId
     ) public view returns (NFTHolder[] memory) {
         return ownerOfTokens(tokenIdsByEvent[_eventId]);
+    }
+
+    // Function to return a list of NFT holders for a specific event group ID
+    function getNFTHoldersByEventGroup(
+        uint256 _groupId
+    ) public view returns (NFTHolderWithEventId[] memory) {
+        IEventManager eventManager = IEventManager(eventManagerAddr);
+        EventRecord[] memory eventIds = eventManager.getEventRecordsByGroupId(
+            _groupId
+        );
+        NFTHolder[][] memory tempHolders = new NFTHolder[][](eventIds.length);
+        uint256 tokenidsLength = 0;
+        for (uint256 index = 0; index < eventIds.length; index++) {
+            tempHolders[index] = getNFTHoldersByEvent(
+                eventIds[index].eventRecordId
+            );
+            tokenidsLength = tokenidsLength + tempHolders[index].length;
+        }
+        NFTHolderWithEventId[] memory holders = new NFTHolderWithEventId[](
+            tokenidsLength
+        );
+        uint256 counter = 0;
+        while (counter < tokenidsLength) {
+            for (uint256 index = 0; index < eventIds.length; index++) {
+                for (
+                    uint256 index2 = 0;
+                    index2 < tempHolders[index].length;
+                    index2++
+                ) {
+                    holders[counter] = NFTHolderWithEventId(
+                        tempHolders[index][index2].holderAddress,
+                        eventIds[index].eventRecordId,
+                        tempHolders[index][index2].tokenId
+                    );
+                    counter++;
+                }
+            }
+        }
+        return holders;
     }
 }
