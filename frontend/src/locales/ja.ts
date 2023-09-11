@@ -1,3 +1,4 @@
+/* eslint-disable import/no-anonymous-default-export */
 import { guide } from "./guide-ja";
 export default {
   TOP: "トップ",

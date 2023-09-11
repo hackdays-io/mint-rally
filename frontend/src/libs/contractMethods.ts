@@ -51,3 +51,29 @@ export const getEventGroups = async () => {
   const eventGroups: Array<Event.EventGroup> = await eventManager.getGroups();
   return eventGroups;
 }
+export const getNFTHoldersOfEvent = async (eventid: BigNumber) => {
+  const mintNFTManager = getMintNFTManagerContract();
+  if (!mintNFTManager)
+    throw new Error("Cannot find v contract");
+  const holders: Array<NFT.NFTHolder> = await mintNFTManager.getNFTHoldersByEvent(eventid);
+  return holders.map((holder) => {
+    return {
+      holderAddress: holder.holderAddress,
+      tokenId: Number(holder.tokenId)
+    }
+  });
+}
+
+export const getNFTHoldersOfEventGroup = async (eventgroupid: BigNumber) => {
+  const mintNFTManager = getMintNFTManagerContract();
+  if (!mintNFTManager)
+    throw new Error("Cannot find v contract");
+  const holders: Array<NFT.NFTHolderWithEventId> = await mintNFTManager.getNFTHoldersByEventGroup(eventgroupid);
+  return holders.map((holder) => {
+    return {
+      eventId: Number(holder.eventId),
+      holderAddress: holder.holderAddress,
+      tokenId: Number(holder.tokenId)
+    }
+  });
+}

@@ -8,7 +8,8 @@
     "dev:polygon": "NODE_ENV=production next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "create:holders": "ts-node --project tsconfig.local.json scripts/createHoldersJson.ts"
   },
   "dependencies": {
     "@chakra-ui/icons": "^2.0.2",
@@ -37,6 +38,7 @@
     "nextjs-google-analytics": "^2.1.0",
     "nprogress": "^0.2.0",
     "ordinal": "^1.0.3",
+    "papaparse": "^5.4.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-feather": "^2.0.10",
@@ -51,6 +53,7 @@
   "devDependencies": {
     "@types/node": "18.0.0",
     "@types/nprogress": "^0.2.0",
+    "@types/papaparse": "^5.3.8",
     "@types/react": "18.0.14",
     "@types/react-dom": "18.0.5",
     "dotenv": "^16.0.1",

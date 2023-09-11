@@ -27,7 +27,7 @@ async function main() {
   const MintNFTFactory = await ethers.getContractFactory("MintNFT");
   const deployedMintNFT: any = await upgrades.deployProxy(
     MintNFTFactory,
-    [forwarder.address, secretPhraseVerifier.address],
+    [forwarder.address, secretPhraseVerifier.address, []],
     {
       initializer: "initialize",
     }
