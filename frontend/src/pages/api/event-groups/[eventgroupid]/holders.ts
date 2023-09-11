@@ -21,9 +21,11 @@ export default async function handler(
     const csv = holders.map((holder) => {
       return `${holder.eventId},${holder.holderAddress},${holder.tokenId}`;
     }).join('\n');
+    res.setHeader('Content-Type', 'text/csv');
     return res.status(200).send(
       `eventId, holderAddress, tokenId\n${csv}`);
   } else {
+    res.setHeader('Content-Type', 'application/json');
     return res.status(200).json(holders);
   }
 }
