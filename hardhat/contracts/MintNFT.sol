@@ -30,6 +30,15 @@ contract MintNFT is
         string metaDataURL;
         uint256 requiredParticipateCount;
     }
+    struct NFTHolder {
+        address holderAddress;
+        uint256 tokenId;
+    }
+    struct NFTHolderWithEventId {
+        address holderAddress;
+        uint256 eventId;
+        uint256 tokenId;
+    }
 
     // NFT meta data url via tokenId
     mapping(uint256 => string) private nftMetaDataURL;
@@ -48,6 +57,9 @@ contract MintNFT is
 
     address private secretPhraseVerifierAddr;
 
+    // Create a mapping to store NFT holders by event ID
+    mapping(uint256 => uint256[]) private tokenIdsByEvent;
+
     event MintedNFTAttributeURL(address indexed holder, string url);
     event MintLocked(uint256 indexed eventId, bool isLocked);
     event ResetSecretPhrase(address indexed executor, uint256 indexed eventId);
@@ -61,15 +73,20 @@ contract MintNFT is
         _;
     }
 
-    // Currently, reinitializer(2) was executed as constructor.
+    // Currently, reinitializer(3) was executed as constructor.
     function initialize(
         MinimalForwarderUpgradeable trustedForwarder,
-        address _secretPhraseVerifierAddr
-    ) public reinitializer(2) {
+        address _secretPhraseVerifierAddr,
+        uint256[] calldata _eventIds
+    ) public reinitializer(3) {
         __ERC721_init("MintRally", "MR");
         __Ownable_init();
         __ERC2771Context_init(address(trustedForwarder));
         secretPhraseVerifierAddr = _secretPhraseVerifierAddr;
+        for (uint256 index = 0; index < _eventIds.length; index++) {
+            uint256 eventId = _eventIds[index];
+            tokenIdsByEvent[eventId].push(index);
+        }
     }
 
     function _msgSender()
@@ -142,7 +159,9 @@ contract MintNFT is
         }
 
         nftMetaDataURL[_tokenIds.current()] = metaDataURL;
+        tokenIdsByEvent[_eventId].push(_tokenIds.current());
         _safeMint(_msgSender(), _tokenIds.current());
+
         _tokenIds.increment();
         emit MintedNFTAttributeURL(_msgSender(), metaDataURL);
     }
@@ -245,5 +264,65 @@ contract MintNFT is
             _eventId
         );
         return result;
+    }
+
+    // Function to return a list of owners from an array of token IDs
+    function ownerOfTokens(
+        uint256[] memory _tokenIdArray
+    ) public view returns (NFTHolder[] memory) {
+        NFTHolder[] memory holders = new NFTHolder[](_tokenIdArray.length);
+        for (uint256 index = 0; index < _tokenIdArray.length; index++) {
+            holders[index] = NFTHolder(
+                ownerOf(_tokenIdArray[index]),
+                _tokenIdArray[index]
+            );
+        }
+        return holders;
+    }
+
+    // Function to return a list of NFT holders for a specific event ID
+    function getNFTHoldersByEvent(
+        uint256 _eventId
+    ) public view returns (NFTHolder[] memory) {
+        return ownerOfTokens(tokenIdsByEvent[_eventId]);
+    }
+
+    // Function to return a list of NFT holders for a specific event group ID
+    function getNFTHoldersByEventGroup(
+        uint256 _groupId
+    ) public view returns (NFTHolderWithEventId[] memory) {
+        IEventManager eventManager = IEventManager(eventManagerAddr);
+        EventRecord[] memory eventIds = eventManager.getEventRecordsByGroupId(
+            _groupId
+        );
+        NFTHolder[][] memory tempHolders = new NFTHolder[][](eventIds.length);
+        uint256 tokenidsLength = 0;
+        for (uint256 index = 0; index < eventIds.length; index++) {
+            tempHolders[index] = getNFTHoldersByEvent(
+                eventIds[index].eventRecordId
+            );
+            tokenidsLength = tokenidsLength + tempHolders[index].length;
+        }
+        NFTHolderWithEventId[] memory holders = new NFTHolderWithEventId[](
+            tokenidsLength
+        );
+        uint256 counter = 0;
+        while (counter < tokenidsLength) {
+            for (uint256 index = 0; index < eventIds.length; index++) {
+                for (
+                    uint256 index2 = 0;
+                    index2 < tempHolders[index].length;
+                    index2++
+                ) {
+                    holders[counter] = NFTHolderWithEventId(
+                        tempHolders[index][index2].holderAddress,
+                        eventIds[index].eventRecordId,
+                        tempHolders[index][index2].tokenId
+                    );
+                    counter++;
+                }
+            }
+        }
+        return holders;
     }
 }
