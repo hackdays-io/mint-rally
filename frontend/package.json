@@ -8,7 +8,8 @@
     "dev:polygon": "NODE_ENV=production next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "create:holders": "ts-node --project tsconfig.local.json scripts/createHoldersJson.ts"
   },
   "dependencies": {
     "@chakra-ui/icons": "^2.0.2",
