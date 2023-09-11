@@ -16,15 +16,15 @@ export default async function handler(
     return res.status(400).json({ message: "eventid is required" });
   }
 
-  const nfts = await getNFTHoldersOfEvent(BigNumber.from(eventid));
+  const holders = await getNFTHoldersOfEvent(BigNumber.from(eventid));
   if (format === 'csv') {
-    const csv = nfts.map((nft) => {
-      return `${nft.holderAddress},${nft.tokenId}`;
+    const csv = holders.map((holder) => {
+      return `${holder.holderAddress},${holder.tokenId}`;
     }).join('\n');
     return res.status(200).send(
       `holderAddress, tokenId\n${csv}`);
   } else {
-    return res.status(200).json(nfts);
+    return res.status(200).json(holders);
 
   }
 }
