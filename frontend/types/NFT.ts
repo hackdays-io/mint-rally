@@ -23,4 +23,9 @@ export namespace NFT {
     holderAddress: string;
     tokenId: number;
   }
+  export interface NFTHolderWithEventId {
+    eventId: number;
+    holderAddress: string;
+    tokenId: number;
+  }
 }

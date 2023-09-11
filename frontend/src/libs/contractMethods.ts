@@ -55,11 +55,25 @@ export const getNFTHoldersOfEvent = async (eventid: BigNumber) => {
   const mintNFTManager = getMintNFTManagerContract();
   if (!mintNFTManager)
     throw new Error("Cannot find v contract");
-  const nfts: Array<NFT.NFTHolder> = await mintNFTManager.getNFTHoldersByEvent(eventid);
-  return nfts.map((nft) => {
+  const holders: Array<NFT.NFTHolder> = await mintNFTManager.getNFTHoldersByEvent(eventid);
+  return holders.map((holder) => {
     return {
-      holderAddress: nft.holderAddress,
-      tokenId: Number(nft.tokenId)
+      holderAddress: holder.holderAddress,
+      tokenId: Number(holder.tokenId)
+    }
+  });
+}
+
+export const getNFTHoldersOfEventGroup = async (eventgroupid: BigNumber) => {
+  const mintNFTManager = getMintNFTManagerContract();
+  if (!mintNFTManager)
+    throw new Error("Cannot find v contract");
+  const holders: Array<NFT.NFTHolderWithEventId> = await mintNFTManager.getNFTHoldersByEventGroup(eventgroupid);
+  return holders.map((holder) => {
+    return {
+      eventId: Number(holder.eventId),
+      holderAddress: holder.holderAddress,
+      tokenId: Number(holder.tokenId)
     }
   });
 }
