@@ -76,17 +76,12 @@ contract MintNFT is
     // Currently, reinitializer(3) was executed as constructor.
     function initialize(
         MinimalForwarderUpgradeable trustedForwarder,
-        address _secretPhraseVerifierAddr,
-        uint256[] calldata _eventIds
+        address _secretPhraseVerifierAddr
     ) public reinitializer(3) {
         __ERC721_init("MintRally", "MR");
         __Ownable_init();
         __ERC2771Context_init(address(trustedForwarder));
         secretPhraseVerifierAddr = _secretPhraseVerifierAddr;
-        for (uint256 index = 0; index < _eventIds.length; index++) {
-            uint256 eventId = _eventIds[index];
-            tokenIdsByEvent[eventId].push(index);
-        }
     }
 
     function _msgSender()

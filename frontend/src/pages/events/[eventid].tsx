@@ -119,8 +119,6 @@ const Event: FC = () => {
               <EventEditSection event={event} />
             </MintNFTLoginRequired>
 
-            <HoldersOfEvent eventId={Number(eventid)} />
-
             <Box
               rounded="lg"
               verticalAlign="top"
@@ -138,6 +136,8 @@ const Event: FC = () => {
                 <MintGuide />
               </Box>
             </Box>
+
+            <HoldersOfEvent eventId={Number(eventid)} />
           </>
         )}
       </Container>
