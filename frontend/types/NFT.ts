@@ -19,4 +19,8 @@ export namespace NFT {
     requiredParticipateCount: number;
     fileObject?: File | null;
   }
+  export interface NFTHolder {
+    holderAddress: string;
+    tokenId: number;
+  }
 }
