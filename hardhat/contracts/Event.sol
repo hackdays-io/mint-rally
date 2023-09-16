@@ -5,6 +5,7 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "./IMintNFT.sol";
+import "./IOperationController.sol";
 import "hardhat/console.sol";
 
 contract EventManager is OwnableUpgradeable {
@@ -43,6 +44,8 @@ contract EventManager is OwnableUpgradeable {
     uint256 private mtxPrice;
     // max mint limit
     uint256 private maxMintLimit;
+    // OperationController contract address
+    address private operationControllerAddr;
 
     modifier onlyGroupOwner(uint256 _groupId) {
         bool _isGroupOwner = false;
@@ -52,6 +55,14 @@ contract EventManager is OwnableUpgradeable {
             }
         }
         require(_isGroupOwner, "You are not group owner");
+        _;
+    }
+
+    modifier whenNotPaused() {
+        IOperationController operationController = IOperationController(
+            operationControllerAddr
+        );
+        require(!operationController.paused(), "Paused");
         _;
     }
 
@@ -74,23 +85,31 @@ contract EventManager is OwnableUpgradeable {
         maxMintLimit = _mintLimit;
     }
 
+    function setOperationControllerAddr(address _operationControllerAddr) public onlyOwner {
+        require(_operationControllerAddr != address(0), "operation controller address is blank");
+        operationControllerAddr = _operationControllerAddr;
+    }
+
     event CreateGroup(address indexed owner, uint256 groupId);
     event CreateEvent(address indexed owner, uint256 eventId);
 
+    // Currently, reinitializer(2) was executed as constructor.
     function initialize(
         address _relayerAddr,
         uint256 _mtxPrice,
-        uint256 _maxMintLimit
-    ) public initializer {
+        uint256 _maxMintLimit,
+        address _operationControllerAddr
+    ) public reinitializer(2) {
         __Ownable_init();
         _groupIds.increment();
         _eventRecordIds.increment();
         setRelayerAddr(_relayerAddr);
         setMtxPrice(_mtxPrice);
         setMaxMintLimit(_maxMintLimit);
+        setOperationControllerAddr(_operationControllerAddr);
     }
 
-    function createGroup(string memory _name) external {
+    function createGroup(string memory _name) external whenNotPaused {
         uint256 _newGroupId = _groupIds.current();
         _groupIds.increment();
 
@@ -135,7 +154,7 @@ contract EventManager is OwnableUpgradeable {
         bool _useMtx,
         bytes32 _secretPhrase,
         IMintNFT.NFTAttribute[] memory _eventNFTAttributes
-    ) external payable onlyGroupOwner(_groupId) {
+    ) external payable onlyGroupOwner(_groupId) whenNotPaused {
         require(
             _mintLimit > 0 && _mintLimit <= maxMintLimit,
             "mint limit is invalid"
