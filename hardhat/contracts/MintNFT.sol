@@ -80,13 +80,8 @@ contract MintNFT is
         IOperationController operationController = IOperationController(
             operationControllerAddr
         );
-        require(!operationController.paused(), "Paused");
+        require(!operationController.paused());
         _;
-    }
-
-    function setOperationControllerAddr(address _operationControllerAddr) public onlyOwner {
-        require(_operationControllerAddr != address(0), "operation controller address is blank");
-        operationControllerAddr = _operationControllerAddr;
     }
 
     // Currently, reinitializer(4) was executed as constructor.
@@ -99,7 +94,7 @@ contract MintNFT is
         __Ownable_init();
         __ERC2771Context_init(address(trustedForwarder));
         secretPhraseVerifierAddr = _secretPhraseVerifierAddr;
-        setOperationControllerAddr(_operationControllerAddr);
+        operationControllerAddr = _operationControllerAddr;
     }
 
     function _msgSender()
