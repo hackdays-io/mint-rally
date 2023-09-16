@@ -10,6 +10,7 @@ import "./lib/Hashing.sol";
 import "./ERC2771ContextUpgradeable.sol";
 import "./IEvent.sol";
 import "./ISecretPhraseVerifier.sol";
+import "./IOperationController.sol";
 
 contract MintNFT is
     ERC721EnumerableUpgradeable,
@@ -60,6 +61,8 @@ contract MintNFT is
     // Create a mapping to store NFT holders by event ID
     mapping(uint256 => uint256[]) private tokenIdsByEvent;
 
+    address private operationControllerAddr;
+
     event MintedNFTAttributeURL(address indexed holder, string url);
     event MintLocked(uint256 indexed eventId, bool isLocked);
     event ResetSecretPhrase(address indexed executor, uint256 indexed eventId);
@@ -73,15 +76,30 @@ contract MintNFT is
         _;
     }
 
-    // Currently, reinitializer(3) was executed as constructor.
+    modifier whenNotPaused() {
+        IOperationController operationController = IOperationController(
+            operationControllerAddr
+        );
+        require(!operationController.paused(), "Paused");
+        _;
+    }
+
+    function setOperationControllerAddr(address _operationControllerAddr) public onlyOwner {
+        require(_operationControllerAddr != address(0), "operation controller address is blank");
+        operationControllerAddr = _operationControllerAddr;
+    }
+
+    // Currently, reinitializer(4) was executed as constructor.
     function initialize(
         MinimalForwarderUpgradeable trustedForwarder,
-        address _secretPhraseVerifierAddr
-    ) public reinitializer(3) {
+        address _secretPhraseVerifierAddr,
+        address _operationControllerAddr
+    ) public reinitializer(4) {
         __ERC721_init("MintRally", "MR");
         __Ownable_init();
         __ERC2771Context_init(address(trustedForwarder));
         secretPhraseVerifierAddr = _secretPhraseVerifierAddr;
+        setOperationControllerAddr(_operationControllerAddr);
     }
 
     function _msgSender()
@@ -120,7 +138,7 @@ contract MintNFT is
         uint256 _groupId,
         uint256 _eventId,
         uint256[24] memory _proof
-    ) external {
+    ) external whenNotPaused {
         canMint(_eventId, _proof);
         remainingEventNftCount[_eventId] = remainingEventNftCount[_eventId] - 1;
 
@@ -184,7 +202,7 @@ contract MintNFT is
     function changeMintLocked(
         uint256 _eventId,
         bool _locked
-    ) external onlyGroupOwner(_eventId) {
+    ) external onlyGroupOwner(_eventId) whenNotPaused {
         isMintLocked[_eventId] = _locked;
         emit MintLocked(_eventId, _locked);
     }
@@ -192,7 +210,7 @@ contract MintNFT is
     function resetSecretPhrase(
         uint256 _eventId,
         bytes32 _secretPhrase
-    ) external onlyGroupOwner(_eventId) {
+    ) external onlyGroupOwner(_eventId) whenNotPaused {
         eventSecretPhrases[_eventId] = _secretPhrase;
         emit ResetSecretPhrase(_msgSender(), _eventId);
     }
@@ -214,7 +232,7 @@ contract MintNFT is
         uint256 _mintLimit,
         bytes32 _secretPhrase,
         NFTAttribute[] memory attributes
-    ) external {
+    ) external whenNotPaused {
         require(_msgSender() == eventManagerAddr, "unauthorized");
         remainingEventNftCount[_eventId] = _mintLimit;
         eventSecretPhrases[_eventId] = _secretPhrase;
@@ -234,7 +252,7 @@ contract MintNFT is
         return remainingEventNftCount[_eventId];
     }
 
-    function burn(uint256 tokenId) public onlyOwner {
+    function burn(uint256 tokenId) public onlyOwner whenNotPaused {
         _burn(tokenId);
     }
 
