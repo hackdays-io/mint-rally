@@ -10,6 +10,7 @@ async function main() {
   let mintNFT: MintNFT;
   let eventManager: EventManager;
   let secretPhraseVerifier: SecretPhraseVerifier;
+  let operationController: OperationController;
 
   const ForwarderFactory = await ethers.getContractFactory(
     "MintRallyForwarder"
@@ -23,10 +24,20 @@ async function main() {
   secretPhraseVerifier = await SecretPhraseVerifierFactory.deploy();
   await secretPhraseVerifier.deployed();
 
+  const OperationControllerFactory = await await ethers.getContractFactory(
+    "OperationController"
+  );
+  operationController = await OperationControllerFactory.deploy();
+  await operationController.deployed();
+
   const MintNFTFactory = await ethers.getContractFactory("MintNFT");
   const deployedMintNFT: any = await upgrades.deployProxy(
     MintNFTFactory,
-    [forwarder.address, secretPhraseVerifier.address, []],
+    [
+      forwarder.address,
+      secretPhraseVerifier.address,
+      operationController.address,
+    ],
     {
       initializer: "initialize",
     }
@@ -37,7 +48,12 @@ async function main() {
   const EventManagerFactory = await ethers.getContractFactory("EventManager");
   const deployedEventManager: any = await upgrades.deployProxy(
     EventManagerFactory,
-    [process.env.MUMBAI_RELAYER_ADDRESS, 250000, 1000000],
+    [
+      process.env.MUMBAI_RELAYER_ADDRESS,
+      250000,
+      1000000,
+      operationController.address,
+    ],
     {
       initializer: "initialize",
     }
@@ -50,12 +66,16 @@ async function main() {
 
   console.log("forwarder address:", forwarder.address);
   console.log("secretPhraseVerifier address:", secretPhraseVerifier.address);
+  console.log("operationController address:", operationController.address);
   console.log("mintNFT address:", mintNFT.address);
   console.log("eventManager address:", eventManager.address, "\n");
   console.log("----------\nFor frontEnd\n----------");
   console.log(`NEXT_PUBLIC_FORWARDER_ADDRESS=${forwarder.address}`);
   console.log(
     `NEXT_PUBLIC_CONTRACT_SECRET_PHRASE_VERIFIER=${secretPhraseVerifier.address}`
+  );
+  console.log(
+    `NEXT_PUBLIC_CONTRACT_OPERATION_CONTROLLER=${operationController.address}`
   );
   console.log(`NEXT_PUBLIC_CONTRACT_MINT_NFT_MANAGER=${mintNFT.address}`);
   console.log(`NEXT_PUBLIC_CONTRACT_EVENT_MANAGER=${eventManager.address}`);
