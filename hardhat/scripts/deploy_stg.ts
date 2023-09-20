@@ -4,7 +4,12 @@
 // When running the script with `npx hardhat run <script>` you'll find the Hardhat
 // Runtime Environment's members available in the global scope.
 import { ethers, upgrades } from "hardhat";
-import { MintNFT, EventManager, SecretPhraseVerifier } from "../typechain";
+import {
+  MintNFT,
+  EventManager,
+  SecretPhraseVerifier,
+  OperationController,
+} from "../typechain";
 
 async function main() {
   let mintNFT: MintNFT;
