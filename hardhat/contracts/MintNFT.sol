@@ -247,7 +247,7 @@ contract MintNFT is
         return remainingEventNftCount[_eventId];
     }
 
-    function burn(uint256 tokenId) public onlyOwner whenNotPaused {
+    function burn(uint256 tokenId) public onlyOwner {
         _burn(tokenId);
     }
 
