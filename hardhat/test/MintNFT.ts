@@ -236,6 +236,26 @@ describe("MintNFT", function () {
     });
   });
 
+  describe("burn", () => {
+    it("success to burn", async () => {
+      const { proofCalldata } = await generateProof();
+      const mintNftTxn = await mintNFT
+        .connect(participant2)
+        .mintParticipateNFT(createdGroupId, createdEventIds[0], proofCalldata);
+      await mintNftTxn.wait();
+
+      expect(await mintNFT.balanceOf(participant2.address)).equal(1);
+
+      const tokenId = await mintNFT.tokenOfOwnerByIndex(
+        participant2.address,
+        0
+      );
+
+      await mintNFT.connect(organizer).burn(tokenId);
+      expect(await mintNFT.balanceOf(participant2.address)).equal(0);
+    });
+  });
+
   describe("get NFT holders of the event", () => {
     let mintNFT: MintNFT;
     let eventManager: EventManager;
