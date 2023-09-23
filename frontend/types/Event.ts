@@ -19,7 +19,8 @@ export namespace Event {
     groupId: string;
     eventName: string;
     description: string;
-    date: Date;
+    startDate: string;
+    endDate: string;
     startTime: string; // "18:00"
     endTime: string; // "21:00"
     secretPhrase: string;

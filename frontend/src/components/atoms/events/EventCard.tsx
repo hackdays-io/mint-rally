@@ -1,6 +1,7 @@
 import { FC } from "react";
 import { Box, Divider, Flex, Heading, Text } from "@chakra-ui/react";
 import { CalendarIcon } from "@chakra-ui/icons";
+import { useParseEventDate } from "src/hooks/useEvent";
 
 type Props = {
   title: string;
@@ -9,6 +10,8 @@ type Props = {
 };
 
 const EventCard: FC<Props> = ({ title, description, date }) => {
+  const { parsedEventDate } = useParseEventDate(date);
+
   return (
     <>
       <Divider borderColor="mint.bg" borderWidth={1.3} />
@@ -39,7 +42,7 @@ const EventCard: FC<Props> = ({ title, description, date }) => {
           <Flex alignItems="center">
             <CalendarIcon color={"gray.700"} mr={3} />
             <Text fontSize={"sm"} color={"black"} overflow="hidden">
-              {date}
+              {parsedEventDate}
             </Text>
           </Flex>
         </Box>
