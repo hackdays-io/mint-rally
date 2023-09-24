@@ -1,4 +1,4 @@
-import { FC, useEffect, useMemo, useState } from "react";
+import { FC, useCallback, useEffect, useMemo, useState } from "react";
 import {
   Box,
   Flex,
@@ -40,7 +40,8 @@ interface EventFormData {
   eventGroupId: string;
   eventName: string;
   description: string;
-  date: string;
+  startDate: string;
+  endDate: string;
   startTime: string;
   endTime: string;
   secretPhrase: string;
@@ -72,7 +73,8 @@ const CreateEventForm: FC<Props> = ({ address }) => {
       eventGroupId: "",
       eventName: "",
       description: "",
-      date: "",
+      startDate: "",
+      endDate: "",
       startTime: "",
       endTime: "",
       secretPhrase: "",
@@ -105,7 +107,8 @@ const CreateEventForm: FC<Props> = ({ address }) => {
           groupId: formData.eventGroupId,
           eventName: formData.eventName,
           description: formData.description,
-          date: new Date(formData.date),
+          startDate: formData.startDate,
+          endDate: formData.endDate,
           startTime: formData.startTime,
           endTime: formData.endTime,
           secretPhrase: formData.secretPhrase,
@@ -141,6 +144,31 @@ const CreateEventForm: FC<Props> = ({ address }) => {
   const isLoading = useMemo(() => {
     if (isCreating || isUploadingMetadata) return true;
   }, [isCreating, isUploadingMetadata]);
+
+  const onStartDateChange = useCallback(
+    (e: any) => {
+      const startDate = e.target.value;
+      setValue("startDate", startDate);
+      setValue("endDate", startDate);
+    },
+    [setValue]
+  );
+
+  const validateEventDate = () => {
+    const startDate = watch("startDate");
+    const startTime = watch("startTime");
+    const endDate = watch("endDate");
+    const endTime = watch("endTime");
+
+    if (startDate && startTime && endDate && endTime) {
+      const startDateTime = new Date(`${startDate} ${startTime}`);
+      const endDateTime = new Date(`${endDate} ${endTime}`);
+      if (startDateTime > endDateTime) {
+        return "End date should be after start date";
+      }
+    }
+    return true;
+  };
 
   return (
     <>
@@ -238,27 +266,26 @@ const CreateEventForm: FC<Props> = ({ address }) => {
                   )}
                 />
               </FormControl>
-              <Flex mb={5} justifyContent="space-between" flexWrap="wrap">
+              <Flex mb={5} gap={5} flexWrap="wrap">
                 <FormControl width={{ base: "100%", md: "30%" }}>
-                  <FormLabel htmlFor="date">{t.EVENT_DATE}</FormLabel>
+                  <FormLabel htmlFor="startDate">
+                    {t.EVENT_START_DATE}
+                  </FormLabel>
                   <Controller
                     control={control}
-                    name="date"
+                    name="startDate"
                     rules={{
                       required: "Date is required",
                     }}
-                    render={({
-                      field: { onChange, value },
-                      formState: { errors },
-                    }) => (
+                    render={({ field: { value }, formState: { errors } }) => (
                       <>
                         <Input
-                          id="date"
-                          onChange={onChange}
+                          id="startDate"
+                          onChange={onStartDateChange}
                           value={value}
                           type="date"
                         />
-                        <ErrorMessage>{errors.date?.message}</ErrorMessage>
+                        <ErrorMessage>{errors.startDate?.message}</ErrorMessage>
                       </>
                     )}
                   />
@@ -288,6 +315,33 @@ const CreateEventForm: FC<Props> = ({ address }) => {
                           type="time"
                         />
                         <ErrorMessage>{errors.startTime?.message}</ErrorMessage>
+                      </>
+                    )}
+                  />
+                </FormControl>
+              </Flex>
+              <Flex mb={5} gap={5} flexWrap="wrap">
+                <FormControl width={{ base: "100%", md: "30%" }}>
+                  <FormLabel htmlFor="endDate">{t.EVENT_END_DATE}</FormLabel>
+                  <Controller
+                    control={control}
+                    name="endDate"
+                    rules={{
+                      required: "Date is required",
+                      validate: validateEventDate,
+                    }}
+                    render={({
+                      field: { onChange, value },
+                      formState: { errors },
+                    }) => (
+                      <>
+                        <Input
+                          id="endDate"
+                          onChange={onChange}
+                          value={value}
+                          type="date"
+                        />
+                        <ErrorMessage>{errors.endDate?.message}</ErrorMessage>
                       </>
                     )}
                   />

@@ -23,8 +23,10 @@ export default {
   CONNECT_WITH_EMAIL: "メールアドレスで接続",
   CONNECT_WITH_SAFE: "Safeで接続",
   INPUT_SAFE_WALLET_ADDRESS: "Safeのウォレットアドレスを入力",
-  NOT_ALLOWED_MAGIC_LINK: "このイベントはメールアドレスログインをサポートしていません。",
-  MAGICLINK_IS_NOT_SUPPORTED_USE_OTHERS: "このイベントはメールアドレスログインをサポートしていません。ログアウトの上違うWalletを選択してください。",
+  NOT_ALLOWED_MAGIC_LINK:
+    "このイベントはメールアドレスログインをサポートしていません。",
+  MAGICLINK_IS_NOT_SUPPORTED_USE_OTHERS:
+    "このイベントはメールアドレスログインをサポートしていません。ログアウトの上違うWalletを選択してください。",
   // Event group index
   NO_EVENTGROUPS_AVAILABLE: "イベントグループがありません",
   NO_EVENTS_AVAILABLE: "イベントがありません",
@@ -41,7 +43,8 @@ export default {
   EVENT_GROUP: "イベントグループ",
   EVENT_NAME: "イベント名",
   EVENT_DESCRIPTION: "イベント説明",
-  EVENT_DATE: "イベント開催日",
+  EVENT_START_DATE: "イベント開始日",
+  EVENT_END_DATE: "イベント終了日",
   EVENT_START_TIME: "イベント開始時刻",
   EVENT_END_TIME: "イベント終了時刻",
   EVENT_NFT_LIMIT: "NFTの発行上限数",
