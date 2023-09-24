@@ -10,7 +10,7 @@ import {
 } from "src/hooks/useMintNFT";
 import { NFTItem } from "src/components/atoms/nft/NFTItem";
 import { Event } from "types/Event";
-import { useEventById } from "src/hooks/useEvent";
+import { useEventById, useParseEventDate } from "src/hooks/useEvent";
 import OrganizerInfo from "src/components/atoms/events/OrganizerInfo";
 import { CalendarIcon } from "@chakra-ui/icons";
 import { MintGuide } from "src/components/atoms/form/MintGuide";
@@ -19,6 +19,7 @@ import { faCircleInfo } from "@fortawesome/free-solid-svg-icons";
 import MintNFTLoginRequired from "src/components/atoms/events/MintNFTLoginRequired";
 import EventEditSection from "src/components/organisms/EventEditSection";
 import { HoldersOfEvent } from "src/components/molecules/HoldersOfEvent";
+import dayjs from "dayjs";
 
 const MintNFTSection: FC<{ event: Event.EventRecord }> = ({ event }) => {
   const address = useAddress();
@@ -78,6 +79,9 @@ const Event: FC = () => {
   const { event, isLoading } = useEventById(Number(eventid));
 
   const { t } = useLocale();
+
+  const { parsedEventDate } = useParseEventDate(event?.date);
+
   return (
     <>
       <Container maxW={800} py={6} pb="120px">
@@ -95,7 +99,7 @@ const Event: FC = () => {
               gap={2}
               color="yellow.900"
             >
-              <CalendarIcon /> {event.date}
+              <CalendarIcon /> {parsedEventDate}
             </Text>
 
             <Text fontSize="md" color="text.black">

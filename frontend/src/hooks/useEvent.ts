@@ -14,6 +14,7 @@ import { Event } from "types/Event";
 import { BigNumber, ethers } from "ethers";
 import { reverse } from "lodash";
 import { useGenerateProof } from "./useSecretPhrase";
+import dayjs from "dayjs";
 
 export const useEventManagerContract = () => {
   const {
@@ -74,7 +75,7 @@ export const useCreateEventGroup = (address: string) => {
       if (!params.groupName) return;
       try {
         await mutateAsync({ args: [params.groupName] });
-      } catch (_) { }
+      } catch (_) {}
     },
     [mutateAsync]
   );
@@ -198,13 +199,19 @@ export const useCreateEvent = (address: string) => {
           value = (await getGasFee(params.mintLimit)) || BigNumber.from(0);
         }
 
+        const startDateTime = dayjs(
+          `${params.startDate} ${params.startTime}`
+        ).toISOString();
+        const endDateTime = dayjs(
+          `${params.endDate} ${params.endTime}`
+        ).toISOString();
+
         await mutateAsync({
           args: [
             params.groupId,
             params.eventName,
             params.description,
-            `${params.date.toLocaleDateString()} ${params.startTime}~${params.endTime
-            }`,
+            `${startDateTime}/${endDateTime}`,
             params.mintLimit,
             params.useMtx,
             proof?.publicInputCalldata[0],
@@ -214,7 +221,7 @@ export const useCreateEvent = (address: string) => {
             value: params.useMtx ? value : 0,
           },
         });
-      } catch (_) { }
+      } catch (_) {}
     },
     [mutateAsync, provider, getGasFee]
   );
@@ -228,52 +235,77 @@ export const useCreateEvent = (address: string) => {
   };
 };
 type UseEventOption = {
-  countPerPage?: number
-  initialCursor?: number
-}
+  countPerPage?: number;
+  initialCursor?: number;
+};
 export const useEvents = (option?: UseEventOption) => {
   const COUNT_PER_PAGE = option?.countPerPage || 50;
   const { eventManagerContract } = useEventManagerContract();
   const [nextCursor, setNextCursor] = useState<number | null>(null);
   const [currentCursor, setCurrentCursor] = useState<number | null>(null);
   const [prevCursor, setPrevCursor] = useState<number | null>(null);
-  const { isLoading: isLodingCount, data: countData, error: countError } = useContractRead(
-    eventManagerContract,
-    "getEventRecordCount"
-  );
-  const [data, setEventData] = useState<any>(null)
-  const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [error, setError] = useState<any>(null)
+  const {
+    isLoading: isLodingCount,
+    data: countData,
+    error: countError,
+  } = useContractRead(eventManagerContract, "getEventRecordCount");
+  const [data, setEventData] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<any>(null);
 
   // read record data
   useEffect(() => {
     if (eventManagerContract === undefined || currentCursor === null) return;
-    setIsLoading(true)
-    eventManagerContract?.call("getEventRecords", [COUNT_PER_PAGE, currentCursor]).then((res: any) => {
-      setEventData(res)
-    }).catch((err: any) => {
-      setError(err)
-    }).finally(() => {
-      setIsLoading(false)
-    })
-  }, [currentCursor, eventManagerContract])
+    setIsLoading(true);
+    eventManagerContract
+      ?.call("getEventRecords", [COUNT_PER_PAGE, currentCursor])
+      .then((res: any) => {
+        setEventData(res);
+      })
+      .catch((err: any) => {
+        setError(err);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, [currentCursor, eventManagerContract]);
   if (option?.initialCursor !== undefined && currentCursor === null) {
-    setCurrentCursor(option?.initialCursor)
+    setCurrentCursor(option?.initialCursor);
   }
 
   const events = useMemo(() => {
     // return empty if both data is not set
-    if (data === null || countData === undefined || currentCursor === null) return [];
+    if (data === null || countData === undefined || currentCursor === null)
+      return [];
     // set cursors for pagenation
-    if (countData > data.length + currentCursor) { setNextCursor(currentCursor + data.length) } else { setNextCursor(null) }
-    if (currentCursor > 0) { setPrevCursor(currentCursor - data.length) } else { setPrevCursor(null) }
+    if (countData > data.length + currentCursor) {
+      setNextCursor(currentCursor + data.length);
+    } else {
+      setNextCursor(null);
+    }
+    if (currentCursor > 0) {
+      setPrevCursor(currentCursor - data.length);
+    } else {
+      setPrevCursor(null);
+    }
     const blackList = process.env.NEXT_PUBLIC_EVENT_BLACK_LIST
       ? JSON.parse(`[${process.env.NEXT_PUBLIC_EVENT_BLACK_LIST}]`)
       : [];
-    return data?.filter((e: any) => !blackList.includes(e.eventRecordId.toNumber()))
+    return data?.filter(
+      (e: any) => !blackList.includes(e.eventRecordId.toNumber())
+    );
   }, [data, countData]);
 
-  return { events, isLoading, error, countData, nextCursor, prevCursor, setCurrentCursor, COUNT_PER_PAGE };
+  return {
+    events,
+    isLoading,
+    error,
+    countData,
+    nextCursor,
+    prevCursor,
+    setCurrentCursor,
+    COUNT_PER_PAGE,
+  };
 };
 export const useEventsByGroupId = () => {
   const { eventManagerContract } = useEventManagerContract();
@@ -281,16 +313,20 @@ export const useEventsByGroupId = () => {
   const [events, setEvents] = useState<Event.EventRecord[] | null>(null);
   const [error, setError] = useState<any>(null);
   const getEventsByGroupId = (groupId: number) => {
-    console.log("getEventsByGroupId", groupId)
-    setIsLoading(true)
-    eventManagerContract?.call("getEventRecordsByGroupId", [groupId]).then((res: any) => {
-      setEvents(res)
-    }).catch((err: any) => {
-      setError(err)
-    }).finally(() => {
-      setIsLoading(false)
-    })
-  }
+    console.log("getEventsByGroupId", groupId);
+    setIsLoading(true);
+    eventManagerContract
+      ?.call("getEventRecordsByGroupId", [groupId])
+      .then((res: any) => {
+        setEvents(res);
+      })
+      .catch((err: any) => {
+        setError(err);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
   return { events, isLoading, error, getEventsByGroupId };
 };
 
@@ -315,7 +351,9 @@ export const useCalcMtxGasFee = (mintLimit?: number) => {
 
       const gasPrice = (await provider.getGasPrice())?.toNumber();
       const value = ethers.utils.parseEther(
-        `${(gasPrice * mintLimit * (660000 * 1 * 0.000000000000000001)).toFixed(6)}`
+        `${(gasPrice * mintLimit * (660000 * 1 * 0.000000000000000001)).toFixed(
+          6
+        )}`
       );
       setGasFee(value);
     };
@@ -328,7 +366,9 @@ export const useCalcMtxGasFee = (mintLimit?: number) => {
       if (!provider) return;
       const gasPrice = (await provider.getGasPrice())?.toNumber();
       const value = ethers.utils.parseEther(
-        `${(gasPrice * _mintLimit * 660000 * 1 * 0.000000000000000001).toFixed(6)}`
+        `${(gasPrice * _mintLimit * 660000 * 1 * 0.000000000000000001).toFixed(
+          6
+        )}`
       );
       return value;
     },
@@ -336,4 +376,22 @@ export const useCalcMtxGasFee = (mintLimit?: number) => {
   );
 
   return { gasFee, getGasFee };
+};
+
+export const useParseEventDate = (eventDate?: string) => {
+  const parsedEventDate = useMemo(() => {
+    if (!eventDate) return "";
+    if (eventDate.length > 30) {
+      const [startDate, endDate] = eventDate.split("/");
+      return (
+        dayjs(startDate).format("YYYY/MM/DD HH:mm") +
+        " ~ " +
+        dayjs(endDate).format("YYYY/MM/DD HH:mm")
+      );
+    } else {
+      return eventDate;
+    }
+  }, [eventDate]);
+
+  return { parsedEventDate };
 };
