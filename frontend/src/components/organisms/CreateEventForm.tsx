@@ -154,6 +154,22 @@ const CreateEventForm: FC<Props> = ({ address }) => {
     [setValue]
   );
 
+  const validateEventDate = () => {
+    const startDate = watch("startDate");
+    const startTime = watch("startTime");
+    const endDate = watch("endDate");
+    const endTime = watch("endTime");
+
+    if (startDate && startTime && endDate && endTime) {
+      const startDateTime = new Date(`${startDate} ${startTime}`);
+      const endDateTime = new Date(`${endDate} ${endTime}`);
+      if (startDateTime > endDateTime) {
+        return "End date should be after start date";
+      }
+    }
+    return true;
+  };
+
   return (
     <>
       {isLoadingEventGroups || typeof groups == "undefined" ? (
@@ -312,12 +328,7 @@ const CreateEventForm: FC<Props> = ({ address }) => {
                     name="endDate"
                     rules={{
                       required: "Date is required",
-                      validate: (value) => {
-                        if (value < watch("startDate")) {
-                          return "End date should be after start date";
-                        }
-                        return true;
-                      },
+                      validate: validateEventDate,
                     }}
                     render={({
                       field: { onChange, value },
