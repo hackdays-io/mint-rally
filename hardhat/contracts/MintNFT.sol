@@ -238,7 +238,7 @@ contract MintNFT is
         uint256 _eventId,
         uint256 _limit,
         uint256 _offset
-    ) external view returns (NFTAttribute[] memory) {
+    ) external view onlyGroupOwner(_eventId) returns (NFTAttribute[] memory) {
         if (_limit == 0) {
             _limit == 100; // default limit
         }
