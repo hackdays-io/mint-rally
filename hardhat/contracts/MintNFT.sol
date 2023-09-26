@@ -234,6 +234,34 @@ contract MintNFT is
         return remainingEventNftCount[_eventId];
     }
 
+    function getNFTAttributeRecordsByEventId(
+        uint256 _eventId,
+        uint256 _limit,
+        uint256 _offset
+    ) external view returns (NFTAttribute[] memory) {
+        if (_limit == 0) {
+            _limit == 100; // default limit
+        }
+        require(_limit <= 100, "limit is too large");
+        // create array of nft attributes
+        NFTAttribute[] memory _nftAttributeRecords = new NFTAttribute[](_limit);
+        uint256 count;
+
+        for (uint256 i = _offset; i < _limit; i++) {
+            string memory ipfsUrl = eventNftAttributes[
+                Hashing.hashingDoubleUint256(_eventId, i)
+            ];
+            if (
+                keccak256(abi.encodePacked(ipfsUrl)) !=
+                keccak256(abi.encodePacked(""))
+            ) {
+                _nftAttributeRecords[count] = NFTAttribute(ipfsUrl, i);
+                ++count;
+            }
+        }
+        return _nftAttributeRecords;
+    }
+
     function burn(uint256 tokenId) public onlyOwner {
         _burn(tokenId);
     }

@@ -345,6 +345,31 @@ describe("MintNFT", function () {
         expect(Number(nftholders[3].eventId)).equal(1);
       });
     });
+
+    describe("getNFTAttributeRecordsByEventId", () => {
+      it("get NFTAttributeRecords by event id", async () => {
+        const nftAttributeRecords =
+          await mintNFT.getNFTAttributeRecordsByEventId(
+            createdEventIds[0],
+            0,
+            100
+          );
+        console.log(nftAttributeRecords);
+        // expect(nftAttributeRecords.length).equal(3);
+        // expect(nftAttributeRecords[0].metaDataURL).equal(
+        //   "ipfs://hogehoge/count0.json"
+        // );
+        // expect(nftAttributeRecords[1].metaDataURL).equal(
+        //   "ipfs://hogehoge/count1.json"
+        // );
+        // expect(nftAttributeRecords[2].metaDataURL).equal(
+        //   "ipfs://hogehoge/count5.json"
+        // );
+        // expect(nftAttributeRecords[0].requiredParticipateCount).equal(0);
+        // expect(nftAttributeRecords[1].requiredParticipateCount).equal(1);
+        // expect(nftAttributeRecords[2].requiredParticipateCount).equal(5);
+      });
+    });
   });
 
   // it("reject mint NFT when secret phrase is invalid", async () => {
@@ -593,3 +618,5 @@ describe("reset secret phrase", () => {
     ).to.be.revertedWith("you are not event group owner");
   });
 });
+
+describe("setEventInfo", () => {});
