@@ -85,8 +85,13 @@ contract EventManager is OwnableUpgradeable {
         maxMintLimit = _mintLimit;
     }
 
-    function setOperationControllerAddr(address _operationControllerAddr) public onlyOwner {
-        require(_operationControllerAddr != address(0), "operation controller address is blank");
+    function setOperationControllerAddr(
+        address _operationControllerAddr
+    ) public onlyOwner {
+        require(
+            _operationControllerAddr != address(0),
+            "operation controller address is blank"
+        );
         operationControllerAddr = _operationControllerAddr;
     }
 
@@ -101,8 +106,10 @@ contract EventManager is OwnableUpgradeable {
         address _operationControllerAddr
     ) public reinitializer(2) {
         __Ownable_init();
-        _groupIds.increment();
-        _eventRecordIds.increment();
+        if (_groupIds.current() == 0 && _eventRecordIds.current() == 0) {
+            _groupIds.increment();
+            _eventRecordIds.increment();
+        }
         setRelayerAddr(_relayerAddr);
         setMtxPrice(_mtxPrice);
         setMaxMintLimit(_maxMintLimit);

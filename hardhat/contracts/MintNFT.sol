@@ -55,12 +55,9 @@ contract MintNFT is
     mapping(uint256 => bytes32) private eventSecretPhrases;
     // is mint locked via EventId
     mapping(uint256 => bool) private isMintLocked;
-
     address private secretPhraseVerifierAddr;
-
     // Create a mapping to store NFT holders by event ID
     mapping(uint256 => uint256[]) private tokenIdsByEvent;
-
     address private operationControllerAddr;
 
     event MintedNFTAttributeURL(address indexed holder, string url);
@@ -84,12 +81,12 @@ contract MintNFT is
         _;
     }
 
-    // Currently, reinitializer(4) was executed as constructor.
+    // Currently, reinitializer(5) was executed as constructor.
     function initialize(
         MinimalForwarderUpgradeable trustedForwarder,
         address _secretPhraseVerifierAddr,
         address _operationControllerAddr
-    ) public reinitializer(4) {
+    ) public reinitializer(5) {
         __ERC721_init("MintRally", "MR");
         __Ownable_init();
         __ERC2771Context_init(address(trustedForwarder));
