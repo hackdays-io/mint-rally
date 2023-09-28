@@ -8,6 +8,7 @@
     "deploy:stg": "npx hardhat run scripts/deploy_stg.ts --network mumbai",
     "deploy:local": "npx hardhat run scripts/deploy_local.ts --network local",
     "forceimport:main": "npx hardhat run scripts/force_import.ts --network polygon",
+    "forceimport:stg": "npx hardhat run scripts/force_import_stg.ts --network mumbai",
     "compile": "npx hardhat compile",
     "test": "npx hardhat compile && npx hardhat test",
     "localchain": "npx hardhat node",
