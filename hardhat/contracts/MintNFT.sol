@@ -240,11 +240,14 @@ contract MintNFT is
         uint256 _offset
     ) external view onlyGroupOwner(_eventId) returns (NFTAttribute[] memory) {
         if (_limit == 0) {
-            _limit == 100; // default limit
+            _limit = 100; // default limit
         }
         require(_limit <= 100, "limit is too large");
         // create array of nft attributes
-        NFTAttribute[] memory _nftAttributeRecords = new NFTAttribute[](_limit);
+        NFTAttribute[] memory _nftAttributeRecordsList = new NFTAttribute[](
+            _limit
+        );
+
         uint256 count;
 
         for (uint256 i = _offset; i < _limit; i++) {
@@ -255,9 +258,14 @@ contract MintNFT is
                 keccak256(abi.encodePacked(ipfsUrl)) !=
                 keccak256(abi.encodePacked(""))
             ) {
-                _nftAttributeRecords[count] = NFTAttribute(ipfsUrl, i);
-                ++count;
+                _nftAttributeRecordsList[count] = NFTAttribute(ipfsUrl, i);
+                count++;
             }
+        }
+
+        NFTAttribute[] memory _nftAttributeRecords = new NFTAttribute[](count);
+        for (uint256 j = 0; j < count; j++) {
+            _nftAttributeRecords[j] = _nftAttributeRecordsList[j];
         }
         return _nftAttributeRecords;
     }

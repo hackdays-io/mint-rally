@@ -345,30 +345,125 @@ describe("MintNFT", function () {
         expect(Number(nftholders[3].eventId)).equal(1);
       });
     });
+  });
 
-    describe("getNFTAttributeRecordsByEventId", () => {
-      it("get NFTAttributeRecords by event id", async () => {
-        const nftAttributeRecords =
-          await mintNFT.getNFTAttributeRecordsByEventId(
-            createdEventIds[0],
-            0,
-            100
-          );
-        console.log(nftAttributeRecords);
-        // expect(nftAttributeRecords.length).equal(3);
-        // expect(nftAttributeRecords[0].metaDataURL).equal(
-        //   "ipfs://hogehoge/count0.json"
-        // );
-        // expect(nftAttributeRecords[1].metaDataURL).equal(
-        //   "ipfs://hogehoge/count1.json"
-        // );
-        // expect(nftAttributeRecords[2].metaDataURL).equal(
-        //   "ipfs://hogehoge/count5.json"
-        // );
-        // expect(nftAttributeRecords[0].requiredParticipateCount).equal(0);
-        // expect(nftAttributeRecords[1].requiredParticipateCount).equal(1);
-        // expect(nftAttributeRecords[2].requiredParticipateCount).equal(5);
+  describe("getNFTAttributeRecordsByEventId", () => {
+    let mintNFT: MintNFT;
+    let eventManager: EventManager;
+
+    let createdGroupId1: number;
+
+    let organizer: SignerWithAddress;
+    let participant1: SignerWithAddress;
+    let relayer: SignerWithAddress;
+
+    before(async () => {
+      [organizer, participant1, relayer] = await ethers.getSigners();
+
+      // generate proof
+      const { publicInputCalldata } = await generateProof();
+
+      // Deploy all contracts
+      [, mintNFT, eventManager] = await deployAll(relayer);
+
+      // Create a Group and an Event
+      await createGroup(eventManager, "First Group");
+      const groupsList = await eventManager.getGroups();
+      createdGroupId1 = groupsList[0].groupId.toNumber();
+
+      await createEventRecord(eventManager, {
+        groupId: createdGroupId1,
+        name: "event1",
+        description: "event1 description",
+        date: "2022-07-3O",
+        mintLimit: 10,
+        useMtx: false,
+        secretPhrase: publicInputCalldata[0],
+        eventNFTAttributes: attributes,
       });
+    });
+
+    it("should revert if msg.sender is not group owner", async () => {
+      await expect(
+        mintNFT.connect(participant1).getNFTAttributeRecordsByEventId(1, 100, 0)
+      ).to.be.revertedWith("you are not event group owner");
+    });
+
+    it("should revert if limit is over 100", async () => {
+      await expect(
+        mintNFT.connect(organizer).getNFTAttributeRecordsByEventId(1, 101, 0)
+      ).to.be.revertedWith("limit is too large");
+    });
+
+    it("get NFTAttributeRecords by event id", async () => {
+      const nftAttributeRecords = await mintNFT
+        .connect(organizer)
+        .getNFTAttributeRecordsByEventId(1, 100, 0);
+      expect(nftAttributeRecords.length).equal(attributes.length);
+      expect(nftAttributeRecords[0].metaDataURL).equal(
+        attributes[0].metaDataURL
+      );
+      expect(nftAttributeRecords[1].metaDataURL).equal(
+        attributes[1].metaDataURL
+      );
+      expect(nftAttributeRecords[2].metaDataURL).equal(
+        attributes[2].metaDataURL
+      );
+      expect(nftAttributeRecords[0].requiredParticipateCount).equal(
+        attributes[0].requiredParticipateCount
+      );
+      expect(nftAttributeRecords[1].requiredParticipateCount).equal(
+        attributes[1].requiredParticipateCount
+      );
+      expect(nftAttributeRecords[2].requiredParticipateCount).equal(
+        attributes[2].requiredParticipateCount
+      );
+    });
+
+    it("get NFTAttributeRecords with limit", async () => {
+      const nftAttributeRecords = await mintNFT
+        .connect(organizer)
+        .getNFTAttributeRecordsByEventId(
+          1,
+          attributes[2].requiredParticipateCount,
+          0
+        );
+      expect(nftAttributeRecords.length).equal(2);
+      expect(nftAttributeRecords[0].metaDataURL).equal(
+        attributes[0].metaDataURL
+      );
+      expect(nftAttributeRecords[1].metaDataURL).equal(
+        attributes[1].metaDataURL
+      );
+      expect(nftAttributeRecords[0].requiredParticipateCount).equal(
+        attributes[0].requiredParticipateCount
+      );
+      expect(nftAttributeRecords[1].requiredParticipateCount).equal(
+        attributes[1].requiredParticipateCount
+      );
+    });
+
+    it("get NFTAttributeRecords with limit and offset", async () => {
+      const nftAttributeRecords = await mintNFT
+        .connect(organizer)
+        .getNFTAttributeRecordsByEventId(
+          1,
+          attributes[2].requiredParticipateCount + 1,
+          attributes[1].requiredParticipateCount
+        );
+      expect(nftAttributeRecords.length).equal(2);
+      expect(nftAttributeRecords[0].metaDataURL).equal(
+        attributes[1].metaDataURL
+      );
+      expect(nftAttributeRecords[1].metaDataURL).equal(
+        attributes[2].metaDataURL
+      );
+      expect(nftAttributeRecords[0].requiredParticipateCount).equal(
+        attributes[1].requiredParticipateCount
+      );
+      expect(nftAttributeRecords[1].requiredParticipateCount).equal(
+        attributes[2].requiredParticipateCount
+      );
     });
   });
 
