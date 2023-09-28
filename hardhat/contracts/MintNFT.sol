@@ -248,9 +248,10 @@ contract MintNFT is
             _limit
         );
 
+        uint256 limitWithOffset = _limit + _offset;
         uint256 count;
 
-        for (uint256 i = _offset; i < _limit; i++) {
+        for (uint256 i = _offset; i < limitWithOffset; i++) {
             string memory ipfsUrl = eventNftAttributes[
                 Hashing.hashingDoubleUint256(_eventId, i)
             ];
