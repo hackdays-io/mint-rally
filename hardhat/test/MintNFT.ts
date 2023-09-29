@@ -547,6 +547,58 @@ describe("nft revolution", () => {
   });
 });
 
+describe("bulk mint by event owner", () => {
+  let mintNFT: MintNFT;
+  let eventManager: EventManager;
+
+  let createdGroupId: number;
+  let createdEventIds: number[] = [];
+
+  let organizer: SignerWithAddress;
+  let participant1: SignerWithAddress;
+  let participant2: SignerWithAddress;
+  let relayer: SignerWithAddress;
+
+  let usedProofCalldata!: any;
+
+  before(async () => {
+    [organizer, participant1, participant2, relayer] =
+      await ethers.getSigners();
+
+    // generate proof
+    const { publicInputCalldata } = await generateProof();
+
+    [, mintNFT, eventManager] = await deployAll(relayer);
+
+    // Create a Group and an Event
+    await createGroup(eventManager, "First Group");
+    const groupsList = await eventManager.getGroups();
+    createdGroupId = groupsList[0].groupId.toNumber();
+    await createEventRecord(eventManager, {
+      groupId: createdGroupId,
+      name: "event1",
+      description: "event1 description",
+      date: "2022-07-3O",
+      mintLimit: 10,
+      useMtx: false,
+      secretPhrase: publicInputCalldata[0],
+      eventNFTAttributes: attributes,
+    });
+
+    const eventsList = await eventManager.getEventRecords(0, 0);
+    createdEventIds = eventsList.map((event) => event.eventRecordId.toNumber());
+  });
+  it("drop NFTs by event owner", async () => {
+    const mintTxn = await mintNFT
+      .connect(organizer)
+      .dropNFTs(createdGroupId, createdEventIds[0], [
+        participant1.address,
+        participant2.address,
+      ]);
+    await mintTxn.wait();
+  });
+});
+
 describe("mint locked flag", () => {
   let mintNFT: MintNFT;
   let eventManager: EventManager;
