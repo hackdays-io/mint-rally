@@ -248,6 +248,11 @@ contract MintNFT is
             _limit
         );
 
+        require(
+            _offset <= type(uint256).max - _limit,
+            "limit + offset must be <= 2^256 - 1"
+        );
+
         uint256 limitWithOffset = _limit + _offset;
         uint256 count;
 
