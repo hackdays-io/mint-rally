@@ -360,6 +360,14 @@ describe("MintNFT", function () {
       ).to.be.revertedWith("limit is too large");
     });
 
+    it("should revert if limit + offset is over flow", async () => {
+      await expect(
+        mintNFT
+          .connect(organizer)
+          .getNFTAttributeRecordsByEventId(1, 100, ethers.constants.MaxUint256)
+      ).to.be.revertedWith("limit + offset must be <= 2^256 - 1");
+    });
+
     it("get NFTAttributeRecords by event id", async () => {
       const nftAttributeRecords = await mintNFT
         .connect(organizer)
