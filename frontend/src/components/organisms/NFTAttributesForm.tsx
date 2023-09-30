@@ -14,7 +14,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { FC } from "react";
-import { Controller, Control, UseFieldArrayRemove } from "react-hook-form";
+import { Controller, Control, FieldArray, UseFieldArrayRemove } from "react-hook-form";
 import { useLocale } from "../../hooks/useLocale";
 import ErrorMessage from "../atoms/form/ErrorMessage";
 import ImageSelectorWithPreview from "../ImageSelectorWithPreview";
@@ -24,11 +24,12 @@ import ordinal from "ordinal";
 type Props = {
   control: Control<any, any>;
   nfts: NFT.NFTImage[];
+  fields: FieldArray<NFT.NFTImage[]>;
   append: (v: any) => void;
   remove: UseFieldArrayRemove;
 };
 
-const NFTAttributesForm: FC<Props> = ({ control, nfts, append, remove }) => {
+const NFTAttributesForm: FC<Props> = ({ control, nfts, fields, append, remove }) => {
   const { t, locale } = useLocale();
 
   const validateUniqRequiredParticipateCount = (v: number) => {
@@ -56,9 +57,9 @@ const NFTAttributesForm: FC<Props> = ({ control, nfts, append, remove }) => {
 
   return (
     <Box>
-      {nfts.map((nft, index) => (
+      {fields.map((nft: NFT.NFTImage, index: number) => (
         <Flex
-          key={index}
+          key={nft.name}
           w="full"
           flexDirection={{ base: "column", md: "row" }}
           mb={10}
@@ -221,7 +222,10 @@ const NFTAttributesForm: FC<Props> = ({ control, nfts, append, remove }) => {
               borderRadius="full"
               aria-label=""
               icon={<Icon as={CloseIcon} color="mint.primary" />}
-              onClick={() => remove(index)}
+              onClick={() => {
+                console.log(index)
+                remove(index)
+              }}
             />
           )}
         </Flex>
