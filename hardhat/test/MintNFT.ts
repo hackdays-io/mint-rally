@@ -348,41 +348,6 @@ describe("MintNFT", function () {
   });
 
   describe("getNFTAttributeRecordsByEventId", () => {
-    let mintNFT: MintNFT;
-    let eventManager: EventManager;
-
-    let createdGroupId1: number;
-
-    let organizer: SignerWithAddress;
-    let participant1: SignerWithAddress;
-    let relayer: SignerWithAddress;
-
-    before(async () => {
-      [organizer, participant1, relayer] = await ethers.getSigners();
-
-      // generate proof
-      const { publicInputCalldata } = await generateProof();
-
-      // Deploy all contracts
-      [, mintNFT, eventManager] = await deployAll(relayer);
-
-      // Create a Group and an Event
-      await createGroup(eventManager, "First Group");
-      const groupsList = await eventManager.getGroups();
-      createdGroupId1 = groupsList[0].groupId.toNumber();
-
-      await createEventRecord(eventManager, {
-        groupId: createdGroupId1,
-        name: "event1",
-        description: "event1 description",
-        date: "2022-07-3O",
-        mintLimit: 10,
-        useMtx: false,
-        secretPhrase: publicInputCalldata[0],
-        eventNFTAttributes: attributes,
-      });
-    });
-
     it("should revert if msg.sender is not group owner", async () => {
       await expect(
         mintNFT.connect(participant1).getNFTAttributeRecordsByEventId(1, 100, 0)
