@@ -12,6 +12,7 @@ import {
   Link,
   Spacer,
   useDisclosure,
+  useMediaQuery,
 } from "@chakra-ui/react";
 import {
   ConnectWallet,
@@ -34,6 +35,8 @@ const Navbar = () => {
   const disconnectWallet = useDisconnect();
   const requiredChainId = +process.env.NEXT_PUBLIC_CHAIN_ID!;
   const { t } = useLocale();
+
+  const [isConnectWalletCompact] = useMediaQuery("(max-width: 768px)");
 
   const switchChain = useSwitchChain();
 
@@ -74,6 +77,15 @@ const Navbar = () => {
             theme="light"
             btnTitle={t.SIGN_IN}
             style={{ fontWeight: "bold", backgroundColor: "#562406" }}
+            switchToActiveChain={true}
+            modalTitleIconUrl=""
+            modalTitle={t.SIGN_IN}
+            modalSize={isConnectWalletCompact ? "compact" : "wide"}
+            welcomeScreen={{
+              title: "ようこそ",
+              subtitle: "記念NFTで思い出をのこしましょう！",
+              img: { src: "/images/logo.svg", width: 200, height: 75 },
+            }}
           />
         )}
         {address && (

@@ -26,6 +26,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       <ThirdwebProvider
         activeChain={activeChain}
         supportedWallets={supportedWallets}
+        clientId={process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID!}
       >
         <ChakraProvider theme={chakraTheme}>
           <Layout>

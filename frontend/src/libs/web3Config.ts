@@ -19,7 +19,6 @@ export const useWeb3WalletConfig = () => {
       apiKey: process.env.NEXT_PUBLIC_MAGIC_LINK_KEY!,
       magicSdkConfiguration: {
         locale: locale === "ja" ? "ja" : "en",
-        network: activeChain as any,
       },
       smsLogin: false,
     });
@@ -34,11 +33,11 @@ export const useWeb3WalletConfig = () => {
     return s_config;
   }, []);
 
-  const supportedWallets = [
-    metamaskWallet(),
-    safeWalletConfig,
-    magicLinkConfig,
-  ];
+  const metamaskConfig = useMemo(() => {
+    return metamaskWallet();
+  }, []);
+
+  const supportedWallets = [metamaskConfig, safeWalletConfig, magicLinkConfig];
 
   return { magicLinkConfig, supportedWallets };
 };
