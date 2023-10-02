@@ -81,12 +81,12 @@ contract MintNFT is
         _;
     }
 
-    // Currently, reinitializer(5) was executed as constructor.
+    // Currently, reinitializer(4) was executed as constructor.
     function initialize(
         MinimalForwarderUpgradeable trustedForwarder,
         address _secretPhraseVerifierAddr,
         address _operationControllerAddr
-    ) public reinitializer(5) {
+    ) public reinitializer(4) {
         __ERC721_init("MintRally", "MR");
         __Ownable_init();
         __ERC2771Context_init(address(trustedForwarder));
