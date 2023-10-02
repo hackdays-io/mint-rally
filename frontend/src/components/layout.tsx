@@ -3,6 +3,7 @@ import Navbar from "./navbar";
 import Footer from "./footer";
 import { Box, Grid } from "@chakra-ui/react";
 import MyHead from "./atoms/MyHead";
+import { Maintenance } from "./organisms/Maintenance";
 
 type Props = {
   children: ReactNode;
@@ -20,6 +21,7 @@ const Layout = ({ children }: Props) => (
       <Box>{children}</Box>
       <Footer />
     </Grid>
+    <Maintenance />
   </>
 );
 export default Layout;
