@@ -113,7 +113,7 @@ contract EventManager is OwnableUpgradeable {
         setRelayerAddr(_relayerAddr);
         setMtxPrice(_mtxPrice);
         setMaxMintLimit(_maxMintLimit);
-        setOperationControllerAddr(_operationControllerAddr);
+        operationControllerAddr = _operationControllerAddr;
     }
 
     function createGroup(string memory _name) external whenNotPaused {
