@@ -1,7 +1,12 @@
 import { expect } from "chai";
 import { ethers, upgrades } from "hardhat";
-// eslint-disable-next-line node/no-missing-import
-import { MintNFT, EventManager, SecretPhraseVerifier } from "../typechain";
+import {
+  MintNFT,
+  EventManager,
+  SecretPhraseVerifier,
+  OperationController,
+  // eslint-disable-next-line node/no-missing-import
+} from "../typechain";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 // eslint-disable-next-line node/no-missing-import
 import { generateProof, wrongProofCalldata } from "./helper/secret_phrase";
@@ -34,17 +39,36 @@ const deploySecretPhraseVerifier = async () => {
   return await SecretPhraseVerifierFactory.deploy();
 };
 /**
+ * deploy operationController
+ * @returns deployed operationController
+ */
+const deployOperationController = async () => {
+  const OperationControllerFactory = await ethers.getContractFactory(
+    "OperationController"
+  );
+  const deployedOperationController: any = await upgrades.deployProxy(
+    OperationControllerFactory,
+    { initializer: "initialize" }
+  );
+  return deployedOperationController.deployed();
+};
+/**
  * deploy mintNFT
  * @param secretPhraseVerifier
+ * @param operationController
  * @returns deployed mintNFT
  */
-const deployMintNFT = async (secretPhraseVerifier: SecretPhraseVerifier) => {
+const deployMintNFT = async (
+  secretPhraseVerifier: SecretPhraseVerifier,
+  operationController: OperationController
+) => {
   const MintNFTFactory = await ethers.getContractFactory("MintNFT");
   const deployedMintNFT: any = await upgrades.deployProxy(
     MintNFTFactory,
     [
       "0xdCb93093424447bF4FE9Df869750950922F1E30B",
       secretPhraseVerifier.address,
+      operationController.address,
     ],
     {
       initializer: "initialize",
@@ -53,15 +77,19 @@ const deployMintNFT = async (secretPhraseVerifier: SecretPhraseVerifier) => {
   return deployedMintNFT.deployed();
 };
 /**
- * deploy evetManager
+ * deploy eventManager
  * @param relayer address
+ * @param operationController
  * @returns deployed eventManager
  */
-const deployEventManager = async (relayer: SignerWithAddress) => {
+const deployEventManager = async (
+  relayer: SignerWithAddress,
+  operationController: OperationController
+) => {
   const EventManager = await ethers.getContractFactory("EventManager");
   const deployedEventManager: any = await upgrades.deployProxy(
     EventManager,
-    [relayer.address, 250000, 1000000],
+    [relayer.address, 250000, 1000000, operationController.address],
     {
       initializer: "initialize",
     }
@@ -75,11 +103,15 @@ const deployEventManager = async (relayer: SignerWithAddress) => {
  */
 const deployAll = async (relayer: SignerWithAddress) => {
   const secretPhraseVerifier = await deploySecretPhraseVerifier();
-  const mintNFT = await deployMintNFT(secretPhraseVerifier);
-  const eventManager = await deployEventManager(relayer);
+  const operationController = await deployOperationController();
+  const mintNFT = await deployMintNFT(
+    secretPhraseVerifier,
+    operationController
+  );
+  const eventManager = await deployEventManager(relayer, operationController);
   await mintNFT.setEventManagerAddr(eventManager.address);
   await eventManager.setMintNFTAddr(mintNFT.address);
-  return [secretPhraseVerifier, mintNFT, eventManager];
+  return [secretPhraseVerifier, mintNFT, eventManager, operationController];
 };
 type eventGroupParams = {
   groupId: BigNumberish;
@@ -127,6 +159,7 @@ const createEventRecord = async (
 describe("MintNFT", function () {
   let mintNFT: MintNFT;
   let eventManager: EventManager;
+  let operationController: OperationController;
 
   let createdGroupId: number;
   const createdEventIds: number[] = [];
@@ -134,14 +167,16 @@ describe("MintNFT", function () {
   let organizer: SignerWithAddress;
   let participant1: SignerWithAddress;
   let relayer: SignerWithAddress;
+  let participant2: SignerWithAddress;
 
   before(async () => {
-    [organizer, participant1, relayer] = await ethers.getSigners();
+    [organizer, participant1, relayer, participant2] =
+      await ethers.getSigners();
 
     // generate proof
     const { publicInputCalldata } = await generateProof();
     // Deploy all contracts
-    [, mintNFT, eventManager] = await deployAll(relayer);
+    [, mintNFT, eventManager, operationController] = await deployAll(relayer);
     // Create a Group and an Event
     await createGroup(eventManager, "First Group");
     const groupsList = await eventManager.getGroups();
@@ -184,6 +219,40 @@ describe("MintNFT", function () {
           .connect(participant1)
           .mintParticipateNFT(createdGroupId, createdEventIds[0], proofCalldata)
       ).to.be.revertedWith("mint is locked");
+      await mintNFT
+        .connect(organizer)
+        .changeMintLocked(createdEventIds[0], false);
+    });
+
+    it("fail to mint when paused", async () => {
+      const { proofCalldata } = await generateProof();
+      await operationController.pause();
+      await expect(
+        mintNFT
+          .connect(participant1)
+          .mintParticipateNFT(createdGroupId, createdEventIds[0], proofCalldata)
+      ).to.be.reverted;
+      await operationController.unpause();
+    });
+  });
+
+  describe("burn", () => {
+    it("success to burn", async () => {
+      const { proofCalldata } = await generateProof();
+      const mintNftTxn = await mintNFT
+        .connect(participant2)
+        .mintParticipateNFT(createdGroupId, createdEventIds[0], proofCalldata);
+      await mintNftTxn.wait();
+
+      expect(await mintNFT.balanceOf(participant2.address)).equal(1);
+
+      const tokenId = await mintNFT.tokenOfOwnerByIndex(
+        participant2.address,
+        0
+      );
+
+      await mintNFT.connect(organizer).burn(tokenId);
+      expect(await mintNFT.balanceOf(participant2.address)).equal(0);
     });
   });
 
@@ -481,6 +550,7 @@ describe("nft revolution", () => {
 describe("mint locked flag", () => {
   let mintNFT: MintNFT;
   let eventManager: EventManager;
+  let operationController: OperationController;
 
   let createdGroupId: number;
   const createdEventIds: number[] = [];
@@ -491,7 +561,7 @@ describe("mint locked flag", () => {
 
   before(async () => {
     [organizer, participant1, relayer] = await ethers.getSigners();
-    [, mintNFT, eventManager] = await deployAll(relayer);
+    [, mintNFT, eventManager, operationController] = await deployAll(relayer);
 
     // Create a Group and an Event
     await createGroup(eventManager, "First Group", organizer);
@@ -532,11 +602,19 @@ describe("mint locked flag", () => {
       mintNFT.connect(participant1).changeMintLocked(1, false)
     ).to.be.revertedWith("you are not event group owner");
   });
+
+  it("should not change if paused", async () => {
+    await operationController.connect(organizer).pause();
+    await expect(mintNFT.connect(organizer).changeMintLocked(1, false)).to.be
+      .reverted;
+    await operationController.connect(organizer).unpause();
+  });
 });
 
 describe("reset secret phrase", () => {
   let mintNFT: MintNFT;
   let eventManager: EventManager;
+  let operationController: OperationController;
 
   let createdGroupId: number;
   const createdEventIds: number[] = [];
@@ -550,7 +628,7 @@ describe("reset secret phrase", () => {
   before(async () => {
     [organizer, participant1, relayer] = await ethers.getSigners();
     // deploy all contracts
-    [, mintNFT, eventManager] = await deployAll(relayer);
+    [, mintNFT, eventManager, operationController] = await deployAll(relayer);
     // generate proof
     const { publicInputCalldata } = await generateProof();
     correctProofCalldata = publicInputCalldata[0];
@@ -591,5 +669,15 @@ describe("reset secret phrase", () => {
     await expect(
       mintNFT.connect(participant1).resetSecretPhrase(1, newProofCalldata)
     ).to.be.revertedWith("you are not event group owner");
+  });
+
+  it("cannot change if paused", async () => {
+    const newProofCalldata =
+      "0x1f376ca3150d51a164c711287cff6e77e2127d635a1534b41d5624472f000000";
+    await operationController.connect(organizer).pause();
+    await expect(
+      mintNFT.connect(organizer).resetSecretPhrase(1, newProofCalldata)
+    ).to.be.reverted;
+    await operationController.connect(organizer).unpause();
   });
 });

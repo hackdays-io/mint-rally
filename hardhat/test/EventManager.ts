@@ -2,8 +2,13 @@ import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { expect } from "chai";
 import { BigNumber } from "ethers";
 import { ethers, upgrades } from "hardhat";
-// eslint-disable-next-line node/no-missing-import
-import { EventManager, MintNFT, SecretPhraseVerifier } from "../typechain";
+import {
+  EventManager,
+  MintNFT,
+  OperationController,
+  SecretPhraseVerifier,
+  // eslint-disable-next-line node/no-missing-import
+} from "../typechain";
 // eslint-disable-next-line node/no-missing-import
 import { generateProof } from "./helper/secret_phrase";
 
@@ -26,6 +31,7 @@ const attributes = [
 describe("EventManager", function () {
   let mintNFT: MintNFT;
   let secretPhraseVerifier: SecretPhraseVerifier;
+  let operationController: OperationController;
   let organizer: SignerWithAddress;
   let participant1: SignerWithAddress;
   let relayer: SignerWithAddress;
@@ -36,12 +42,22 @@ describe("EventManager", function () {
       "SecretPhraseVerifier"
     );
     secretPhraseVerifier = await SecretPhraseVerifierFactory.deploy();
+    const OperationControllerFactory = await ethers.getContractFactory(
+      "OperationController"
+    );
+    const deployedOperationController: any = await upgrades.deployProxy(
+      OperationControllerFactory,
+      { initializer: "initialize" }
+    );
+    operationController = deployedOperationController;
+    await operationController.deployed();
     const MintNFTFactory = await ethers.getContractFactory("MintNFT");
     const deployedMintNFT: any = await upgrades.deployProxy(
       MintNFTFactory,
       [
         "0xdCb93093424447bF4FE9Df869750950922F1E30B",
         secretPhraseVerifier.address,
+        operationController.address,
       ],
       {
         initializer: "initialize",
@@ -60,7 +76,7 @@ describe("EventManager", function () {
       );
       const deployedEventManagerContract: any = await upgrades.deployProxy(
         eventManagerContractFactory,
-        [relayer.address, 250000, 1000000],
+        [relayer.address, 250000, 1000000, operationController.address],
         {
           initializer: "initialize",
         }
@@ -79,6 +95,13 @@ describe("EventManager", function () {
       const groupsBeforeCreate = await eventManager.getGroups();
       expect(groupsBeforeCreate.length).to.equal(0);
 
+      // revert if paused
+      await operationController.connect(organizer).pause();
+      await expect(eventManager.createGroup("group1")).to.be.revertedWith(
+        "Paused"
+      );
+      await operationController.connect(organizer).unpause();
+
       const txn1 = await eventManager.createGroup("group1");
       await txn1.wait();
       const groupsAfterCreate = await eventManager.getGroups();
@@ -87,6 +110,23 @@ describe("EventManager", function () {
 
       const eventRecordsBeforeCreate = await eventManager.getEventRecords(0, 0);
       expect(eventRecordsBeforeCreate.length).to.equal(0);
+
+      // revert if paused
+      await operationController.connect(organizer).pause();
+      await expect(
+        eventManager.createEventRecord(
+          groupsAfterCreate[0].groupId.toNumber(),
+          "event-1",
+          "event-1 description",
+          "2022-07-3O",
+          100,
+          false,
+          publicInputCalldata[0],
+          attributes
+        )
+      ).to.be.revertedWith("Paused");
+
+      await operationController.connect(organizer).unpause();
 
       const txn2 = await eventManager.createEventRecord(
         groupsAfterCreate[0].groupId.toNumber(),
@@ -238,7 +278,7 @@ describe("EventManager", function () {
       );
       const deployedEventManagerContract: any = await upgrades.deployProxy(
         eventManagerContractFactory,
-        [relayer.address, 500000, 1000000],
+        [relayer.address, 500000, 1000000, operationController.address],
         {
           initializer: "initialize",
         }
@@ -288,7 +328,7 @@ describe("EventManager", function () {
       );
       const deployedEventManagerContract: any = await upgrades.deployProxy(
         eventManagerContractFactory,
-        [relayer.address, 250000, 1000000],
+        [relayer.address, 250000, 1000000, operationController.address],
         {
           initializer: "initialize",
         }
