@@ -1,6 +1,7 @@
 import { Box, Heading, Text, Container, Spinner } from "@chakra-ui/react";
 import { FC } from "react";
 import ENSName from "src/components/atoms/web3/ENSName";
+import { ShareButtons } from "src/components/atoms/users/ShareButtons";
 import { GroupedCollection } from "src/components/organisms/nft/GroupedCollection";
 import {
   useGetOwnedNFTByAddress,
@@ -21,6 +22,11 @@ export const UserEntity: FC<{ address: string }> = ({ address }) => {
         <Text fontSize="lg" wordBreak="break-all">
           <ENSName address={address} enableEtherScanLink />
         </Text>
+        <ShareButtons
+          address={address}
+          twitter
+          facebook
+        />
 
         {isLoading ? (
           <Spinner />
