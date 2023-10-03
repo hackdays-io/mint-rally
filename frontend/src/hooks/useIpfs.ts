@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ipfsUploader } from "src/libs/libIpfs";
 import { NFT } from "types/NFT";
+import { v4 as uuidv4 } from "uuid";
 
 export interface NFTAttribute {
   requiredParticipateCount: number;
@@ -65,7 +66,7 @@ export const useIpfs = () => {
       }
       const metaDataRootCid = await uploader.uploadMetadataFilesToIpfs(
         metadataFiles,
-        encodeURI(`${groupId}-${eventName}`)
+        uuidv4()
       );
       setLoading(false);
       setNftAttributes(
