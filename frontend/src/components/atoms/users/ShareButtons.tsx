@@ -40,7 +40,7 @@ export const ShareButtons: FC<Props> = ({
       {/* {twitter && (
         <TwitterShareButton
           url={shareUrl}
-          title={`Check out my NFT on MintRally!`}
+          title={`Check out my NFT Collection on MintRally!`}
           hashtags={["MintRally"]}
           style={{ marginRight: "5px" }}
         >
@@ -52,7 +52,7 @@ export const ShareButtons: FC<Props> = ({
       {twitter && (
         <TwitterShareButton
           url={shareUrl}
-          title={`Check out my NFT on MintRally!`}
+          title={`Check out my NFT Collection on MintRally!`}
           hashtags={["MintRally"]}
           style={{ marginRight: "8px" }}
         >
@@ -63,7 +63,7 @@ export const ShareButtons: FC<Props> = ({
       {facebook && (
         <FacebookShareButton
           url={shareUrl}
-          quote={`Check out my NFT on MintRally!`}
+          quote={`Check out my NFT Collection on MintRally!`}
           hashtag="#MintRally"
         >
           <FacebookIcon size={32} round />
