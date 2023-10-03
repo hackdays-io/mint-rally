@@ -1,24 +1,21 @@
-import { ethers, upgrades, network } from "hardhat";
+import { network } from "hardhat";
+import { upgradeEventManager, upgradeMintNFT } from "../../helper/upgrade";
 
 async function main() {
   if (network.name !== "polygon") throw new Error("wrong network");
 
-  const MintNFTFactory = await ethers.getContractFactory("MintNFT");
-  const deployedMintNFT: any = await upgrades.upgradeProxy(
-    process.env.POLYGON_MINTNFT_ADDRESS!,
-    MintNFTFactory
-  );
-  await deployedMintNFT.deployed();
+  await upgradeMintNFT([
+    process.env.POLYGON_FOWARDER_ADDRESS,
+    process.env.POLYGON_SECRETPHRASE_VERIFIER_ADDRESS,
+    process.env.POLYGON_OPERATION_CONTROLLER_ADDRESS,
+  ]);
 
-  // // const EventManagerFactory = await ethers.getContractFactory("EventManager");
-  // // const deployedEventManager: any = await upgrades.upgradeProxy(
-  // //   process.env.POLYGON_EVENTMANAGER_ADDRESS!,
-  // //   EventManagerFactory
-  // // );
-  // // await deployedEventManager.deployed();
-
-  console.log("mintNFT address:", deployedMintNFT.address);
-  // // console.log("eventManager address:", deployedEventManager.address);
+  await upgradeEventManager([
+    process.env.POLYGON_RELAYER_ADDRESS,
+    250000,
+    1000000,
+    process.env.POLYGON_OPERATION_CONTROLLER_ADDRESS,
+  ]);
 }
 
 main().catch((error) => {

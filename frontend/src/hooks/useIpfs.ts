@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ipfsUploader } from "src/libs/libIpfs";
 import { NFT } from "types/NFT";
+import { v4 as uuid } from "uuid";
 
 export interface NFTAttribute {
   requiredParticipateCount: number;
@@ -40,6 +41,8 @@ export const useIpfs = () => {
           })
         );
         baseNftAttributes = nftAttributes.concat(baseNftAttributes);
+      } else {
+        throw new Error("Failed to upload NFT files to IPFS");
       }
 
       const metadataFiles: File[] = [];
@@ -65,8 +68,11 @@ export const useIpfs = () => {
       }
       const metaDataRootCid = await uploader.uploadMetadataFilesToIpfs(
         metadataFiles,
-        encodeURI(`${groupId}-${eventName}`)
+        `${groupId}-${uuid()}`
       );
+      if (!metaDataRootCid) {
+        throw new Error("Failed to upload metadata files to IPFS");
+      }
       setLoading(false);
       setNftAttributes(
         baseNftAttributes.map((attribute) => {

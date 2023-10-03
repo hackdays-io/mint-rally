@@ -3,80 +3,47 @@
 //
 // When running the script with `npx hardhat run <script>` you'll find the Hardhat
 // Runtime Environment's members available in the global scope.
-import { writeFileSync } from "fs";
-import { ethers, upgrades } from "hardhat";
 import {
-  MintNFT,
-  EventManager,
-  SecretPhraseVerifier,
-  OperationController,
-} from "../typechain";
+  deployEventManager,
+  deployForwarder,
+  deployMintNFT,
+  deployOperationController,
+  deploySecretPhraseVerifier,
+} from "./helper/deploy";
 
 async function main() {
-  let mintNFT: MintNFT;
-  let eventManager: EventManager;
-  let secretPhraseVerifier: SecretPhraseVerifier;
-  let operationController: OperationController;
+  const forwarder = await deployForwarder();
+  const secretPhraseVerifier = await deploySecretPhraseVerifier();
+  const operationController = await deployOperationController();
 
-  const ForwarderFactory = await ethers.getContractFactory(
-    "MintRallyForwarder"
-  );
-  const forwarder = await ForwarderFactory.deploy();
-  await forwarder.deployed();
+  const mintNFT = await deployMintNFT({
+    forwarderAddress: forwarder.address,
+    secretPhraseVerifierAddress: secretPhraseVerifier.address,
+    operationControllerAddress: operationController.address,
+  });
 
-  const SecretPhraseVerifierFactory = await ethers.getContractFactory(
-    "SecretPhraseVerifier"
-  );
-  secretPhraseVerifier = await SecretPhraseVerifierFactory.deploy();
-  await secretPhraseVerifier.deployed();
-
-  const OperationControllerFactory = await await ethers.getContractFactory(
-    "OperationController"
-  );
-  operationController = await OperationControllerFactory.deploy();
-  await operationController.deployed();
-
-  const MintNFTFactory = await ethers.getContractFactory("MintNFT");
-  const deployedMintNFT: any = await upgrades.deployProxy(
-    MintNFTFactory,
-    [
-      forwarder.address,
-      secretPhraseVerifier.address,
-      operationController.address,
-    ],
-    {
-      initializer: "initialize",
-    }
-  );
-  mintNFT = deployedMintNFT;
-  await mintNFT.deployed();
-
-  const EventManagerFactory = await ethers.getContractFactory("EventManager");
-  const deployedEventManager: any = await upgrades.deployProxy(
-    EventManagerFactory,
-    [
-      process.env.LOCAL_RELAYER_ADDRESS,
-      250000,
-      1000000,
-      operationController.address,
-    ],
-    {
-      initializer: "initialize",
-    }
-  );
-  eventManager = deployedEventManager;
-  await eventManager.deployed();
+  const eventManager = await deployEventManager({
+    mtxPrice: 500000,
+    maxMintLimit: 1000000,
+    operationControllerAddress: operationController.address,
+  });
 
   await mintNFT.setEventManagerAddr(eventManager.address);
   await eventManager.setMintNFTAddr(mintNFT.address);
 
-  console.log("forwarder address:", forwarder.address);
-  console.log("secretPhraseVerifier address:", secretPhraseVerifier.address);
-  console.log("operationController address:", operationController.address);
-  console.log("mintNFT address:", mintNFT.address);
-  console.log("eventManager address:", eventManager.address, "\n");
-  console.log("----------\nFor frontEnd\n----------");
-  console.log(`NEXT_PUBLIC_FORWARDER_ADDRESS=${forwarder.address}`);
+  console.log("----------\nFor Contract env\n----------");
+  console.log(`LOCAL_FORWARDER_ADDRESS=${forwarder.address}`);
+  console.log(
+    `LOCAL_SECRETPHRASE_VERIFIER_ADDRESS=${secretPhraseVerifier.address}`
+  );
+  console.log(
+    `LOCAL_OPERATION_CONTROLLER_ADDRESS=${operationController.address}`
+  );
+  console.log(`LOCAL_MINTNFT_ADDRESS=${mintNFT.address}`);
+  console.log(`LOCAL_EVENTMANAGER_ADDRESS=${eventManager.address}`);
+
+  console.log("----------\nFor Frontend env\n----------");
+  console.log(`NEXT_PUBLIC_CONTRACT_FORWARDER_ADDRESS=${forwarder.address}`);
   console.log(
     `NEXT_PUBLIC_CONTRACT_SECRET_PHRASE_VERIFIER=${secretPhraseVerifier.address}`
   );
