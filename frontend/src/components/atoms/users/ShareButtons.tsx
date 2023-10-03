@@ -34,9 +34,6 @@ export const ShareButtons: FC<Props> = ({
 
   return (
     <Flex alignItems="center">
-      <Text mb={1} mr={5}>
-        Share on
-      </Text>
       {/* {twitter && (
         <TwitterShareButton
           url={shareUrl}
