@@ -53,7 +53,7 @@ export const ShareButtons: FC<Props> = ({
           hashtags={["MintRally"]}
           style={{ marginRight: "8px" }}
         >
-          <XIcon color="black" />
+          <XIcon color="black" maxWidth="18px" />
         </TwitterShareButton>
       )}
 
@@ -63,7 +63,7 @@ export const ShareButtons: FC<Props> = ({
           quote={`Check out my NFT Collection on MintRally!`}
           hashtag="#MintRally"
         >
-          <FacebookIcon size={32} round />
+          <FacebookIcon size={24} round />
         </FacebookShareButton>
       )}
       <Icon
@@ -72,7 +72,7 @@ export const ShareButtons: FC<Props> = ({
         w={6}
         h={6}
         color="green.500"
-        size="lg"
+        boxSize={5}
         mx={2}
         cursor="pointer"
       />
