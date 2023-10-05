@@ -57,6 +57,9 @@ export default {
   EVENT_SECRETPHRASE_DESC:
     "ひみつの「あいことば」は忘れないようにしてください。あとから確認することはできません。",
   EVENT_DISTRIBUTED_NFT: "イベントで配布されるNFT",
+  SELECT_PAST_EVENT_TO_COPY:
+    "過去のイベント詳細をコピーしたい場合は、選択してボタンを押してください。",
+  COPY: "コピーする",
   // Event page
   SIGN_IN_TO_GET_NFT: "NFTをGetしよう！",
   SELECT_WALLET: "NFTの取得方法を選択してください",

@@ -56,6 +56,9 @@ export default {
   EVENT_SECRETPHRASE_DESC:
     "Please do not forget this phrase. you can't get this phrase after submitting",
   EVENT_DISTRIBUTED_NFT: "NFTs to be distributed at the event",
+  SELECT_PAST_EVENT_TO_COPY:
+    "To copy past event details, select it and press the button.",
+  COPY: "Copy",
   // Event page
   SIGN_IN_TO_GET_NFT: "Sign in to get NFT!",
   GET_NFT_USING_METAMASK: "Get NFT with Metamask",

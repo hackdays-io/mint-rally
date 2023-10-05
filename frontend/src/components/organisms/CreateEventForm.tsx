@@ -26,11 +26,13 @@ import {
   useCalcMtxGasFee,
   useCreateEvent,
   useOwnEventGroups,
+  useEventsByGroupId,
 } from "src/hooks/useEvent";
 import { Event } from "types/Event";
 import { NFT } from "types/NFT";
 import { formatEther } from "ethers/lib/utils";
 import { useRouter } from "next/router";
+import EventCard from "../atoms/events/EventCard";
 
 type Props = {
   address: string;
@@ -59,6 +61,7 @@ const CreateEventForm: FC<Props> = ({ address }) => {
     saveNFTMetadataOnIPFS,
   } = useIpfs();
   const [formData, setFormData] = useState<EventFormData | null>(null);
+  const [copiedPastEventId, setCopiedPastEventId] = useState<number | null>(null);
   const router = useRouter();
   const {
     control,
@@ -92,6 +95,11 @@ const CreateEventForm: FC<Props> = ({ address }) => {
 
   // state for loading event groups
   const { groups, isLoading: isLoadingEventGroups } = useOwnEventGroups();
+  const {
+    events,
+    isLoading: eventLoading,
+    getEventsByGroupId,
+  } = useEventsByGroupId();
   const { createEvent, isCreating, createError, createStatus, createdEventId } =
     useCreateEvent(address);
 
@@ -135,6 +143,10 @@ const CreateEventForm: FC<Props> = ({ address }) => {
     }
   }, [router.query.group_id, groups]);
 
+  useEffect(() => {
+    getEventsByGroupId(Number(watch("eventGroupId")));
+  }, [watch("eventGroupId")]);
+
   const errorMessage = useMemo(() => {
     if (createError || errors) {
       return (createError || errors) as any;
@@ -144,6 +156,39 @@ const CreateEventForm: FC<Props> = ({ address }) => {
   const isLoading = useMemo(() => {
     if (isCreating || isUploadingMetadata) return true;
   }, [isCreating, isUploadingMetadata]);
+
+  const onGroupChange = useCallback(
+    (e: any) => {
+      const groupId = e.target.value;
+      setValue("eventGroupId", groupId);
+    }, [setValue]
+  );
+
+  const onCopyPastEventChange =
+    () => {
+      const foundEvent = events?.find((event: Event.EventRecord) => event.eventRecordId.toNumber() === copiedPastEventId);
+      if (foundEvent) {
+        setValue("eventName", foundEvent.name);
+        setValue("description", foundEvent.description);
+        const [startDateTime, endDateTime] = foundEvent.date.split('/');
+
+        const formatDateTime = (dateTime: string) => {
+          const localDateTime = new Date(dateTime);
+          const [date, time] = localDateTime.toLocaleString().split(' ');
+          const formattedDate = date.split('/').join('-');
+          const finalFormattedDate = `${formattedDate.split('-')[0]}-${parseInt(formattedDate.split('-')[1]).toString().padStart(2, '0')}-${parseInt(formattedDate.split('-')[2]).toString().padStart(2, '0')}`;
+          return { finalFormattedDate, time };
+        }
+
+        const { finalFormattedDate: startDate, time: startTime } = formatDateTime(startDateTime);
+        const { finalFormattedDate: endDate, time: endTime } = formatDateTime(endDateTime);
+
+        setValue("startDate", startDate);
+        setValue("startTime", startTime);
+        setValue("endDate", endDate);
+        setValue("endTime", endTime);
+      }
+    };
 
   const onStartDateChange = useCallback(
     (e: any) => {
@@ -194,12 +239,12 @@ const CreateEventForm: FC<Props> = ({ address }) => {
               control={control}
               {...register("eventGroupId")}
               name="eventGroupId"
-              render={({ field: { onChange, value } }) => (
+              render={({ field: { value } }) => (
                 <Select
                   id="eventGroupId"
                   placeholder="Please select event group"
                   value={value}
-                  onChange={onChange}
+                  onChange={onGroupChange}
                 >
                   {groups.map((item: Event.EventGroup) => {
                     return (
@@ -218,6 +263,24 @@ const CreateEventForm: FC<Props> = ({ address }) => {
 
           {watch("eventGroupId") ? (
             <>
+              <FormControl mb={5}>
+                <FormLabel htmlFor="pastEventIds">{t.SELECT_PAST_EVENT_TO_COPY}</FormLabel>
+                <Select
+                  placeholder="Select option"
+                  onChange={(e) => setCopiedPastEventId(Number(e.target.value))}
+                >
+                  {events?.map((event: Event.EventRecord) => (
+                    <option
+                      value={Number(event.eventRecordId)}
+                      key={Number(event.eventRecordId)}>
+                      {event.name}
+                    </option>
+                  ))}
+                </Select>
+                <Button mt={4} mb={4} onClick={onCopyPastEventChange}>
+                  {t.COPY}
+                </Button>
+              </FormControl>
               <FormControl mb={5}>
                 <FormLabel htmlFor="name">{t.EVENT_NAME}</FormLabel>
                 <Controller
@@ -503,7 +566,7 @@ const CreateEventForm: FC<Props> = ({ address }) => {
           ) : (
             <span>Please select event group first.</span>
           )}
-        </form>
+        </form >
       )}
     </>
   );
