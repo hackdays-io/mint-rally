@@ -8,10 +8,10 @@ import {
 } from "@chakra-ui/react";
 import { faArrowLeft, faEnvelope } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useConnect, useConnectionStatus } from "@thirdweb-dev/react";
+import { useConnectionStatus } from "@thirdweb-dev/react";
 import { FC, useState } from "react";
 import { useLocale } from "src/hooks/useLocale";
-import { chainId, useWeb3WalletConfig } from "src/libs/web3Config";
+import { useConnectMagic } from "src/hooks/useWallet";
 
 type Props = {
   selected: (selected: boolean) => void;
@@ -20,23 +20,13 @@ type Props = {
 
 const GetWithMagicLinkButton: FC<Props> = ({ selected, disabled }) => {
   const { t } = useLocale();
-  const { magicLinkConfig } = useWeb3WalletConfig();
-  const connect = useConnect();
   const connectionStatus = useConnectionStatus();
 
   const [isSelected, setSelected] = useState<boolean>(false);
   const [isNotValid, setIsNotValid] = useState<boolean>(true);
   const [enteredEmailAddress, setEnteredEmailAddress] = useState("");
-  const handleConnect = async () => {
-    try {
-      await connect(magicLinkConfig, {
-        email: enteredEmailAddress,
-        chainId: Number(chainId),
-      });
-    } catch (e) {
-      console.log(e);
-    }
-  };
+
+  const { handleConnect, isLoading } = useConnectMagic(enteredEmailAddress);
 
   return (
     <>
@@ -107,11 +97,13 @@ const GetWithMagicLinkButton: FC<Props> = ({ selected, disabled }) => {
               onClick={() => {
                 handleConnect();
               }}
-              isLoading={["connecting"].includes(connectionStatus)}
+              isLoading={isLoading || ["connecting"].includes(connectionStatus)}
               disabled={
                 ["unknown", "connecting", "connected"].includes(
                   connectionStatus
-                ) || isNotValid
+                ) ||
+                isLoading ||
+                isNotValid
               }
             >
               {t.CONNECT}

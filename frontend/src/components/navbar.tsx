@@ -9,13 +9,10 @@ import {
   DrawerOverlay,
   Flex,
   IconButton,
-  Link,
   Spacer,
   useDisclosure,
-  useMediaQuery,
 } from "@chakra-ui/react";
 import {
-  ConnectWallet,
   useAddress,
   useChainId,
   useDisconnect,
@@ -27,6 +24,8 @@ import router from "next/router";
 import Image from "next/image";
 import { useLocale } from "../hooks/useLocale";
 import LocaleSelector from "./atoms/LocaleSelector";
+import { ConnectWalletModal } from "./molecules/web3/ConnectWalletModal";
+import { useState } from "react";
 
 const Navbar = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -36,14 +35,16 @@ const Navbar = () => {
   const requiredChainId = +process.env.NEXT_PUBLIC_CHAIN_ID!;
   const { t } = useLocale();
 
-  const [isConnectWalletCompact] = useMediaQuery("(max-width: 768px)");
+  const [connecting, setConnecting] = useState<boolean>(false);
 
   const switchChain = useSwitchChain();
 
   const Login = () => {
     return (
       <Flex justifyContent="center" alignItems="center" mt={{ base: 5, md: 0 }}>
-        {address ? (
+        {!address || connecting ? (
+          <ConnectWalletModal setConnecting={setConnecting} />
+        ) : (
           <>
             {chainId !== requiredChainId ? (
               <Box pr={4}>
@@ -72,23 +73,8 @@ const Navbar = () => {
               {t.SIGN_OUT}
             </Button>
           </>
-        ) : (
-          <ConnectWallet
-            theme="light"
-            btnTitle={t.SIGN_IN}
-            style={{ fontWeight: "bold", backgroundColor: "#562406" }}
-            switchToActiveChain={true}
-            modalTitleIconUrl=""
-            modalTitle={t.SIGN_IN}
-            modalSize={isConnectWalletCompact ? "compact" : "wide"}
-            welcomeScreen={{
-              title: "ようこそ",
-              subtitle: "記念NFTで思い出をのこしましょう！",
-              img: { src: "/images/logo.svg", width: 200, height: 75 },
-            }}
-          />
         )}
-        {address && (
+        {address && !connecting && (
           <Box marginLeft={3} cursor="pointer">
             <NextLink href="/users/me">
               <a>

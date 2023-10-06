@@ -1,18 +1,10 @@
-import {
-  Button,
-  FormLabel,
-  HStack,
-  Img,
-  Input,
-  Spacer,
-  Stack,
-} from "@chakra-ui/react";
+import { Button, FormLabel, HStack, Input, Stack } from "@chakra-ui/react";
 import { faArrowLeft, faEnvelope } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useConnect, useConnectionStatus } from "@thirdweb-dev/react";
+import { useConnectionStatus } from "@thirdweb-dev/react";
 import { FC, useState } from "react";
 import { useLocale } from "src/hooks/useLocale";
-import { chainId, useWeb3WalletConfig } from "src/libs/web3Config";
+import { useConnectMagic } from "src/hooks/useWallet";
 
 type Props = {
   selected: (selected: boolean) => void;
@@ -20,24 +12,13 @@ type Props = {
 
 const MagicLinkConnectButton: FC<Props> = ({ selected }) => {
   const { t } = useLocale();
-  const { magicLinkConfig } = useWeb3WalletConfig();
-  const connect = useConnect();
   const connectionStatus = useConnectionStatus();
 
   const [isSelected, setSelected] = useState<boolean>(false);
   const [isNotValid, setIsNotValid] = useState<boolean>(true);
   const [enteredEmailAddress, setEnteredEmailAddress] = useState("");
 
-  const handleConnect = async () => {
-    try {
-      await connect(magicLinkConfig, {
-        email: enteredEmailAddress,
-        chainId: Number(chainId),
-      });
-    } catch (e) {
-      console.log(e);
-    }
-  };
+  const { handleConnect, isLoading } = useConnectMagic(enteredEmailAddress);
 
   return (
     <>
@@ -107,9 +88,11 @@ const MagicLinkConnectButton: FC<Props> = ({ selected }) => {
               disabled={
                 ["unknown", "connecting", "connected"].includes(
                   connectionStatus
-                ) || isNotValid
+                ) ||
+                isNotValid ||
+                isLoading
               }
-              isLoading={["connecting"].includes(connectionStatus)}
+              isLoading={["connecting"].includes(connectionStatus) || isLoading}
             >
               {t.CONNECT}
             </Button>
