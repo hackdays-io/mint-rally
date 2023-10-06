@@ -34,10 +34,12 @@ describe("EventManager", function () {
   let operationController: OperationController;
   let organizer: SignerWithAddress;
   let participant1: SignerWithAddress;
+  let participant2: SignerWithAddress;
   let relayer: SignerWithAddress;
 
   before(async () => {
-    [organizer, participant1, relayer] = await ethers.getSigners();
+    [organizer, participant1, participant2, relayer] =
+      await ethers.getSigners();
     const SecretPhraseVerifierFactory = await ethers.getContractFactory(
       "SecretPhraseVerifier"
     );
@@ -403,6 +405,523 @@ describe("EventManager", function () {
       expect(ownEventRecords[0].name).to.equal("event2");
       expect(ownEventRecords[1].name).to.equal("event1");
       expect(ownEventRecords[2].name).to.equal("event0");
+    });
+  });
+
+  describe("Role", async () => {
+    let eventManager: EventManager;
+
+    beforeEach(async () => {
+      const eventManagerContractFactory = await ethers.getContractFactory(
+        "EventManager"
+      );
+      const deployedEventManagerContract: any = await upgrades.deployProxy(
+        eventManagerContractFactory,
+        [relayer.address, 250000, 1000000, operationController.address],
+        {
+          initializer: "initialize",
+        }
+      );
+      eventManager = await deployedEventManagerContract.deployed();
+      await eventManager.setMintNFTAddr(mintNFT.address);
+      await mintNFT.setEventManagerAddr(eventManager.address);
+    });
+
+    describe("grantAdminRole", async () => {
+      it("should grant if group owner", async () => {
+        const txn1 = await eventManager
+          .connect(organizer)
+          .createGroup("group1");
+        await txn1.wait();
+        const groups = await eventManager.getOwnGroups(organizer.address);
+        const groupId = groups[0].groupId.toNumber();
+
+        // In myself case
+        expect(await eventManager.connect(organizer).isAdmin(groupId)).to.equal(
+          false
+        );
+
+        // revert if paused
+        await operationController.connect(organizer).pause();
+        await expect(
+          eventManager
+            .connect(organizer)
+            .grantAdminRole(groupId, organizer.address)
+        ).to.be.revertedWith("Paused");
+        await operationController.connect(organizer).unpause();
+
+        await eventManager
+          .connect(organizer)
+          .grantAdminRole(groupId, organizer.address);
+
+        expect(await eventManager.connect(organizer).isAdmin(groupId)).to.equal(
+          true
+        );
+
+        // No error in duplicate grant
+        await eventManager
+          .connect(organizer)
+          .grantAdminRole(groupId, organizer.address);
+
+        // In other user case
+        expect(
+          await eventManager.connect(participant1).isAdmin(groupId)
+        ).to.equal(false);
+
+        await eventManager
+          .connect(organizer)
+          .grantAdminRole(groupId, participant1.address);
+
+        expect(
+          await eventManager.connect(participant1).isAdmin(groupId)
+        ).to.equal(true);
+      });
+
+      it("should grant if admin member", async () => {
+        const txn1 = await eventManager
+          .connect(organizer)
+          .createGroup("group1");
+        await txn1.wait();
+        const groups = await eventManager.getOwnGroups(organizer.address);
+        const groupId = groups[0].groupId.toNumber();
+
+        // revert if not group owner and not admin
+        await expect(
+          eventManager
+            .connect(participant1)
+            .grantAdminRole(groupId, participant1.address)
+        ).to.be.revertedWith("Not permitted");
+
+        await eventManager
+          .connect(organizer)
+          .grantAdminRole(groupId, participant1.address);
+
+        await eventManager
+          .connect(participant1)
+          .grantAdminRole(groupId, participant2.address);
+
+        expect(
+          await eventManager.connect(participant2).isAdmin(groupId)
+        ).to.equal(true);
+      });
+
+      it("should revert if not permitted", async () => {
+        const txn1 = await eventManager
+          .connect(organizer)
+          .createGroup("group1");
+        await txn1.wait();
+        const groups = await eventManager.getOwnGroups(organizer.address);
+        const groupId = groups[0].groupId.toNumber();
+
+        // participant1 is other group owner and collaborator of group1
+        const txn2 = await eventManager
+          .connect(participant1)
+          .createGroup("group2");
+        await txn2.wait();
+        await eventManager
+          .connect(organizer)
+          .grantCollaboratorRole(groupId, participant1.address);
+
+        await expect(
+          eventManager
+            .connect(participant1)
+            .grantAdminRole(groupId, participant1.address)
+        ).to.be.revertedWith("Not permitted");
+      });
+
+      it("should revert if invalid group id", async () => {
+        await expect(
+          eventManager
+            .connect(organizer)
+            .grantAdminRole(0, participant1.address)
+        ).to.revertedWith("Invalid groupId");
+
+        await expect(
+          eventManager
+            .connect(organizer)
+            .grantAdminRole(2, participant1.address)
+        ).to.revertedWith("Invalid groupId");
+      });
+    });
+
+    describe("grantCollaboratorRole", async () => {
+      it("should grant", async () => {
+        const txn1 = await eventManager
+          .connect(organizer)
+          .createGroup("group1");
+        await txn1.wait();
+        const groups = await eventManager.getOwnGroups(organizer.address);
+        const groupId = groups[0].groupId.toNumber();
+
+        // In myself case
+        expect(
+          await eventManager.connect(organizer).isCollaborator(groupId)
+        ).to.equal(false);
+
+        // revert if paused
+        await operationController.connect(organizer).pause();
+        await expect(
+          eventManager
+            .connect(organizer)
+            .grantCollaboratorRole(groupId, organizer.address)
+        ).to.be.revertedWith("Paused");
+        await operationController.connect(organizer).unpause();
+
+        await eventManager
+          .connect(organizer)
+          .grantCollaboratorRole(groupId, organizer.address);
+
+        expect(
+          await eventManager.connect(organizer).isCollaborator(groupId)
+        ).to.equal(true);
+
+        // In other user case
+        expect(
+          await eventManager.connect(participant1).isCollaborator(groupId)
+        ).to.equal(false);
+
+        await eventManager
+          .connect(organizer)
+          .grantCollaboratorRole(groupId, participant1.address);
+
+        expect(
+          await eventManager.connect(participant1).isCollaborator(groupId)
+        ).to.equal(true);
+      });
+
+      it("should revert", async () => {
+        const txn1 = await eventManager
+          .connect(organizer)
+          .createGroup("group1");
+        await txn1.wait();
+        const groups = await eventManager.getOwnGroups(organizer.address);
+        const groupId = groups[0].groupId.toNumber();
+
+        // participant1 is other group owner and collaborator of group1
+        const txn2 = await eventManager
+          .connect(participant1)
+          .createGroup("group2");
+        await txn2.wait();
+        await eventManager
+          .connect(organizer)
+          .grantCollaboratorRole(groupId, participant1.address);
+
+        await expect(
+          eventManager
+            .connect(participant1)
+            .grantCollaboratorRole(groupId, participant1.address)
+        ).to.be.revertedWith("Not permitted");
+      });
+    });
+
+    describe("revokeAdminRole", async () => {
+      it("should revoke if group owner", async () => {
+        const txn1 = await eventManager
+          .connect(organizer)
+          .createGroup("group1");
+        await txn1.wait();
+        const groups = await eventManager.getOwnGroups(organizer.address);
+        const groupId = groups[0].groupId.toNumber();
+
+        // No error in no data
+        await eventManager
+          .connect(organizer)
+          .revokeAdminRole(groupId, organizer.address);
+
+        // In myself case
+        await eventManager
+          .connect(organizer)
+          .grantAdminRole(groupId, organizer.address);
+        expect(await eventManager.connect(organizer).isAdmin(groupId)).to.equal(
+          true
+        );
+
+        // revert if paused
+        await operationController.connect(organizer).pause();
+        await expect(
+          eventManager
+            .connect(organizer)
+            .revokeAdminRole(groupId, organizer.address)
+        ).to.be.revertedWith("Paused");
+        await operationController.connect(organizer).unpause();
+
+        await eventManager
+          .connect(organizer)
+          .revokeAdminRole(groupId, organizer.address);
+        expect(await eventManager.connect(organizer).isAdmin(groupId)).to.equal(
+          false
+        );
+
+        // In other user case
+        await eventManager
+          .connect(organizer)
+          .grantAdminRole(groupId, participant1.address);
+        expect(
+          await eventManager.connect(participant1).isAdmin(groupId)
+        ).to.equal(true);
+
+        await eventManager
+          .connect(organizer)
+          .revokeAdminRole(groupId, participant1.address);
+        expect(
+          await eventManager.connect(participant1).isAdmin(groupId)
+        ).to.equal(false);
+      });
+
+      it("should revoke if admin member", async () => {
+        const txn1 = await eventManager
+          .connect(organizer)
+          .createGroup("group1");
+        await txn1.wait();
+        const groups = await eventManager.getOwnGroups(organizer.address);
+        const groupId = groups[0].groupId.toNumber();
+
+        // revert if not group owner and not admin
+        await expect(
+          eventManager
+            .connect(participant1)
+            .revokeAdminRole(groupId, participant1.address)
+        ).to.be.revertedWith("Not permitted");
+
+        await eventManager
+          .connect(organizer)
+          .grantAdminRole(groupId, participant1.address);
+
+        // revoke by myself
+        await eventManager
+          .connect(participant1)
+          .revokeAdminRole(groupId, participant1.address);
+
+        expect(
+          await eventManager.connect(participant1).isAdmin(groupId)
+        ).to.equal(false);
+      });
+
+      it("should revert if not permitted", async () => {
+        const txn1 = await eventManager
+          .connect(organizer)
+          .createGroup("group1");
+        await txn1.wait();
+        const groups = await eventManager.getOwnGroups(organizer.address);
+        const groupId = groups[0].groupId.toNumber();
+
+        // participant1 is other group owner and collaborator of group1
+        const txn2 = await eventManager
+          .connect(participant1)
+          .createGroup("group2");
+        await txn2.wait();
+        await eventManager
+          .connect(organizer)
+          .grantCollaboratorRole(groupId, participant1.address);
+
+        await expect(
+          eventManager
+            .connect(participant1)
+            .revokeAdminRole(groupId, participant1.address)
+        ).to.be.revertedWith("Not permitted");
+      });
+
+      it("should revert if invalid group id", async () => {
+        await expect(
+          eventManager
+            .connect(organizer)
+            .revokeAdminRole(0, participant1.address)
+        ).to.revertedWith("Invalid groupId");
+
+        await expect(
+          eventManager
+            .connect(organizer)
+            .revokeAdminRole(2, participant1.address)
+        ).to.revertedWith("Invalid groupId");
+      });
+    });
+
+    describe("revokeCollaboratorRole", async () => {
+      it("should revoke", async () => {
+        const txn1 = await eventManager
+          .connect(organizer)
+          .createGroup("group1");
+        await txn1.wait();
+        const groups = await eventManager.getOwnGroups(organizer.address);
+        const groupId = groups[0].groupId.toNumber();
+
+        // In myself case
+        await eventManager
+          .connect(organizer)
+          .grantCollaboratorRole(groupId, organizer.address);
+        expect(
+          await eventManager.connect(organizer).isCollaborator(groupId)
+        ).to.equal(true);
+
+        // revert if paused
+        await operationController.connect(organizer).pause();
+        await expect(
+          eventManager
+            .connect(organizer)
+            .revokeCollaboratorRole(groupId, organizer.address)
+        ).to.be.revertedWith("Paused");
+        await operationController.connect(organizer).unpause();
+
+        await eventManager
+          .connect(organizer)
+          .revokeCollaboratorRole(groupId, organizer.address);
+        expect(
+          await eventManager.connect(organizer).isCollaborator(groupId)
+        ).to.equal(false);
+
+        // In other user case
+        await eventManager
+          .connect(organizer)
+          .grantCollaboratorRole(groupId, participant1.address);
+        expect(
+          await eventManager.connect(participant1).isCollaborator(groupId)
+        ).to.equal(true);
+
+        await eventManager
+          .connect(organizer)
+          .revokeCollaboratorRole(groupId, participant1.address);
+        expect(
+          await eventManager.connect(participant1).isCollaborator(groupId)
+        ).to.equal(false);
+      });
+
+      it("should revert", async () => {
+        const txn1 = await eventManager
+          .connect(organizer)
+          .createGroup("group1");
+        await txn1.wait();
+        const groups = await eventManager.getOwnGroups(organizer.address);
+        const groupId = groups[0].groupId.toNumber();
+
+        // participant1 is other group owner and collaborator of group1
+        const txn2 = await eventManager
+          .connect(participant1)
+          .createGroup("group2");
+        await txn2.wait();
+        await eventManager
+          .connect(organizer)
+          .grantCollaboratorRole(groupId, participant1.address);
+
+        await expect(
+          eventManager
+            .connect(participant1)
+            .revokeCollaboratorRole(groupId, participant1.address)
+        ).to.be.revertedWith("Not permitted");
+      });
+    });
+
+    describe("isAdmin", async () => {
+      it("should return true", async () => {
+        const txn1 = await eventManager
+          .connect(organizer)
+          .createGroup("group1");
+        await txn1.wait();
+        const txn2 = await eventManager
+          .connect(organizer)
+          .createGroup("group1");
+        await txn2.wait();
+        const groups = await eventManager.getOwnGroups(organizer.address);
+        const groupId1 = groups[0].groupId.toNumber();
+        const groupId2 = groups[1].groupId.toNumber();
+
+        // collaborator of group1 and admin of group2, but not admin of group1
+        await eventManager
+          .connect(organizer)
+          .grantCollaboratorRole(groupId1, participant1.address);
+        await eventManager
+          .connect(organizer)
+          .grantAdminRole(groupId2, participant1.address);
+        expect(
+          await eventManager.connect(participant1).isAdmin(groupId1)
+        ).to.equal(false);
+
+        await eventManager
+          .connect(organizer)
+          .grantAdminRole(groupId1, participant1.address);
+        expect(
+          await eventManager.connect(participant1).isAdmin(groupId1)
+        ).to.equal(true);
+      });
+
+      it("should return false if unknown group id", async () => {
+        expect(await eventManager.connect(organizer).isAdmin(0)).to.equal(
+          false
+        );
+      });
+
+      it("should return false if unknown address", async () => {
+        const txn1 = await eventManager
+          .connect(organizer)
+          .createGroup("group1");
+        await txn1.wait();
+        const groups = await eventManager.getOwnGroups(organizer.address);
+        const groupId = groups[0].groupId.toNumber();
+
+        await eventManager
+          .connect(organizer)
+          .grantAdminRole(groupId, organizer.address);
+
+        expect(
+          await eventManager.connect(participant1).isAdmin(groupId)
+        ).to.equal(false);
+      });
+    });
+
+    describe("isCollaborator", async () => {
+      it("should return true", async () => {
+        const txn1 = await eventManager
+          .connect(organizer)
+          .createGroup("group1");
+        await txn1.wait();
+        const txn2 = await eventManager
+          .connect(organizer)
+          .createGroup("group1");
+        await txn2.wait();
+        const groups = await eventManager.getOwnGroups(organizer.address);
+        const groupId1 = groups[0].groupId.toNumber();
+        const groupId2 = groups[1].groupId.toNumber();
+
+        // admin of group1 and collaborator of group2, but not collaborator of group1
+        await eventManager
+          .connect(organizer)
+          .grantAdminRole(groupId1, participant1.address);
+        await eventManager
+          .connect(organizer)
+          .grantCollaboratorRole(groupId2, participant1.address);
+        expect(
+          await eventManager.connect(participant1).isCollaborator(groupId1)
+        ).to.equal(false);
+
+        await eventManager
+          .connect(organizer)
+          .grantCollaboratorRole(groupId1, participant1.address);
+        expect(
+          await eventManager.connect(participant1).isAdmin(groupId1)
+        ).to.equal(true);
+      });
+
+      it("should return false if unknown group id", async () => {
+        expect(
+          await eventManager.connect(organizer).isCollaborator(0)
+        ).to.equal(false);
+      });
+
+      it("should return false if unknown address", async () => {
+        const txn1 = await eventManager
+          .connect(organizer)
+          .createGroup("group1");
+        await txn1.wait();
+        const groups = await eventManager.getOwnGroups(organizer.address);
+        const groupId = groups[0].groupId.toNumber();
+
+        await eventManager
+          .connect(organizer)
+          .grantCollaboratorRole(groupId, organizer.address);
+
+        expect(
+          await eventManager.connect(participant1).isCollaborator(groupId)
+        ).to.equal(false);
+      });
     });
   });
 });
