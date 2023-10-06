@@ -47,6 +47,12 @@ contract EventManager is OwnableUpgradeable {
     // OperationController contract address
     address private operationControllerAddr;
 
+    // Roles
+    bytes32 private constant ADMIN_ROLE = keccak256("ADMIN");
+    bytes32 private constant COLLABORATOR_ROLE = keccak256("COLLABORATOR");
+    // groupId => address => Role => bool
+    mapping(uint256 => mapping(address => mapping(bytes32 => bool))) private memberRolesByGroupId;
+
     modifier onlyGroupOwner(uint256 _groupId) {
         bool _isGroupOwner = false;
         for (uint256 _i = 0; _i < ownGroupIds[msg.sender].length; _i++) {
@@ -271,5 +277,47 @@ contract EventManager is OwnableUpgradeable {
             }
         }
         return isGroupOwner;
+    }
+
+    function grantAdminRole(uint256 _groupId, address _address) external {
+        _grantRole(_groupId, _address, ADMIN_ROLE);
+    }
+
+    function grantCollaboratorRole(uint256 _groupId, address _address) external {
+        _grantRole(_groupId, _address, COLLABORATOR_ROLE);
+    }
+
+    function revokeAdminRole(uint256 _groupId, address _address) external {
+        _revokeRole(_groupId, _address, ADMIN_ROLE);
+    }
+
+    function revokeCollaboratorRole(uint256 _groupId, address _address) external {
+        _revokeRole(_groupId, _address, COLLABORATOR_ROLE);
+    }
+
+    function _grantRole(uint256 _groupId, address _address, bytes32 _role) private whenNotPaused {
+        require(_isGroupOwnerOrAdmin(_groupId), "Not permitted");
+
+        memberRolesByGroupId[_groupId][_address][_role] = true;
+    }
+
+    function _revokeRole(uint256 _groupId, address _address, bytes32 _role) private whenNotPaused {
+        require(_isGroupOwnerOrAdmin(_groupId), "Not permitted");
+
+        delete memberRolesByGroupId[_groupId][_address][_role];
+    }
+
+    function _isGroupOwnerOrAdmin(uint256 _groupId) private view returns (bool) {
+        require(_groupId > 0 && _groupId <= groups.length, "Invalid groupId");
+
+        return groups[_groupId - 1].ownerAddress == msg.sender || isAdmin(_groupId);
+    }
+
+    function isAdmin(uint256 _groupId) public view returns (bool) {
+        return memberRolesByGroupId[_groupId][msg.sender][ADMIN_ROLE];
+    }
+
+    function isCollaborator(uint256 _groupId) external view returns (bool) {
+        return memberRolesByGroupId[_groupId][msg.sender][COLLABORATOR_ROLE];
     }
 }
