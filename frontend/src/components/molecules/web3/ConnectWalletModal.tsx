@@ -3,6 +3,7 @@ import { FC, useState } from "react";
 import MagicLinkConnectButton from "src/components/atoms/web3/MagicLinkConnectButton";
 import MetamaskConnectButton from "src/components/atoms/web3/MetamaskConnectButton";
 import SafeConnectButton from "src/components/atoms/web3/SafeConnectButton";
+import WalletConnectButton from "src/components/atoms/web3/WalletConnectButton";
 import { useLocale } from "src/hooks/useLocale";
 import ModalBase from "../common/ModalBase";
 
@@ -14,7 +15,7 @@ export const ConnectWalletModal: FC<Props> = ({ setConnecting }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const [magicLinkSelected, setMagicLinkSelected] = useState<boolean>(false);
-  const [safeSelected, safeLinkSelected] = useState<boolean>(false);
+  const [safeLinkSelected, setSafeLinkSelected] = useState<boolean>(false);
 
   const { t } = useLocale();
 
@@ -30,15 +31,22 @@ export const ConnectWalletModal: FC<Props> = ({ setConnecting }) => {
             MintRally へようこそ
           </Text>
           <Grid gap={2} justifyContent="center">
-            {!magicLinkSelected && !safeSelected && <MetamaskConnectButton />}
+            {!magicLinkSelected && !safeLinkSelected && (
+              <MetamaskConnectButton />
+            )}
+            {!magicLinkSelected && !safeLinkSelected && <WalletConnectButton />}
             {!magicLinkSelected && (
               <SafeConnectButton
                 selected={safeLinkSelected}
+                setSelected={setSafeLinkSelected}
                 setConnecting={setConnecting}
               />
             )}
-            {!safeSelected && (
-              <MagicLinkConnectButton selected={setMagicLinkSelected} />
+            {!safeLinkSelected && (
+              <MagicLinkConnectButton
+                selected={magicLinkSelected}
+                setSelected={setMagicLinkSelected}
+              />
             )}
           </Grid>
         </Box>

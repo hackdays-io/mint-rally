@@ -22,6 +22,7 @@ export default {
   CONNECT_WITH_METAMASK: "Metamaskで接続",
   CONNECT_WITH_EMAIL: "メールアドレスで接続",
   CONNECT_WITH_SAFE: "Safeで接続",
+  CONNECT_WITH_WALLETCONNECT: "WalletConnectで接続",
   INPUT_SAFE_WALLET_ADDRESS: "Safeのウォレットアドレスを入力",
   NOT_ALLOWED_MAGIC_LINK:
     "このイベントはメールアドレスログインをサポートしていません。",

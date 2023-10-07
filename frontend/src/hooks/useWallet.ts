@@ -13,6 +13,17 @@ export const activeChain =
     ? Polygon
     : { ...Localhost, chainId: 31337 };
 
+export const useWalletConnect = () => {
+  const { walletConnectConfig } = useWeb3WalletConfig();
+  const connect = useConnect();
+
+  const handleConnect = useCallback(async () => {
+    await connect(walletConnectConfig, { chainId: activeChain.chainId });
+  }, [connect, walletConnectConfig]);
+
+  return handleConnect;
+};
+
 export const useConnectMagic = (email: string) => {
   const { magicLinkConfig } = useWeb3WalletConfig();
   const magic = magicLinkConfig.create({ chain: Mumbai });

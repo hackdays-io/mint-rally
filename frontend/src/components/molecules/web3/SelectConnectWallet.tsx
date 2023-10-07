@@ -17,12 +17,16 @@ const SelectConnectWallet: FC<Props> = ({ setConnecting }) => {
       {!magicLinkSelected && !safeSelected && <MetamaskConnectButton />}
       {!magicLinkSelected && (
         <SafeConnectButton
-          selected={safeLinkSelected}
+          selected={safeSelected}
+          setSelected={safeLinkSelected}
           setConnecting={setConnecting}
         />
       )}
       {!safeSelected && (
-        <MagicLinkConnectButton selected={setMagicLinkSelected} />
+        <MagicLinkConnectButton
+          selected={magicLinkSelected}
+          setSelected={setMagicLinkSelected}
+        />
       )}
     </VStack>
   );

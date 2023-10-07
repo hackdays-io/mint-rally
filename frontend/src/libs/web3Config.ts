@@ -1,5 +1,10 @@
 import { Localhost, Mumbai, Polygon } from "@thirdweb-dev/chains";
-import { magicLink, metamaskWallet, safeWallet } from "@thirdweb-dev/react";
+import {
+  magicLink,
+  metamaskWallet,
+  safeWallet,
+  walletConnect,
+} from "@thirdweb-dev/react";
 import { useLocale } from "src/hooks/useLocale";
 import { useMemo } from "react";
 
@@ -37,7 +42,18 @@ export const useWeb3WalletConfig = () => {
     return metamaskWallet();
   }, []);
 
-  const supportedWallets = [metamaskConfig, safeWalletConfig, magicLinkConfig];
+  const walletConnectConfig = useMemo(() => {
+    return walletConnect({
+      projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_ID!,
+    });
+  }, []);
 
-  return { magicLinkConfig, supportedWallets };
+  const supportedWallets = [
+    metamaskConfig,
+    safeWalletConfig,
+    magicLinkConfig,
+    walletConnectConfig,
+  ];
+
+  return { magicLinkConfig, walletConnectConfig, supportedWallets };
 };

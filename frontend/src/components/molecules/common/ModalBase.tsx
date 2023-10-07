@@ -19,7 +19,7 @@ const ModalBase: FC<Props> = ({ isOpen, onClose, children, maxWidth }) => {
   return (
     <AlertDialog
       isOpen={isOpen}
-      onClose={() => onClose()}
+      onClose={onClose}
       leastDestructiveRef={cancelRef}
       isCentered
     >

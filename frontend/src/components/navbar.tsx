@@ -25,73 +25,73 @@ import Image from "next/image";
 import { useLocale } from "../hooks/useLocale";
 import LocaleSelector from "./atoms/LocaleSelector";
 import { ConnectWalletModal } from "./molecules/web3/ConnectWalletModal";
-import { useState } from "react";
+import { FC, useState } from "react";
 
-const Navbar = () => {
-  const { isOpen, onOpen, onClose } = useDisclosure();
+const Login: FC = () => {
   const address = useAddress();
   const chainId = useChainId();
   const disconnectWallet = useDisconnect();
   const requiredChainId = +process.env.NEXT_PUBLIC_CHAIN_ID!;
+  const [connecting, setConnecting] = useState<boolean>(false);
+  const switchChain = useSwitchChain();
   const { t } = useLocale();
 
-  const [connecting, setConnecting] = useState<boolean>(false);
+  return (
+    <Flex justifyContent="center" alignItems="center" mt={{ base: 5, md: 0 }}>
+      {!address || connecting ? (
+        <ConnectWalletModal setConnecting={setConnecting} />
+      ) : (
+        <>
+          {chainId !== requiredChainId ? (
+            <Box pr={4}>
+              <Button
+                bg="mint.subtle"
+                color="mint.font"
+                borderRadius={"16px"}
+                variant="solid"
+                onClick={() => switchChain(requiredChainId)}
+                size="md"
+              >
+                {t.SWITCH_NETWORK}
+              </Button>
+            </Box>
+          ) : (
+            <></>
+          )}
+          <Button
+            bg="mint.subtle"
+            color="mint.font"
+            borderRadius={"16px"}
+            variant="solid"
+            onClick={disconnectWallet}
+            size="md"
+          >
+            {t.SIGN_OUT}
+          </Button>
+        </>
+      )}
+      {address && !connecting && (
+        <Box marginLeft={3} cursor="pointer">
+          <NextLink href="/users/me">
+            <a>
+              <Image
+                src="/user.png"
+                alt="Loggedin"
+                width={50}
+                height={50}
+                objectFit="contain"
+              />
+            </a>
+          </NextLink>
+        </Box>
+      )}
+    </Flex>
+  );
+};
 
-  const switchChain = useSwitchChain();
-
-  const Login = () => {
-    return (
-      <Flex justifyContent="center" alignItems="center" mt={{ base: 5, md: 0 }}>
-        {!address || connecting ? (
-          <ConnectWalletModal setConnecting={setConnecting} />
-        ) : (
-          <>
-            {chainId !== requiredChainId ? (
-              <Box pr={4}>
-                <Button
-                  bg="mint.subtle"
-                  color="mint.font"
-                  borderRadius={"16px"}
-                  variant="solid"
-                  onClick={() => switchChain(requiredChainId)}
-                  size="md"
-                >
-                  {t.SWITCH_NETWORK}
-                </Button>
-              </Box>
-            ) : (
-              <></>
-            )}
-            <Button
-              bg="mint.subtle"
-              color="mint.font"
-              borderRadius={"16px"}
-              variant="solid"
-              onClick={disconnectWallet}
-              size="md"
-            >
-              {t.SIGN_OUT}
-            </Button>
-          </>
-        )}
-        {address && !connecting && (
-          <Box marginLeft={3} cursor="pointer">
-            <NextLink href="/users/me">
-              <a>
-                <Image
-                  src="/user.png"
-                  alt="Loggedin"
-                  width={50}
-                  height={50}
-                  objectFit="contain"
-                />
-              </a>
-            </NextLink>
-          </Box>
-        )}
-      </Flex>
-    );
-  };
+const Navbar = () => {
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const { t } = useLocale();
 
   return (
     <>
