@@ -9,6 +9,7 @@ import "solidity-coverage";
 import "@openzeppelin/hardhat-upgrades";
 import "hardhat-contract-sizer";
 import "hardhat-interface-generator";
+import "hardhat-watcher";
 
 dotenv.config();
 
@@ -62,6 +63,16 @@ const config: HardhatUserConfig = {
   },
   mocha: {
     timeout: 600000,
+  },
+  watcher: {
+    compilation: {
+      tasks: ["compile"],
+      files: ["./contracts"],
+      ignoredFiles: ["**/.vscode"],
+      verbose: true,
+      clearOnStart: true,
+      start: "echo Running my compilation task now..",
+    },
   },
 };
 
