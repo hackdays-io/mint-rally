@@ -73,6 +73,13 @@ const config: HardhatUserConfig = {
       clearOnStart: true,
       start: "echo Running my compilation task now..",
     },
+    test: {
+      tasks: [{ command: "test", params: { testFiles: ["{path}"] } }],
+      files: ["./test/**/*", "./contracts"],
+      verbose: true,
+      clearOnStart: true,
+      start: "echo Running my test task now..",
+    },
   },
 };
 
