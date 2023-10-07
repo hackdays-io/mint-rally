@@ -63,6 +63,7 @@ contract MintNFT is
     event MintedNFTAttributeURL(address indexed holder, string url);
     event MintLocked(uint256 indexed eventId, bool isLocked);
     event ResetSecretPhrase(address indexed executor, uint256 indexed eventId);
+    event DroppedNFTs(address indexed executor, uint256 indexed eventId);
 
     modifier onlyGroupOwner(uint256 _eventId) {
         IEventManager eventManager = IEventManager(eventManagerAddr);
@@ -169,6 +170,27 @@ contract MintNFT is
 
         _tokenIds.increment();
         emit MintedNFTAttributeURL(_msgSender(), metaDataURL);
+    }
+
+    function dropNFTs(
+        uint256 _eventId,
+        address[] memory _addresses
+    ) external onlyGroupOwner(_eventId) whenNotPaused {
+        for (uint256 index = 0; index < _addresses.length; index++) {
+            address addr = _addresses[index];
+            if (!isHoldingEventNFTByAddress(addr, _eventId)) {
+                isHoldingEventNFT[
+                    Hashing.hashingAddressUint256(addr, _eventId)
+                ] = true;
+                nftMetaDataURL[_tokenIds.current()] = eventNftAttributes[
+                    Hashing.hashingDoubleUint256(_eventId, 0)
+                ];
+                tokenIdsByEvent[_eventId].push(_tokenIds.current());
+                _safeMint(addr, _tokenIds.current());
+                _tokenIds.increment();
+            }
+        }
+        emit DroppedNFTs(_msgSender(), _eventId);
     }
 
     function canMint(

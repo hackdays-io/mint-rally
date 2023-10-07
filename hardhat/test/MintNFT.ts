@@ -557,13 +557,23 @@ describe("bulk mint by event owner", () => {
   let organizer: SignerWithAddress;
   let participant1: SignerWithAddress;
   let participant2: SignerWithAddress;
+  let participant3: SignerWithAddress;
+  let participant4: SignerWithAddress;
+  let participant5: SignerWithAddress;
+  let participant6: SignerWithAddress;
   let relayer: SignerWithAddress;
 
-  let usedProofCalldata!: any;
-
   before(async () => {
-    [organizer, participant1, participant2, relayer] =
-      await ethers.getSigners();
+    [
+      organizer,
+      participant1,
+      participant2,
+      participant3,
+      participant4,
+      participant5,
+      participant6,
+      relayer,
+    ] = await ethers.getSigners();
 
     // generate proof
     const { publicInputCalldata } = await generateProof();
@@ -589,13 +599,26 @@ describe("bulk mint by event owner", () => {
     createdEventIds = eventsList.map((event) => event.eventRecordId.toNumber());
   });
   it("drop NFTs by event owner", async () => {
-    const mintTxn = await mintNFT
-      .connect(organizer)
-      .dropNFTs(createdGroupId, createdEventIds[0], [
-        participant1.address,
-        participant2.address,
-      ]);
-    await mintTxn.wait();
+    await expect(
+      mintNFT
+        .connect(organizer)
+        .dropNFTs(createdEventIds[0], [
+          participant1.address,
+          participant2.address,
+          participant3.address,
+          participant4.address,
+          participant5.address,
+          participant6.address,
+        ])
+    )
+      .to.emit(mintNFT, "DroppedNFTs")
+      .withArgs(organizer.address, createdEventIds[0]);
+    expect(await mintNFT.ownerOf(0)).equal(participant1.address);
+    expect(await mintNFT.ownerOf(1)).equal(participant2.address);
+    expect(await mintNFT.ownerOf(2)).equal(participant3.address);
+    expect(await mintNFT.ownerOf(3)).equal(participant4.address);
+    expect(await mintNFT.ownerOf(4)).equal(participant5.address);
+    expect(await mintNFT.ownerOf(5)).equal(participant6.address);
   });
 });
 
