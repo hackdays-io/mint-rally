@@ -9,7 +9,7 @@ const UserByAddress: FC = () => {
   } = useRouter();
 
   return address ? (
-    <Container maxWidth={1000} mt={10}>
+    <Container maxWidth={1000} mt={{ base: 5, md: 10 }}>
       <UserEntity address={String(address)} />
     </Container>
   ) : (

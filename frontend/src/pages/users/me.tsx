@@ -10,7 +10,7 @@ const User: FC = () => {
   const { t } = useLocale();
 
   return (
-    <Container maxWidth={1000} mt={10}>
+    <Container maxWidth={1000} mt={{ base: 5, md: 10 }}>
       <LoginRequired forbiddenText={t.PLEASE_SIGN_IN}>
         {address && <UserEntity address={address} />}
       </LoginRequired>

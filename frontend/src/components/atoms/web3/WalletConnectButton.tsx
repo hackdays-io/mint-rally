@@ -35,12 +35,14 @@ const WalletConnectButton: FC<Props> = ({
   }, [wallets]);
 
   const handleConnect = useCallback(async () => {
-    if (isMobile()) {
-      handleWalletConnect();
-    } else {
-      setSelected(true);
-    }
-  }, [handleWalletConnect]);
+    try {
+      if (isMobile()) {
+        handleWalletConnect();
+      } else {
+        setSelected(true);
+      }
+    } catch (_) {}
+  }, [handleWalletConnect, setSelected]);
 
   return (
     <>
