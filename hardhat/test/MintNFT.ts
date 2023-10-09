@@ -620,6 +620,20 @@ describe("bulk mint by event owner", () => {
     expect(await mintNFT.ownerOf(4)).equal(participant5.address);
     expect(await mintNFT.ownerOf(5)).equal(participant6.address);
   });
+  it("prohibit drop NFTs by not event owner", async () => {
+    await expect(
+      mintNFT
+        .connect(participant1)
+        .dropNFTs(createdEventIds[0], [
+          participant1.address,
+          participant2.address,
+          participant3.address,
+          participant4.address,
+          participant5.address,
+          participant6.address,
+        ])
+    ).revertedWith("you are not event group owner");
+  });
 });
 
 describe("mint locked flag", () => {
