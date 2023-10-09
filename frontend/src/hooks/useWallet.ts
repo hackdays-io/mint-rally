@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useLocale } from "./useLocale";
 import { useRouter } from "next/router";
 import { useWeb3WalletConfig } from "src/libs/web3Config";
@@ -34,6 +34,18 @@ export const useConnectMagic = (email: string) => {
   const connect = useConnect();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState();
+
+  useEffect(() => {
+    const focusInterval = setInterval(() => {
+      if (isLoading && document.getElementsByClassName("magic-iframe")[0]) {
+        (document.getElementsByClassName("magic-iframe")[0] as any).focus();
+      }
+    }, 200);
+
+    return () => {
+      clearInterval(focusInterval);
+    };
+  }, [isLoading]);
 
   const handleConnect = useCallback(async () => {
     setIsLoading(true);

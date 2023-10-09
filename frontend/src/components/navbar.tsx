@@ -25,22 +25,19 @@ import Image from "next/image";
 import { useLocale } from "../hooks/useLocale";
 import LocaleSelector from "./atoms/LocaleSelector";
 import { ConnectWalletModal } from "./molecules/web3/ConnectWalletModal";
-import { FC, useState } from "react";
+import { FC, useCallback, useState } from "react";
 
 const Login: FC = () => {
   const address = useAddress();
   const chainId = useChainId();
   const disconnectWallet = useDisconnect();
   const requiredChainId = +process.env.NEXT_PUBLIC_CHAIN_ID!;
-  const [connecting, setConnecting] = useState<boolean>(false);
   const switchChain = useSwitchChain();
   const { t } = useLocale();
 
   return (
     <Flex justifyContent="center" alignItems="center" mt={{ base: 5, md: 0 }}>
-      {!address || connecting ? (
-        <ConnectWalletModal setConnecting={setConnecting} />
-      ) : (
+      {address && (
         <>
           {chainId !== requiredChainId ? (
             <Box pr={4}>
@@ -70,7 +67,7 @@ const Login: FC = () => {
           </Button>
         </>
       )}
-      {address && !connecting && (
+      {address && (
         <Box marginLeft={3} cursor="pointer">
           <NextLink href="/users/me">
             <a>
@@ -91,7 +88,19 @@ const Login: FC = () => {
 
 const Navbar = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const {
+    isOpen: isConnectWalletOpen,
+    onOpen: onConnectWalletOpen,
+    onClose: onConnectWalletClose,
+  } = useDisclosure();
   const { t } = useLocale();
+  const address = useAddress();
+  const [connecting, setConnecting] = useState<boolean>(false);
+
+  const handleOpenConnectWallet = useCallback(() => {
+    onConnectWalletOpen();
+    onClose();
+  }, [onConnectWalletOpen, onClose]);
 
   return (
     <>
@@ -172,7 +181,17 @@ const Navbar = () => {
           </a>
           <LocaleSelector></LocaleSelector>
           <Box px={4}>
-            <Login />
+            {!address || connecting ? (
+              <Button
+                backgroundColor="yellow.900"
+                color="white"
+                onClick={handleOpenConnectWallet}
+              >
+                {t.SIGN_IN}
+              </Button>
+            ) : (
+              <Login />
+            )}
           </Box>
         </Flex>
 
@@ -206,11 +225,31 @@ const Navbar = () => {
                 <Button w="100%">{t.HELP}</Button>
               </a>
               <LocaleSelector></LocaleSelector>
+              {!address && (
+                <Box mt={5}>
+                  <Button
+                    backgroundColor="yellow.900"
+                    color="white"
+                    onClick={handleOpenConnectWallet}
+                  >
+                    {t.SIGN_IN}
+                  </Button>
+                </Box>
+              )}
+
               <Login />
             </DrawerBody>
           </DrawerContent>
         </DrawerOverlay>
       </Drawer>
+
+      {(!address || connecting) && (
+        <ConnectWalletModal
+          setConnecting={setConnecting}
+          onClose={onConnectWalletClose}
+          isOpen={isConnectWalletOpen}
+        />
+      )}
     </>
   );
 };
