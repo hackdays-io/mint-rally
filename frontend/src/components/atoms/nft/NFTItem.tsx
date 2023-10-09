@@ -43,7 +43,14 @@ export const NFTItem: FC<Props> = ({
                 />
               </Box>
               <Box>
-                <Text fontSize="md" fontWeight="bold" mt={2} textAlign="center">
+                <Text
+                  fontSize="md"
+                  fontWeight="bold"
+                  mt={2}
+                  textAlign="center"
+                  wordBreak="break-all"
+                  noOfLines={2}
+                >
                   {nft.name}
                 </Text>
               </Box>

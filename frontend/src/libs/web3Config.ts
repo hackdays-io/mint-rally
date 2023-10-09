@@ -45,6 +45,9 @@ export const useWeb3WalletConfig = () => {
   const walletConnectConfig = useMemo(() => {
     return walletConnect({
       projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_ID!,
+      qrModalOptions: {
+        themeMode: "light",
+      },
     });
   }, []);
 

@@ -16,6 +16,8 @@ export const ConnectWalletModal: FC<Props> = ({ setConnecting }) => {
 
   const [magicLinkSelected, setMagicLinkSelected] = useState<boolean>(false);
   const [safeLinkSelected, setSafeLinkSelected] = useState<boolean>(false);
+  const [walletConnectSelected, setWalletConnectSelected] =
+    useState<boolean>(false);
 
   const { t } = useLocale();
 
@@ -31,18 +33,23 @@ export const ConnectWalletModal: FC<Props> = ({ setConnecting }) => {
             MintRally へようこそ
           </Text>
           <Grid gap={2} justifyContent="center">
+            {!magicLinkSelected &&
+              !safeLinkSelected &&
+              !walletConnectSelected && <MetamaskConnectButton />}
             {!magicLinkSelected && !safeLinkSelected && (
-              <MetamaskConnectButton />
+              <WalletConnectButton
+                selected={walletConnectSelected}
+                setSelected={setWalletConnectSelected}
+              />
             )}
-            {!magicLinkSelected && !safeLinkSelected && <WalletConnectButton />}
-            {!magicLinkSelected && (
+            {!magicLinkSelected && !walletConnectSelected && (
               <SafeConnectButton
                 selected={safeLinkSelected}
                 setSelected={setSafeLinkSelected}
                 setConnecting={setConnecting}
               />
             )}
-            {!safeLinkSelected && (
+            {!safeLinkSelected && !walletConnectSelected && (
               <MagicLinkConnectButton
                 selected={magicLinkSelected}
                 setSelected={setMagicLinkSelected}

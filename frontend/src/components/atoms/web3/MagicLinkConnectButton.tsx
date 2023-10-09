@@ -17,9 +17,16 @@ import { useConnectMagic } from "src/hooks/useWallet";
 type Props = {
   selected: boolean;
   setSelected: (selected: boolean) => void;
+  buttonText?: string;
+  disabled?: boolean;
 };
 
-const MagicLinkConnectButton: FC<Props> = ({ selected, setSelected }) => {
+const MagicLinkConnectButton: FC<Props> = ({
+  selected,
+  setSelected,
+  buttonText,
+  disabled,
+}) => {
   const { t } = useLocale();
   const connectionStatus = useConnectionStatus();
 
@@ -42,8 +49,9 @@ const MagicLinkConnectButton: FC<Props> = ({ selected, setSelected }) => {
           onClick={() => {
             setSelected(true);
           }}
+          disabled={disabled}
         >
-          {t.CONNECT_WITH_EMAIL}
+          {buttonText || t.CONNECT_WITH_EMAIL}
         </Button>
       ) : (
         <Box maxW="100%" width="400px" textAlign="left">

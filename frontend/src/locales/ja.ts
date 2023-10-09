@@ -62,6 +62,7 @@ export default {
   SIGN_IN_TO_GET_NFT: "NFTをGetしよう！",
   SELECT_WALLET: "NFTの取得方法を選択してください",
   GET_NFT_USING_METAMASK: "Metamask で受け取る",
+  GET_NFT_USING_WALLETCONNECT: "WalletConnect で受け取る",
   GET_NFT_USING_EMAIL: "メールアドレスで受け取る",
   EMAIL_ADDRESS: "メールアドレス",
   PLEASE_ENTER_EMAIL_ADDRESS:

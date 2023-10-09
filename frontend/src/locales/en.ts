@@ -60,6 +60,7 @@ export default {
   // Event page
   SIGN_IN_TO_GET_NFT: "Sign in to get NFT!",
   GET_NFT_USING_METAMASK: "Get NFT with Metamask",
+  GET_NFT_USING_WALLETCONNECT: "Get NFT with WalletConnect",
   GET_NFT_USING_EMAIL: "Get NFT with Email",
   EMAIL_ADDRESS: "Email address",
   PLEASE_ENTER_EMAIL_ADDRESS: "Please enter your email address and connect.",

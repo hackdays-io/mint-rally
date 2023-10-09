@@ -18,7 +18,9 @@ export const useWalletConnect = () => {
   const connect = useConnect();
 
   const handleConnect = useCallback(async () => {
-    await connect(walletConnectConfig, { chainId: activeChain.chainId });
+    await connect(walletConnectConfig, {
+      chainId: activeChain.chainId,
+    });
   }, [connect, walletConnectConfig]);
 
   return handleConnect;

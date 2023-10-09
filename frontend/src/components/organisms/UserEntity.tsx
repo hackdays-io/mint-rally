@@ -13,21 +13,21 @@ export const UserEntity: FC<{ address: string }> = ({ address }) => {
   // if groupedNFT has tokenid, get the nft
 
   return (
-    <Container maxW="1000">
-      <Box mt={10}>
-        <Heading as="h1" size="xl" color="mint.primary" fontWeight={700}>
-          NFT Collection
-        </Heading>
-        <Text fontSize="lg" wordBreak="break-all">
-          <ENSName address={address} enableEtherScanLink />
-        </Text>
+    <Box>
+      <Heading as="h1" size="xl" color="yellow.900" fontWeight={700}>
+        NFT Collection
+      </Heading>
+      <Text fontSize="lg" wordBreak="break-all">
+        <ENSName address={address} enableEtherScanLink />
+      </Text>
 
+      <Box mt={10}>
         {isLoading ? (
           <Spinner />
         ) : (
           <GroupedCollection groupedNFTs={groupedNFTs} />
         )}
       </Box>
-    </Container>
+    </Box>
   );
 };
