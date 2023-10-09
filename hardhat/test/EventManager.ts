@@ -11,6 +11,7 @@ import {
 } from "../typechain";
 // eslint-disable-next-line node/no-missing-import
 import { generateProof } from "./helper/secret_phrase";
+import { group } from "console";
 
 // ToDo requiredParticipateCountに重複がある場合エラーになってしまう。
 const attributes = [
@@ -269,6 +270,189 @@ describe("EventManager", function () {
       it("should return specified number of records by pagenation", async () => {
         const _events = await eventManager.getEventRecords(50, 0);
         expect(_events.length).to.equal(50);
+      });
+    });
+
+    describe("RBAC", () => {
+      it("should create if admin", async () => {
+        const groupName1 = "AdminGroup1";
+        const groupName2 = "AdminGroup2";
+        const txn1 = await eventManager
+          .connect(organizer)
+          .createGroup(groupName1);
+        await txn1.wait();
+        const txn2 = await eventManager
+          .connect(organizer)
+          .createGroup(groupName2);
+        await txn2.wait();
+
+        const groups = await eventManager.getOwnGroups(organizer.address);
+        const groupId1 = groups
+          .find((group) => group.name === groupName1)!
+          .groupId.toNumber();
+        const groupId2 = groups
+          .find((group) => group.name === groupName2)!
+          .groupId.toNumber();
+
+        // grant roles of group2
+        await eventManager
+          .connect(organizer)
+          .grantAdminRole(groupId2, participant1.address);
+        await eventManager
+          .connect(organizer)
+          .grantCollaboratorRole(groupId2, participant1.address);
+
+        const roles = await eventManager.getRoles(
+          groupId1,
+          participant1.address
+        );
+        expect(roles.admin).to.equal(false);
+        expect(roles.collaborator).to.equal(false);
+
+        // revert if no role of group1
+        await expect(
+          eventManager
+            .connect(participant1)
+            .createEventRecord(
+              groupId1,
+              "event1",
+              "event1 description",
+              "2022-07-3O",
+              100,
+              false,
+              publicInputCalldata[0],
+              attributes
+            )
+        ).to.be.revertedWith("You have no permission");
+
+        // grant role and then create
+        await eventManager
+          .connect(organizer)
+          .grantAdminRole(groupId1, participant1.address);
+
+        const txn3 = await eventManager
+          .connect(participant1)
+          .createEventRecord(
+            groupId1,
+            "event1",
+            "event1 description",
+            "2022-07-3O",
+            100,
+            false,
+            publicInputCalldata[0],
+            attributes
+          );
+        await txn3.wait();
+        const records = await eventManager.getEventRecordsByGroupId(groupId1);
+        expect(records.length).to.equal(1);
+      });
+
+      it("should create if collaborator", async () => {
+        const groupName1 = "CollaboratorGroup1";
+        const groupName2 = "CollaboratorGroup2";
+        const txn1 = await eventManager
+          .connect(organizer)
+          .createGroup(groupName1);
+        await txn1.wait();
+        const txn2 = await eventManager
+          .connect(organizer)
+          .createGroup(groupName2);
+        await txn2.wait();
+
+        const groups = await eventManager.getOwnGroups(organizer.address);
+        const groupId1 = groups
+          .find((group) => group.name === groupName1)!
+          .groupId.toNumber();
+        const groupId2 = groups
+          .find((group) => group.name === groupName2)!
+          .groupId.toNumber();
+
+        // grant roles of group2
+        await eventManager
+          .connect(organizer)
+          .grantAdminRole(groupId2, participant1.address);
+        await eventManager
+          .connect(organizer)
+          .grantCollaboratorRole(groupId2, participant1.address);
+
+        const roles = await eventManager.getRoles(
+          groupId1,
+          participant1.address
+        );
+        expect(roles.admin).to.equal(false);
+        expect(roles.collaborator).to.equal(false);
+
+        // revert if no role of group1
+        await expect(
+          eventManager
+            .connect(participant1)
+            .createEventRecord(
+              groupId1,
+              "event1",
+              "event1 description",
+              "2022-07-3O",
+              100,
+              false,
+              publicInputCalldata[0],
+              attributes
+            )
+        ).to.be.revertedWith("You have no permission");
+
+        // grant role and then create
+        await eventManager
+          .connect(organizer)
+          .grantCollaboratorRole(groupId1, participant1.address);
+
+        const txn3 = await eventManager
+          .connect(participant1)
+          .createEventRecord(
+            groupId1,
+            "event1",
+            "event1 description",
+            "2022-07-3O",
+            100,
+            false,
+            publicInputCalldata[0],
+            attributes
+          );
+        await txn3.wait();
+        const records = await eventManager.getEventRecordsByGroupId(groupId1);
+        expect(records.length).to.equal(1);
+      });
+
+      it("should revert if no role", async () => {
+        const groupName = "NoRoleGroup1";
+        const txn1 = await eventManager
+          .connect(organizer)
+          .createGroup(groupName);
+        await txn1.wait();
+
+        const groups = await eventManager.getOwnGroups(organizer.address);
+        const groupId = groups
+          .find((group) => group.name === groupName)!
+          .groupId.toNumber();
+
+        const roles = await eventManager.getRoles(
+          groupId,
+          participant1.address
+        );
+        expect(roles.admin).to.equal(false);
+        expect(roles.collaborator).to.equal(false);
+
+        await expect(
+          eventManager
+            .connect(participant1)
+            .createEventRecord(
+              groupId,
+              "event1",
+              "event1 description",
+              "2022-07-3O",
+              100,
+              false,
+              publicInputCalldata[0],
+              attributes
+            )
+        ).to.be.revertedWith("You have no permission");
       });
     });
   });

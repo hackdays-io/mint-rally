@@ -58,14 +58,11 @@ contract EventManager is OwnableUpgradeable {
     // groupId => address => Role => bool
     mapping(uint256 => mapping(address => mapping(bytes32 => bool))) private memberRolesByGroupId;
 
-    modifier onlyGroupOwner(uint256 _groupId) {
-        bool _isGroupOwner = false;
-        for (uint256 _i = 0; _i < ownGroupIds[msg.sender].length; _i++) {
-            if (ownGroupIds[msg.sender][_i] == _groupId) {
-                _isGroupOwner = true;
-            }
-        }
-        require(_isGroupOwner, "You are not group owner");
+    modifier onlyGroupOwnerOrAdminOrCollaborator(uint256 _groupId) {
+        require(
+            _isGroupOwnerOrAdmin(_groupId, msg.sender) || _hasRole(_groupId, msg.sender, COLLABORATOR_ROLE),
+            "You have no permission"
+        );
         _;
     }
 
@@ -172,7 +169,7 @@ contract EventManager is OwnableUpgradeable {
         bool _useMtx,
         bytes32 _secretPhrase,
         IMintNFT.NFTAttribute[] memory _eventNFTAttributes
-    ) external payable onlyGroupOwner(_groupId) whenNotPaused {
+    ) external payable onlyGroupOwnerOrAdminOrCollaborator(_groupId) whenNotPaused {
         require(
             _mintLimit > 0 && _mintLimit <= maxMintLimit,
             "mint limit is invalid"
