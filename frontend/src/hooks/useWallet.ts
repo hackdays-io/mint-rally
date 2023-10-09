@@ -37,8 +37,9 @@ export const useConnectMagic = (email: string) => {
 
   useEffect(() => {
     const focusInterval = setInterval(() => {
-      if (isLoading && document.getElementsByClassName("magic-iframe")[0]) {
-        (document.getElementsByClassName("magic-iframe")[0] as any).focus();
+      const activeElement: any = document.activeElement;
+      if (isLoading && activeElement?.className !== "magic-iframe") {
+        activeElement?.blur();
       }
     }, 200);
 
