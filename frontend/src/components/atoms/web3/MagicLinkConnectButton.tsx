@@ -54,7 +54,7 @@ const MagicLinkConnectButton: FC<Props> = ({
           {buttonText || t.CONNECT_WITH_EMAIL}
         </Button>
       ) : (
-        <Box maxW="100%" width="400px" textAlign="left">
+        <Box maxW="400px" w={{ base: "auto", md: "400px" }} textAlign="left">
           <HStack mb={{ base: 2, md: 0 }}>
             <Button
               leftIcon={<FontAwesomeIcon icon={faArrowLeft} />}
