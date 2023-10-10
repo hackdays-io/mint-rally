@@ -32,7 +32,7 @@ import { Event } from "types/Event";
 import { NFT } from "types/NFT";
 import { formatEther } from "ethers/lib/utils";
 import { useRouter } from "next/router";
-import EventCard from "../atoms/events/EventCard";
+import { useCopyPastAttribute } from "src/hooks/useMintNFT";
 
 type Props = {
   address: string;
@@ -103,6 +103,8 @@ const CreateEventForm: FC<Props> = ({ address }) => {
   const { createEvent, isCreating, createError, createStatus, createdEventId } =
     useCreateEvent(address);
 
+  const { isLoading: isLoadingAttributeRecords, error, copyPastAttribute } = useCopyPastAttribute();
+
   const onSubmit = async (data: EventFormData) => {
     setFormData(data);
     saveNFTMetadataOnIPFS(data.eventGroupId, data.eventName, data.nfts);
@@ -165,9 +167,11 @@ const CreateEventForm: FC<Props> = ({ address }) => {
   );
 
   const onCopyPastEventChange =
-    () => {
+    async () => {
       const foundEvent = events?.find((event: Event.EventRecord) => event.eventRecordId.toNumber() === copiedPastEventId);
-      if (foundEvent) {
+      if (foundEvent && copiedPastEventId) {
+        const pastAttributeRecords = await copyPastAttribute(copiedPastEventId);
+
         setValue("eventName", foundEvent.name);
         setValue("description", foundEvent.description);
         const [startDateTime, endDateTime] = foundEvent.date.split('/');
@@ -187,6 +191,9 @@ const CreateEventForm: FC<Props> = ({ address }) => {
         setValue("startTime", startTime);
         setValue("endDate", endDate);
         setValue("endTime", endTime);
+        console.log("copiedPastEventId", copiedPastEventId);
+        console.log("pastAttributeRecords", pastAttributeRecords);
+        setValue("nfts", pastAttributeRecords);
       }
     };
 
@@ -263,7 +270,7 @@ const CreateEventForm: FC<Props> = ({ address }) => {
 
           {watch("eventGroupId") ? (
             <>
-              <FormControl mb={5}>
+              <FormControl mt={16} mb={5}>
                 <FormLabel htmlFor="pastEventIds">{t.SELECT_PAST_EVENT_TO_COPY}</FormLabel>
                 <Select
                   placeholder="Select option"
@@ -277,7 +284,7 @@ const CreateEventForm: FC<Props> = ({ address }) => {
                     </option>
                   ))}
                 </Select>
-                <Button mt={4} mb={4} onClick={onCopyPastEventChange}>
+                <Button mt={4} mb={16} onClick={onCopyPastEventChange}>
                   {t.COPY}
                 </Button>
               </FormControl>
