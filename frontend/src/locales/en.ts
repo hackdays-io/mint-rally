@@ -131,4 +131,11 @@ export default {
   ERROR_MINTING_PARTICIPATION_NFT: "An error occurred when minting your NFT",
   OWNER: "Owner",
   MINTGUIDE: guide,
+
+  // maintenance
+  MAINTENANCE_TITLE: "In Maintenance",
+  MAINTENANCE_DESC1:
+    "We apologize for the inconvenience, some features of the service are currently unavailable due to system maintenance.",
+  MAINTENANCE_DESC2:
+    "We would appreciate it if you could access the site again after a few minutes.",
 };

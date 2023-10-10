@@ -131,4 +131,11 @@ export default {
   ERROR_MINTING_PARTICIPATION_NFT: "NFTをミント中にエラーが発生しました",
   OWNER: "所有者",
   MINTGUIDE: guide,
+
+  // maintenance
+  MAINTENANCE_TITLE: "メンテナンス中",
+  MAINTENANCE_DESC1:
+    "大変申し訳ございませんが、現在システムメンテナンスのため、サービスの一部機能がご利用いただけません。",
+  MAINTENANCE_DESC2:
+    "ご不便をおかけし申し訳ございませんが、時間をおいてから再度アクセスしていただけると幸いです。",
 };
