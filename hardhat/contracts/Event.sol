@@ -24,6 +24,11 @@ contract EventManager is OwnableUpgradeable {
         bool useMtx;
     }
 
+    struct Roles {
+        bool admin;
+        bool collaborator;
+    }
+
     using Counters for Counters.Counter;
 
     Counters.Counter private _eventRecordIds;
@@ -296,28 +301,31 @@ contract EventManager is OwnableUpgradeable {
     }
 
     function _grantRole(uint256 _groupId, address _address, bytes32 _role) private whenNotPaused {
-        require(_isGroupOwnerOrAdmin(_groupId), "Not permitted");
+        require(_isGroupOwnerOrAdmin(_groupId, msg.sender), "Not permitted");
 
         memberRolesByGroupId[_groupId][_address][_role] = true;
     }
 
     function _revokeRole(uint256 _groupId, address _address, bytes32 _role) private whenNotPaused {
-        require(_isGroupOwnerOrAdmin(_groupId), "Not permitted");
+        require(_isGroupOwnerOrAdmin(_groupId, msg.sender), "Not permitted");
 
         delete memberRolesByGroupId[_groupId][_address][_role];
     }
 
-    function _isGroupOwnerOrAdmin(uint256 _groupId) private view returns (bool) {
+    function _isGroupOwnerOrAdmin(uint256 _groupId, address _sender) private view returns (bool) {
         require(_groupId > 0 && _groupId <= groups.length, "Invalid groupId");
 
-        return groups[_groupId - 1].ownerAddress == msg.sender || isAdmin(_groupId);
+        return groups[_groupId - 1].ownerAddress == _sender || _hasRole(_groupId, _sender, ADMIN_ROLE);
     }
 
-    function isAdmin(uint256 _groupId) public view returns (bool) {
-        return memberRolesByGroupId[_groupId][msg.sender][ADMIN_ROLE];
+    function _hasRole(uint256 _groupId, address _address, bytes32 _role) private view returns (bool) {
+        return memberRolesByGroupId[_groupId][_address][_role];
     }
 
-    function isCollaborator(uint256 _groupId) external view returns (bool) {
-        return memberRolesByGroupId[_groupId][msg.sender][COLLABORATOR_ROLE];
+    function getRoles(uint256 _groupId, address _address) external view returns (Roles memory) {
+        return Roles({
+            admin: memberRolesByGroupId[_groupId][_address][ADMIN_ROLE],
+            collaborator: memberRolesByGroupId[_groupId][_address][COLLABORATOR_ROLE]
+        });
     }
 }
