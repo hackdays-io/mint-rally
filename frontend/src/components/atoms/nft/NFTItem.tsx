@@ -13,7 +13,7 @@ type Props = {
   clickable?: boolean;
   address?: string;
   showShareButtons?: boolean;
-  showViewButtons?: boolean; //showOpenSeaLink >> showViewBottons
+  showViewButtons?: boolean;
 };
 
 export const NFTItem: FC<Props> = ({

@@ -123,7 +123,7 @@ export const MintForm: FC<Props> = ({ event, address }) => {
                 clickable={false}
                 address={address}
                 showShareButtons={true}
-                showViewButtons={true} //showOpenSeaLink >> showViewBottons
+                showViewButtons={true}
               />
             </Box>
             <span id="confettiReward" />
