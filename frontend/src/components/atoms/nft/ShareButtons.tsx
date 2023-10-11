@@ -35,7 +35,7 @@ export const ShareButtons: FC<Props> = ({
   };
 
   return (
-    <Flex alignItems="center">
+    <Flex alignItems="center" my={2}>
       <Text mb={1} mr={5}>
         Share on
       </Text>
