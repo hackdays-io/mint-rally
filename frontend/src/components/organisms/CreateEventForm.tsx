@@ -1,6 +1,7 @@
 import { FC, useCallback, useEffect, useMemo, useState } from "react";
 import {
   Box,
+  Divider,
   Flex,
   Radio,
   RadioGroup,
@@ -284,10 +285,11 @@ const CreateEventForm: FC<Props> = ({ address }) => {
                     </option>
                   ))}
                 </Select>
-                <Button mt={4} mb={16} onClick={onCopyPastEventChange}>
+                <Button mt={4} onClick={onCopyPastEventChange}>
                   {t.COPY}
                 </Button>
               </FormControl>
+              <Divider borderWidth={1.3} mt={14} mb={20} />
               <FormControl mb={5}>
                 <FormLabel htmlFor="name">{t.EVENT_NAME}</FormLabel>
                 <Controller
