@@ -275,21 +275,24 @@ const CreateEventForm: FC<Props> = ({ address }) => {
                 <>
                   <FormControl mt={16} mb={5}>
                     <FormLabel htmlFor="pastEventIds">{t.SELECT_PAST_EVENT_TO_COPY}</FormLabel>
-                    <Select
-                      placeholder="Select option"
-                      onChange={(e) => setCopiedPastEventId(Number(e.target.value))}
-                    >
-                      {events?.map((event: Event.EventRecord) => (
-                        <option
-                          value={Number(event.eventRecordId)}
-                          key={Number(event.eventRecordId)}>
-                          {event.name}
-                        </option>
-                      ))}
-                    </Select>
-                    <Button mt={4} onClick={onCopyPastEventChange}>
-                      {t.COPY}
-                    </Button>
+                    <Flex mt={4}>
+                      <Select
+                        mr={5}
+                        placeholder="Select option"
+                        onChange={(e) => setCopiedPastEventId(Number(e.target.value))}
+                      >
+                        {events?.map((event: Event.EventRecord) => (
+                          <option
+                            value={Number(event.eventRecordId)}
+                            key={Number(event.eventRecordId)}>
+                            {event.name}
+                          </option>
+                        ))}
+                      </Select>
+                      <Button onClick={onCopyPastEventChange}>
+                        {t.COPY}
+                      </Button>
+                    </Flex>
                   </FormControl>
                   <Divider borderWidth={1.3} mt={14} mb={20} /></>
               )}
