@@ -10,7 +10,13 @@ struct EventRecord {
 }
 
 interface IEventManager {
+    // TODO: Remove after isGroupOwnerOrAdminOrCollaboratorByEventId is released
     function isGroupOwnerByEventId(
+        address _addr,
+        uint256 _eventId
+    ) external view returns (bool);
+
+    function isGroupOwnerOrAdminOrCollaboratorByEventId(
         address _addr,
         uint256 _eventId
     ) external view returns (bool);

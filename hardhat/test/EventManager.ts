@@ -1067,5 +1067,94 @@ describe("EventManager", function () {
         });
       });
     });
+
+    describe("isGroupOwnerOrAdminOrCollaboratorByEventId", async () => {
+      let publicInputCalldata: any;
+
+      beforeEach(async () => {
+        const { publicInputCalldata: _publicInputCalldata } =
+          await generateProof();
+        publicInputCalldata = _publicInputCalldata;
+      });
+
+      it("should return true if group owner", async () => {
+        const txn1 = await eventManager
+          .connect(organizer)
+          .createGroup("group1");
+        await txn1.wait();
+
+        const groups = await eventManager.getOwnGroups(organizer.address);
+        const groupId = groups[0].groupId.toNumber();
+
+        const txn2 = await eventManager
+          .connect(organizer)
+          .createEventRecord(
+            groupId,
+            "event1",
+            "event1 description",
+            "2022-07-3O",
+            100,
+            false,
+            publicInputCalldata[0],
+            attributes
+          );
+        await txn2.wait();
+        const txn3 = await eventManager
+          .connect(organizer)
+          .createEventRecord(
+            groupId,
+            "event1",
+            "event1 description",
+            "2022-07-3O",
+            100,
+            false,
+            publicInputCalldata[0],
+            attributes
+          );
+        await txn3.wait();
+        const eventRecords = await eventManager.getEventRecordsByGroupId(
+          groupId
+        );
+        expect(eventRecords.length).to.equal(2);
+        const eventId = eventRecords[1].eventRecordId.toNumber(); // 2nd event id
+
+        expect(
+          await eventManager.isGroupOwnerOrAdminOrCollaboratorByEventId(
+            organizer.address,
+            eventId
+          )
+        ).to.equal(true);
+
+        // check before grant
+        expect(
+          await eventManager.isGroupOwnerOrAdminOrCollaboratorByEventId(
+            participant1.address,
+            eventId
+          )
+        ).to.equal(false);
+        expect(
+          await eventManager.isGroupOwnerOrAdminOrCollaboratorByEventId(
+            participant2.address,
+            eventId
+          )
+        ).to.equal(false);
+
+        // check after grant
+        await eventManager.grantAdminRole(groupId, participant1.address);
+        await eventManager.grantCollaboratorRole(groupId, participant2.address);
+        expect(
+          await eventManager.isGroupOwnerOrAdminOrCollaboratorByEventId(
+            participant1.address,
+            eventId
+          )
+        ).to.equal(true);
+        expect(
+          await eventManager.isGroupOwnerOrAdminOrCollaboratorByEventId(
+            participant2.address,
+            eventId
+          )
+        ).to.equal(true);
+      });
+    });
   });
 });

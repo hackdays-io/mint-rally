@@ -60,7 +60,7 @@ contract EventManager is OwnableUpgradeable {
 
     modifier onlyGroupOwnerOrAdminOrCollaborator(uint256 _groupId) {
         require(
-            _isGroupOwnerOrAdmin(_groupId, msg.sender) || _hasRole(_groupId, msg.sender, COLLABORATOR_ROLE),
+            _isGroupOwnerOrAdminOrCollaborator(_groupId, msg.sender),
             "You have no permission"
         );
         _;
@@ -267,6 +267,7 @@ contract EventManager is OwnableUpgradeable {
         return _eventRecord;
     }
 
+    // TODO: Remove after isGroupOwnerOrAdminOrCollaboratorByEventId is released
     function isGroupOwnerByEventId(
         address _address,
         uint256 _eventId
@@ -279,6 +280,11 @@ contract EventManager is OwnableUpgradeable {
             }
         }
         return isGroupOwner;
+    }
+
+    function isGroupOwnerOrAdminOrCollaboratorByEventId(address _address, uint256 _eventId) external view returns (bool) {
+        uint256 _groupId = groupIdByEventId[_eventId];
+        return _isGroupOwnerOrAdminOrCollaborator(_groupId, _address);
     }
 
     function grantAdminRole(uint256 _groupId, address _address) external {
@@ -309,10 +315,16 @@ contract EventManager is OwnableUpgradeable {
         delete memberRolesByGroupId[_groupId][_address][_role];
     }
 
-    function _isGroupOwnerOrAdmin(uint256 _groupId, address _sender) private view returns (bool) {
+    function _isGroupOwnerOrAdmin(uint256 _groupId, address _address) private view returns (bool) {
         require(_groupId > 0 && _groupId <= groups.length, "Invalid groupId");
 
-        return groups[_groupId - 1].ownerAddress == _sender || _hasRole(_groupId, _sender, ADMIN_ROLE);
+        return groups[_groupId - 1].ownerAddress == _address || _hasRole(_groupId, _address, ADMIN_ROLE);
+    }
+
+    function _isGroupOwnerOrAdminOrCollaborator(uint256 _groupId, address _address) private view returns (bool) {
+        require(_groupId > 0 && _groupId <= groups.length, "Invalid groupId");
+
+        return _isGroupOwnerOrAdmin(_groupId, _address) || _hasRole(_groupId, _address, COLLABORATOR_ROLE);
     }
 
     function _hasRole(uint256 _groupId, address _address, bytes32 _role) private view returns (bool) {
