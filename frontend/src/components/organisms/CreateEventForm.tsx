@@ -271,25 +271,28 @@ const CreateEventForm: FC<Props> = ({ address }) => {
 
           {watch("eventGroupId") ? (
             <>
-              <FormControl mt={16} mb={5}>
-                <FormLabel htmlFor="pastEventIds">{t.SELECT_PAST_EVENT_TO_COPY}</FormLabel>
-                <Select
-                  placeholder="Select option"
-                  onChange={(e) => setCopiedPastEventId(Number(e.target.value))}
-                >
-                  {events?.map((event: Event.EventRecord) => (
-                    <option
-                      value={Number(event.eventRecordId)}
-                      key={Number(event.eventRecordId)}>
-                      {event.name}
-                    </option>
-                  ))}
-                </Select>
-                <Button mt={4} onClick={onCopyPastEventChange}>
-                  {t.COPY}
-                </Button>
-              </FormControl>
-              <Divider borderWidth={1.3} mt={14} mb={20} />
+              {events?.length !== 0 && (
+                <>
+                  <FormControl mt={16} mb={5}>
+                    <FormLabel htmlFor="pastEventIds">{t.SELECT_PAST_EVENT_TO_COPY}</FormLabel>
+                    <Select
+                      placeholder="Select option"
+                      onChange={(e) => setCopiedPastEventId(Number(e.target.value))}
+                    >
+                      {events?.map((event: Event.EventRecord) => (
+                        <option
+                          value={Number(event.eventRecordId)}
+                          key={Number(event.eventRecordId)}>
+                          {event.name}
+                        </option>
+                      ))}
+                    </Select>
+                    <Button mt={4} onClick={onCopyPastEventChange}>
+                      {t.COPY}
+                    </Button>
+                  </FormControl>
+                  <Divider borderWidth={1.3} mt={14} mb={20} /></>
+              )}
               <FormControl mb={5}>
                 <FormLabel htmlFor="name">{t.EVENT_NAME}</FormLabel>
                 <Controller
