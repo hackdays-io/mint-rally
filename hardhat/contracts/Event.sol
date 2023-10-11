@@ -267,21 +267,6 @@ contract EventManager is OwnableUpgradeable {
         return _eventRecord;
     }
 
-    // TODO: Remove after isGroupOwnerOrAdminOrCollaboratorByEventId is released
-    function isGroupOwnerByEventId(
-        address _address,
-        uint256 _eventId
-    ) public view returns (bool) {
-        uint256 _groupId = groupIdByEventId[_eventId];
-        bool isGroupOwner = false;
-        for (uint256 _i = 0; _i < ownGroupIds[_address].length; _i++) {
-            if (ownGroupIds[_address][_i] == _groupId) {
-                isGroupOwner = true;
-            }
-        }
-        return isGroupOwner;
-    }
-
     function isGroupOwnerOrAdminOrCollaboratorByEventId(address _address, uint256 _eventId) external view returns (bool) {
         uint256 _groupId = groupIdByEventId[_eventId];
         return _isGroupOwnerOrAdminOrCollaborator(_groupId, _address);
