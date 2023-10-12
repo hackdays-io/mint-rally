@@ -10,7 +10,7 @@ import {
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 // eslint-disable-next-line node/no-missing-import
 import { generateProof, wrongProofCalldata } from "./helper/secret_phrase";
-import { BigNumberish, BytesLike, Signer } from "ethers";
+import { BigNumberish, BytesLike, Signer, utils } from "ethers";
 
 // ToDo requiredParticipateCountに重複がある場合エラーになってしまう。
 const attributes = [
@@ -27,6 +27,10 @@ const attributes = [
     requiredParticipateCount: 5,
   },
 ];
+
+const ADMIN_ROLE = utils.keccak256(utils.toUtf8Bytes("ADMIN"));
+const COLLABORATOR_ROLE = utils.keccak256(utils.toUtf8Bytes("COLLABORATOR"));
+
 // deploy functions
 /**
  * deploy secretPhraseVerifier
@@ -610,13 +614,13 @@ describe("mint locked flag", () => {
 
     eventManager
       .connect(organizer)
-      .grantAdminRole(createdGroupId, participant1.address);
+      .grantRole(createdGroupId, participant1.address, ADMIN_ROLE);
     await mintNFT.connect(participant1).changeMintLocked(1, false);
 
     // Clean up
     eventManager
       .connect(organizer)
-      .revokeAdminRole(createdGroupId, participant1.address);
+      .revokeRole(createdGroupId, participant1.address, ADMIN_ROLE);
   });
 
   it("should change flag by collaborator", async () => {
@@ -626,13 +630,13 @@ describe("mint locked flag", () => {
 
     eventManager
       .connect(organizer)
-      .grantCollaboratorRole(createdGroupId, participant1.address);
+      .grantRole(createdGroupId, participant1.address, COLLABORATOR_ROLE);
     await mintNFT.connect(participant1).changeMintLocked(1, false);
 
     // Clean up
     eventManager
       .connect(organizer)
-      .revokeCollaboratorRole(createdGroupId, participant1.address);
+      .revokeRole(createdGroupId, participant1.address, COLLABORATOR_ROLE);
   });
 
   it("should not change if paused", async () => {
@@ -713,13 +717,13 @@ describe("reset secret phrase", () => {
 
     eventManager
       .connect(organizer)
-      .grantAdminRole(createdGroupId, participant1.address);
+      .grantRole(createdGroupId, participant1.address, ADMIN_ROLE);
     await mintNFT.connect(participant1).resetSecretPhrase(1, newProofCalldata);
 
     // Clean up
     eventManager
       .connect(organizer)
-      .revokeAdminRole(createdGroupId, participant1.address);
+      .revokeRole(createdGroupId, participant1.address, ADMIN_ROLE);
   });
 
   it("should reset secret phrase by collaborator", async () => {
@@ -732,13 +736,13 @@ describe("reset secret phrase", () => {
 
     eventManager
       .connect(organizer)
-      .grantCollaboratorRole(createdGroupId, participant1.address);
+      .grantRole(createdGroupId, participant1.address, COLLABORATOR_ROLE);
     await mintNFT.connect(participant1).resetSecretPhrase(1, newProofCalldata);
 
     // Clean up
     eventManager
       .connect(organizer)
-      .revokeCollaboratorRole(createdGroupId, participant1.address);
+      .revokeRole(createdGroupId, participant1.address, COLLABORATOR_ROLE);
   });
 
   it("cannot change if paused", async () => {
