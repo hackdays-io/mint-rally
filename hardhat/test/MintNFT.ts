@@ -594,6 +594,16 @@ describe("bulk mint by event owner", () => {
       secretPhrase: publicInputCalldata[0],
       eventNFTAttributes: attributes,
     });
+    await createEventRecord(eventManager, {
+      groupId: createdGroupId,
+      name: "event2",
+      description: "event1 description",
+      date: "2022-07-3O",
+      mintLimit: 10,
+      useMtx: false,
+      secretPhrase: publicInputCalldata[0],
+      eventNFTAttributes: attributes,
+    });
 
     const eventsList = await eventManager.getEventRecords(0, 0);
     createdEventIds = eventsList.map((event) => event.eventRecordId.toNumber());
@@ -602,7 +612,7 @@ describe("bulk mint by event owner", () => {
     await expect(
       mintNFT
         .connect(organizer)
-        .dropNFTs(createdEventIds[0], [
+        .dropNFTs(createdEventIds[1], [
           participant1.address,
           participant2.address,
           participant3.address,
@@ -612,13 +622,17 @@ describe("bulk mint by event owner", () => {
         ])
     )
       .to.emit(mintNFT, "DroppedNFTs")
-      .withArgs(organizer.address, createdEventIds[0]);
-    expect(await mintNFT.ownerOf(0)).equal(participant1.address);
-    expect(await mintNFT.ownerOf(1)).equal(participant2.address);
-    expect(await mintNFT.ownerOf(2)).equal(participant3.address);
-    expect(await mintNFT.ownerOf(3)).equal(participant4.address);
-    expect(await mintNFT.ownerOf(4)).equal(participant5.address);
-    expect(await mintNFT.ownerOf(5)).equal(participant6.address);
+      .withArgs(organizer.address, createdEventIds[1]);
+    it("should return NFTs by specified Event ID", async () => {
+      expect(await mintNFT.getNFTHoldersByEvent(createdEventIds[1])).to.equal([
+        participant1,
+        participant2,
+        participant3,
+        participant4,
+        participant5,
+        participant6,
+      ]);
+    });
   });
   it("prohibit drop NFTs by not event owner", async () => {
     await expect(
@@ -633,6 +647,28 @@ describe("bulk mint by event owner", () => {
           participant6.address,
         ])
     ).revertedWith("you are not event group owner");
+  });
+  it("should raise error when the number of NFTs to be dropped is greater than the remaining count", async () => {
+    const [
+      participant7,
+      participant8,
+      participant9,
+      participant10,
+      participant11,
+      participant12,
+    ] = await ethers.getSigners();
+    await expect(
+      mintNFT
+        .connect(organizer)
+        .dropNFTs(createdEventIds[1], [
+          participant7.address,
+          participant8.address,
+          participant9.address,
+          participant10.address,
+          participant11.address,
+          participant12.address,
+        ])
+    ).revertedWith("remaining count is not enough");
   });
 });
 

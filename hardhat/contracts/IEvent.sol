@@ -18,4 +18,8 @@ interface IEventManager {
     function getEventRecordsByGroupId(
         uint256 _groupId
     ) external view returns (EventRecord[] memory);
+
+    function getEventById(
+        uint256 _eventId
+    ) external view returns (EventRecord memory);
 }

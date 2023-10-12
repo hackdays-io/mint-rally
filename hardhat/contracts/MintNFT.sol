@@ -133,21 +133,25 @@ contract MintNFT is
         uint256[24] memory _proof
     ) external whenNotPaused {
         canMint(_eventId, _proof);
-        remainingEventNftCount[_eventId] = remainingEventNftCount[_eventId] - 1;
 
         ISecretPhraseVerifier secretPhraseVerifier = ISecretPhraseVerifier(
             secretPhraseVerifierAddr
         );
         secretPhraseVerifier.submitProof(_proof, _eventId);
+        _mintNFT(_groupId, _eventId, _msgSender());
+    }
 
+    function _mintNFT(
+        uint256 _groupId,
+        uint256 _eventId,
+        address _address
+    ) internal {
+        remainingEventNftCount[_eventId] = remainingEventNftCount[_eventId] - 1;
         isHoldingEventNFT[
-            Hashing.hashingAddressUint256(_msgSender(), _eventId)
+            Hashing.hashingAddressUint256(_address, _eventId)
         ] = true;
 
-        bytes32 groupHash = Hashing.hashingAddressUint256(
-            _msgSender(),
-            _groupId
-        );
+        bytes32 groupHash = Hashing.hashingAddressUint256(_address, _groupId);
         uint256 participationCount = countOfParticipation[groupHash];
         countOfParticipation[groupHash] = participationCount + 1;
 
@@ -169,25 +173,22 @@ contract MintNFT is
         _safeMint(_msgSender(), _tokenIds.current());
 
         _tokenIds.increment();
-        emit MintedNFTAttributeURL(_msgSender(), metaDataURL);
+        emit MintedNFTAttributeURL(_address, metaDataURL);
     }
 
     function dropNFTs(
         uint256 _eventId,
         address[] memory _addresses
     ) external onlyGroupOwner(_eventId) whenNotPaused {
+        uint256 groupId = getGroupIdByEvent(_eventId);
+        require(
+            remainingEventNftCount[_eventId] >= _addresses.length,
+            "remaining count is not enough"
+        );
         for (uint256 index = 0; index < _addresses.length; index++) {
             address addr = _addresses[index];
             if (!isHoldingEventNFTByAddress(addr, _eventId)) {
-                isHoldingEventNFT[
-                    Hashing.hashingAddressUint256(addr, _eventId)
-                ] = true;
-                nftMetaDataURL[_tokenIds.current()] = eventNftAttributes[
-                    Hashing.hashingDoubleUint256(_eventId, 0)
-                ];
-                tokenIdsByEvent[_eventId].push(_tokenIds.current());
-                _safeMint(addr, _tokenIds.current());
-                _tokenIds.increment();
+                _mintNFT(groupId, _eventId, addr);
             }
         }
         emit DroppedNFTs(_msgSender(), _eventId);
@@ -351,5 +352,11 @@ contract MintNFT is
             }
         }
         return holders;
+    }
+
+    function getGroupIdByEvent(uint256 _eventId) public view returns (uint256) {
+        IEventManager eventManager = IEventManager(eventManagerAddr);
+        EventRecord memory _event = eventManager.getEventById(_eventId);
+        return _event.groupId;
     }
 }
