@@ -58,9 +58,9 @@ contract EventManager is OwnableUpgradeable {
     // groupId => address => Role => bool
     mapping(uint256 => mapping(address => mapping(bytes32 => bool))) private memberRolesByGroupId;
 
-    modifier onlyGroupOwnerOrAdminOrCollaborator(uint256 _groupId) {
+    modifier onlyCollaboratorAccess(uint256 _groupId) {
         require(
-            _isGroupOwnerOrAdminOrCollaborator(_groupId, msg.sender),
+            _hasCollaboratorAccess(_groupId, msg.sender),
             "You have no permission"
         );
         _;
@@ -169,7 +169,7 @@ contract EventManager is OwnableUpgradeable {
         bool _useMtx,
         bytes32 _secretPhrase,
         IMintNFT.NFTAttribute[] memory _eventNFTAttributes
-    ) external payable onlyGroupOwnerOrAdminOrCollaborator(_groupId) whenNotPaused {
+    ) external payable onlyCollaboratorAccess(_groupId) whenNotPaused {
         require(
             _mintLimit > 0 && _mintLimit <= maxMintLimit,
             "mint limit is invalid"
@@ -267,20 +267,20 @@ contract EventManager is OwnableUpgradeable {
         return _eventRecord;
     }
 
-    function isGroupOwnerOrAdminOrCollaboratorByEventId(address _address, uint256 _eventId) external view returns (bool) {
+    function hasCollaboratorAccessByEventId(address _address, uint256 _eventId) external view returns (bool) {
         uint256 _groupId = groupIdByEventId[_eventId];
-        return _isGroupOwnerOrAdminOrCollaborator(_groupId, _address);
+        return _hasCollaboratorAccess(_groupId, _address);
     }
 
     function grantRole(uint256 _groupId, address _address, bytes32 _role) external whenNotPaused {
-        require(_isGroupOwnerOrAdmin(_groupId, msg.sender), "Not permitted");
+        require(_hasAdminAccess(_groupId, msg.sender), "Not permitted");
         require(_isValidRole(_role), "Invalid role");
 
         memberRolesByGroupId[_groupId][_address][_role] = true;
     }
 
     function revokeRole(uint256 _groupId, address _address, bytes32 _role) external whenNotPaused {
-        require(_isGroupOwnerOrAdmin(_groupId, msg.sender), "Not permitted");
+        require(_hasAdminAccess(_groupId, msg.sender), "Not permitted");
         require(_isValidRole(_role), "Invalid role");
 
         delete memberRolesByGroupId[_groupId][_address][_role];
@@ -290,16 +290,16 @@ contract EventManager is OwnableUpgradeable {
         return _role == ADMIN_ROLE || _role == COLLABORATOR_ROLE;
     }
 
-    function _isGroupOwnerOrAdmin(uint256 _groupId, address _address) private view returns (bool) {
+    function _hasAdminAccess(uint256 _groupId, address _address) private view returns (bool) {
         require(_groupId > 0 && _groupId <= groups.length, "Invalid groupId");
 
         return groups[_groupId - 1].ownerAddress == _address || _hasRole(_groupId, _address, ADMIN_ROLE);
     }
 
-    function _isGroupOwnerOrAdminOrCollaborator(uint256 _groupId, address _address) private view returns (bool) {
+    function _hasCollaboratorAccess(uint256 _groupId, address _address) private view returns (bool) {
         require(_groupId > 0 && _groupId <= groups.length, "Invalid groupId");
 
-        return _isGroupOwnerOrAdmin(_groupId, _address) || _hasRole(_groupId, _address, COLLABORATOR_ROLE);
+        return _hasAdminAccess(_groupId, _address) || _hasRole(_groupId, _address, COLLABORATOR_ROLE);
     }
 
     function _hasRole(uint256 _groupId, address _address, bytes32 _role) private view returns (bool) {

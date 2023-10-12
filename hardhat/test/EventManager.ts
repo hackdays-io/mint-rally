@@ -1057,7 +1057,7 @@ describe("EventManager", function () {
       });
     });
 
-    describe("isGroupOwnerOrAdminOrCollaboratorByEventId", async () => {
+    describe("hasCollaboratorAccessByEventId", async () => {
       let publicInputCalldata: any;
 
       beforeEach(async () => {
@@ -1108,7 +1108,7 @@ describe("EventManager", function () {
         const eventId = eventRecords[1].eventRecordId.toNumber(); // 2nd event id
 
         expect(
-          await eventManager.isGroupOwnerOrAdminOrCollaboratorByEventId(
+          await eventManager.hasCollaboratorAccessByEventId(
             organizer.address,
             eventId
           )
@@ -1116,13 +1116,13 @@ describe("EventManager", function () {
 
         // check before grant
         expect(
-          await eventManager.isGroupOwnerOrAdminOrCollaboratorByEventId(
+          await eventManager.hasCollaboratorAccessByEventId(
             participant1.address,
             eventId
           )
         ).to.equal(false);
         expect(
-          await eventManager.isGroupOwnerOrAdminOrCollaboratorByEventId(
+          await eventManager.hasCollaboratorAccessByEventId(
             participant2.address,
             eventId
           )
@@ -1136,13 +1136,13 @@ describe("EventManager", function () {
           COLLABORATOR_ROLE
         );
         expect(
-          await eventManager.isGroupOwnerOrAdminOrCollaboratorByEventId(
+          await eventManager.hasCollaboratorAccessByEventId(
             participant1.address,
             eventId
           )
         ).to.equal(true);
         expect(
-          await eventManager.isGroupOwnerOrAdminOrCollaboratorByEventId(
+          await eventManager.hasCollaboratorAccessByEventId(
             participant2.address,
             eventId
           )
