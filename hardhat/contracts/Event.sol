@@ -284,32 +284,22 @@ contract EventManager is OwnableUpgradeable {
         return isGroupOwner;
     }
 
-    function grantAdminRole(uint256 _groupId, address _address) external {
-        _grantRole(_groupId, _address, ADMIN_ROLE);
-    }
-
-    function grantCollaboratorRole(uint256 _groupId, address _address) external {
-        _grantRole(_groupId, _address, COLLABORATOR_ROLE);
-    }
-
-    function revokeAdminRole(uint256 _groupId, address _address) external {
-        _revokeRole(_groupId, _address, ADMIN_ROLE);
-    }
-
-    function revokeCollaboratorRole(uint256 _groupId, address _address) external {
-        _revokeRole(_groupId, _address, COLLABORATOR_ROLE);
-    }
-
-    function _grantRole(uint256 _groupId, address _address, bytes32 _role) private whenNotPaused {
+    function grantRole(uint256 _groupId, address _address, bytes32 _role) external whenNotPaused {
         require(_isGroupOwnerOrAdmin(_groupId, msg.sender), "Not permitted");
+        require(_isValidRole(_role), "Invalid role");
 
         memberRolesByGroupId[_groupId][_address][_role] = true;
     }
 
-    function _revokeRole(uint256 _groupId, address _address, bytes32 _role) private whenNotPaused {
+    function revokeRole(uint256 _groupId, address _address, bytes32 _role) external whenNotPaused {
         require(_isGroupOwnerOrAdmin(_groupId, msg.sender), "Not permitted");
+        require(_isValidRole(_role), "Invalid role");
 
         delete memberRolesByGroupId[_groupId][_address][_role];
+    }
+
+    function _isValidRole(bytes32 _role) private pure returns (bool) {
+        return _role == ADMIN_ROLE || _role == COLLABORATOR_ROLE;
     }
 
     function _isGroupOwnerOrAdmin(uint256 _groupId, address _sender) private view returns (bool) {
