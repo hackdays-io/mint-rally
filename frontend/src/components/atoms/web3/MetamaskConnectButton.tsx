@@ -9,7 +9,11 @@ import { useLocale } from "src/hooks/useLocale";
 import { useDeeplink2Metamask } from "src/hooks/useWallet";
 import { chainId } from "src/libs/web3Config";
 
-const MetamaskConnectButton: FC = () => {
+type Props = {
+  buttonText?: string;
+};
+
+const MetamaskConnectButton: FC<Props> = ({ buttonText }) => {
   const { t } = useLocale();
   const metamaskConfig = metamaskWallet();
   const connect = useConnect();
@@ -45,7 +49,7 @@ const MetamaskConnectButton: FC = () => {
       )}
       isLoading={["connecting"].includes(connectionStatus)}
     >
-      {t.CONNECT_WITH_METAMASK}
+      {buttonText || t.CONNECT_WITH_METAMASK}
     </Button>
   );
 };

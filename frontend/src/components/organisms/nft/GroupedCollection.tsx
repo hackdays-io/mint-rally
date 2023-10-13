@@ -13,7 +13,7 @@ export const GroupedCollection: FC<Props> = ({ groupedNFTs }) => {
   return isLoading ? (
     <Spinner />
   ) : (
-    <Box mt={5}>
+    <Box>
       {Object.keys(groupedNFTs).map((groupId: string) => (
         <Box mb={10} key={`group${groupId}`}>
           <Heading
@@ -32,9 +32,9 @@ export const GroupedCollection: FC<Props> = ({ groupedNFTs }) => {
 
           <Grid
             mt={5}
-            columnGap={5}
-            rowGap={10}
+            gap={5}
             gridTemplateColumns={{ md: "1fr 1fr 1fr 1fr 1fr", sm: "1fr 1fr" }}
+            alignItems="start"
           >
             {groupedNFTs[Number(groupId)].map((nft) => (
               <NFTItem

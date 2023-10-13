@@ -17,6 +17,7 @@ export default {
   CONNECT_WITH_METAMASK: "Connect with Metamask",
   CONNECT_WITH_EMAIL: "Connect with Email",
   CONNECT_WITH_SAFE: "Connect with Safe",
+  CONNECT_WITH_WALLETCONNECT: "Connect with WalletConnect",
   INPUT_SAFE_WALLET_ADDRESS: "Input Safe Wallet Address",
   NOT_ALLOWED_MAGIC_LINK: "This event is not supported email login.",
   MAGICLINK_IS_NOT_SUPPORTED_USE_OTHERS:
@@ -59,6 +60,7 @@ export default {
   // Event page
   SIGN_IN_TO_GET_NFT: "Sign in to get NFT!",
   GET_NFT_USING_METAMASK: "Get NFT with Metamask",
+  GET_NFT_USING_WALLETCONNECT: "Get NFT with WalletConnect",
   GET_NFT_USING_EMAIL: "Get NFT with Email",
   EMAIL_ADDRESS: "Email address",
   PLEASE_ENTER_EMAIL_ADDRESS: "Please enter your email address and connect.",

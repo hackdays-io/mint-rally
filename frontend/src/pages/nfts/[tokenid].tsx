@@ -17,6 +17,7 @@ import Image from "next/image";
 import { FC } from "react";
 import { OrganizerRows } from "src/components/atoms/events/OrganizerInfo";
 import { ShareButtons } from "src/components/atoms/nft/ShareButtons";
+import { ViewButtons } from "src/components/atoms/nft/ViewBottons";
 import ENSName from "src/components/atoms/web3/ENSName";
 import { useLocale } from "src/hooks/useLocale";
 import {
@@ -109,12 +110,19 @@ const Entity: FC<Props> = (props: Props) => {
                   />
                 </Box>
 
-                <Flex justifyContent="center" pb={4} width={{ md: 350 }}>
+                <Flex justifyContent="center" width={{ md: 350 }}>
                   <ShareButtons
                     tokenId={Number(props.tokenid)}
                     address={props.address!}
                     twitter
                     facebook
+                  />
+                </Flex>
+                <Flex justifyContent="center" width={{ md: 350 }}>
+                  <ViewButtons
+                    tokenId={Number(props.tokenid)}
+                    address={props.address!}
+                    opensea
                   />
                 </Flex>
               </Box>
