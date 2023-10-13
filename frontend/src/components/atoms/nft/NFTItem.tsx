@@ -3,6 +3,7 @@ import { FC } from "react";
 import { NFT } from "types/NFT";
 import { ipfs2http } from "utils/ipfs2http";
 import { ShareButtons } from "./ShareButtons";
+import { ViewButtons } from "./ViewBottons";
 import NextLink from "next/link";
 
 type Props = {
@@ -12,7 +13,7 @@ type Props = {
   clickable?: boolean;
   address?: string;
   showShareButtons?: boolean;
-  showOpenSeaLink?: boolean;
+  showViewButtons?: boolean;
 };
 
 export const NFTItem: FC<Props> = ({
@@ -21,6 +22,7 @@ export const NFTItem: FC<Props> = ({
   clickable = true,
   address = "",
   showShareButtons = false,
+  showViewButtons = false,
 }) => {
   return (
     <>
@@ -56,6 +58,13 @@ export const NFTItem: FC<Props> = ({
             address={address}
             twitter={true}
             facebook={true}
+          />
+        )}
+        {showViewButtons && (
+          <ViewButtons
+            tokenId={tokenId}
+            address={address}
+            opensea={true}
           />
         )}
       </Flex>
