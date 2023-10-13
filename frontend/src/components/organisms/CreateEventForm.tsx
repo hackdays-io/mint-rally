@@ -86,7 +86,7 @@ const CreateEventForm: FC<Props> = ({ address }) => {
     },
   });
 
-  const { remove, append } = useFieldArray({ control, name: "nfts" });
+  const { fields, remove, append } = useFieldArray({ control, name: "nfts" });
 
   const { gasFee } = useCalcMtxGasFee(watch("mintLimit"));
 
@@ -477,6 +477,7 @@ const CreateEventForm: FC<Props> = ({ address }) => {
                 <NFTAttributesForm
                   control={control}
                   nfts={watch("nfts")}
+                  fields={fields}
                   append={append}
                   remove={remove}
                 />
