@@ -67,7 +67,7 @@ contract MintNFT is
     modifier onlyCollaboratorAccess(uint256 _eventId) {
         IEventManager eventManager = IEventManager(eventManagerAddr);
         require(
-            eventManager.hasCollaboratorAccessByEventId(msg.sender, _eventId),
+            eventManager.hasCollaboratorAccessByEventId(_msgSender(), _eventId),
             "you have no permission"
         );
         _;
