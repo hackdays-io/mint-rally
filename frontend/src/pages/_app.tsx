@@ -28,6 +28,12 @@ function MyApp({ Component, pageProps }: AppProps) {
         supportedWallets={supportedWallets}
         clientId={process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID!}
         theme="light"
+        dAppMeta={{
+          name: "MintRally",
+          url: "https://mintrally.xyz",
+          logoUrl: "https://mintrally.xyz/images/logo.png",
+          description: "MintRally is a Proof of Participation NFT platform.",
+        }}
       >
         <ChakraProvider theme={chakraTheme}>
           <Layout>
