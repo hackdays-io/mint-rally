@@ -10,7 +10,7 @@ import {
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 // eslint-disable-next-line node/no-missing-import
 import { generateProof, wrongProofCalldata } from "./helper/secret_phrase";
-import { BigNumberish, BytesLike, Signer } from "ethers";
+import { BigNumberish, BytesLike, Signer, utils } from "ethers";
 
 // ToDo requiredParticipateCountに重複がある場合エラーになってしまう。
 const attributes = [
@@ -27,6 +27,10 @@ const attributes = [
     requiredParticipateCount: 5,
   },
 ];
+
+const ADMIN_ROLE = utils.keccak256(utils.toUtf8Bytes("ADMIN"));
+const COLLABORATOR_ROLE = utils.keccak256(utils.toUtf8Bytes("COLLABORATOR"));
+
 // deploy functions
 /**
  * deploy secretPhraseVerifier
@@ -600,7 +604,39 @@ describe("mint locked flag", () => {
   it("No one but the owner should be able to change mintable flag", async () => {
     await expect(
       mintNFT.connect(participant1).changeMintLocked(1, false)
-    ).to.be.revertedWith("you are not event group owner");
+    ).to.be.revertedWith("you have no permission");
+  });
+
+  it("should change flag by admin", async () => {
+    await expect(
+      mintNFT.connect(participant1).changeMintLocked(1, false)
+    ).to.be.revertedWith("you have no permission");
+
+    eventManager
+      .connect(organizer)
+      .grantRole(createdGroupId, participant1.address, ADMIN_ROLE);
+    await mintNFT.connect(participant1).changeMintLocked(1, false);
+
+    // Clean up
+    eventManager
+      .connect(organizer)
+      .revokeRole(createdGroupId, participant1.address, ADMIN_ROLE);
+  });
+
+  it("should change flag by collaborator", async () => {
+    await expect(
+      mintNFT.connect(participant1).changeMintLocked(1, false)
+    ).to.be.revertedWith("you have no permission");
+
+    eventManager
+      .connect(organizer)
+      .grantRole(createdGroupId, participant1.address, COLLABORATOR_ROLE);
+    await mintNFT.connect(participant1).changeMintLocked(1, false);
+
+    // Clean up
+    eventManager
+      .connect(organizer)
+      .revokeRole(createdGroupId, participant1.address, COLLABORATOR_ROLE);
   });
 
   it("should not change if paused", async () => {
@@ -668,7 +704,45 @@ describe("reset secret phrase", () => {
       "0x1f376ca3150d51a164c711287cff6e77e2127d635a1534b41d5624472f000000";
     await expect(
       mintNFT.connect(participant1).resetSecretPhrase(1, newProofCalldata)
-    ).to.be.revertedWith("you are not event group owner");
+    ).to.be.revertedWith("you have no permission");
+  });
+
+  it("should reset secret phrase by admin", async () => {
+    const newProofCalldata =
+      "0x1f376ca3150d51a164c711287cff6e77e2127d635a1534b41d5624472f000000";
+
+    await expect(
+      mintNFT.connect(participant1).resetSecretPhrase(1, newProofCalldata)
+    ).to.be.revertedWith("you have no permission");
+
+    eventManager
+      .connect(organizer)
+      .grantRole(createdGroupId, participant1.address, ADMIN_ROLE);
+    await mintNFT.connect(participant1).resetSecretPhrase(1, newProofCalldata);
+
+    // Clean up
+    eventManager
+      .connect(organizer)
+      .revokeRole(createdGroupId, participant1.address, ADMIN_ROLE);
+  });
+
+  it("should reset secret phrase by collaborator", async () => {
+    const newProofCalldata =
+      "0x1f376ca3150d51a164c711287cff6e77e2127d635a1534b41d5624472f000000";
+
+    await expect(
+      mintNFT.connect(participant1).resetSecretPhrase(1, newProofCalldata)
+    ).to.be.revertedWith("you have no permission");
+
+    eventManager
+      .connect(organizer)
+      .grantRole(createdGroupId, participant1.address, COLLABORATOR_ROLE);
+    await mintNFT.connect(participant1).resetSecretPhrase(1, newProofCalldata);
+
+    // Clean up
+    eventManager
+      .connect(organizer)
+      .revokeRole(createdGroupId, participant1.address, COLLABORATOR_ROLE);
   });
 
   it("cannot change if paused", async () => {
