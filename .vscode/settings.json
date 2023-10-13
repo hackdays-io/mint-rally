@@ -1,4 +1,5 @@
 {
   "solidity.packageDefaultDependenciesContractsDirectory": "",
-  "solidity.packageDefaultDependenciesDirectory": "../node_modules"
+  "solidity.packageDefaultDependenciesDirectory": "./hardhat/node_modules",
+  "typescript.tsdk": "./frontend/node_modules/typescript/lib"
 }

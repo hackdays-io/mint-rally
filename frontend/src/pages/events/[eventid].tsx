@@ -50,7 +50,7 @@ const MintNFTSection: FC<{ event: Event.EventRecord }> = ({ event }) => {
             tokenId={holdingNFT.tokenId || 0}
             address={address}
             showShareButtons={true}
-            showOpenSeaLink={true}
+            showViewButtons={true}
           />
         </Box>
       ) : (

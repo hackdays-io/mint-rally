@@ -26,11 +26,16 @@ import { useDeeplink2Metamask } from "src/hooks/useWallet";
 import { chainId } from "src/libs/web3Config";
 
 type Props = {
-  selected: (selected: boolean) => void;
+  selected: boolean;
+  setSelected: (selected: boolean) => void;
   setConnecting: (connecting: boolean) => void;
 };
 
-const SafeConnectButton: FC<Props> = ({ selected, setConnecting }) => {
+const SafeConnectButton: FC<Props> = ({
+  selected,
+  setSelected,
+  setConnecting,
+}) => {
   const { t } = useLocale();
   const safeConfig = safeWallet();
   const metamaskConfig = metamaskWallet();
@@ -41,7 +46,6 @@ const SafeConnectButton: FC<Props> = ({ selected, setConnecting }) => {
 
   const deeplink = useDeeplink2Metamask();
 
-  const [isSelected, setSelected] = useState<boolean>(false);
   const [safeAddress, setSafeAddress] = useState("");
 
   const handleMetamaskConnect = useCallback(async () => {
@@ -58,15 +62,18 @@ const SafeConnectButton: FC<Props> = ({ selected, setConnecting }) => {
     }
     setConnecting(false);
     setSelected(false);
-    selected(false);
-  }, [selected, setSelected, setConnecting, disconnect, personalWallet]);
+  }, [setSelected, setConnecting, disconnect, personalWallet]);
+
+  const handleSelect = useCallback(() => {
+    setConnecting(true);
+    setSelected(true);
+  }, []);
 
   const handleConnect = useCallback(async () => {
     if (!personalWallet) return;
     await connect(safeConfig, { chain: Polygon, safeAddress, personalWallet });
     setConnecting(false);
     setSelected(false);
-    selected(false);
   }, [connect, personalWallet, safeAddress, safeConfig]);
 
   const SafeIcon = () => (
@@ -75,7 +82,7 @@ const SafeConnectButton: FC<Props> = ({ selected, setConnecting }) => {
 
   return (
     <>
-      {!isSelected ? (
+      {!selected ? (
         <Button
           w={280}
           leftIcon={<SafeIcon />}
@@ -84,25 +91,19 @@ const SafeConnectButton: FC<Props> = ({ selected, setConnecting }) => {
             backgroundColor: "#562406",
             color: "#fff",
           }}
-          onClick={() => {
-            setConnecting(true);
-            setSelected(true);
-            selected(true);
-          }}
+          onClick={handleSelect}
         >
           {t.CONNECT_WITH_SAFE}
         </Button>
       ) : (
-        <Box maxW="100%" width="400px" textAlign="left">
+        <Box maxW="400px" w={{ base: "auto", md: "400px" }} textAlign="left">
           <HStack mb={{ base: 2, md: 0 }}>
             <Button
               leftIcon={<FontAwesomeIcon icon={faArrowLeft} />}
               _hover={{ background: "transparent" }}
               p={0}
               background="transparent"
-              onClick={() => {
-                handleBack();
-              }}
+              onClick={handleBack}
             >
               Back
             </Button>
