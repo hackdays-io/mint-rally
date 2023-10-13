@@ -12,22 +12,20 @@ import { useRouter } from "next/router";
 import { XIcon } from "../icons/TwitterXicon/TwitterXicon";
 
 type Props = {
-  tokenId: number;
   address: string;
   twitter?: boolean;
   facebook?: boolean;
 };
 
 export const ShareButtons: FC<Props> = ({
-  tokenId,
   address,
   twitter = null,
   facebook = null,
 }) => {
   const router = useRouter();
   const shareUrl = useMemo(() => {
-    return `https://mintrally.xyz/${router.locale}/nfts/${tokenId}`;
-  }, [router.locale, tokenId]);
+    return `https://mintrally.xyz/${router.locale}/users/${address}`;
+  }, [router.locale, address]);
   const copyClipBoard = () => {
     const copyText: any = document.getElementById("shareURL");
     copyText?.select();
@@ -35,14 +33,11 @@ export const ShareButtons: FC<Props> = ({
   };
 
   return (
-    <Flex alignItems="center" my={2}>
-      <Text mb={1} mr={5}>
-        Share on
-      </Text>
+    <Flex alignItems="center">
       {/* {twitter && (
         <TwitterShareButton
           url={shareUrl}
-          title={`Check out my NFT on Mintrally!`}
+          title={`Check out my NFT Collection on MintRally!`}
           hashtags={["MintRally"]}
           style={{ marginRight: "5px" }}
         >
@@ -54,21 +49,21 @@ export const ShareButtons: FC<Props> = ({
       {twitter && (
         <TwitterShareButton
           url={shareUrl}
-          title={`Check out my NFT on Mintrally!`}
+          title={`Check out my NFT Collection on MintRally!`}
           hashtags={["MintRally"]}
           style={{ marginRight: "8px" }}
         >
-          <XIcon color="black" />
+          <XIcon color="black" maxWidth="18px" />
         </TwitterShareButton>
       )}
 
       {facebook && (
         <FacebookShareButton
           url={shareUrl}
-          quote={`Check out my NFT on Mintrally!`}
+          quote={`Check out my NFT Collection on MintRally!`}
           hashtag="#MintRally"
         >
-          <FacebookIcon size={32} round />
+          <FacebookIcon size={24} round />
         </FacebookShareButton>
       )}
       <Icon
@@ -77,7 +72,7 @@ export const ShareButtons: FC<Props> = ({
         w={6}
         h={6}
         color="green.500"
-        size="lg"
+        boxSize={5}
         mx={2}
         cursor="pointer"
       />

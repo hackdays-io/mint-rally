@@ -36,6 +36,22 @@ const Footer = () => (
           Discord
         </Box>
       </Link>
+      <Link href="https://twitter.com/mint_rally" target="_blank">
+        <Box
+          cursor="pointer"
+          as="span"
+          py="1"
+          px="3"
+          ml={2}
+          backgroundColor="mint.bg"
+          borderRadius="full"
+          fontSize="sm"
+          color="mint.primary"
+          fontWeight="bold"
+        >
+          X
+        </Box>
+      </Link>
     </Box>
   </Box>
 );

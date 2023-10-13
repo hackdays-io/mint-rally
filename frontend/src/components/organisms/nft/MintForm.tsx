@@ -8,6 +8,7 @@ import AlertMessage from "src/components/atoms/form/AlertMessage";
 import { useReward } from "react-rewards";
 import { useWallet } from "@thirdweb-dev/react";
 import { NFTItem } from "src/components/atoms/nft/NFTItem";
+import { useRouter } from "next/router";
 
 type Props = {
   event: Event.EventRecord;
@@ -16,6 +17,10 @@ type Props = {
 
 export const MintForm: FC<Props> = ({ event, address }) => {
   const { t } = useLocale();
+  const {
+    query: { secret_phrase },
+    asPath,
+  } = useRouter();
   const walletMetadata = useWallet()?.getMeta();
 
   const {
@@ -45,6 +50,10 @@ export const MintForm: FC<Props> = ({ event, address }) => {
   }, [status, mintedNFT]);
 
   const [enteredSecretPhrase, setEnteredSecretPhrase] = useState("");
+
+  useEffect(() => {
+    if (secret_phrase) setEnteredSecretPhrase(secret_phrase.toString());
+  }, [secret_phrase]);
 
   const claimMint = useCallback(async () => {
     if (!event) return;
@@ -123,7 +132,7 @@ export const MintForm: FC<Props> = ({ event, address }) => {
                 clickable={false}
                 address={address}
                 showShareButtons={true}
-                showOpenSeaLink={true}
+                showViewButtons={true}
               />
             </Box>
             <span id="confettiReward" />
