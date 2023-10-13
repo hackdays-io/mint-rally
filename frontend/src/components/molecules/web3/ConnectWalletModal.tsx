@@ -37,6 +37,7 @@ export const ConnectWalletModal: FC<Props> = ({
               <WalletConnectButton
                 selected={walletConnectSelected}
                 setSelected={setWalletConnectSelected}
+                onStartConnect={onClose}
               />
             )}
             {!magicLinkSelected && !walletConnectSelected && (

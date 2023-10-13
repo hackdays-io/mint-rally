@@ -14,19 +14,21 @@ type Props = {
   selected: boolean;
   setSelected: (selected: boolean) => void;
   buttonText?: string;
+  onStartConnect?: () => void;
 };
 
 const WalletConnectButton: FC<Props> = ({
   selected,
   setSelected,
   buttonText,
+  onStartConnect,
 }) => {
   const { t } = useLocale();
 
   const disconnect = useDisconnect();
   const connectionStatus = useConnectionStatus();
   const { walletConnectConfig } = useWeb3WalletConfig();
-  const handleWalletConnect = useWalletConnect();
+  const handleWalletConnect = useWalletConnect(onStartConnect);
 
   const wallets = useWallets();
 

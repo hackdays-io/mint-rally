@@ -13,12 +13,13 @@ export const activeChain =
     ? Polygon
     : { ...Localhost, chainId: 31337 };
 
-export const useWalletConnect = () => {
+export const useWalletConnect = (onStartConnect?: () => void) => {
   const { walletConnectConfig } = useWeb3WalletConfig();
   const connect = useConnect();
 
   const handleConnect = useCallback(async () => {
     try {
+      onStartConnect && onStartConnect();
       await connect(walletConnectConfig, {
         chainId: activeChain.chainId,
       });
