@@ -1,6 +1,6 @@
 import { BigNumber } from "ethers";
 import { FC } from "react";
-import { Button, Textarea } from "@chakra-ui/react";
+import { Button, FormLabel, Textarea } from "@chakra-ui/react";
 import { Controller, useForm } from "react-hook-form";
 import { Event } from "types/Event";
 import { useDropNFTs } from "src/hooks/useDropNFTs";
@@ -23,38 +23,41 @@ const DropNFTs: FC<Props> = ({ event, address }) => {
     address
   );
   const submit = async (data: FormData) => {
+    console.log(data);
     if (!data.addresses || isLoading) return;
     await dropNFTs(data.addresses.split("\n"));
   };
   return (
     <p>
-      <label htmlFor="addressList">Drop NFTs</label>
-      <Controller
-        control={control}
-        name="addresses"
-        render={({ field }) => (
-          <Textarea
-            backgroundColor="white"
-            maxW={300}
-            value={field.value}
-            onChange={field.onChange}
-            placeholder="Please provide address list. One address per line."
-          />
-        )}
-      />
-      <Button
-        ml={3}
-        size="sm"
-        backgroundColor="transparent"
-        border="1px solid"
-        borderColor="yellow.800"
-        color="yellow.800"
-        type="submit"
-        isLoading={isLoading}
-        disabled={isLoading}
-      >
-        Submit
-      </Button>
+      <form onSubmit={handleSubmit(submit)}>
+        <FormLabel htmlFor="addressList">Drop NFTs</FormLabel>
+        <Controller
+          control={control}
+          name="addresses"
+          render={({ field }) => (
+            <Textarea
+              backgroundColor="white"
+              maxW={300}
+              value={field.value}
+              onChange={field.onChange}
+              placeholder="Please provide address list. One address per line."
+            />
+          )}
+        />
+        <Button
+          ml={3}
+          size="sm"
+          backgroundColor="transparent"
+          border="1px solid"
+          borderColor="yellow.800"
+          color="yellow.800"
+          type="submit"
+          isLoading={isLoading}
+          disabled={isLoading}
+        >
+          Submit
+        </Button>
+      </form>
     </p>
   );
 };
