@@ -623,6 +623,12 @@ describe("bulk mint by event owner", () => {
     )
       .to.emit(mintNFT, "DroppedNFTs")
       .withArgs(organizer.address, createdEventIds[1]);
+    expect(await mintNFT.ownerOf(0)).to.equal(participant1.address);
+    expect(await mintNFT.ownerOf(1)).to.equal(participant2.address);
+    expect(await mintNFT.ownerOf(2)).to.equal(participant3.address);
+    expect(await mintNFT.ownerOf(3)).to.equal(participant4.address);
+    expect(await mintNFT.ownerOf(4)).to.equal(participant5.address);
+    expect(await mintNFT.ownerOf(5)).to.equal(participant6.address);
     it("should return NFTs by specified Event ID", async () => {
       expect(await mintNFT.getNFTHoldersByEvent(createdEventIds[1])).to.equal([
         participant1,
