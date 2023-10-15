@@ -1,10 +1,10 @@
-import { BigNumber } from "ethers";
-import { FC } from "react";
+import { FC, useState } from "react";
 import { Button, FormLabel, Textarea } from "@chakra-ui/react";
 import { Controller, useForm } from "react-hook-form";
 import { Event } from "types/Event";
 import { useDropNFTs } from "src/hooks/useDropNFTs";
-import { useAddress } from "@thirdweb-dev/react";
+import { useLocale } from "src/hooks/useLocale";
+import AlertMessage from "src/components/atoms/form/AlertMessage";
 
 type Props = {
   event: Event.EventRecord;
@@ -15,6 +15,9 @@ type FormData = {
 };
 
 const DropNFTs: FC<Props> = ({ event, address }) => {
+  const { t } = useLocale();
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const { control, handleSubmit } = useForm<FormData>({
     defaultValues: { addresses: "" },
   });
@@ -25,22 +28,29 @@ const DropNFTs: FC<Props> = ({ event, address }) => {
   const submit = async (data: FormData) => {
     console.log(data);
     if (!data.addresses || isLoading) return;
-    await dropNFTs(data.addresses.split("\n"));
+    setIsSuccess(false);
+    setErrorMessage("");
+    try {
+      await dropNFTs(data.addresses.split("\n"));
+      setIsSuccess(true);
+    } catch (e: any) {
+      setErrorMessage(e.message);
+    }
   };
   return (
     <p>
       <form onSubmit={handleSubmit(submit)}>
-        <FormLabel htmlFor="addressList">Drop NFTs</FormLabel>
+        <FormLabel htmlFor="addressList">{t.DROP_NFTs}</FormLabel>
         <Controller
           control={control}
           name="addresses"
           render={({ field }) => (
             <Textarea
               backgroundColor="white"
-              maxW={300}
+              maxW={500}
               value={field.value}
               onChange={field.onChange}
-              placeholder="Please provide address list. One address per line."
+              placeholder={t.PLEASE_PROVIDE_ADDRESS_LIST_TO_DROP_NFT}
             />
           )}
         />
@@ -55,9 +65,13 @@ const DropNFTs: FC<Props> = ({ event, address }) => {
           isLoading={isLoading}
           disabled={isLoading}
         >
-          Submit
+          {t.SUBMIT_DROP_NFTs}
         </Button>
       </form>
+      {isSuccess && (
+        <AlertMessage status="success" title={t.DROP_NFTs_SUCCESS} />
+      )}
+      {errorMessage && <AlertMessage title={errorMessage} />}
     </p>
   );
 };

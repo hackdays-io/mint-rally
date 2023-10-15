@@ -45,14 +45,10 @@ export const useDropNFTs = (
   const dropNFTs = useCallback(
     async (addresses: string[]) => {
       if (!event || !event.eventRecordId) return;
-      try {
-        console.log('dropNFTs', event.eventRecordId, addresses);
-        await mutateAsync({
-          args: [event.eventRecordId, addresses],
-        });
-      } catch (error) {
-        console.log('dropNFTs error', error);
-      }
+      console.log('dropNFTs', event.eventRecordId, addresses);
+      await mutateAsync({
+        args: [event.eventRecordId, addresses],
+      });
     },
     [event, mutateAsync]
   );
