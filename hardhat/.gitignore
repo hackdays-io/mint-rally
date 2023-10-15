@@ -9,7 +9,8 @@ cache
 artifacts
 
 .openzeppelin/unknown-*.json
-
+.openzeppelin/poygon-mumbai.json
+/build/
 /circuits/**/*.ptau
 /circuits/**/*.zkey
 /circuits/**/*.r1cs

@@ -551,6 +551,137 @@ describe("nft revolution", () => {
   });
 });
 
+describe("bulk mint by event owner", () => {
+  let mintNFT: MintNFT;
+  let eventManager: EventManager;
+
+  let createdGroupId: number;
+  let createdEventIds: number[] = [];
+
+  let organizer: SignerWithAddress;
+  let participant1: SignerWithAddress;
+  let participant2: SignerWithAddress;
+  let participant3: SignerWithAddress;
+  let participant4: SignerWithAddress;
+  let participant5: SignerWithAddress;
+  let participant6: SignerWithAddress;
+  let relayer: SignerWithAddress;
+
+  before(async () => {
+    [
+      organizer,
+      participant1,
+      participant2,
+      participant3,
+      participant4,
+      participant5,
+      participant6,
+      relayer,
+    ] = await ethers.getSigners();
+
+    // generate proof
+    const { publicInputCalldata } = await generateProof();
+
+    [, mintNFT, eventManager] = await deployAll(relayer);
+
+    // Create a Group and an Event
+    await createGroup(eventManager, "First Group");
+    const groupsList = await eventManager.getGroups();
+    createdGroupId = groupsList[0].groupId.toNumber();
+    await createEventRecord(eventManager, {
+      groupId: createdGroupId,
+      name: "event1",
+      description: "event1 description",
+      date: "2022-07-3O",
+      mintLimit: 10,
+      useMtx: false,
+      secretPhrase: publicInputCalldata[0],
+      eventNFTAttributes: attributes,
+    });
+    await createEventRecord(eventManager, {
+      groupId: createdGroupId,
+      name: "event2",
+      description: "event1 description",
+      date: "2022-07-3O",
+      mintLimit: 10,
+      useMtx: false,
+      secretPhrase: publicInputCalldata[0],
+      eventNFTAttributes: attributes,
+    });
+
+    const eventsList = await eventManager.getEventRecords(0, 0);
+    createdEventIds = eventsList.map((event) => event.eventRecordId.toNumber());
+  });
+  it("drop NFTs by event owner", async () => {
+    await expect(
+      mintNFT
+        .connect(organizer)
+        .dropNFTs(createdEventIds[1], [
+          participant1.address,
+          participant2.address,
+          participant3.address,
+          participant4.address,
+          participant5.address,
+          participant6.address,
+        ])
+    )
+      .to.emit(mintNFT, "DroppedNFTs")
+      .withArgs(organizer.address, createdEventIds[1]);
+    expect(await mintNFT.ownerOf(0)).to.equal(participant1.address);
+    expect(await mintNFT.ownerOf(1)).to.equal(participant2.address);
+    expect(await mintNFT.ownerOf(2)).to.equal(participant3.address);
+    expect(await mintNFT.ownerOf(3)).to.equal(participant4.address);
+    expect(await mintNFT.ownerOf(4)).to.equal(participant5.address);
+    expect(await mintNFT.ownerOf(5)).to.equal(participant6.address);
+    it("should return NFTs by specified Event ID", async () => {
+      expect(await mintNFT.getNFTHoldersByEvent(createdEventIds[1])).to.equal([
+        participant1,
+        participant2,
+        participant3,
+        participant4,
+        participant5,
+        participant6,
+      ]);
+    });
+  });
+  it("prohibit drop NFTs by not event owner", async () => {
+    await expect(
+      mintNFT
+        .connect(participant1)
+        .dropNFTs(createdEventIds[0], [
+          participant1.address,
+          participant2.address,
+          participant3.address,
+          participant4.address,
+          participant5.address,
+          participant6.address,
+        ])
+    ).revertedWith("you are not event group owner");
+  });
+  it("should raise error when the number of NFTs to be dropped is greater than the remaining count", async () => {
+    const [
+      participant7,
+      participant8,
+      participant9,
+      participant10,
+      participant11,
+      participant12,
+    ] = await ethers.getSigners();
+    await expect(
+      mintNFT
+        .connect(organizer)
+        .dropNFTs(createdEventIds[1], [
+          participant7.address,
+          participant8.address,
+          participant9.address,
+          participant10.address,
+          participant11.address,
+          participant12.address,
+        ])
+    ).revertedWith("remaining count is not enough");
+  });
+});
+
 describe("mint locked flag", () => {
   let mintNFT: MintNFT;
   let eventManager: EventManager;

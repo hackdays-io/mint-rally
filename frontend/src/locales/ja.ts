@@ -22,6 +22,7 @@ export default {
   CONNECT_WITH_METAMASK: "Metamaskで接続",
   CONNECT_WITH_EMAIL: "メールアドレスで接続",
   CONNECT_WITH_SAFE: "Safeで接続",
+  CONNECT_WITH_WALLETCONNECT: "WalletConnectで接続",
   INPUT_SAFE_WALLET_ADDRESS: "Safeのウォレットアドレスを入力",
   NOT_ALLOWED_MAGIC_LINK:
     "このイベントはメールアドレスログインをサポートしていません。",
@@ -61,6 +62,7 @@ export default {
   SIGN_IN_TO_GET_NFT: "NFTをGetしよう！",
   SELECT_WALLET: "NFTの取得方法を選択してください",
   GET_NFT_USING_METAMASK: "Metamask で受け取る",
+  GET_NFT_USING_WALLETCONNECT: "WalletConnect で受け取る",
   GET_NFT_USING_EMAIL: "メールアドレスで受け取る",
   EMAIL_ADDRESS: "メールアドレス",
   PLEASE_ENTER_EMAIL_ADDRESS:

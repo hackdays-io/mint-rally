@@ -7,13 +7,13 @@ import SelectConnectWallet from "src/components/molecules/web3/SelectConnectWall
 
 type Props = {
   children: ReactNode;
-  requiredChainID: number;
+  requiredChainID?: number;
   forbiddenText: string;
 };
 
 const LoginRequired: FC<Props> = ({
   children,
-  requiredChainID,
+  requiredChainID = Number(process.env.NEXT_PUBLIC_CHAIN_ID!),
   forbiddenText,
 }) => {
   const address = useAddress();

@@ -9,12 +9,10 @@ import {
   DrawerOverlay,
   Flex,
   IconButton,
-  Link,
   Spacer,
   useDisclosure,
 } from "@chakra-ui/react";
 import {
-  ConnectWallet,
   useAddress,
   useChainId,
   useDisconnect,
@@ -26,74 +24,83 @@ import router from "next/router";
 import Image from "next/image";
 import { useLocale } from "../hooks/useLocale";
 import LocaleSelector from "./atoms/LocaleSelector";
+import { ConnectWalletModal } from "./molecules/web3/ConnectWalletModal";
+import { FC, useCallback, useState } from "react";
 
-const Navbar = () => {
-  const { isOpen, onOpen, onClose } = useDisclosure();
+const Login: FC = () => {
   const address = useAddress();
   const chainId = useChainId();
   const disconnectWallet = useDisconnect();
   const requiredChainId = +process.env.NEXT_PUBLIC_CHAIN_ID!;
+  const switchChain = useSwitchChain();
   const { t } = useLocale();
 
-  const switchChain = useSwitchChain();
+  return (
+    <Flex justifyContent="center" alignItems="center" mt={{ base: 5, md: 0 }}>
+      {address && (
+        <>
+          {chainId !== requiredChainId ? (
+            <Box pr={4}>
+              <Button
+                bg="mint.subtle"
+                color="mint.font"
+                borderRadius={"16px"}
+                variant="solid"
+                onClick={() => switchChain(requiredChainId)}
+                size="md"
+              >
+                {t.SWITCH_NETWORK}
+              </Button>
+            </Box>
+          ) : (
+            <></>
+          )}
+          <Button
+            bg="mint.subtle"
+            color="mint.font"
+            borderRadius={"16px"}
+            variant="solid"
+            onClick={disconnectWallet}
+            size="md"
+          >
+            {t.SIGN_OUT}
+          </Button>
+        </>
+      )}
+      {address && (
+        <Box marginLeft={3} cursor="pointer">
+          <NextLink href="/users/me">
+            <a>
+              <Image
+                src="/user.png"
+                alt="Loggedin"
+                width={50}
+                height={50}
+                objectFit="contain"
+              />
+            </a>
+          </NextLink>
+        </Box>
+      )}
+    </Flex>
+  );
+};
 
-  const Login = () => {
-    return (
-      <Flex justifyContent="center" alignItems="center" mt={{ base: 5, md: 0 }}>
-        {address ? (
-          <>
-            {chainId !== requiredChainId ? (
-              <Box pr={4}>
-                <Button
-                  bg="mint.subtle"
-                  color="mint.font"
-                  borderRadius={"16px"}
-                  variant="solid"
-                  onClick={() => switchChain(requiredChainId)}
-                  size="md"
-                >
-                  {t.SWITCH_NETWORK}
-                </Button>
-              </Box>
-            ) : (
-              <></>
-            )}
-            <Button
-              bg="mint.subtle"
-              color="mint.font"
-              borderRadius={"16px"}
-              variant="solid"
-              onClick={disconnectWallet}
-              size="md"
-            >
-              {t.SIGN_OUT}
-            </Button>
-          </>
-        ) : (
-          <ConnectWallet
-            theme="light"
-            btnTitle={t.SIGN_IN}
-            style={{ fontWeight: "bold", backgroundColor: "#562406" }}
-          />
-        )}
-        {address && (
-          <Box marginLeft={3} cursor="pointer">
-            <NextLink href="/users/me">
-              <a>
-                <Image
-                  src="/user.png"
-                  alt="Loggedin"
-                  width={50}
-                  height={50}
-                  objectFit="contain"
-                />
-              </a>
-            </NextLink>
-          </Box>
-        )}
-      </Flex>
-    );
-  };
+const Navbar = () => {
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const {
+    isOpen: isConnectWalletOpen,
+    onOpen: onConnectWalletOpen,
+    onClose: onConnectWalletClose,
+  } = useDisclosure();
+  const { t } = useLocale();
+  const address = useAddress();
+  const [connecting, setConnecting] = useState<boolean>(false);
+
+  const handleOpenConnectWallet = useCallback(() => {
+    onConnectWalletOpen();
+    onClose();
+  }, [onConnectWalletOpen, onClose]);
 
   return (
     <>
@@ -112,15 +119,13 @@ const Navbar = () => {
           pr={8}
         >
           <NextLink href="/">
-            <a>
-              <Image
-                src={"/images/logo.svg"}
-                height={75}
-                width={200}
-                objectFit="contain"
-                alt="Mint Rally Logo"
-              />
-            </a>
+            <Image
+              src={"/images/logo.svg"}
+              height={75}
+              width={200}
+              objectFit="contain"
+              alt="Mint Rally Logo"
+            />
           </NextLink>
         </Flex>
         <Box pr={4} display={{ base: "none", md: "block" }}>
@@ -176,7 +181,17 @@ const Navbar = () => {
           </a>
           <LocaleSelector></LocaleSelector>
           <Box px={4}>
-            <Login />
+            {!address || connecting ? (
+              <Button
+                backgroundColor="yellow.900"
+                color="white"
+                onClick={handleOpenConnectWallet}
+              >
+                {t.SIGN_IN}
+              </Button>
+            ) : (
+              <Login />
+            )}
           </Box>
         </Flex>
 
@@ -210,11 +225,31 @@ const Navbar = () => {
                 <Button w="100%">{t.HELP}</Button>
               </a>
               <LocaleSelector></LocaleSelector>
+              {!address && (
+                <Box mt={5}>
+                  <Button
+                    backgroundColor="yellow.900"
+                    color="white"
+                    onClick={handleOpenConnectWallet}
+                  >
+                    {t.SIGN_IN}
+                  </Button>
+                </Box>
+              )}
+
               <Login />
             </DrawerBody>
           </DrawerContent>
         </DrawerOverlay>
       </Drawer>
+
+      {(!address || connecting) && (
+        <ConnectWalletModal
+          setConnecting={setConnecting}
+          onClose={onConnectWalletClose}
+          isOpen={isConnectWalletOpen}
+        />
+      )}
     </>
   );
 };

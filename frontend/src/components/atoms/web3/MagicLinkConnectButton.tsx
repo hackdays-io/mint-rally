@@ -1,47 +1,43 @@
 import {
+  Box,
   Button,
+  Divider,
   FormLabel,
   HStack,
-  Img,
   Input,
-  Spacer,
   Stack,
 } from "@chakra-ui/react";
 import { faArrowLeft, faEnvelope } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useConnect, useConnectionStatus } from "@thirdweb-dev/react";
+import { useConnectionStatus } from "@thirdweb-dev/react";
 import { FC, useState } from "react";
 import { useLocale } from "src/hooks/useLocale";
-import { chainId, useWeb3WalletConfig } from "src/libs/web3Config";
+import { useConnectMagic } from "src/hooks/useWallet";
 
 type Props = {
-  selected: (selected: boolean) => void;
+  selected: boolean;
+  setSelected: (selected: boolean) => void;
+  buttonText?: string;
+  disabled?: boolean;
 };
 
-const MagicLinkConnectButton: FC<Props> = ({ selected }) => {
+const MagicLinkConnectButton: FC<Props> = ({
+  selected,
+  setSelected,
+  buttonText,
+  disabled,
+}) => {
   const { t } = useLocale();
-  const { magicLinkConfig } = useWeb3WalletConfig();
-  const connect = useConnect();
   const connectionStatus = useConnectionStatus();
 
-  const [isSelected, setSelected] = useState<boolean>(false);
   const [isNotValid, setIsNotValid] = useState<boolean>(true);
   const [enteredEmailAddress, setEnteredEmailAddress] = useState("");
 
-  const handleConnect = async () => {
-    try {
-      await connect(magicLinkConfig, {
-        email: enteredEmailAddress,
-        chainId: Number(chainId),
-      });
-    } catch (e) {
-      console.log(e);
-    }
-  };
+  const { handleConnect, isLoading } = useConnectMagic(enteredEmailAddress);
 
   return (
     <>
-      {!isSelected ? (
+      {!selected ? (
         <Button
           w={280}
           leftIcon={<FontAwesomeIcon icon={faEnvelope} />}
@@ -52,13 +48,27 @@ const MagicLinkConnectButton: FC<Props> = ({ selected }) => {
           }}
           onClick={() => {
             setSelected(true);
-            selected(true);
           }}
+          disabled={disabled}
         >
-          {t.CONNECT_WITH_EMAIL}
+          {buttonText || t.CONNECT_WITH_EMAIL}
         </Button>
       ) : (
-        <>
+        <Box maxW="400px" w={{ base: "auto", md: "400px" }} textAlign="left">
+          <HStack mb={{ base: 2, md: 0 }}>
+            <Button
+              leftIcon={<FontAwesomeIcon icon={faArrowLeft} />}
+              _hover={{ background: "transparent" }}
+              p={0}
+              background="transparent"
+              onClick={() => {
+                setSelected(false);
+              }}
+            >
+              Back
+            </Button>
+          </HStack>
+          <Divider borderColor="yellow.900" mb={4} />
           <FormLabel color="yellow.900">
             {t.PLEASE_ENTER_EMAIL_ADDRESS}
           </FormLabel>
@@ -68,34 +78,24 @@ const MagicLinkConnectButton: FC<Props> = ({ selected }) => {
             align={"center"}
             alignContent={"center"}
             justify={"center"}
+            gap={2}
           >
-            <HStack mb={{ base: 2, md: 0 }}>
-              <Button
-                leftIcon={<FontAwesomeIcon icon={faArrowLeft} />}
-                p={0}
-                background="transparent"
-                onClick={() => {
-                  selected(false);
-                  setSelected(false);
-                }}
-              />
-              <Input
-                variant="outline"
-                type="text"
-                backgroundColor={"#fff"}
-                onChange={(e) => {
-                  setEnteredEmailAddress(e.target.value);
-                  setIsNotValid(!e.target.value.includes("@"));
-                }}
-                placeholder={t.EMAIL_ADDRESS}
-                disabled={["unknown", "connecting", "connected"].includes(
-                  connectionStatus
-                )}
-                width={280}
-              />
-            </HStack>
+            <Input
+              variant="outline"
+              type="text"
+              backgroundColor={"#fff"}
+              onChange={(e) => {
+                setEnteredEmailAddress(e.target.value);
+                setIsNotValid(!e.target.value.includes("@"));
+              }}
+              placeholder={t.EMAIL_ADDRESS}
+              disabled={["unknown", "connecting", "connected"].includes(
+                connectionStatus
+              )}
+              width="full"
+            />
             <Button
-              w={{ md: 100, base: "full" }}
+              w={{ base: "full", md: "130px" }}
               style={{
                 fontWeight: "bold",
                 backgroundColor: "#562406",
@@ -107,14 +107,16 @@ const MagicLinkConnectButton: FC<Props> = ({ selected }) => {
               disabled={
                 ["unknown", "connecting", "connected"].includes(
                   connectionStatus
-                ) || isNotValid
+                ) ||
+                isNotValid ||
+                isLoading
               }
-              isLoading={["connecting"].includes(connectionStatus)}
+              isLoading={["connecting"].includes(connectionStatus) || isLoading}
             >
               {t.CONNECT}
             </Button>
           </Stack>
-        </>
+        </Box>
       )}
     </>
   );

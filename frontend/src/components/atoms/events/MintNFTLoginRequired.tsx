@@ -57,7 +57,7 @@ const MintNFTLoginRequired: FC<Props> = ({
           textAlign="center"
         >
           {t.PLEASE_SWITCH_NETWORK}
-          <Text fontSize="xl">
+          <Text fontSize="xl" mt={5}>
             <Button
               onClick={() => switchNetwork(requiredChainID)}
               style={{
