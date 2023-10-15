@@ -150,6 +150,7 @@ const CreateEventForm: FC<Props> = ({ address }) => {
 
   useEffect(() => {
     getEventsByGroupId(Number(watch("eventGroupId")));
+    withPastData !== null && setWithPastData(null);
   }, [watch("eventGroupId")]);
 
   const errorMessage = useMemo(() => {
