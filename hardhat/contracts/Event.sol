@@ -105,8 +105,8 @@ contract EventManager is OwnableUpgradeable {
 
     event CreateGroup(address indexed owner, uint256 groupId);
     event CreateEvent(address indexed owner, uint256 eventId);
-    event GrantRole(uint256 indexed groupId, address member, bytes32 role);
-    event RevokeRole(uint256 indexed groupId, address member, bytes32 role);
+    event GrantRole(uint256 indexed groupId, address addr, bytes32 role);
+    event RevokeRole(uint256 indexed groupId, address addr, bytes32 role);
 
     // Currently, reinitializer(2) was executed as constructor.
     function initialize(
