@@ -581,7 +581,7 @@ const CreateEventForm: FC<Props> = ({ address }) => {
           ) : (
             <span>Please select event group first.</span>
           )}
-        </form >
+        </form>
       )}
     </>
   );
