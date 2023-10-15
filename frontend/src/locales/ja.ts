@@ -58,8 +58,10 @@ export default {
     "ひみつの「あいことば」は忘れないようにしてください。あとから確認することはできません。",
   EVENT_DISTRIBUTED_NFT: "イベントで配布されるNFT",
   SELECT_PAST_EVENT_TO_COPY:
-    "過去に開催したイベントの詳細をコピーしたい場合は、選択してボタンを押してください。",
+    "過去に開催したイベントの詳細をコピーしたい場合は、「過去のイベントからコピーを作成」ボタンを押してください。",
   COPY: "コピーする",
+  CREATE_EVENT_WITHOUT_PAST_DATA: "イベントを新規作成",
+  CREATE_EVENT_WITH_PAST_DATA: "過去のイベントからコピーを作成",
   // Event page
   SIGN_IN_TO_GET_NFT: "NFTをGetしよう！",
   SELECT_WALLET: "NFTの取得方法を選択してください",

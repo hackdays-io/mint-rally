@@ -57,8 +57,10 @@ export default {
     "Please do not forget this phrase. you can't get this phrase after submitting",
   EVENT_DISTRIBUTED_NFT: "NFTs to be distributed at the event",
   SELECT_PAST_EVENT_TO_COPY:
-    "To copy past event details, select it and press the button.",
+    'To copy past event details, select it and press the "Create an event with a copy from a past event" button.',
   COPY: "Copy",
+  CREATE_EVENT_WITHOUT_PAST_DATA: "Create a new event",
+  CREATE_EVENT_WITH_PAST_DATA: "Create an event with a copy from a past event",
   // Event page
   SIGN_IN_TO_GET_NFT: "Sign in to get NFT!",
   GET_NFT_USING_METAMASK: "Get NFT with Metamask",
