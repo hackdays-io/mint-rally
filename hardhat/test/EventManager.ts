@@ -647,9 +647,11 @@ describe("EventManager", function () {
           admin: false,
           collaborator: false,
         });
-        await eventManager
-          .connect(organizer)
-          .grantRole(groupId, organizer.address, ADMIN_ROLE);
+        await expect(
+          eventManager
+            .connect(organizer)
+            .grantRole(groupId, organizer.address, ADMIN_ROLE)
+        ).to.emit(eventManager, "GrantRole");
         expectRoles(groupId, organizer.address, {
           admin: true,
           collaborator: false,
@@ -838,9 +840,11 @@ describe("EventManager", function () {
           admin: true,
           collaborator: true,
         });
-        await eventManager
-          .connect(organizer)
-          .revokeRole(groupId, organizer.address, ADMIN_ROLE);
+        await expect(
+          eventManager
+            .connect(organizer)
+            .revokeRole(groupId, organizer.address, ADMIN_ROLE)
+        ).to.emit(eventManager, "RevokeRole");
         expectRoles(groupId, organizer.address, {
           admin: false,
           collaborator: true,
