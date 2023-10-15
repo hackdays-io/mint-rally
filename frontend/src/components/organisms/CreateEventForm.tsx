@@ -178,11 +178,11 @@ const CreateEventForm: FC<Props> = ({ address }) => {
         <Link href="/event-groups/new">please create event group first</Link>
       ) : createdEventId ? (
         <Box>
-          <Text>Your Event Created🎉</Text>
+          <Text>{t.YOUR_EVENT_WAS_CREATED}</Text>
 
           <Link href={`/events/${createdEventId}`}>
             <Button mt={10} backgroundColor="mint.bg" size="md">
-              Go to Event Page
+              {t.GOTO_EVENT_PAGE}
             </Button>
           </Link>
         </Box>
