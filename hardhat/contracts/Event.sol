@@ -105,6 +105,8 @@ contract EventManager is OwnableUpgradeable {
 
     event CreateGroup(address indexed owner, uint256 groupId);
     event CreateEvent(address indexed owner, uint256 eventId);
+    event GrantRole(uint256 indexed groupId, address member, bytes32 role);
+    event RevokeRole(uint256 indexed groupId, address member, bytes32 role);
 
     // Currently, reinitializer(2) was executed as constructor.
     function initialize(
@@ -277,6 +279,8 @@ contract EventManager is OwnableUpgradeable {
         require(_isValidRole(_role), "Invalid role");
 
         memberRolesByGroupId[_groupId][_address][_role] = true;
+
+        emit GrantRole(_groupId, _address, _role);
     }
 
     function revokeRole(uint256 _groupId, address _address, bytes32 _role) external whenNotPaused {
@@ -284,6 +288,8 @@ contract EventManager is OwnableUpgradeable {
         require(_isValidRole(_role), "Invalid role");
 
         delete memberRolesByGroupId[_groupId][_address][_role];
+
+        emit RevokeRole(_groupId, _address, _role);
     }
 
     function _isValidRole(bytes32 _role) private pure returns (bool) {
