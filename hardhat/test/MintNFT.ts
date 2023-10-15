@@ -656,7 +656,7 @@ describe("bulk mint by event owner", () => {
           participant5.address,
           participant6.address,
         ])
-    ).revertedWith("you are not event group owner");
+    ).revertedWith("you have no permission");
   });
   it("should raise error when the number of NFTs to be dropped is greater than the remaining count", async () => {
     const [

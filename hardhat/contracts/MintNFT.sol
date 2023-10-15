@@ -179,7 +179,7 @@ contract MintNFT is
     function dropNFTs(
         uint256 _eventId,
         address[] memory _addresses
-    ) external onlyGroupOwner(_eventId) whenNotPaused {
+    ) external onlyCollaboratorAccess(_eventId) whenNotPaused {
         uint256 groupId = getGroupIdByEvent(_eventId);
         require(
             remainingEventNftCount[_eventId] >= _addresses.length,
