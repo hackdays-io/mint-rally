@@ -47,9 +47,9 @@ export const useDropNFTs = (
       if (!event || !event.eventRecordId) return;
       try {
         console.log('dropNFTs', event.eventRecordId, addresses);
-        /*await mutateAsync({
+        await mutateAsync({
           args: [event.eventRecordId, addresses],
-        });*/
+        });
       } catch (error) {
         console.log('dropNFTs error', error);
       }
@@ -65,7 +65,6 @@ export const useDropNFTs = (
         // const to = mintNFTContract?.getAddress();
         const from = address;
         const data = mintNFTContract?.encoder.encode("dropNFTs", [
-          event?.groupId.toNumber(),
           event?.eventRecordId.toNumber(),
           addresses
         ]);
