@@ -395,3 +395,59 @@ export const useParseEventDate = (eventDate?: string) => {
 
   return { parsedEventDate };
 };
+
+export const useGrantRole = () => {
+  const { eventManagerContract } = useEventManagerContract();
+  const {
+    mutateAsync,
+    isLoading: isGranting,
+    error: grantError,
+    status: grantStatus,
+  } = useContractWrite(eventManagerContract, "grantRole");
+
+  const grantRole = useCallback(
+    async (params: { groupId: number; address: string; role: string }) => {
+      if (!params.groupId) return;
+      if (!params.address) return;
+      if (!params.role) return;
+
+      const bytes32Role = ethers.utils.keccak256(
+        ethers.utils.toUtf8Bytes(params.role.toUpperCase())
+      );
+      try {
+        await mutateAsync({
+          args: [params.groupId, params.address, bytes32Role],
+        });
+      } catch (_) {}
+    },
+    [mutateAsync]
+  );
+  return {
+    grantRole,
+    isGranting,
+    grantStatus,
+    grantError,
+  };
+};
+
+export const useRoles = () => {
+  const { eventManagerContract } = useEventManagerContract();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [roles, setRoles] = useState<Event.Roles | null>(null);
+  const [error, setError] = useState<any>(null);
+  const getRoles = (groupId: number, address: string) => {
+    setIsLoading(true);
+    eventManagerContract
+      ?.call("getRoles", [groupId, address])
+      .then((res: any) => {
+        setRoles(res);
+      })
+      .catch((err: any) => {
+        setError(err);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
+  return { roles, isLoading, error, getRoles };
+};

@@ -37,6 +37,15 @@ export default {
   EVENT_GROUP_APPEND_NFT: "Add NFT",
   // Event group page
   OWN_EVENTS: "'s Events",
+  // RBAC
+  RBAC_EDIT_COLLABORATORS: "Edit Collaborators",
+  RBAC_ADMIN_ROLE: "Administrator",
+  RBAC_COLLABORATOR_ROLE: "Collaborator",
+  RBAC_ROLE: "Role",
+  RBAC_WALLET_ADDRESS: "Wallet Address",
+  RBAC_GRANT_ROLE: "Grant Role",
+  RBAC_GRANT_SUCCESS: "Successfully granted.",
+  RBAC_GRANT_ERROR: "An error occurred when updating the role.",
   // Event index
   CREATE_NEW_EVENT: "Create new event",
   // Event new
