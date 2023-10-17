@@ -179,17 +179,13 @@ export const useCopyPastAttribute = () => {
       0
     );
 
-    console.log("nftAttributes", nftAttributes);
-
     const metaDataPromises = nftAttributes.map(
       ({ metaDataURL, requiredParticipateCount }) => {
         const getMetaData = async (
           metaDataURL: string,
           requiredParticipateCount: BigNumber
         ) => {
-          console.log("pre axios metaDataURL", metaDataURL);
           const { data: metaData } = await axios.get(ipfs2http(metaDataURL));
-          console.log("metaData", metaData);
 
           const nftImage: NFT.NFTImage = {
             name: metaData.name,

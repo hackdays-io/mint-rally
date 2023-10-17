@@ -9,7 +9,7 @@ export const activeChain =
     ? Mumbai
     : chainId === "137"
     ? Polygon
-    : { ...Localhost, chainId: 31337 };
+    : { ...Localhost, rpc: ["http://localhost:8545"], chainId: 31337 };
 
 export const useWeb3WalletConfig = () => {
   const { t, locale } = useLocale();
