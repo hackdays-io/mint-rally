@@ -19,6 +19,11 @@ export default [
       resolve({ preferBuiltins: true }),
       commonjs(),
       json({ compact: true }),
+      replace({
+        "process.env.POLYGON_FORWARDER_ADDRESS": JSON.stringify(
+          process.env.POLYGON_FORWARDER_ADDRESS
+        ),
+      }),
     ],
     external: [
       ...builtins,
@@ -42,8 +47,8 @@ export default [
       commonjs(),
       json({ compact: true }),
       replace({
-        "process.env.MUMBAI_FOWARDER_ADDRESS": JSON.stringify(
-          process.env.MUMBAI_FOWARDER_ADDRESS
+        "process.env.MUMBAI_FORWARDER_ADDRESS": JSON.stringify(
+          process.env.MUMBAI_FORWARDER_ADDRESS
         ),
       }),
     ],

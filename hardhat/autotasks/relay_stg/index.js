@@ -35,7 +35,7 @@ async function handler(event) {
       speed: "fast",
     });
     const forwarder = new Contract(
-      process.env.MUMBAI_FOWARDER_ADDRESS,
+      process.env.MUMBAI_FORWARDER_ADDRESS,
       ForwarderAbi.abi,
       signer
     );
