@@ -1,7 +1,9 @@
 import resolve from "@rollup/plugin-node-resolve";
+import replace from "@rollup/plugin-replace";
 import commonjs from "@rollup/plugin-commonjs";
 import json from "@rollup/plugin-json";
 import builtins from "builtin-modules";
+require("dotenv").config();
 
 export default [
   {
@@ -39,6 +41,11 @@ export default [
       resolve({ preferBuiltins: true }),
       commonjs(),
       json({ compact: true }),
+      replace({
+        "process.env.MUMBAI_FOWARDER_ADDRESS": JSON.stringify(
+          process.env.MUMBAI_FOWARDER_ADDRESS
+        ),
+      }),
     ],
     external: [
       ...builtins,
