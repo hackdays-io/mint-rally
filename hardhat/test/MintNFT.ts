@@ -611,6 +611,81 @@ describe("mint locked flag", () => {
   });
 });
 
+describe("non transferable flag", () => {
+  let mintNFT: MintNFT;
+  let eventManager: EventManager;
+  let operationController: OperationController;
+
+  let createdGroupId: number;
+  const createdEventIds: number[] = [];
+
+  let organizer: SignerWithAddress;
+  let participant1: SignerWithAddress;
+  let participant2: SignerWithAddress;
+  let relayer: SignerWithAddress;
+
+  let correctProofCalldata!: any;
+
+  before(async () => {
+    [organizer, participant1, participant2, relayer] =
+      await ethers.getSigners();
+
+    // generate proof
+    const { publicInputCalldata, proofCalldata } = await generateProof();
+    [, mintNFT, eventManager, operationController] = await deployAll(relayer);
+    correctProofCalldata = publicInputCalldata[0];
+
+    // Create a Group and an Event
+    await createGroup(eventManager, "First Group", organizer);
+    const groupsList = await eventManager.getGroups();
+    createdGroupId = groupsList[0].groupId.toNumber();
+
+    const createEventTxn = await eventManager.createEventRecord(
+      createdGroupId,
+      "event1",
+      "event1 description",
+      "2022-07-3O",
+      10,
+      false,
+      correctProofCalldata,
+      attributes
+    );
+    await createEventTxn.wait();
+    const eventsList = await eventManager.getEventRecords(0, 0);
+    createdEventIds.push(eventsList[0].eventRecordId.toNumber());
+
+    const mintNftTxn = await mintNFT
+      .connect(participant1)
+      .mintParticipateNFT(createdGroupId, createdEventIds[0], proofCalldata);
+    await mintNftTxn.wait();
+  });
+
+  it("should get non transferable flag", async () => {
+    const flag = await mintNFT.connect(organizer).getIsNonTransferable(1);
+    expect(flag).equal(false);
+    expect(await mintNFT.ownerOf(0)).equal(participant1.address);
+    await expect(
+      mintNFT
+        .connect(participant1)
+        .transferFrom(participant1.address, participant2.address, 0)
+    ).not.to.be.reverted;
+    expect(await mintNFT.ownerOf(0)).equal(participant2.address);
+  });
+
+  it("No one but the owner should be able to change non transferable flag", async () => {
+    await expect(
+      mintNFT.connect(participant1).changeNonTransferable(1, false)
+    ).to.be.revertedWith("you are not event group owner");
+  });
+
+  it("should not change if paused", async () => {
+    await operationController.connect(organizer).pause();
+    await expect(mintNFT.connect(organizer).changeNonTransferable(1, false)).to
+      .be.reverted;
+    await operationController.connect(organizer).unpause();
+  });
+});
+
 describe("reset secret phrase", () => {
   let mintNFT: MintNFT;
   let eventManager: EventManager;

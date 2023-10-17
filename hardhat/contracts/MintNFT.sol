@@ -59,10 +59,13 @@ contract MintNFT is
     // Create a mapping to store NFT holders by event ID
     mapping(uint256 => uint256[]) private tokenIdsByEvent;
     address private operationControllerAddr;
+    // is non transferable via EventId
+    mapping(uint256 => bool) private isNonTransferable;
 
     event MintedNFTAttributeURL(address indexed holder, string url);
     event MintLocked(uint256 indexed eventId, bool isLocked);
     event ResetSecretPhrase(address indexed executor, uint256 indexed eventId);
+    event NonTransferable(uint256 indexed eventId, bool isNonTransferable);
 
     modifier onlyGroupOwner(uint256 _eventId) {
         IEventManager eventManager = IEventManager(eventManagerAddr);
@@ -199,6 +202,14 @@ contract MintNFT is
         emit MintLocked(_eventId, _locked);
     }
 
+    function changeNonTransferable(
+        uint256 _eventId,
+        bool _isNonTransferable
+    ) external onlyGroupOwner(_eventId) whenNotPaused {
+        isNonTransferable[_eventId] = _isNonTransferable;
+        emit NonTransferable(_eventId, _isNonTransferable);
+    }
+
     function resetSecretPhrase(
         uint256 _eventId,
         bytes32 _secretPhrase
@@ -209,6 +220,12 @@ contract MintNFT is
 
     function getIsMintLocked(uint256 _eventId) external view returns (bool) {
         return isMintLocked[_eventId];
+    }
+
+    function getIsNonTransferable(
+        uint256 _eventId
+    ) external view returns (bool) {
+        return isNonTransferable[_eventId];
     }
 
     function isHoldingEventNFTByAddress(
