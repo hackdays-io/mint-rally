@@ -107,7 +107,7 @@ const NFTAttributesForm: FC<Props> = ({ control, nfts, append, remove }) => {
                   <>
                     <Input
                       variant="outline"
-                      value={value || nfts[index].name}
+                      value={nfts[index].name || value}
                       onChange={(e) => {
                         onChange(e.target.value);
                       }}
@@ -134,7 +134,7 @@ const NFTAttributesForm: FC<Props> = ({ control, nfts, append, remove }) => {
                   <>
                     <Input
                       variant="outline"
-                      value={value || nfts[index].description}
+                      value={nfts[index].description || value}
                       onChange={(e) => {
                         onChange(e.target.value);
                       }}
@@ -170,7 +170,7 @@ const NFTAttributesForm: FC<Props> = ({ control, nfts, append, remove }) => {
                         <NumberInput
                           // 内部的に1回目の参加でMintさせたい場合は内部的には0と設定する必要があるが、利用者へ伝わらないので表示状が1となる様にする。
                           // その為、画面上に表示されているから1引いた値を内部値へ反映させる。
-                          value={value + 1}
+                          value={nfts[index].requiredParticipateCount + 1 || value + 1}
                           min={2}
                           onChange={(__, num) => {
                             // 内部的に1回目の参加でMintさせたい場合は内部的には0と設定する必要があるが、利用者へ伝わらないので表示状が1となる様にする。

@@ -416,6 +416,99 @@ describe("MintNFT", function () {
     });
   });
 
+  describe("getNFTAttributeRecordsByEventId", () => {
+    it("should revert if msg.sender is not group owner", async () => {
+      await expect(
+        mintNFT.connect(participant1).getNFTAttributeRecordsByEventId(1, 100, 0)
+      ).to.be.revertedWith("you are not event group owner");
+    });
+
+    it("should revert if limit is over 100", async () => {
+      await expect(
+        mintNFT.connect(organizer).getNFTAttributeRecordsByEventId(1, 101, 0)
+      ).to.be.revertedWith("limit is too large");
+    });
+
+    it("should revert if limit + offset is over flow", async () => {
+      await expect(
+        mintNFT
+          .connect(organizer)
+          .getNFTAttributeRecordsByEventId(1, 100, ethers.constants.MaxUint256)
+      ).to.be.revertedWith("limit + offset must be <= 2^256 - 1");
+    });
+
+    it("get NFTAttributeRecords by event id", async () => {
+      const nftAttributeRecords = await mintNFT
+        .connect(organizer)
+        .getNFTAttributeRecordsByEventId(1, 100, 0);
+      expect(nftAttributeRecords.length).equal(attributes.length);
+      expect(nftAttributeRecords[0].metaDataURL).equal(
+        attributes[0].metaDataURL
+      );
+      expect(nftAttributeRecords[1].metaDataURL).equal(
+        attributes[1].metaDataURL
+      );
+      expect(nftAttributeRecords[2].metaDataURL).equal(
+        attributes[2].metaDataURL
+      );
+      expect(nftAttributeRecords[0].requiredParticipateCount).equal(
+        attributes[0].requiredParticipateCount
+      );
+      expect(nftAttributeRecords[1].requiredParticipateCount).equal(
+        attributes[1].requiredParticipateCount
+      );
+      expect(nftAttributeRecords[2].requiredParticipateCount).equal(
+        attributes[2].requiredParticipateCount
+      );
+    });
+
+    it("get NFTAttributeRecords with limit", async () => {
+      const nftAttributeRecords = await mintNFT
+        .connect(organizer)
+        .getNFTAttributeRecordsByEventId(
+          1,
+          attributes[2].requiredParticipateCount,
+          0
+        );
+      expect(nftAttributeRecords.length).equal(2);
+      expect(nftAttributeRecords[0].metaDataURL).equal(
+        attributes[0].metaDataURL
+      );
+      expect(nftAttributeRecords[1].metaDataURL).equal(
+        attributes[1].metaDataURL
+      );
+      expect(nftAttributeRecords[0].requiredParticipateCount).equal(
+        attributes[0].requiredParticipateCount
+      );
+      expect(nftAttributeRecords[1].requiredParticipateCount).equal(
+        attributes[1].requiredParticipateCount
+      );
+    });
+
+    it("get NFTAttributeRecords with limit and offset", async () => {
+      const nftAttributeRecords = await mintNFT
+        .connect(organizer)
+        .getNFTAttributeRecordsByEventId(
+          1,
+          attributes[2].requiredParticipateCount + 1,
+          attributes[1].requiredParticipateCount
+        );
+      expect(nftAttributeRecords.length).equal(2);
+      expect(nftAttributeRecords[0].metaDataURL).equal(
+        attributes[1].metaDataURL
+      );
+      expect(nftAttributeRecords[1].metaDataURL).equal(
+        attributes[2].metaDataURL
+      );
+      expect(nftAttributeRecords[0].requiredParticipateCount).equal(
+        attributes[1].requiredParticipateCount
+      );
+      expect(nftAttributeRecords[1].requiredParticipateCount).equal(
+        attributes[2].requiredParticipateCount
+      );
+    });
+  });
+
   // it("reject mint NFT when secret phrase is invalid", async () => {
   //   const [owner1] = await ethers.getSigners();
   //   const mintNftTxn = await mintNFT
@@ -681,3 +774,5 @@ describe("reset secret phrase", () => {
     await operationController.connect(organizer).unpause();
   });
 });
+
+describe("setEventInfo", () => {});
