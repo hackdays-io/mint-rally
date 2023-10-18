@@ -11,7 +11,7 @@ async function main() {
   //   process.env.MUMBAI_OPERATION_CONTROLLER_ADDRESS!,
   // ]
 
-  await upgradeEventManager();
+  // await upgradeEventManager();
 }
 
 main().catch((error) => {
