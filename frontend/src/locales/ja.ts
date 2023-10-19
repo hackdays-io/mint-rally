@@ -104,6 +104,8 @@ export default {
   SECRET_PHRASE_RESET_SUCCESS: "あいことばをリセットしました",
   SECRET_PHRASE_RESET_FAIL: "あいことばのリセット中にエラーが発生しました",
   EVENT_ADMIN_SUBMIT: "変更する",
+  DROP_NFTS: "NFTを配布する",
+  PLEASE_ENTER_WALLET_ADDRESSES: "NFTを配布するウォレットアドレスを入力してください。改行で区切って複数入力できます。",
 
   FEATUE: "特徴",
   FEATUE_DESC_1: "大切なイベントに参加した記録を残すことができます",

@@ -102,6 +102,8 @@ export default {
   SECRET_PHRASE_RESET_NEW_PLACEHOLDER: "Input new secret phrase",
   SECRET_PHRASE_RESET_SUCCESS: "Successfully reset secret phrase.",
   SECRET_PHRASE_RESET_FAIL: "Failed to reset secret phrase.",
+  DROP_NFTS: "Drop NFTs",
+  PLEASE_ENTER_WALLET_ADDRESSES: "Please provide wallet addresses to drop NFTs. one address per line.",
 
   FEATUE: "FEATURES",
   FEATUE_DESC_1:
