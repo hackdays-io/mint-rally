@@ -28,7 +28,7 @@ const DropNFTs: FC<Props> = ({ event, address }) => {
     console.log(data);
     if (!data.addresses || isLoading) return;
     if (data.addresses.split("\n").length > 100) {
-      alert({t.YOU_CAN_DROP_UP_TO_100_NFTS_AT_ONCE});
+      alert(t.YOU_CAN_DROP_UP_TO_100_NFTS_AT_ONCE);
       return;
     }
     await dropNFTs(data.addresses.split("\n"));
