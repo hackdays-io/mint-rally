@@ -18,11 +18,11 @@ export const useDropNFTs = (
 
   const {
     mutateAsync,
-    isLoading: isMinting,
-    error: mintError,
-    status: mintStatus,
+    isLoading: isDropping,
+    error: dropError,
+    status: contractStatus,
   } = useContractWrite(mintNFTContract, "dropNFTs");
-  const [mtxStatus, setMtxStatus] = useState<{
+  const [dropStatus, setDropStatus] = useState<{
     error: any;
     isLoading: boolean;
     status: "error" | "idle" | "loading" | "success";
@@ -33,14 +33,14 @@ export const useDropNFTs = (
   });
 
   const error: any = useMemo(() => {
-    return mtxStatus.error || mintError;
-  }, [mintError, mtxStatus]);
+    return dropStatus.error || dropError;
+  }, [dropError, dropStatus]);
   const isLoading = useMemo(() => {
-    return mtxStatus.isLoading || isMinting;
-  }, [isMinting, mtxStatus]);
-  const status = useMemo(() => {
-    return useMTX ? mtxStatus.status : mintStatus;
-  }, [mintStatus, mtxStatus]);
+    return dropStatus.isLoading || isDropping;
+  }, [isDropping, dropStatus]);
+  const status: "error" | "idle" | "loading" | "success" = useMemo(() => {
+    return useMTX ? dropStatus.status : contractStatus;
+  }, [contractStatus, dropStatus]);
 
   const dropNFTs = useCallback(
     async (addresses: string[]) => {
@@ -52,6 +52,7 @@ export const useDropNFTs = (
         });
       } catch (error) {
         console.log('dropNFTs error', error);
+        setDropStatus({ ...dropStatus, error, status: "error" });
       }
     },
     [event, mutateAsync]
@@ -60,15 +61,17 @@ export const useDropNFTs = (
   const dropNFTsMTX = useCallback(
     async (addresses: string[]) => {
       if (!event || !event.eventRecordId || !event.groupId || !sdk) return;
-      setMtxStatus({ isLoading: true, status: "loading", error: null });
+      setDropStatus({ isLoading: true, status: "loading", error: null });
       try {
-        // const to = mintNFTContract?.getAddress();
+        console.log("dropNFTsMTX", event.eventRecordId, addresses);
+        const to = mintNFTContract?.getAddress();
         const from = address;
         const data = mintNFTContract?.encoder.encode("dropNFTs", [
           event?.eventRecordId.toNumber(),
           addresses
         ]);
         const request = await signMetaTxRequest(sdk.wallet, forwarderContract, {
+          to,
           from,
           data,
         });
@@ -76,10 +79,10 @@ export const useDropNFTs = (
           request: request.request,
           signature: request.signature.signature,
         });
-        setMtxStatus({ ...mtxStatus, status: "success", isLoading: false });
+        setDropStatus({ ...dropStatus, status: "success", isLoading: false });
         return response;
       } catch (error) {
-        setMtxStatus({ ...mtxStatus, error, status: "error" });
+        setDropStatus({ ...dropStatus, error, status: "error" });
       }
     },
     [event, forwarderContract, signer]

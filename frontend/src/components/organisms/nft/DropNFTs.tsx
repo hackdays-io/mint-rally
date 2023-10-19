@@ -4,6 +4,7 @@ import { Controller, useForm } from "react-hook-form";
 import { Event } from "types/Event";
 import { useDropNFTs } from "src/hooks/useDropNFTs";
 import { useLocale } from "src/hooks/useLocale";
+import AlertMessage from "src/components/atoms/form/AlertMessage";
 
 type Props = {
   event: Event.EventRecord;
@@ -18,7 +19,7 @@ const DropNFTs: FC<Props> = ({ event, address }) => {
   const { control, handleSubmit } = useForm<FormData>({
     defaultValues: { addresses: "" },
   });
-  const { dropNFTs, dropNFTsMTX, error, isLoading } = useDropNFTs(
+  const { dropNFTs, dropNFTsMTX, error, isLoading, status } = useDropNFTs(
     event,
     address
   );
@@ -29,7 +30,11 @@ const DropNFTs: FC<Props> = ({ event, address }) => {
       alert(t.YOU_CAN_DROP_UP_TO_100_NFTS_AT_ONCE);
       return;
     }
-    await dropNFTs(data.addresses.split("\n"));
+    if (event.useMtx) {
+      await dropNFTsMTX(data.addresses.split("\n"));
+    } else {
+      await dropNFTs(data.addresses.split("\n"));
+    }
   };
   return (
     <p>
@@ -65,6 +70,10 @@ const DropNFTs: FC<Props> = ({ event, address }) => {
           Submit
         </Button>
       </form>
+      {status == "success" && (
+        <AlertMessage status="success" title={t.DROP_NFTS_SUCCESS} />
+      )}
+      {error && <AlertMessage status="error" title={error.message} />}
     </p>
   );
 };
