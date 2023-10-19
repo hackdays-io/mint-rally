@@ -1,10 +1,8 @@
-import { BigNumber } from "ethers";
 import { FC } from "react";
 import { Button, FormLabel, Textarea, Text } from "@chakra-ui/react";
 import { Controller, useForm } from "react-hook-form";
 import { Event } from "types/Event";
 import { useDropNFTs } from "src/hooks/useDropNFTs";
-import { useAddress } from "@thirdweb-dev/react";
 import { useLocale } from "src/hooks/useLocale";
 
 type Props = {
