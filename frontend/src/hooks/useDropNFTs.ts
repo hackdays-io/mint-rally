@@ -38,8 +38,8 @@ export const useDropNFTs = (
     return dropStatus.isLoading || isDropping;
   }, [isDropping, dropStatus]);
   const status = useMemo(() => {
-    return event.useMtx ? dropStatus.status : contractStatus;
-  }, [contractStatus, dropStatus]);
+    return dropStatus.status;
+  }, [dropStatus]);
 
   const dropNFTs = useCallback(
     async (addresses: string[]) => {
@@ -70,8 +70,8 @@ export const useDropNFTs = (
           addresses
         ]);
         const request = await signMetaTxRequest(sdk.wallet, forwarderContract, {
-          to,
           from,
+          to,
           data,
         });
         const { data: response } = await axios.post("/api/autotask", {
