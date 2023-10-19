@@ -108,6 +108,7 @@ export default {
   PLEASE_ENTER_WALLET_ADDRESSES: "NFTを配布するウォレットアドレスを入力してください。改行で区切って複数入力できます。",
   YOU_CAN_DROP_UP_TO_100_NFTS_AT_ONCE: "一度に配布できるウォレットアドレスは100件までです。",
   DROP_NFTS_SUCCESS: "NFTを配布しました！",
+  DROPNFT_SUBMIT: "配布する",
 
   FEATUE: "特徴",
   FEATUE_DESC_1: "大切なイベントに参加した記録を残すことができます",

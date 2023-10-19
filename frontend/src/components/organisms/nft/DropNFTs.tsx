@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { Button, FormLabel, Textarea, Text } from "@chakra-ui/react";
+import { Button, FormLabel, Textarea, Text, Box } from "@chakra-ui/react";
 import { Controller, useForm } from "react-hook-form";
 import { Event } from "types/Event";
 import { useDropNFTs } from "src/hooks/useDropNFTs";
@@ -37,7 +37,7 @@ const DropNFTs: FC<Props> = ({ event, address }) => {
     }
   };
   return (
-    <p>
+    <Box>
       <form onSubmit={handleSubmit(submit)}>
         <FormLabel fontWeight="bold" htmlFor="addressList">
           {t.DROP_NFTS}
@@ -67,15 +67,14 @@ const DropNFTs: FC<Props> = ({ event, address }) => {
           isLoading={isLoading}
           disabled={isLoading}
         >
-          Submit
+          {t.DROPNFT_SUBMIT}
         </Button>
       </form>
-      {status}
       {status == "success" && (
         <AlertMessage status="success" title={t.DROP_NFTS_SUCCESS} />
       )}
       {error && <AlertMessage status="error" title={error.message} />}
-    </p>
+    </Box>
   );
 };
 
