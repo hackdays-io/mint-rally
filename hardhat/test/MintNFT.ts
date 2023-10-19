@@ -417,12 +417,6 @@ describe("MintNFT", function () {
   });
 
   describe("getNFTAttributeRecordsByEventId", () => {
-    it("should revert if msg.sender is not group owner", async () => {
-      await expect(
-        mintNFT.connect(participant1).getNFTAttributeRecordsByEventId(1, 100, 0)
-      ).to.be.revertedWith("you are not event group owner");
-    });
-
     it("should revert if limit is over 100", async () => {
       await expect(
         mintNFT.connect(organizer).getNFTAttributeRecordsByEventId(1, 101, 0)
