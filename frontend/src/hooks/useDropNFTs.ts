@@ -9,7 +9,6 @@ import axios from "axios";
 export const useDropNFTs = (
   event: Event.EventRecord,
   address: string,
-  useMTX: boolean = false
 ) => {
   const { mintNFTContract } = useMintNFTContract();
   const { forwarderContract } = useForwarderContract();
@@ -38,8 +37,8 @@ export const useDropNFTs = (
   const isLoading = useMemo(() => {
     return dropStatus.isLoading || isDropping;
   }, [isDropping, dropStatus]);
-  const status: "error" | "idle" | "loading" | "success" = useMemo(() => {
-    return useMTX ? dropStatus.status : contractStatus;
+  const status = useMemo(() => {
+    return event.useMtx ? dropStatus.status : contractStatus;
   }, [contractStatus, dropStatus]);
 
   const dropNFTs = useCallback(
@@ -79,6 +78,7 @@ export const useDropNFTs = (
           request: request.request,
           signature: request.signature.signature,
         });
+        console.log('success', response);
         setDropStatus({ ...dropStatus, status: "success", isLoading: false });
         return response;
       } catch (error) {

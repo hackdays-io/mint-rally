@@ -70,6 +70,7 @@ const DropNFTs: FC<Props> = ({ event, address }) => {
           Submit
         </Button>
       </form>
+      {status}
       {status == "success" && (
         <AlertMessage status="success" title={t.DROP_NFTS_SUCCESS} />
       )}
