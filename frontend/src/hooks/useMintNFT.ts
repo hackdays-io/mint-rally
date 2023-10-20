@@ -19,6 +19,11 @@ import { BigNumber } from "ethers";
 import { useCurrentBlock } from "./useBlockChain";
 import { useGenerateProof } from "./useSecretPhrase";
 
+export interface NFTAttribute {
+  metaDataURL: string;
+  requiredParticipateCount: BigNumber;
+}
+
 export const useMintNFTContract = () => {
   const {
     contract: mintNFTContract,
@@ -132,6 +137,74 @@ export const useGetOwnedNftIdsByAddress = (address?: string) => {
   // }, [logs]);
 
   return ids;
+};
+
+export const useGetNFTAttributeRecordsByEventId = () => {
+  const { mintNFTContract } = useMintNFTContract();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<any>(null);
+
+  const getNFTAttributeRecordsByEventId = async (
+    eventId: number,
+    limit: number,
+    offset: number
+  ): Promise<NFTAttribute[]> => {
+    if (mintNFTContract === undefined) return [];
+    setIsLoading(true);
+    try {
+      const res = await mintNFTContract.call(
+        "getNFTAttributeRecordsByEventId",
+        [eventId, limit, offset]
+      );
+      return res; // 追加: 戻り値としてresを返します
+    } catch (err) {
+      setError(err);
+      return [];
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return { isLoading, error, getNFTAttributeRecordsByEventId };
+};
+
+export const useCopyPastAttribute = () => {
+  const { isLoading, error, getNFTAttributeRecordsByEventId } =
+    useGetNFTAttributeRecordsByEventId();
+
+  const copyPastAttribute = async (eventId: number) => {
+    const nftAttributes = await getNFTAttributeRecordsByEventId(
+      eventId,
+      100,
+      0
+    );
+
+    const metaDataPromises = nftAttributes.map(
+      ({ metaDataURL, requiredParticipateCount }) => {
+        const getMetaData = async (
+          metaDataURL: string,
+          requiredParticipateCount: BigNumber
+        ) => {
+          const { data: metaData } = await axios.get(ipfs2http(metaDataURL));
+
+          const nftImage: NFT.NFTImage = {
+            name: metaData.name,
+            image: metaData.image,
+            description: metaData.description,
+            requiredParticipateCount: Number(requiredParticipateCount),
+            fileObject: null,
+          };
+          return nftImage;
+        };
+        return getMetaData(metaDataURL, requiredParticipateCount);
+      }
+    );
+
+    const metaDatas: NFT.NFTImage[] = await Promise.all(metaDataPromises);
+    return metaDatas.filter((metaData) => metaData);
+  };
+
+  return { isLoading, error, copyPastAttribute };
 };
 
 export const useGetOwnedNFTByAddress = (address?: string) => {
