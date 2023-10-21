@@ -66,7 +66,7 @@ export const useDropNFTs = (
         const to = mintNFTContract?.getAddress();
         const from = address;
         const data = mintNFTContract?.encoder.encode("dropNFTs", [
-          event?.eventRecordId.toNumber(),
+          event?.eventRecordId,
           addresses
         ]);
         const request = await signMetaTxRequest(sdk.wallet, forwarderContract, {
