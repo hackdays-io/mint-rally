@@ -44,6 +44,7 @@ export default {
   RBAC_ROLE: "Role",
   RBAC_WALLET_ADDRESS: "Wallet Address",
   RBAC_GRANT_ROLE: "Grant Role",
+  RBAC_INPUT_ADDRESS_ERROR: "Address is required",
   RBAC_GRANT_SUCCESS: "Successfully granted.",
   RBAC_GRANT_ERROR: "An error occurred when updating the role.",
   // Event index

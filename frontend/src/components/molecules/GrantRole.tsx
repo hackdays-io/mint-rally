@@ -7,32 +7,64 @@ import {
   Select,
 } from "@chakra-ui/react";
 import { FC, useEffect, useState } from "react";
-import { useGrantRole } from "src/hooks/useEvent";
+import { Controller, useForm } from "react-hook-form";
 import { useLocale } from "src/hooks/useLocale";
+import { useGrantRole } from "src/hooks/useEvent";
 import AlertMessage from "src/components/atoms/form/AlertMessage";
+import ErrorMessage from "src/components/atoms/form/ErrorMessage";
 
 type GrantRoleProps = {
   groupId: number;
+};
+
+type GrantRoleFormData = {
+  role: string;
+  address: string;
 };
 
 const DEFAULT_INPUT_ROLE = "admin";
 
 const GrantRole: FC<GrantRoleProps> = ({ groupId }) => {
   const { t } = useLocale();
-  const [role, setRole] = useState<string>(DEFAULT_INPUT_ROLE);
-  const [address, setAddress] = useState<string>("");
+  const [formData, setFormData] = useState<GrantRoleFormData | null>(null);
+  const {
+    control,
+    handleSubmit,
+    formState: { isSubmitting },
+    register,
+  } = useForm<GrantRoleFormData>({
+    mode: "all",
+    defaultValues: {
+      role: DEFAULT_INPUT_ROLE,
+      address: "",
+    },
+  });
   const { grantRole, isGranting, grantStatus, grantError } = useGrantRole();
   const [successMessage, setSuccessMessage] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string>("");
 
-  const handleGrant = async () => {
-    if (isGranting) return;
-    try {
-      await grantRole({ groupId, address, role });
-    } catch (error) {
-      console.error(error);
-    }
+  const onSubmit = async (data: GrantRoleFormData) => {
+    setFormData(data);
   };
+
+  useEffect(() => {
+    if (!formData) return;
+
+    const grant = async () => {
+      if (isGranting) return;
+      try {
+        const params = {
+          groupId,
+          address: formData.address,
+          role: formData.role,
+        };
+        await grantRole(params);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    grant();
+  }, [formData]);
 
   useEffect(() => {
     if (grantStatus === "success") {
@@ -59,35 +91,42 @@ const GrantRole: FC<GrantRoleProps> = ({ groupId }) => {
           <AlertMessage status="error" title={errorMessage} />
         </Box>
       )}
-      <form>
+      <form onSubmit={handleSubmit(onSubmit)}>
         <FormControl mb={3}>
           <FormLabel htmlFor="role">{t.RBAC_ROLE}</FormLabel>
-          <Select
-            id="role"
-            value={role}
-            onChange={(e) => {
-              setRole(e.target.value);
-            }}
-          >
-            <option value="admin">{t.RBAC_ADMIN_ROLE}</option>
-            <option value="collaborator">{t.RBAC_COLLABORATOR_ROLE}</option>
-          </Select>
+          <Controller
+            control={control}
+            {...register("role")}
+            name="role"
+            render={({ field: { onChange, value } }) => (
+              <Select id="role" value={value} onChange={onChange}>
+                <option value="admin">{t.RBAC_ADMIN_ROLE}</option>
+                <option value="collaborator">{t.RBAC_COLLABORATOR_ROLE}</option>
+              </Select>
+            )}
+          />
         </FormControl>
+
         <FormControl mb={3}>
           <FormLabel htmlFor="address">{t.RBAC_WALLET_ADDRESS}</FormLabel>
-          <Input
-            id="address"
-            type="text"
-            value={address}
-            onChange={(e) => {
-              setAddress(e.target.value);
+          <Controller
+            control={control}
+            name="address"
+            rules={{
+              required: t.RBAC_INPUT_ADDRESS_ERROR,
             }}
+            render={({ field: { onChange, value }, formState: { errors } }) => (
+              <>
+                <Input id="address" onChange={onChange} value={value} />
+                <ErrorMessage>{errors.address?.message}</ErrorMessage>
+              </>
+            )}
           />
         </FormControl>
         <Button
-          isLoading={isGranting}
-          disabled={!role || !address}
-          onClick={handleGrant}
+          type="submit"
+          isLoading={isGranting || isSubmitting}
+          disabled={isGranting || isSubmitting}
           w="full"
         >
           {t.RBAC_GRANT_ROLE}
