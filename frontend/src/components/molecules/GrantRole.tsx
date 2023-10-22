@@ -11,7 +11,6 @@ import { Controller, useForm } from "react-hook-form";
 import { useLocale } from "src/hooks/useLocale";
 import { useGrantRole } from "src/hooks/useEvent";
 import AlertMessage from "src/components/atoms/form/AlertMessage";
-import ErrorMessage from "src/components/atoms/form/ErrorMessage";
 
 type GrantRoleProps = {
   groupId: number;
@@ -112,13 +111,17 @@ const GrantRole: FC<GrantRoleProps> = ({ groupId }) => {
           <Controller
             control={control}
             name="address"
-            rules={{
-              required: t.RBAC_INPUT_ADDRESS_ERROR,
-            }}
             render={({ field: { onChange, value }, formState: { errors } }) => (
               <>
-                <Input id="address" onChange={onChange} value={value} />
-                <ErrorMessage>{errors.address?.message}</ErrorMessage>
+                <Input
+                  id="address"
+                  onChange={onChange}
+                  value={value}
+                  required
+                  maxLength={42}
+                  pattern="^0x[a-fA-F0-9]{40}$"
+                  title={t.RBAC_INPUT_ADDRESS_TITLE}
+                />
               </>
             )}
           />

@@ -44,7 +44,8 @@ export default {
   RBAC_ROLE: "Role",
   RBAC_WALLET_ADDRESS: "Wallet Address",
   RBAC_GRANT_ROLE: "Grant Role",
-  RBAC_INPUT_ADDRESS_ERROR: "Address is required",
+  RBAC_INPUT_ADDRESS_TITLE:
+    "The address must start with 0x and be a total of 42 characters in length.",
   RBAC_GRANT_SUCCESS: "Successfully granted.",
   RBAC_GRANT_ERROR: "An error occurred when updating the role.",
   // Event index
