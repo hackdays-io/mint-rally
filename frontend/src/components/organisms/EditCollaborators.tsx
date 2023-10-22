@@ -1,8 +1,16 @@
-import { Box, Button, Heading, useDisclosure } from "@chakra-ui/react";
+import {
+  Button,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Tabs,
+  useDisclosure,
+} from "@chakra-ui/react";
 import { FC } from "react";
 import ModalBase from "src/components/molecules/common/ModalBase";
+import GrantRole from "src/components/molecules/GrantRole";
 import { useLocale } from "src/hooks/useLocale";
-import GrantRole from "../molecules/GrantRole";
 
 type EditCollaboratorsProps = {
   groupId: number;
@@ -25,12 +33,17 @@ const EditCollaborators: FC<EditCollaboratorsProps> = ({ groupId }) => {
       </Button>
 
       <ModalBase isOpen={isOpen} onClose={onClose}>
-        <Box my={3}>
-          <Heading as="h3" fontSize="lg" mb={2}>
-            {t.RBAC_EDIT_COLLABORATORS}
-          </Heading>
-          <GrantRole groupId={groupId} />
-        </Box>
+        <Tabs>
+          <TabList>
+            <Tab>{t.RBAC_GRANT}</Tab>
+          </TabList>
+
+          <TabPanels>
+            <TabPanel>
+              <GrantRole groupId={groupId} />
+            </TabPanel>
+          </TabPanels>
+        </Tabs>
       </ModalBase>
     </>
   );

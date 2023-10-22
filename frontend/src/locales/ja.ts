@@ -39,6 +39,7 @@ export default {
   OWN_EVENTS: "のイベント",
   // RBAC
   RBAC_EDIT_COLLABORATORS: "権限管理",
+  RBAC_GRANT: "権限付与",
   RBAC_ADMIN_ROLE: "管理者",
   RBAC_COLLABORATOR_ROLE: "コラボレーター",
   RBAC_ROLE: "権限",

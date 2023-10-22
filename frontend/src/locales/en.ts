@@ -39,6 +39,7 @@ export default {
   OWN_EVENTS: "'s Events",
   // RBAC
   RBAC_EDIT_COLLABORATORS: "Edit Collaborators",
+  RBAC_GRANT: "Grant",
   RBAC_ADMIN_ROLE: "Administrator",
   RBAC_COLLABORATOR_ROLE: "Collaborator",
   RBAC_ROLE: "Role",
