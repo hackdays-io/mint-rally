@@ -51,7 +51,6 @@ export const useDropNFTs = (
         });
       } catch (error) {
         console.log('dropNFTs error', error);
-        setDropStatus({ ...dropStatus, error, status: "error" });
       }
     },
     [event, mutateAsync]

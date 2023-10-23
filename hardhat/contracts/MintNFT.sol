@@ -65,11 +65,11 @@ contract MintNFT is
     event ResetSecretPhrase(address indexed executor, uint256 indexed eventId);
     event DroppedNFTs(address indexed executor, uint256 indexed eventId);
 
-    modifier onlyGroupOwner(uint256 _eventId) {
+    modifier onlyCollaboratorAccess(uint256 _eventId) {
         IEventManager eventManager = IEventManager(eventManagerAddr);
         require(
-            eventManager.isGroupOwnerByEventId(msg.sender, _eventId),
-            "you are not event group owner"
+            eventManager.hasCollaboratorAccessByEventId(_msgSender(), _eventId),
+            "you have no permission"
         );
         _;
     }
@@ -179,7 +179,7 @@ contract MintNFT is
     function dropNFTs(
         uint256 _eventId,
         address[] memory _addresses
-    ) external onlyGroupOwner(_eventId) whenNotPaused {
+    ) external onlyCollaboratorAccess(_eventId) whenNotPaused {
         uint256 groupId = getGroupIdByEvent(_eventId);
         require(
             remainingEventNftCount[_eventId] >= _addresses.length,
@@ -217,7 +217,7 @@ contract MintNFT is
     function changeMintLocked(
         uint256 _eventId,
         bool _locked
-    ) external onlyGroupOwner(_eventId) whenNotPaused {
+    ) external onlyCollaboratorAccess(_eventId) whenNotPaused {
         isMintLocked[_eventId] = _locked;
         emit MintLocked(_eventId, _locked);
     }
@@ -225,7 +225,7 @@ contract MintNFT is
     function resetSecretPhrase(
         uint256 _eventId,
         bytes32 _secretPhrase
-    ) external onlyGroupOwner(_eventId) whenNotPaused {
+    ) external onlyCollaboratorAccess(_eventId) whenNotPaused {
         eventSecretPhrases[_eventId] = _secretPhrase;
         emit ResetSecretPhrase(_msgSender(), _eventId);
     }
