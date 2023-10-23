@@ -113,6 +113,29 @@ export const useOwnEventGroups = () => {
   return { groups, isLoading, error };
 };
 
+export const useCollaboratorAccessEventGroups = () => {
+  const { eventManagerContract } = useEventManagerContract();
+  const address = useAddress();
+  const {
+    isLoading,
+    data: _groups,
+    error,
+  } = useContractRead(eventManagerContract, "getCollaboratorAccessGroups", [
+    address,
+  ]);
+
+  const groups = useMemo(() => {
+    return _groups?.filter((group: any) => {
+      const blackList = process.env.NEXT_PUBLIC_EVENT_GROUP_BLACK_LIST
+        ? JSON.parse(`[${process.env.NEXT_PUBLIC_EVENT_GROUP_BLACK_LIST}]`)
+        : [];
+      return !blackList.includes(group.groupId.toNumber());
+    });
+  }, [_groups]);
+
+  return { groups, isLoading, error };
+};
+
 export const useEventGroups = () => {
   const { eventManagerContract } = useEventManagerContract();
   const { isLoading, data: _groups } = useContractRead(
