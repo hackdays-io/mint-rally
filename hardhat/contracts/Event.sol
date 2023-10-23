@@ -160,6 +160,27 @@ contract EventManager is OwnableUpgradeable {
         return _groups;
     }
 
+    function getCollaboratorAccessGroups(
+        address _address
+    ) external view returns (Group[] memory) {
+        uint256[] memory _targetGroupIds = new uint256[](groups.length);
+        uint256 _count = 0;
+        for (uint256 _groupId = 1; _groupId <= groups.length; _groupId++) {
+            if (_hasCollaboratorAccess(_groupId, _address)) {
+                _targetGroupIds[_count] = _groupId;
+                _count++;
+            }
+        }
+
+        Group[] memory _groups = new Group[](_count);
+        for (uint256 _i = 0; _i < _count; _i++) {
+            uint256 _groupsIndex = _targetGroupIds[_i] - 1;
+            _groups[_i] = groups[_groupsIndex];
+        }
+        
+        return _groups;
+    }
+
     function createEventRecord(
         uint256 _groupId,
         string memory _name,
