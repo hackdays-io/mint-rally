@@ -36,6 +36,13 @@ export default {
   EVENT_GROUP_NFT_TITLE: "NFTs (イベントごとにNFTを設定もできます)",
   EVENT_GROUP_CREATED: "イベントグループが作成されました！",
   EVENT_GROUP_APPEND_NFT: "NFTを追加する",
+  // Event group tab
+  EVENT_GROUP_TAB_EVENTS: "イベント一覧",
+  EVENT_GROUP_TAB_LEADERS: "リーダーボード",
+  // Event group leaders
+  EVENT_GROUP_LEADERS_RANK: "ランク",
+  EVENT_GROUP_LEADERS_ADDRESS: "アドレス",
+  EVENT_GROUP_LEADERS_COUNT: "所持数",
   // Event group page
   OWN_EVENTS: "のイベント",
   // Event index

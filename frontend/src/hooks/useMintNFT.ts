@@ -545,6 +545,21 @@ export const useResetSecretPhrase = (eventId: number | BigNumber) => {
   return { reset, isReseting, error, isSuccess };
 };
 
+export const useHoldersOfEventGroup = (groupId: number) => {
+  const { mintNFTContract } = useMintNFTContract();
+
+  const { data, isLoading } = useContractRead(
+    mintNFTContract,
+    "getNFTHoldersByEventGroup",
+    [groupId]
+  );
+
+  return {
+    holders: data as { holderAddress: string; tokenId: BigNumber }[],
+    isLoading,
+  };
+};
+
 export const useHoldersOfEvent = (eventId: number | BigNumber) => {
   const { mintNFTContract } = useMintNFTContract();
 
@@ -558,4 +573,50 @@ export const useHoldersOfEvent = (eventId: number | BigNumber) => {
     holders: data as { holderAddress: string; tokenId: BigNumber }[],
     isLoading,
   };
+};
+
+export const useLeadersOfEventGroup = (groupId: number) => {
+  const { holders, isLoading } = useHoldersOfEventGroup(groupId);
+
+  // count duplicate addresses of holders, holders type is { holderAddress: string; tokenId: BigNumber }[]
+  const leaders = useMemo(() => {
+    const activeHolders = holders?.filter(
+      (h) => h.holderAddress !== "0x000000000000000000000000000000000000dEaD"
+    );
+    const countMap = new Map();
+    activeHolders?.forEach((holder) => {
+      const address = holder.holderAddress;
+      if (countMap.has(address)) {
+        countMap.set(address, countMap.get(address) + 1);
+      } else {
+        countMap.set(address, 1);
+      }
+    });
+    const sorted: [string, number][] = Array.from(countMap).sort(
+      (a, b) => b[1] - a[1]
+    );
+
+    // create object {rank: number, address: string[], count: number}[], rank is 1 origin, if sorted[1] is same put in same rank
+    const result: { rank: number; address: string[]; count: number }[] = [];
+    let rank = 1;
+    let count = 0;
+    sorted.forEach((item, index) => {
+      if (index === 0) {
+        result.push({ rank, address: [item[0]], count: item[1] });
+        count = item[1];
+      } else {
+        if (count === item[1]) {
+          result[result.length - 1].address.push(item[0]);
+        } else {
+          rank = index + 1;
+          result.push({ rank, address: [item[0]], count: item[1] });
+          count = item[1];
+        }
+      }
+    });
+
+    return result;
+  }, [holders]);
+
+  return { leaders, isLoading };
 };
