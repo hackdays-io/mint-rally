@@ -81,7 +81,7 @@ const EventGroup = () => {
                     </Thead>
                     <Tbody wordBreak="break-word">
                       {leaders.map((user) => (
-                        <Tr>
+                        <Tr key={user.rank}>
                           <Td
                             textAlign="center"
                             fontSize={
@@ -96,7 +96,7 @@ const EventGroup = () => {
                           </Td>
                           <Td>
                             {user.address.map((addr) => (
-                              <Link href={`/users/${addr}`}>
+                              <Link key={addr} href={`/users/${addr}`}>
                                 <Text
                                   cursor={"pointer"}
                                   _hover={{ textDecoration: "underline" }}
