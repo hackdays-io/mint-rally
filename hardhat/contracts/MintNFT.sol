@@ -59,6 +59,8 @@ contract MintNFT is
     // Create a mapping to store NFT holders by event ID
     mapping(uint256 => uint256[]) private tokenIdsByEvent;
     address private operationControllerAddr;
+    // Create a mapping to store event ID by token ID
+    mapping(uint256 => uint256) private eventIdOfTokenId;
     // is non transferable via EventId
     mapping(uint256 => bool) private isNonTransferable;
 
@@ -207,6 +209,10 @@ contract MintNFT is
         bool _isNonTransferable
     ) external onlyGroupOwner(_eventId) whenNotPaused {
         isNonTransferable[_eventId] = _isNonTransferable;
+        if (tokenIdsByEvent[_eventId].length != 0) {
+            _setEventIdOfTokenIds(_eventId, tokenIdsByEvent[_eventId]);
+        }
+
         emit NonTransferable(_eventId, _isNonTransferable);
     }
 
@@ -346,5 +352,39 @@ contract MintNFT is
             }
         }
         return holders;
+    }
+
+    function transferFrom(
+        address from,
+        address to,
+        uint256 tokenId
+    ) public virtual override {
+        uint256 eventId = eventIdOfTokenId[tokenId];
+        if (eventId == 0) {
+            super.transferFrom(from, to, tokenId);
+        } else {
+            require(!isNonTransferable[eventId], "transfer is locked");
+            super.transferFrom(from, to, tokenId);
+        }
+    }
+
+    function setEventIdOfTokenIds(uint256 eveintId) external onlyOwner {
+        require(tokenIdsByEvent[eveintId].length != 0, "");
+        _setEventIdOfTokenIds(eveintId, tokenIdsByEvent[eveintId]);
+    }
+
+    function _setEventIdOfTokenIds(
+        uint256 eveintId,
+        uint256[] memory tokenIds
+    ) internal {
+        uint256 lastTokenIdIndex = tokenIds.length - 1;
+        for (uint256 i = 0; i <= lastTokenIdIndex; i++) {
+            uint256 tokenId = tokenIds[lastTokenIdIndex - i];
+            if (eventIdOfTokenId[tokenId] == eveintId) {
+                break;
+            } else {
+                eventIdOfTokenId[tokenId] = eveintId;
+            }
+        }
     }
 }

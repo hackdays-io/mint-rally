@@ -672,6 +672,19 @@ describe("non transferable flag", () => {
     expect(await mintNFT.ownerOf(0)).equal(participant2.address);
   });
 
+  it("should change non transferable flag by owner", async () => {
+    await mintNFT.connect(organizer).changeNonTransferable(1, true);
+    const flag = await mintNFT.connect(organizer).getIsNonTransferable(1);
+    expect(flag).equal(true);
+    expect(await mintNFT.ownerOf(0)).equal(participant2.address);
+    await expect(
+      mintNFT
+        .connect(participant2)
+        .transferFrom(participant2.address, participant1.address, 0)
+    ).to.be.reverted;
+    expect(await mintNFT.ownerOf(0)).equal(participant2.address);
+  });
+
   it("No one but the owner should be able to change non transferable flag", async () => {
     await expect(
       mintNFT.connect(participant1).changeNonTransferable(1, false)
