@@ -2,11 +2,12 @@ import { Container, Heading, Spinner, VStack, Text } from "@chakra-ui/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useMemo } from "react";
-import EventCard from "../../components/atoms/events/EventCard";
-import { useLocale } from "../../hooks/useLocale";
+import EventCard from "../../../components/atoms/events/EventCard";
+import { useLocale } from "../../../hooks/useLocale";
 import { useEventGroups, useEventsByGroupId } from "src/hooks/useEvent";
 import { Event } from "types/Event";
 import ENSName from "src/components/atoms/web3/ENSName";
+import EventGroupTab from "src/components/molecules/EventGroupTab";
 
 const EventGroup = () => {
   const router = useRouter();
@@ -38,10 +39,7 @@ const EventGroup = () => {
           <>
             {findgroup && (
               <>
-                <Heading mb={6}>
-                  {findgroup.name}
-                  {t.OWN_EVENTS}
-                </Heading>
+                <Heading mb={6}>{findgroup.name}</Heading>
                 <Text mb={6}>
                   {t.ORGANIZER}:{" "}
                   <ENSName
@@ -49,8 +47,9 @@ const EventGroup = () => {
                     enableEtherScanLink={true}
                   />
                 </Text>
+                <EventGroupTab />
                 {eventLoading ? (
-                  <Spinner />
+                  <Spinner mt={5} />
                 ) : (
                   <VStack spacing={5} align="stretch">
                     {events?.map((event: Event.EventRecord) => {

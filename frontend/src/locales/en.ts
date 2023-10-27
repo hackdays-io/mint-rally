@@ -36,6 +36,13 @@ export default {
   EVENT_GROUP_NFT_TITLE: "NFTs (You can edit in each event.)",
   EVENT_GROUP_CREATED: "Event Group Created!",
   EVENT_GROUP_APPEND_NFT: "Add NFT",
+  // Event group tab
+  EVENT_GROUP_TAB_EVENTS: "Event List",
+  EVENT_GROUP_TAB_LEADERS: "Leader Board",
+  // Event group leaders
+  EVENT_GROUP_LEADERS_RANK: "RANK",
+  EVENT_GROUP_LEADERS_ADDRESS: "ADDRESS",
+  EVENT_GROUP_LEADERS_COUNT: "COUNT",
   // Event group page
   OWN_EVENTS: "'s Events",
   // Event index
