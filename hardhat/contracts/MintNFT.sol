@@ -368,15 +368,19 @@ contract MintNFT is
         }
     }
 
-    function setEventIdOfTokenIds(uint256 eveintId) external onlyOwner {
-        require(tokenIdsByEvent[eveintId].length != 0, "");
-        _setEventIdOfTokenIds(eveintId, tokenIdsByEvent[eveintId]);
+    function setEventIdOfTokenIds(
+        uint256 eveintId,
+        uint256[] memory tokenIds
+    ) external onlyOwner {
+        _setEventIdOfTokenIds(eveintId, tokenIds);
     }
 
     function _setEventIdOfTokenIds(
         uint256 eveintId,
         uint256[] memory tokenIds
     ) internal {
+        require(tokenIds.length != 0, "tokenIds is blank");
+
         uint256 lastIndex = tokenIds.length - 1;
         for (uint256 i = 0; i <= lastIndex; i++) {
             uint256 tokenId = tokenIds[lastIndex - i];
