@@ -173,9 +173,11 @@ contract MintNFT is
         nftMetaDataURL[tokenId] = metaDataURL;
         tokenIdsByEvent[_eventId].push(tokenId);
         eventIdOfTokenId[tokenId] = _eventId;
-        _safeMint(_msgSender(), tokenId);
 
         _tokenIds.increment();
+
+        _safeMint(_msgSender(), tokenId);
+
         emit MintedNFTAttributeURL(_msgSender(), metaDataURL);
     }
 
