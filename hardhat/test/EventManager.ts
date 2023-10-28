@@ -1217,5 +1217,105 @@ describe("EventManager", function () {
         ).to.equal(true);
       });
     });
+
+    describe("getRolesByGroupId", async () => {
+      it("should return empty array if no assignee", async () => {
+        const txn1 = await eventManager
+          .connect(organizer)
+          .createGroup("group1");
+        await txn1.wait();
+
+        const groups = await eventManager.getOwnGroups(organizer.address);
+        const groupId = groups[0].groupId.toNumber();
+
+        const roles = await eventManager.getRolesByGroupId(groupId);
+        expect(roles.length).to.equal(0);
+      });
+
+      it("should return one value", async () => {
+        const txn1 = await eventManager
+          .connect(organizer)
+          .createGroup("group1");
+        await txn1.wait();
+
+        // other data
+        const txn2 = await eventManager
+          .connect(organizer)
+          .createGroup("group2");
+        await txn2.wait();
+
+        const groups = await eventManager.getOwnGroups(organizer.address);
+        const groupId1 = groups[0].groupId.toNumber();
+        const groupId2 = groups[1].groupId.toNumber();
+
+        // other data
+        await eventManager
+          .connect(organizer)
+          .grantRole(groupId2, participant1.address, ADMIN_ROLE);
+
+        await eventManager
+          .connect(organizer)
+          .grantRole(groupId1, organizer.address, ADMIN_ROLE);
+
+        const roles1 = await eventManager.getRolesByGroupId(groupId1);
+        expect(roles1.length).to.equal(1);
+        expect(roles1[0].assignee).to.equal(organizer.address);
+        expect(roles1[0].admin).to.equal(true);
+        expect(roles1[0].collaborator).to.equal(false);
+
+        await eventManager
+          .connect(organizer)
+          .grantRole(groupId1, organizer.address, COLLABORATOR_ROLE);
+
+        const roles2 = await eventManager.getRolesByGroupId(groupId1);
+        expect(roles2.length).to.equal(1);
+        expect(roles2[0].assignee).to.equal(organizer.address);
+        expect(roles2[0].admin).to.equal(true);
+        expect(roles2[0].collaborator).to.equal(true);
+
+        await eventManager
+          .connect(organizer)
+          .revokeRole(groupId1, organizer.address, ADMIN_ROLE);
+
+        const roles3 = await eventManager.getRolesByGroupId(groupId1);
+        expect(roles3.length).to.equal(1);
+        expect(roles3[0].assignee).to.equal(organizer.address);
+        expect(roles3[0].admin).to.equal(false);
+        expect(roles3[0].collaborator).to.equal(true);
+
+        await eventManager
+          .connect(organizer)
+          .revokeRole(groupId1, organizer.address, COLLABORATOR_ROLE);
+
+        const roles = await eventManager.getRolesByGroupId(groupId1);
+        expect(roles.length).to.equal(0);
+      });
+
+      it("should return multiple values", async () => {
+        const txn1 = await eventManager
+          .connect(organizer)
+          .createGroup("group1");
+        await txn1.wait();
+
+        const groups = await eventManager.getOwnGroups(organizer.address);
+        const groupId = groups[0].groupId.toNumber();
+
+        await eventManager
+          .connect(organizer)
+          .grantRole(groupId, organizer.address, ADMIN_ROLE);
+        await eventManager
+          .connect(organizer)
+          .grantRole(groupId, participant1.address, COLLABORATOR_ROLE);
+
+        const roles = await eventManager.getRolesByGroupId(groupId);
+        expect(roles.length).to.equal(2);
+        expect(roles[0].assignee).to.equal(organizer.address);
+        expect(roles[0].admin).to.equal(true);
+        expect(roles[0].collaborator).to.equal(false);
+        expect(roles[1].assignee).to.equal(participant1.address);
+        expect(roles[1].admin).to.equal(false);
+        expect(roles[1].collaborator).to.equal(true);
+      });
+    });
   });
 });
