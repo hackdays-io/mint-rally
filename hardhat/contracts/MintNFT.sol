@@ -354,17 +354,17 @@ contract MintNFT is
         return holders;
     }
 
-    function transferFrom(
+    function _transfer(
         address from,
         address to,
         uint256 tokenId
-    ) public virtual override {
+    ) internal virtual override {
         uint256 eventId = eventIdOfTokenId[tokenId];
-        if (eventId == 0) {
-            super.transferFrom(from, to, tokenId);
-        } else {
+        if (eventId != 0) {
             require(!isNonTransferable[eventId], "transfer is locked");
-            super.transferFrom(from, to, tokenId);
+            super._transfer(from, to, tokenId);
+        } else {
+            super._transfer(from, to, tokenId);
         }
     }
 
@@ -377,13 +377,14 @@ contract MintNFT is
         uint256 eveintId,
         uint256[] memory tokenIds
     ) internal {
-        uint256 lastTokenIdIndex = tokenIds.length - 1;
-        for (uint256 i = 0; i <= lastTokenIdIndex; i++) {
-            uint256 tokenId = tokenIds[lastTokenIdIndex - i];
-            if (eventIdOfTokenId[tokenId] == eveintId) {
-                break;
-            } else {
+        uint256 lastIndex = tokenIds.length - 1;
+        for (uint256 i = 0; i <= lastIndex; i++) {
+            uint256 tokenId = tokenIds[lastIndex - i];
+
+            if (eventIdOfTokenId[tokenId] != eveintId) {
                 eventIdOfTokenId[tokenId] = eveintId;
+            } else {
+                break;
             }
         }
     }
