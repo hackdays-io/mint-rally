@@ -356,6 +356,12 @@ contract MintNFT is
         return holders;
     }
 
+    function getTokenIdsByEvent(
+        uint256 eventId
+    ) external view returns (uint256[] memory) {
+        return tokenIdsByEvent[eventId];
+    }
+
     function getEventIdOfTokenId(
         uint256 _tokenId
     ) public view returns (uint256) {
