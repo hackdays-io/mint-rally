@@ -4,9 +4,15 @@ import { useRouter } from "next/router";
 import { useEffect, useMemo } from "react";
 import EventCard from "../../components/atoms/events/EventCard";
 import { useLocale } from "../../hooks/useLocale";
-import { useEventGroups, useEventsByGroupId } from "src/hooks/useEvent";
+import {
+  useEventGroups,
+  useEventsByGroupId,
+  useRoles,
+} from "src/hooks/useEvent";
 import { Event } from "types/Event";
 import ENSName from "src/components/atoms/web3/ENSName";
+import { useAddress } from "@thirdweb-dev/react";
+import EditCollaborators from "src/components/organisms/EditCollaborators";
 
 const EventGroup = () => {
   const router = useRouter();
@@ -28,6 +34,14 @@ const EventGroup = () => {
       (item: Event.EventGroup) => item.groupId.toString() == eventgroupid
     );
   }, [groups]);
+  const address = useAddress();
+  const { roles, isLoading: isRolesLoading, getRoles } = useRoles();
+  useEffect(() => {
+    if (findgroup == undefined) return;
+    if (address == undefined) return;
+    if (isRolesLoading) return;
+    getRoles(findgroup.groupId, address);
+  }, [findgroup, address, isRolesLoading, getRoles]);
 
   return (
     <>
@@ -49,6 +63,10 @@ const EventGroup = () => {
                     enableEtherScanLink={true}
                   />
                 </Text>
+                {((address && findgroup && address == findgroup.ownerAddress) ||
+                  (roles && roles.admin)) && (
+                  <EditCollaborators groupId={findgroup.groupId} />
+                )}
                 {eventLoading ? (
                   <Spinner />
                 ) : (

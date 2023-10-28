@@ -37,6 +37,18 @@ export default {
   EVENT_GROUP_APPEND_NFT: "NFTを追加する",
   // Event group page
   OWN_EVENTS: "のイベント",
+  // RBAC
+  RBAC_EDIT_COLLABORATORS: "権限管理",
+  RBAC_GRANT: "権限付与",
+  RBAC_ADMIN_ROLE: "管理者",
+  RBAC_COLLABORATOR_ROLE: "コラボレーター",
+  RBAC_ROLE: "権限",
+  RBAC_WALLET_ADDRESS: "ウォレットアドレス",
+  RBAC_GRANT_ROLE: "権限を付与する",
+  RBAC_INPUT_ADDRESS_TITLE:
+    "アドレスは 0x から始まり、合計で 42 文字である必要があります。",
+  RBAC_GRANT_SUCCESS: "権限の付与に成功しました。",
+  RBAC_GRANT_ERROR: "権限の更新中にエラーが発生しました。",
   // Event index
   CREATE_NEW_EVENT: "イベントを作成",
   // Event new
