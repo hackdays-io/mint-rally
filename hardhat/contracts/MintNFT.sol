@@ -214,9 +214,6 @@ contract MintNFT is
         bool _isNonTransferable
     ) external onlyGroupOwner(_eventId) whenNotPaused {
         isNonTransferable[_eventId] = _isNonTransferable;
-        if (tokenIdsByEvent[_eventId].length != 0) {
-            _setEventIdOfTokenIds(_eventId, tokenIdsByEvent[_eventId]);
-        }
 
         emit NonTransferable(_eventId, _isNonTransferable);
     }
@@ -380,10 +377,10 @@ contract MintNFT is
     }
 
     function setEventIdOfTokenIds(
-        uint256 eveintId,
+        uint256 eventId,
         uint256[] memory tokenIds
     ) external onlyOwner {
-        _setEventIdOfTokenIds(eveintId, tokenIds);
+        _setEventIdOfTokenIds(eventId, tokenIds);
     }
 
     function setEventIdOfTokenIdsBatch(
@@ -394,27 +391,27 @@ contract MintNFT is
 
         require(eventIdsLength == tokenIdsArr.length, "length is not match");
 
-        for (uint256 i = 0; i < eventIdsLength; i++) {
+        for (uint256 i = 0; i < eventIdsLength; ) {
             if (tokenIdsArr[i].length != 0) {
                 _setEventIdOfTokenIds(eventIds[i], tokenIdsArr[i]);
+            }
+
+            unchecked {
+                ++i;
             }
         }
     }
 
     function _setEventIdOfTokenIds(
-        uint256 eveintId,
+        uint256 eventId,
         uint256[] memory tokenIds
     ) internal {
-        require(tokenIds.length != 0, "tokenIds is blank");
+        uint256 tokenIdsLength = tokenIds.length;
+        for (uint256 i = 0; i < tokenIdsLength; ) {
+            eventIdOfTokenId[tokenIds[i]] = eventId;
 
-        uint256 lastIndex = tokenIds.length - 1;
-        for (uint256 i = 0; i <= lastIndex; i++) {
-            uint256 tokenId = tokenIds[lastIndex - i];
-
-            if (eventIdOfTokenId[tokenId] != eveintId) {
-                eventIdOfTokenId[tokenId] = eveintId;
-            } else {
-                break;
+            unchecked {
+                ++i;
             }
         }
     }
