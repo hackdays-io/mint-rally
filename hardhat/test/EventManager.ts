@@ -508,6 +508,74 @@ describe("EventManager", function () {
       expect(ownGroups2[1].name).to.equal("group3");
     });
   });
+
+  describe("GetCollaboratorAccessGroups", async () => {
+    it("should return groups of collaborator access", async () => {
+      const eventManagerContractFactory = await ethers.getContractFactory(
+        "EventManager"
+      );
+      const deployedEventManagerContract: any = await upgrades.deployProxy(
+        eventManagerContractFactory,
+        [relayer.address, 500000, 1000000, operationController.address],
+        {
+          initializer: "initialize",
+        }
+      );
+      const eventManager: EventManager =
+        await deployedEventManagerContract.deployed();
+      await eventManager.setMintNFTAddr(mintNFT.address);
+      await mintNFT.setEventManagerAddr(eventManager.address);
+
+      // create groups
+      const ownGroupName = "OwnGroup";
+      const otherGroupName = "OtherGroup";
+      const adminGroupName = "AdminGroup";
+      const collaboratorGroupName = "CollaboratorGroup";
+
+      const txn1 = await eventManager
+        .connect(organizer)
+        .createGroup(ownGroupName);
+      await txn1.wait();
+      const txn2 = await eventManager
+        .connect(participant1)
+        .createGroup(otherGroupName);
+      await txn2.wait();
+      const txn3 = await eventManager
+        .connect(participant1)
+        .createGroup(adminGroupName);
+      await txn3.wait();
+      const txn4 = await eventManager
+        .connect(participant1)
+        .createGroup(collaboratorGroupName);
+      await txn4.wait();
+
+      const groups = await eventManager.getGroups();
+      const adminGroupId = groups
+        .find((group) => group.name === adminGroupName)!
+        .groupId.toNumber();
+      const collaboratorGroupId = groups
+        .find((group) => group.name === collaboratorGroupName)!
+        .groupId.toNumber();
+
+      // grant roles
+      await eventManager
+        .connect(participant1)
+        .grantRole(adminGroupId, organizer.address, ADMIN_ROLE);
+      await eventManager
+        .connect(participant1)
+        .grantRole(collaboratorGroupId, organizer.address, COLLABORATOR_ROLE);
+
+      // check
+      const ownGroups = await eventManager.getCollaboratorAccessGroups(
+        organizer.address
+      );
+      expect(ownGroups.length).to.equal(3);
+      expect(ownGroups[0].name).to.equal(ownGroupName);
+      expect(ownGroups[1].name).to.equal(adminGroupName);
+      expect(ownGroups[2].name).to.equal(collaboratorGroupName);
+    });
+  });
+
   describe("GetOwnEvents", async () => {
     let eventManager: EventManager;
     let publicInputCalldata: any;
