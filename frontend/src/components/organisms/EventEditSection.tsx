@@ -1,6 +1,6 @@
 import { Box, Divider, Heading, Text } from "@chakra-ui/react";
 import { FC, useMemo } from "react";
-import { useOwnEventGroups } from "src/hooks/useEvent";
+import { useCollaboratorAccessEventGroups } from "src/hooks/useEvent";
 import { Event } from "types/Event";
 import EventMintLock from "../molecules/EventMintLock";
 import ResetSecretPhrase from "../molecules/ResetSecretPhrase";
@@ -15,7 +15,7 @@ type Props = {
 const EventEditSection: FC<Props> = ({ event }) => {
   const address = useAddress();
   const { t } = useLocale();
-  const { groups } = useOwnEventGroups();
+  const { groups } = useCollaboratorAccessEventGroups();
 
   const isOrganizer = useMemo(() => {
     return groups?.find(

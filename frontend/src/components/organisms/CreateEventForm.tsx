@@ -25,7 +25,7 @@ import { useIpfs } from "src/hooks/useIpfs";
 import {
   useCalcMtxGasFee,
   useCreateEvent,
-  useOwnEventGroups,
+  useCollaboratorAccessEventGroups,
 } from "src/hooks/useEvent";
 import { Event } from "types/Event";
 import { NFT } from "types/NFT";
@@ -91,7 +91,8 @@ const CreateEventForm: FC<Props> = ({ address }) => {
   const { gasFee } = useCalcMtxGasFee(watch("mintLimit"));
 
   // state for loading event groups
-  const { groups, isLoading: isLoadingEventGroups } = useOwnEventGroups();
+  const { groups, isLoading: isLoadingEventGroups } =
+    useCollaboratorAccessEventGroups();
   const { createEvent, isCreating, createError, createStatus, createdEventId } =
     useCreateEvent(address);
 

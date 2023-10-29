@@ -113,6 +113,29 @@ export const useOwnEventGroups = () => {
   return { groups, isLoading, error };
 };
 
+export const useCollaboratorAccessEventGroups = () => {
+  const { eventManagerContract } = useEventManagerContract();
+  const address = useAddress();
+  const {
+    isLoading,
+    data: _groups,
+    error,
+  } = useContractRead(eventManagerContract, "getCollaboratorAccessGroups", [
+    address,
+  ]);
+
+  const groups = useMemo(() => {
+    return _groups?.filter((group: any) => {
+      const blackList = process.env.NEXT_PUBLIC_EVENT_GROUP_BLACK_LIST
+        ? JSON.parse(`[${process.env.NEXT_PUBLIC_EVENT_GROUP_BLACK_LIST}]`)
+        : [];
+      return !blackList.includes(group.groupId.toNumber());
+    });
+  }, [_groups]);
+
+  return { groups, isLoading, error };
+};
+
 export const useEventGroups = () => {
   const { eventManagerContract } = useEventManagerContract();
   const { isLoading, data: _groups } = useContractRead(
@@ -394,4 +417,60 @@ export const useParseEventDate = (eventDate?: string) => {
   }, [eventDate]);
 
   return { parsedEventDate };
+};
+
+export const useGrantRole = () => {
+  const { eventManagerContract } = useEventManagerContract();
+  const {
+    mutateAsync,
+    isLoading: isGranting,
+    error: grantError,
+    status: grantStatus,
+  } = useContractWrite(eventManagerContract, "grantRole");
+
+  const grantRole = useCallback(
+    async (params: { groupId: number; address: string; role: string }) => {
+      if (!params.groupId) return;
+      if (!params.address) return;
+      if (!params.role) return;
+
+      const bytes32Role = ethers.utils.keccak256(
+        ethers.utils.toUtf8Bytes(params.role.toUpperCase())
+      );
+      try {
+        await mutateAsync({
+          args: [params.groupId, params.address, bytes32Role],
+        });
+      } catch (_) {}
+    },
+    [mutateAsync]
+  );
+  return {
+    grantRole,
+    isGranting,
+    grantStatus,
+    grantError,
+  };
+};
+
+export const useRoles = () => {
+  const { eventManagerContract } = useEventManagerContract();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [roles, setRoles] = useState<Event.Roles | null>(null);
+  const [error, setError] = useState<any>(null);
+  const getRoles = (groupId: number, address: string) => {
+    setIsLoading(true);
+    eventManagerContract
+      ?.call("getRoles", [groupId, address])
+      .then((res: any) => {
+        setRoles(res);
+      })
+      .catch((err: any) => {
+        setError(err);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
+  return { roles, isLoading, error, getRoles };
 };
