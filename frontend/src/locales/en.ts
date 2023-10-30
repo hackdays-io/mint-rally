@@ -81,6 +81,8 @@ export default {
   COPY: "Copy",
   SELECT_PAST_EVENT_TO_COPY_NOTICES:
     "Secret phrase and taking of gas fee setting will not be copied.",
+  YOUR_EVENT_WAS_CREATED: "Your event was created🎉",
+  GOTO_EVENT_PAGE: "Go to event page",
   // Event page
   SIGN_IN_TO_GET_NFT: "Sign in to get NFT!",
   GET_NFT_USING_METAMASK: "Get NFT with Metamask",
@@ -126,6 +128,11 @@ export default {
   SECRET_PHRASE_RESET_NEW_PLACEHOLDER: "Input new secret phrase",
   SECRET_PHRASE_RESET_SUCCESS: "Successfully reset secret phrase.",
   SECRET_PHRASE_RESET_FAIL: "Failed to reset secret phrase.",
+  DROP_NFTS: "Drop NFTs",
+  PLEASE_ENTER_WALLET_ADDRESSES: "Please provide wallet addresses to drop NFTs. one address per line.",
+  YOU_CAN_DROP_UP_TO_100_NFTS_AT_ONCE: "You can drop up to 100 NFTs at a time.",
+  DROP_NFTS_SUCCESS: "Successfully dropped NFTs.",
+  DROPNFT_SUBMIT: "Drop",
 
   FEATUE: "FEATURES",
   FEATUE_DESC_1:

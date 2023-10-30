@@ -34,9 +34,7 @@ const ResetSecretPhrase: FC<Props> = ({ eventId }) => {
           <Text fontWeight="bold" mb={2}>
             {t.SECRET_PHRASE_RESET}
           </Text>
-          <FormLabel fontWeight="bold" fontSize="sm">
-            {t.SECRET_PHRASE_RESET_NEW}
-          </FormLabel>
+          <FormLabel fontSize="sm">{t.SECRET_PHRASE_RESET_NEW}</FormLabel>
           <Flex alignItems="center">
             <Controller
               control={control}

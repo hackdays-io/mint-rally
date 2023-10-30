@@ -11,6 +11,7 @@
     "forceimport:stg": "npx hardhat run scripts/force_import_stg.ts --network mumbai",
     "compile": "npx hardhat compile",
     "test": "npx hardhat compile && npx hardhat test",
+    "test:watch": "npx hardhat watch test",
     "localchain": "npx hardhat node",
     "slither": "slither . --solc-remaps '@openzeppelin=node_modules/@openzeppelin' --exclude naming-convention,external-function,low-level-calls",
     "size": "npx hardhat size-contracts",
@@ -79,6 +80,7 @@
     "dayjs": "^1.11.9",
     "defender-relay-client": "^1.28.1",
     "eth-sig-util": "^3.0.1",
-    "hardhat-interface-generator": "^0.0.6"
+    "hardhat-interface-generator": "^0.0.6",
+    "hardhat-watcher": "^2.5.0"
   }
 }
