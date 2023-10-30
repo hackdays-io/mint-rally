@@ -1,7 +1,7 @@
 import { Box, Button, Flex, Heading, Tooltip } from "@chakra-ui/react";
 import { FC, useEffect, useState } from "react";
 import { useLocale } from "src/hooks/useLocale";
-import { useRevokeRole, useRolesByGroupId } from "src/hooks/useEvent";
+import { useRevokeRole, useMemberRoles } from "src/hooks/useEvent";
 import AlertMessage from "src/components/atoms/form/AlertMessage";
 
 type CollaboratorsProps = {
@@ -15,7 +15,7 @@ type RevokeInput = {
 
 const Collaborators: FC<CollaboratorsProps> = ({ groupId }) => {
   const { t } = useLocale();
-  const { rolesList, getRolesByGroupId } = useRolesByGroupId();
+  const { memberRoles, getMemberRoles } = useMemberRoles();
   const { revokeRole, isRevoking, revokeStatus, revokeError } = useRevokeRole();
   const [revokeInput, setRevokeInput] = useState<RevokeInput | null>(null);
   const [errorMessage, setErrorMessage] = useState<string>("");
@@ -57,7 +57,7 @@ const Collaborators: FC<CollaboratorsProps> = ({ groupId }) => {
   };
 
   useEffect(() => {
-    getRolesByGroupId(groupId);
+    getMemberRoles(groupId);
   }, [groupId]);
 
   useEffect(() => {
@@ -86,17 +86,17 @@ const Collaborators: FC<CollaboratorsProps> = ({ groupId }) => {
         {t.RBAC_ADMINS}
       </Heading>
       <Flex flexWrap="wrap" columnGap={1} rowGap={1} mb={4}>
-        {rolesList
-          ?.filter((roles) => {
-            return roles.admin === true;
+        {memberRoles
+          ?.filter((memberRole) => {
+            return memberRole.admin === true;
           })
-          .map((roles) => (
+          .map((memberRole) => (
             <Tooltip
-              label={roles.assignee}
+              label={memberRole.assignee}
               backgroundColor="white"
               color="yellow.900"
               fontSize="xs"
-              key={`${roles.assignee}`}
+              key={`${memberRole.assignee}`}
             >
               <Box
                 as="span"
@@ -106,13 +106,14 @@ const Collaborators: FC<CollaboratorsProps> = ({ groupId }) => {
                 borderRadius="full"
                 border="2px solid lightgray"
                 backgroundColor={
-                  isSelectedRevokeInput(roles.assignee, "admin")
+                  isSelectedRevokeInput(memberRole.assignee, "admin")
                     ? "mint.primary"
                     : "white"
                 }
-                onClick={() => updateRevokeInput(roles.assignee, "admin")}
+                onClick={() => updateRevokeInput(memberRole.assignee, "admin")}
               >
-                {roles.assignee.slice(0, 5)}...{roles.assignee.slice(-3)}
+                {memberRole.assignee.slice(0, 5)}...
+                {memberRole.assignee.slice(-3)}
               </Box>
             </Tooltip>
           ))}
@@ -122,17 +123,17 @@ const Collaborators: FC<CollaboratorsProps> = ({ groupId }) => {
         {t.RBAC_COLLABORATORS}
       </Heading>
       <Flex flexWrap="wrap" columnGap={1} rowGap={1}>
-        {rolesList
-          ?.filter((roles) => {
-            return roles.collaborator === true;
+        {memberRoles
+          ?.filter((memberRole) => {
+            return memberRole.collaborator === true;
           })
-          .map((roles) => (
+          .map((memberRole) => (
             <Tooltip
-              label={roles.assignee}
+              label={memberRole.assignee}
               backgroundColor="white"
               color="yellow.900"
               fontSize="xs"
-              key={`${roles.assignee}`}
+              key={`${memberRole.assignee}`}
             >
               <Box
                 as="span"
@@ -142,15 +143,16 @@ const Collaborators: FC<CollaboratorsProps> = ({ groupId }) => {
                 borderRadius="full"
                 border="2px solid lightgray"
                 backgroundColor={
-                  isSelectedRevokeInput(roles.assignee, "collaborator")
+                  isSelectedRevokeInput(memberRole.assignee, "collaborator")
                     ? "mint.primary"
                     : "white"
                 }
                 onClick={() =>
-                  updateRevokeInput(roles.assignee, "collaborator")
+                  updateRevokeInput(memberRole.assignee, "collaborator")
                 }
               >
-                {roles.assignee.slice(0, 5)}...{roles.assignee.slice(-3)}
+                {memberRole.assignee.slice(0, 5)}...
+                {memberRole.assignee.slice(-3)}
               </Box>
             </Tooltip>
           ))}

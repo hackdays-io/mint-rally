@@ -10,7 +10,7 @@ import { useLocale } from "../../../hooks/useLocale";
 import {
   useEventGroups,
   useEventsByGroupId,
-  useRoles,
+  useMemberRole,
 } from "src/hooks/useEvent";
 import { Event } from "types/Event";
 import EventGroupTab from "src/components/molecules/EventGroupTab";
@@ -36,13 +36,17 @@ const EventGroup = () => {
     );
   }, [groups]);
   const address = useAddress();
-  const { roles, isLoading: isRolesLoading, getRoles } = useRoles();
+  const {
+    memberRole,
+    isLoading: isRoleLoading,
+    getMemberRole,
+  } = useMemberRole();
   useEffect(() => {
     if (findgroup == undefined) return;
     if (address == undefined) return;
-    if (isRolesLoading) return;
-    getRoles(findgroup.groupId, address);
-  }, [findgroup, address, isRolesLoading, getRoles]);
+    if (isRoleLoading) return;
+    getMemberRole(findgroup.groupId, address);
+  }, [findgroup, address, isRoleLoading, getMemberRole]);
 
   return (
     <>
@@ -62,7 +66,7 @@ const EventGroup = () => {
                   />
                 </Text>
                 {((address && findgroup && address == findgroup.ownerAddress) ||
-                  (roles && roles.admin)) && (
+                  (memberRole && memberRole.admin)) && (
                   <EditCollaborators groupId={findgroup.groupId} />
                 )}
                 <EventGroupTab />

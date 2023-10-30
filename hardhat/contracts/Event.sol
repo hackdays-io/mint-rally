@@ -24,7 +24,7 @@ contract EventManager is OwnableUpgradeable {
         bool useMtx;
     }
 
-    struct Roles {
+    struct MemberRole {
         address assignee;
         bool admin;
         bool collaborator;
@@ -179,7 +179,7 @@ contract EventManager is OwnableUpgradeable {
             uint256 _groupsIndex = _targetGroupIds[_i] - 1;
             _groups[_i] = groups[_groupsIndex];
         }
-        
+
         return _groups;
     }
 
@@ -363,20 +363,20 @@ contract EventManager is OwnableUpgradeable {
         return memberRolesByGroupId[_groupId][_address][_role];
     }
 
-    function getRoles(uint256 _groupId, address _address) external view returns (Roles memory) {
-        return Roles({
+    function getMemberRole(uint256 _groupId, address _address) external view returns (MemberRole memory) {
+        return MemberRole({
             assignee: _address,
             admin: memberRolesByGroupId[_groupId][_address][ADMIN_ROLE],
             collaborator: memberRolesByGroupId[_groupId][_address][COLLABORATOR_ROLE]
         });
     }
 
-    function getRolesByGroupId(uint256 _groupId) external view returns (Roles[] memory) {
+    function getMemberRoles(uint256 _groupId) external view returns (MemberRole[] memory) {
         uint256 _count = memberAddressesByGroupId[_groupId].length;
-        Roles[] memory _roles = new Roles[](_count);
+        MemberRole[] memory _roles = new MemberRole[](_count);
         for (uint256 _i = 0; _i < _count; _i++) {
             address _address = memberAddressesByGroupId[_groupId][_i];
-            _roles[_i] = Roles({
+            _roles[_i] = MemberRole({
                 assignee: _address,
                 admin: memberRolesByGroupId[_groupId][_address][ADMIN_ROLE],
                 collaborator: memberRolesByGroupId[_groupId][_address][COLLABORATOR_ROLE]

@@ -29,7 +29,7 @@ export namespace Event {
     attributes: { metaDataURL: string; requiredParticipateCount: number }[];
   }
 
-  export interface Roles {
+  export interface MemberRole {
     assignee: string;
     admin: boolean;
     collaborator: boolean;

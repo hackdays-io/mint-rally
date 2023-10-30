@@ -491,17 +491,17 @@ export const useRevokeRole = () => {
   };
 };
 
-export const useRoles = () => {
+export const useMemberRole = () => {
   const { eventManagerContract } = useEventManagerContract();
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [roles, setRoles] = useState<Event.Roles | null>(null);
+  const [memberRole, setMemberRole] = useState<Event.MemberRole | null>(null);
   const [error, setError] = useState<any>(null);
-  const getRoles = (groupId: number, address: string) => {
+  const getMemberRole = (groupId: number, address: string) => {
     setIsLoading(true);
     eventManagerContract
-      ?.call("getRoles", [groupId, address])
+      ?.call("getMemberRole", [groupId, address])
       .then((res: any) => {
-        setRoles(res);
+        setMemberRole(res);
       })
       .catch((err: any) => {
         setError(err);
@@ -510,20 +510,21 @@ export const useRoles = () => {
         setIsLoading(false);
       });
   };
-  return { roles, isLoading, error, getRoles };
+  return { memberRole, isLoading, error, getMemberRole };
 };
 
-export const useRolesByGroupId = () => {
+export const useMemberRoles = () => {
   const { eventManagerContract } = useEventManagerContract();
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [rolesList, setRolesList] = useState<Array<Event.Roles> | null>(null);
+  const [memberRoles, setMemberRoles] =
+    useState<Array<Event.MemberRole> | null>(null);
   const [error, setError] = useState<any>(null);
-  const getRolesByGroupId = (groupId: number) => {
+  const getMemberRoles = (groupId: number) => {
     setIsLoading(true);
     eventManagerContract
-      ?.call("getRolesByGroupId", [groupId])
+      ?.call("getMemberRoles", [groupId])
       .then((res: any) => {
-        setRolesList(res);
+        setMemberRoles(res);
       })
       .catch((err: any) => {
         setError(err);
@@ -532,5 +533,5 @@ export const useRolesByGroupId = () => {
         setIsLoading(false);
       });
   };
-  return { rolesList, isLoading, error, getRolesByGroupId };
+  return { memberRoles, isLoading, error, getMemberRoles };
 };
