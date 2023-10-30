@@ -10,6 +10,28 @@
 - Organizers can easily generate nice NFT images on the screen
 - Participants can gain attractive NFTs by continuing to attend events.
 
+## Deployed Contract Address
+
+### Polygon
+
+| Contract Name        | Address                                    |
+| -------------------- | ------------------------------------------ |
+| Forwarder            | 0xc4579f8A0c6dd6A0B02914B0F48eF53f4d740980 |
+| MintNFT              | 0x7d895Ca96caa5344EC0b732c6e1DEfa560671e14 |
+| EventManager         | 0xFe2fe598E6C8B2fe66E55D5545D7d0aE4d52fCA1 |
+| SecretphraseVerifier | 0xea9bFA9176292A06724fD5F6F5Ec0c5f9F7AFea3 |
+| OperationController  | 0x13Eb4ddb37Cb2049E68723Af3cD4eEa2c50BD451 |
+
+### Mumbai
+
+| Contract Name        | Address                                    |
+| -------------------- | ------------------------------------------ |
+| Forwarder            | 0xe9a9403381Ae89595D7DE67e2512aDb914F17DA7 |
+| MintNFT              | 0xC3894D90dF7EFCAe8CF34e300CF60FF29Db9a868 |
+| EventManager         | 0x4fe4F50B719572b3a5A33516da59eC43F51F4A45 |
+| SecretphraseVerifier | 0x8CeC10307447B3FA8D45007cf0cd45e9139EFEac |
+| OperationController  | 0x4946049358140cfda80e36a7ba0c84871b964e3e |
+
 ## Problem to be solved
 
 Solves the problem of organizers struggling with event retention rates.
@@ -29,19 +51,3 @@ Solves the problem of organizers struggling with event retention rates.
 ## Deployment
 
 - [Deploy](docs/deploy.md)
-
-## Challenges Faced
-
-### Solved
-
-- Calling another contract from a contract and minting it.
-- full on chain
-- Restrict the ability to mint only event attendees.
-
-### Under Challenge
-
-- Allow each event organizer to manage their own participation fees.
-- Image Editor.
-- Making the NFT generative.
-- Meta-transaction to eliminate the burden of gas costs for participants
-- Issue uncool NFTs to absentees.

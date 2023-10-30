@@ -402,21 +402,25 @@ export const useCalcMtxGasFee = (mintLimit?: number) => {
 };
 
 export const useParseEventDate = (eventDate?: string) => {
-  const parsedEventDate = useMemo(() => {
-    if (!eventDate) return "";
-    if (eventDate.length > 30) {
-      const [startDate, endDate] = eventDate.split("/");
+  const parse = useCallback((_eventDate: string) => {
+    if (!_eventDate) return "";
+    if (_eventDate.length > 30) {
+      const [startDate, endDate] = _eventDate.split("/");
       return (
         dayjs(startDate).format("YYYY/MM/DD HH:mm") +
         " ~ " +
         dayjs(endDate).format("YYYY/MM/DD HH:mm")
       );
     } else {
-      return eventDate;
+      return _eventDate;
     }
+  }, []);
+
+  const parsedEventDate = useMemo(() => {
+    return parse(eventDate || "");
   }, [eventDate]);
 
-  return { parsedEventDate };
+  return { parsedEventDate, parse };
 };
 
 export const useGrantRole = () => {

@@ -22,6 +22,7 @@ export default {
   CONNECT_WITH_METAMASK: "Metamaskで接続",
   CONNECT_WITH_EMAIL: "メールアドレスで接続",
   CONNECT_WITH_SAFE: "Safeで接続",
+  CONNECT_WITH_WALLETCONNECT: "WalletConnectで接続",
   INPUT_SAFE_WALLET_ADDRESS: "Safeのウォレットアドレスを入力",
   NOT_ALLOWED_MAGIC_LINK:
     "このイベントはメールアドレスログインをサポートしていません。",
@@ -35,6 +36,13 @@ export default {
   EVENT_GROUP_NFT_TITLE: "NFTs (イベントごとにNFTを設定もできます)",
   EVENT_GROUP_CREATED: "イベントグループが作成されました！",
   EVENT_GROUP_APPEND_NFT: "NFTを追加する",
+  // Event group tab
+  EVENT_GROUP_TAB_EVENTS: "イベント一覧",
+  EVENT_GROUP_TAB_LEADERS: "リーダーボード",
+  // Event group leaders
+  EVENT_GROUP_LEADERS_RANK: "ランク",
+  EVENT_GROUP_LEADERS_ADDRESS: "アドレス",
+  EVENT_GROUP_LEADERS_COUNT: "所持数",
   // Event group page
   OWN_EVENTS: "のイベント",
   // RBAC
@@ -69,10 +77,16 @@ export default {
   EVENT_SECRETPHRASE_DESC:
     "ひみつの「あいことば」は忘れないようにしてください。あとから確認することはできません。",
   EVENT_DISTRIBUTED_NFT: "イベントで配布されるNFT",
+  SELECT_PAST_EVENT_TO_COPY:
+    "過去に開催したイベント情報を用いて新しいイベントを作成することができます。内容は後から変更できます。",
+  SELECT_PAST_EVENT_TO_COPY_NOTICES:
+    "あいことばとガス代の肩代わりはコピーされません",
+  COPY: "コピーする",
   // Event page
   SIGN_IN_TO_GET_NFT: "NFTをGetしよう！",
   SELECT_WALLET: "NFTの取得方法を選択してください",
   GET_NFT_USING_METAMASK: "Metamask で受け取る",
+  GET_NFT_USING_WALLETCONNECT: "WalletConnect で受け取る",
   GET_NFT_USING_EMAIL: "メールアドレスで受け取る",
   EMAIL_ADDRESS: "メールアドレス",
   PLEASE_ENTER_EMAIL_ADDRESS:

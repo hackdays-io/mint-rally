@@ -84,19 +84,6 @@ async function main() {
   );
   console.log(`NEXT_PUBLIC_CONTRACT_MINT_NFT_MANAGER=${mintNFT.address}`);
   console.log(`NEXT_PUBLIC_CONTRACT_EVENT_MANAGER=${eventManager.address}`);
-
-  // writeFileSync(
-  //   "./scripts/deployed_contract_addr_stg.json",
-  //   JSON.stringify(
-  //     {
-  //       MintRallyFowarder: forwarder.address,
-  //       MintNFT: mintNFT.address,
-  //       EventManager: eventManager.address,
-  //     },
-  //     null,
-  //     2
-  //   )
-  // );
 }
 
 // We recommend this pattern to be able to use async/await everywhere

@@ -17,6 +17,7 @@ export default {
   CONNECT_WITH_METAMASK: "Connect with Metamask",
   CONNECT_WITH_EMAIL: "Connect with Email",
   CONNECT_WITH_SAFE: "Connect with Safe",
+  CONNECT_WITH_WALLETCONNECT: "Connect with WalletConnect",
   INPUT_SAFE_WALLET_ADDRESS: "Input Safe Wallet Address",
   NOT_ALLOWED_MAGIC_LINK: "This event is not supported email login.",
   MAGICLINK_IS_NOT_SUPPORTED_USE_OTHERS:
@@ -35,6 +36,13 @@ export default {
   EVENT_GROUP_NFT_TITLE: "NFTs (You can edit in each event.)",
   EVENT_GROUP_CREATED: "Event Group Created!",
   EVENT_GROUP_APPEND_NFT: "Add NFT",
+  // Event group tab
+  EVENT_GROUP_TAB_EVENTS: "Event List",
+  EVENT_GROUP_TAB_LEADERS: "Leader Board",
+  // Event group leaders
+  EVENT_GROUP_LEADERS_RANK: "RANK",
+  EVENT_GROUP_LEADERS_ADDRESS: "ADDRESS",
+  EVENT_GROUP_LEADERS_COUNT: "COUNT",
   // Event group page
   OWN_EVENTS: "'s Events",
   // RBAC
@@ -68,9 +76,15 @@ export default {
   EVENT_SECRETPHRASE_DESC:
     "Please do not forget this phrase. you can't get this phrase after submitting",
   EVENT_DISTRIBUTED_NFT: "NFTs to be distributed at the event",
+  SELECT_PAST_EVENT_TO_COPY:
+    "New events can be created using information from previous events. The content can be changed.",
+  COPY: "Copy",
+  SELECT_PAST_EVENT_TO_COPY_NOTICES:
+    "Secret phrase and taking of gas fee setting will not be copied.",
   // Event page
   SIGN_IN_TO_GET_NFT: "Sign in to get NFT!",
   GET_NFT_USING_METAMASK: "Get NFT with Metamask",
+  GET_NFT_USING_WALLETCONNECT: "Get NFT with WalletConnect",
   GET_NFT_USING_EMAIL: "Get NFT with Email",
   EMAIL_ADDRESS: "Email address",
   PLEASE_ENTER_EMAIL_ADDRESS: "Please enter your email address and connect.",

@@ -30,19 +30,22 @@ export const useIpfs = () => {
       const imageUpdatedNfts = nfts.filter((nft) => nft.fileObject);
       let baseNftAttributes = nfts.filter((nft) => !nft.fileObject);
       const uploader = new ipfsUploader();
-      const uploadResult = await uploader.uploadNFTsToIpfs(imageUpdatedNfts);
-      if (uploadResult) {
-        const nftAttributes: NFT.NFTImage[] = uploadResult.renamedFiles.map(
-          ({ name, fileObject, description, requiredParticipateCount }) => ({
-            name: name,
-            image: `ipfs://${uploadResult.rootCid}/${fileObject.name}`,
-            description: description,
-            requiredParticipateCount,
-          })
-        );
-        baseNftAttributes = nftAttributes.concat(baseNftAttributes);
-      } else {
-        throw new Error("Failed to upload NFT files to IPFS");
+
+      if (imageUpdatedNfts.length !== 0) {
+        const uploadResult = await uploader.uploadNFTsToIpfs(imageUpdatedNfts);
+        if (uploadResult) {
+          const nftAttributes: NFT.NFTImage[] = uploadResult.renamedFiles.map(
+            ({ name, fileObject, description, requiredParticipateCount }) => ({
+              name: name,
+              image: `ipfs://${uploadResult.rootCid}/${fileObject.name}`,
+              description: description,
+              requiredParticipateCount,
+            })
+          );
+          baseNftAttributes = nftAttributes.concat(baseNftAttributes);
+        } else {
+          throw new Error("Failed to upload NFT files to IPFS");
+        }
       }
 
       const metadataFiles: File[] = [];

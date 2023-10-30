@@ -1,5 +1,10 @@
 import { Localhost, Mumbai, Polygon } from "@thirdweb-dev/chains";
-import { magicLink, metamaskWallet, safeWallet } from "@thirdweb-dev/react";
+import {
+  magicLink,
+  metamaskWallet,
+  safeWallet,
+  walletConnect,
+} from "@thirdweb-dev/react";
 import { useLocale } from "src/hooks/useLocale";
 import { useMemo } from "react";
 
@@ -9,7 +14,7 @@ export const activeChain =
     ? Mumbai
     : chainId === "137"
     ? Polygon
-    : { ...Localhost, chainId: 31337 };
+    : { ...Localhost, rpc: ["http://localhost:8545"], chainId: 31337 };
 
 export const useWeb3WalletConfig = () => {
   const { t, locale } = useLocale();
@@ -19,7 +24,6 @@ export const useWeb3WalletConfig = () => {
       apiKey: process.env.NEXT_PUBLIC_MAGIC_LINK_KEY!,
       magicSdkConfiguration: {
         locale: locale === "ja" ? "ja" : "en",
-        network: activeChain as any,
       },
       smsLogin: false,
     });
@@ -34,11 +38,25 @@ export const useWeb3WalletConfig = () => {
     return s_config;
   }, []);
 
+  const metamaskConfig = useMemo(() => {
+    return metamaskWallet();
+  }, []);
+
+  const walletConnectConfig = useMemo(() => {
+    return walletConnect({
+      projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_ID!,
+      qrModalOptions: {
+        themeMode: "light",
+      },
+    });
+  }, []);
+
   const supportedWallets = [
-    metamaskWallet(),
+    metamaskConfig,
     safeWalletConfig,
     magicLinkConfig,
+    walletConnectConfig,
   ];
 
-  return { magicLinkConfig, supportedWallets };
+  return { magicLinkConfig, walletConnectConfig, supportedWallets };
 };
