@@ -457,6 +457,40 @@ export const useGrantRole = () => {
   };
 };
 
+export const useRevokeRole = () => {
+  const { eventManagerContract } = useEventManagerContract();
+  const {
+    mutateAsync,
+    isLoading: isRevoking,
+    error: revokeError,
+    status: revokeStatus,
+  } = useContractWrite(eventManagerContract, "revokeRole");
+
+  const revokeRole = useCallback(
+    async (params: { groupId: number; address: string; role: string }) => {
+      if (!params.groupId) return;
+      if (!params.address) return;
+      if (!params.role) return;
+
+      const bytes32Role = ethers.utils.keccak256(
+        ethers.utils.toUtf8Bytes(params.role.toUpperCase())
+      );
+      try {
+        await mutateAsync({
+          args: [params.groupId, params.address, bytes32Role],
+        });
+      } catch (_) {}
+    },
+    [mutateAsync]
+  );
+  return {
+    revokeRole,
+    isRevoking,
+    revokeStatus: revokeStatus,
+    revokeError: revokeError,
+  };
+};
+
 export const useRoles = () => {
   const { eventManagerContract } = useEventManagerContract();
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -477,4 +511,26 @@ export const useRoles = () => {
       });
   };
   return { roles, isLoading, error, getRoles };
+};
+
+export const useRolesByGroupId = () => {
+  const { eventManagerContract } = useEventManagerContract();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [rolesList, setRolesList] = useState<Array<Event.Roles> | null>(null);
+  const [error, setError] = useState<any>(null);
+  const getRolesByGroupId = (groupId: number) => {
+    setIsLoading(true);
+    eventManagerContract
+      ?.call("getRolesByGroupId", [groupId])
+      .then((res: any) => {
+        setRolesList(res);
+      })
+      .catch((err: any) => {
+        setError(err);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
+  return { rolesList, isLoading, error, getRolesByGroupId };
 };

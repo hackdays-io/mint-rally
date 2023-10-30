@@ -30,6 +30,7 @@ export namespace Event {
   }
 
   export interface Roles {
+    assignee: string;
     admin: boolean;
     collaborator: boolean;
   }
