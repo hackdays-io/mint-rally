@@ -35,12 +35,14 @@ const signTypeData = async (signer: UserWallet, data: any) => {
 
 export const buildRequest = async (
   forwarder: SmartContract<BaseContract>,
-  input: any
+  input: any,
+  numberOfMint: number
 ) => {
   // get nonce from forwarder contract
   // this nonce is used to prevent replay attack
   const nonce = (await forwarder.call("getNonce", [input.from])).toString();
-  return { value: 0, gas: 1e6, nonce, ...input };
+  const gas: number = (numberOfMint > 0) ? 5e5 * numberOfMint : 1e6;
+  return { value: 0, gas: gas, nonce, ...input };
 };
 
 export const buildTypedData = async (
@@ -55,9 +57,10 @@ export const buildTypedData = async (
 export const signMetaTxRequest = async (
   signer: UserWallet,
   forwarder: any,
-  input: any
+  input: any,
+  numberOfMint: number
 ) => {
-  const request = await buildRequest(forwarder, input);
+  const request = await buildRequest(forwarder, input, numberOfMint);
   const toSign = await buildTypedData(forwarder, request);
   const signature = await signTypeData(signer, toSign);
   return { signature, request };
