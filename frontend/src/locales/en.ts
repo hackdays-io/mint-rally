@@ -57,6 +57,11 @@ export default {
     "The address must start with 0x and be a total of 42 characters in length.",
   RBAC_GRANT_SUCCESS: "Successfully granted.",
   RBAC_GRANT_ERROR: "An error occurred when updating the role.",
+  RBAC_LIST: "Collaborators",
+  RBAC_ADMINS: "Administrators",
+  RBAC_COLLABORATORS: "Collaborators",
+  RBAC_REVOKE_ROLE: "Revoke Role",
+  RBAC_REVOKE_ERROR: "An error occurred when updating the role.",
   // Event index
   CREATE_NEW_EVENT: "Create new event",
   // Event new
