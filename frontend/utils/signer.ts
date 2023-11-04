@@ -41,7 +41,7 @@ export const buildRequest = async (
   // get nonce from forwarder contract
   // this nonce is used to prevent replay attack
   const nonce = (await forwarder.call("getNonce", [input.from])).toString();
-  const gas: number = (numberOfMint > 0) ? 5e5 * numberOfMint : 1e6;
+  const gas: number = (numberOfMint > 1) ? 5e5 * numberOfMint : 1e6;
   return { value: 0, gas: gas, nonce, ...input };
 };
 
