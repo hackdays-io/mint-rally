@@ -19,21 +19,18 @@ const DropNFTs: FC<Props> = ({ event, address }) => {
   const { control, handleSubmit } = useForm<FormData>({
     defaultValues: { addresses: "" },
   });
-  const { dropNFTs, dropNFTsMTX, error, isLoading, status } = useDropNFTs(
-    event,
-    address
-  );
+  const { dropNFTs, dropNFTsMTX, error, isLoading, status, isDroppedComplete } =
+    useDropNFTs(event, address);
   const submit = async (data: FormData) => {
-    console.log(data);
     if (!data.addresses || isLoading) return;
-    if (data.addresses.split("\n").length > 100) {
+    if (data.addresses.trim().split("\n").length > 100) {
       alert(t.YOU_CAN_DROP_UP_TO_100_NFTS_AT_ONCE);
       return;
     }
     if (event.useMtx) {
-      await dropNFTsMTX(data.addresses.split("\n"));
+      await dropNFTsMTX(data.addresses.trim().split("\n"));
     } else {
-      await dropNFTs(data.addresses.split("\n"));
+      await dropNFTs(data.addresses.trim().split("\n"));
     }
   };
   return (
@@ -70,10 +67,24 @@ const DropNFTs: FC<Props> = ({ event, address }) => {
           {t.DROPNFT_SUBMIT}
         </Button>
       </form>
-      {status == "success" && (
+      {status == "success" && !isDroppedComplete && (
+        <AlertMessage status="loading" title={t.DROPPING_NFTS} />
+      )}
+      {status == "success" && isDroppedComplete && (
         <AlertMessage status="success" title={t.DROP_NFTS_SUCCESS} />
       )}
-      {error && <AlertMessage status="error" title={error.message} />}
+      {error && (
+        <>
+          <AlertMessage
+            status="error"
+            title={t.ERROR_MINTING_PARTICIPATION_NFT}
+          >
+            {error.reason && (
+              <Text className="linebreak">: {error.reason}</Text>
+            )}
+          </AlertMessage>
+        </>
+      )}
     </Box>
   );
 };

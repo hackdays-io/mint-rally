@@ -228,7 +228,6 @@ export const useCreateEvent = (address: string) => {
         const endDateTime = dayjs(
           `${params.endDate} ${params.endTime}`
         ).toISOString();
-        console.log('call mutateAsync');
         await mutateAsync({
           args: [
             params.groupId,
@@ -336,7 +335,6 @@ export const useEventsByGroupId = () => {
   const [events, setEvents] = useState<Event.EventRecord[] | null>(null);
   const [error, setError] = useState<any>(null);
   const getEventsByGroupId = (groupId: number) => {
-    console.log("getEventsByGroupId", groupId);
     setIsLoading(true);
     eventManagerContract
       ?.call("getEventRecordsByGroupId", [groupId])

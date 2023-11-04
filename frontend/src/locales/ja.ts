@@ -133,6 +133,7 @@ export default {
   DROP_NFTS: "NFTを配布する",
   PLEASE_ENTER_WALLET_ADDRESSES: "NFTを配布するウォレットアドレスを入力してください。改行で区切って複数入力できます。",
   YOU_CAN_DROP_UP_TO_100_NFTS_AT_ONCE: "一度に配布できるウォレットアドレスは100件までです。",
+  DROPPING_NFTS: "NFTを配布中です... しばらくお待ちください。このウィンドウから移動しても大丈夫です。",
   DROP_NFTS_SUCCESS: "NFTを配布しました！",
   DROPNFT_SUBMIT: "配布する",
 

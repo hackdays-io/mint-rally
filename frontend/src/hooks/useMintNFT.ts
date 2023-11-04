@@ -400,12 +400,10 @@ export const useMintParticipateNFT = (
           to,
           data,
         });
-        console.log(`post request: ${JSON.stringify(request)}`);
         const { data: response } = await axios.post("/api/autotask", {
           request: request.request,
           signature: request.signature.signature,
         });
-        console.log(`post response: ${JSON.stringify(response)}`);
         setMtxStatus({ ...mtxStatus, status: "success", isLoading: false });
         return response;
       } catch (error) {

@@ -1,5 +1,5 @@
 import { useForwarderContract, useMintNFTContract } from "./useMintNFT";
-import { ContractEvent, useContractEvents, useContractWrite, useSDK, useSigner } from "@thirdweb-dev/react";
+import { ContractEvent, useContractEvents, useContractWrite, useSDK, useSigner, TransactionError } from "@thirdweb-dev/react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Event } from "types/Event";
 import { signMetaTxRequest } from "utils/signer";
@@ -24,12 +24,13 @@ export const useDropNFTs = (
   const [dropStatus, setDropStatus] = useState<{
     error: any;
     isLoading: boolean;
-    status: "error" | "idle" | "loading" | "success" | "submitted";
+    status: "error" | "idle" | "loading" | "success";
   }>({
     error: null,
     isLoading: false,
     status: "idle",
   });
+  const [isDroppedComplete, setDroppedComplete] = useState(false);
 
   const fromBlock = useCurrentBlock();
   const { data } = useContractEvents(mintNFTContract, "DroppedNFTs", {
@@ -51,14 +52,25 @@ export const useDropNFTs = (
     return dropStatus.isLoading || isDropping;
   }, [isDropping, dropStatus]);
   const status = useMemo(() => {
-    return dropStatus.status;
-  }, [dropStatus]);
+    return event.useMtx ? dropStatus.status : contractStatus;
+  }, [dropStatus, contractStatus]);
+
+  useEffect(() => {
+    const includesNewEvent = (data: ContractEvent<Record<string, any>>[]) => {
+      if (!fromBlock) return false;
+      return data.some((event) => {
+        return event.transaction.blockNumber > fromBlock;
+      });
+    };
+    if (status !== "success" || !data || !includesNewEvent(data)) return;
+    setDroppedComplete(true);
+  }, [data, status, fromBlock]);
 
   const dropNFTs = useCallback(
     async (addresses: string[]) => {
       if (!event || !event.eventRecordId) return;
       try {
-        console.log('dropNFTs', event.eventRecordId, addresses);
+        setDroppedComplete(false);
         await mutateAsync({
           args: [event.eventRecordId, addresses],
         });
@@ -68,24 +80,13 @@ export const useDropNFTs = (
     },
     [event, mutateAsync]
   );
-  useEffect(() => {
-    const includesNewEvent = (data: ContractEvent<Record<string, any>>[]) => {
-      if (!fromBlock) return false;
-      return data.some((event) => {
-        return event.transaction.blockNumber > fromBlock;
-      });
-    };
-    if (status !== "success" || !data || !includesNewEvent(data)) return;
-    console.log(data);
-    setDropStatus({ ...dropStatus, status: "success", isLoading: false });
-  }, [data, status, fromBlock]);
 
   const dropNFTsMTX = useCallback(
     async (addresses: string[]) => {
       if (!event || !event.eventRecordId || !event.groupId || !sdk) return;
+      setDroppedComplete(false);
       setDropStatus({ isLoading: true, status: "loading", error: null });
       try {
-        console.log("dropNFTsMTX", event.eventRecordId, addresses);
         const to = mintNFTContract?.getAddress();
         const from = address;
         const data = mintNFTContract?.encoder.encode("dropNFTs", [
@@ -101,9 +102,8 @@ export const useDropNFTs = (
           request: request.request,
           signature: request.signature.signature,
         });
-        console.log('success', response);
         // Transaction submitted
-        setDropStatus({ ...dropStatus, status: "submitted", isLoading: false });
+        setDropStatus({ ...dropStatus, status: "success", isLoading: false });
         return response;
       } catch (error) {
         setDropStatus({ ...dropStatus, error, status: "error" });
@@ -118,6 +118,7 @@ export const useDropNFTs = (
     dropNFTsMTX,
     isLoading,
     error,
-    status
+    status,
+    isDroppedComplete
   };
 };

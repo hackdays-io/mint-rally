@@ -131,6 +131,7 @@ export default {
   DROP_NFTS: "Drop NFTs",
   PLEASE_ENTER_WALLET_ADDRESSES: "Please provide wallet addresses to drop NFTs. one address per line.",
   YOU_CAN_DROP_UP_TO_100_NFTS_AT_ONCE: "You can drop up to 100 NFTs at a time.",
+  DROPPING_NFTS: "Dropping NFTs... It will take a long time. You can move from this window.",
   DROP_NFTS_SUCCESS: "Successfully dropped NFTs.",
   DROPNFT_SUBMIT: "Drop",
 
