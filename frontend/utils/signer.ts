@@ -58,7 +58,7 @@ export const signMetaTxRequest = async (
   signer: UserWallet,
   forwarder: any,
   input: any,
-  numberOfMint: number
+  numberOfMint: number = 1
 ) => {
   const request = await buildRequest(forwarder, input, numberOfMint);
   const toSign = await buildTypedData(forwarder, request);

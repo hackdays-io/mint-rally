@@ -75,7 +75,7 @@ export const useCreateEventGroup = (address: string) => {
       if (!params.groupName) return;
       try {
         await mutateAsync({ args: [params.groupName] });
-      } catch (_) {}
+      } catch (_) { }
     },
     [mutateAsync]
   );
@@ -228,7 +228,7 @@ export const useCreateEvent = (address: string) => {
         const endDateTime = dayjs(
           `${params.endDate} ${params.endTime}`
         ).toISOString();
-
+        console.log('call mutateAsync');
         await mutateAsync({
           args: [
             params.groupId,
@@ -244,7 +244,7 @@ export const useCreateEvent = (address: string) => {
             value: params.useMtx ? value : 0,
           },
         });
-      } catch (_) {}
+      } catch (_) { }
     },
     [mutateAsync, provider, getGasFee]
   );
@@ -445,7 +445,7 @@ export const useGrantRole = () => {
         await mutateAsync({
           args: [params.groupId, params.address, bytes32Role],
         });
-      } catch (_) {}
+      } catch (_) { }
     },
     [mutateAsync]
   );

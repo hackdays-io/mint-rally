@@ -1,10 +1,10 @@
-import { BigNumber } from "ethers";
 import { useForwarderContract, useMintNFTContract } from "./useMintNFT";
-import { useContractWrite, useSDK, useSigner } from "@thirdweb-dev/react";
+import { ContractEvent, useContractEvents, useContractWrite, useSDK, useSigner } from "@thirdweb-dev/react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Event } from "types/Event";
 import { signMetaTxRequest } from "utils/signer";
 import axios from "axios";
+import { useCurrentBlock } from "./useBlockChain";
 
 export const useDropNFTs = (
   event: Event.EventRecord,
@@ -24,12 +24,25 @@ export const useDropNFTs = (
   const [dropStatus, setDropStatus] = useState<{
     error: any;
     isLoading: boolean;
-    status: "error" | "idle" | "loading" | "success";
+    status: "error" | "idle" | "loading" | "success" | "submitted";
   }>({
     error: null,
     isLoading: false,
     status: "idle",
   });
+
+  const fromBlock = useCurrentBlock();
+  const { data } = useContractEvents(mintNFTContract, "DroppedNFTs", {
+    queryFilter: {
+      filters: {
+        from: null,
+        to: address,
+        fromBlock: fromBlock,
+      },
+    },
+    subscribe: true,
+  });
+
 
   const error: any = useMemo(() => {
     return dropStatus.error || dropError;
@@ -55,6 +68,17 @@ export const useDropNFTs = (
     },
     [event, mutateAsync]
   );
+  useEffect(() => {
+    const includesNewEvent = (data: ContractEvent<Record<string, any>>[]) => {
+      if (!fromBlock) return false;
+      return data.some((event) => {
+        return event.transaction.blockNumber > fromBlock;
+      });
+    };
+    if (status !== "success" || !data || !includesNewEvent(data)) return;
+    console.log(data);
+    setDropStatus({ ...dropStatus, status: "success", isLoading: false });
+  }, [data, status, fromBlock]);
 
   const dropNFTsMTX = useCallback(
     async (addresses: string[]) => {
@@ -78,7 +102,8 @@ export const useDropNFTs = (
           signature: request.signature.signature,
         });
         console.log('success', response);
-        setDropStatus({ ...dropStatus, status: "success", isLoading: false });
+        // Transaction submitted
+        setDropStatus({ ...dropStatus, status: "submitted", isLoading: false });
         return response;
       } catch (error) {
         setDropStatus({ ...dropStatus, error, status: "error" });
@@ -86,6 +111,7 @@ export const useDropNFTs = (
     },
     [event, forwarderContract, signer]
   );
+
 
   return {
     dropNFTs,
