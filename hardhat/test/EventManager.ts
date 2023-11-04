@@ -754,7 +754,7 @@ describe("EventManager", function () {
           eventManager
             .connect(participant1)
             .grantRole(groupId, participant1.address, ADMIN_ROLE)
-        ).to.be.revertedWith("Not permitted");
+        ).to.be.revertedWith("You have no permission");
 
         await eventManager
           .connect(organizer)
@@ -834,7 +834,7 @@ describe("EventManager", function () {
           eventManager
             .connect(participant1)
             .grantRole(groupId, participant1.address, ADMIN_ROLE)
-        ).to.be.revertedWith("Not permitted");
+        ).to.be.revertedWith("You have no permission");
       });
 
       it("should revert if invalid group id", async () => {
@@ -950,7 +950,7 @@ describe("EventManager", function () {
           eventManager
             .connect(participant1)
             .revokeRole(groupId, participant1.address, ADMIN_ROLE)
-        ).to.be.revertedWith("Not permitted");
+        ).to.be.revertedWith("You have no permission");
 
         // revoke by myself
         await eventManager
@@ -1036,7 +1036,7 @@ describe("EventManager", function () {
           eventManager
             .connect(participant1)
             .revokeRole(groupId, participant1.address, ADMIN_ROLE)
-        ).to.be.revertedWith("Not permitted");
+        ).to.be.revertedWith("You have no permission");
       });
 
       it("should revert if invalid group id", async () => {
