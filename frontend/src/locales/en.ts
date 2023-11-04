@@ -62,6 +62,8 @@ export default {
   RBAC_COLLABORATORS: "Collaborators",
   RBAC_REVOKE_ROLE: "Revoke Role",
   RBAC_REVOKE_ERROR: "An error occurred when updating the role.",
+  RBAC_NO_ADMINS: "No administrators.",
+  RBAC_NO_COLLABORATORS: "No collaborators.",
   // Event index
   CREATE_NEW_EVENT: "Create new event",
   // Event new

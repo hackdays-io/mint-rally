@@ -62,6 +62,8 @@ export default {
   RBAC_COLLABORATORS: "コラボレーター",
   RBAC_REVOKE_ROLE: "権限を剥奪する",
   RBAC_REVOKE_ERROR: "権限の更新中にエラーが発生しました。",
+  RBAC_NO_ADMINS: "管理者がいません。",
+  RBAC_NO_COLLABORATORS: "コラボレーターがいません。",
   // Event index
   CREATE_NEW_EVENT: "イベントを作成",
   // Event new

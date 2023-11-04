@@ -1,8 +1,11 @@
-import { Box, Button, Flex, Heading, Tooltip } from "@chakra-ui/react";
-import { FC, useEffect, useState } from "react";
+import { Box, Button, Flex, Heading, Text, Tooltip } from "@chakra-ui/react";
+import { FC, useEffect, useMemo, useState } from "react";
 import { useLocale } from "src/hooks/useLocale";
 import { useRevokeRole, useMemberRoles } from "src/hooks/useEvent";
 import AlertMessage from "src/components/atoms/form/AlertMessage";
+import { faCheckCircle } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Event } from "types/Event";
 
 type CollaboratorsProps = {
   groupId: number;
@@ -15,7 +18,7 @@ type RevokeInput = {
 
 const Collaborators: FC<CollaboratorsProps> = ({ groupId }) => {
   const { t } = useLocale();
-  const { memberRoles, getMemberRoles } = useMemberRoles();
+  const { memberRoles, isLoading } = useMemberRoles(groupId);
   const { revokeRole, isRevoking, revokeStatus, revokeError } = useRevokeRole();
   const [revokeInput, setRevokeInput] = useState<RevokeInput | null>(null);
   const [errorMessage, setErrorMessage] = useState<string>("");
@@ -57,10 +60,6 @@ const Collaborators: FC<CollaboratorsProps> = ({ groupId }) => {
   };
 
   useEffect(() => {
-    getMemberRoles(groupId);
-  }, [groupId]);
-
-  useEffect(() => {
     if (revokeStatus === "success") {
       setRevokeInput(null);
       setErrorMessage("");
@@ -74,6 +73,18 @@ const Collaborators: FC<CollaboratorsProps> = ({ groupId }) => {
     }
   }, [revokeError]);
 
+  const admins = useMemo(() => {
+    return memberRoles?.filter((memberRole: Event.MemberRole) => {
+      return memberRole.admin === true;
+    });
+  }, [memberRoles]);
+
+  const collaborators = useMemo(() => {
+    return memberRoles?.filter((memberRole: Event.MemberRole) => {
+      return memberRole.collaborator === true;
+    });
+  }, [memberRoles]);
+
   return (
     <>
       {errorMessage && (
@@ -86,76 +97,92 @@ const Collaborators: FC<CollaboratorsProps> = ({ groupId }) => {
         {t.RBAC_ADMINS}
       </Heading>
       <Flex flexWrap="wrap" columnGap={1} rowGap={1} mb={4}>
-        {memberRoles
-          ?.filter((memberRole) => {
-            return memberRole.admin === true;
-          })
-          .map((memberRole) => (
-            <Tooltip
-              label={memberRole.assignee}
-              backgroundColor="white"
-              color="yellow.900"
+        {admins?.length === 0 && <Text>{t.RBAC_NO_ADMINS}</Text>}
+        {admins?.map((memberRole: Event.MemberRole) => (
+          <Tooltip
+            label={memberRole.assignee}
+            backgroundColor="white"
+            color="yellow.900"
+            fontSize="xs"
+            key={`${memberRole.assignee}`}
+          >
+            <Box
+              as="span"
+              px={3}
+              py={1}
               fontSize="xs"
-              key={`${memberRole.assignee}`}
+              borderRadius="full"
+              border="2px solid lightgray"
+              backgroundColor={
+                isSelectedRevokeInput(memberRole.assignee, "admin")
+                  ? "yellow.400"
+                  : "white"
+              }
+              cursor="pointer"
+              onClick={() => updateRevokeInput(memberRole.assignee, "admin")}
             >
-              <Box
-                as="span"
-                px={3}
-                py={1}
-                fontSize="xs"
-                borderRadius="full"
-                border="2px solid lightgray"
-                backgroundColor={
-                  isSelectedRevokeInput(memberRole.assignee, "admin")
-                    ? "mint.primary"
-                    : "white"
-                }
-                onClick={() => updateRevokeInput(memberRole.assignee, "admin")}
-              >
-                {memberRole.assignee.slice(0, 5)}...
-                {memberRole.assignee.slice(-3)}
+              <Box as="span" mr={1}>
+                <FontAwesomeIcon
+                  icon={faCheckCircle}
+                  color={
+                    isSelectedRevokeInput(memberRole.assignee, "admin")
+                      ? "white"
+                      : "lightgray"
+                  }
+                />
               </Box>
-            </Tooltip>
-          ))}
+              {memberRole.assignee.slice(0, 5)}...
+              {memberRole.assignee.slice(-3)}
+            </Box>
+          </Tooltip>
+        ))}
       </Flex>
 
       <Heading as="h3" size="md" mb={2}>
         {t.RBAC_COLLABORATORS}
       </Heading>
       <Flex flexWrap="wrap" columnGap={1} rowGap={1}>
-        {memberRoles
-          ?.filter((memberRole) => {
-            return memberRole.collaborator === true;
-          })
-          .map((memberRole) => (
-            <Tooltip
-              label={memberRole.assignee}
-              backgroundColor="white"
-              color="yellow.900"
+        {collaborators?.length === 0 && <Text>{t.RBAC_NO_COLLABORATORS}</Text>}
+        {collaborators?.map((memberRole: Event.MemberRole) => (
+          <Tooltip
+            label={memberRole.assignee}
+            backgroundColor="white"
+            color="yellow.900"
+            fontSize="xs"
+            key={`${memberRole.assignee}`}
+          >
+            <Box
+              as="span"
+              px={3}
+              py={1}
               fontSize="xs"
-              key={`${memberRole.assignee}`}
+              borderRadius="full"
+              border="2px solid lightgray"
+              backgroundColor={
+                isSelectedRevokeInput(memberRole.assignee, "collaborator")
+                  ? "yellow.400"
+                  : "white"
+              }
+              cursor="pointer"
+              onClick={() =>
+                updateRevokeInput(memberRole.assignee, "collaborator")
+              }
             >
-              <Box
-                as="span"
-                px={3}
-                py={1}
-                fontSize="xs"
-                borderRadius="full"
-                border="2px solid lightgray"
-                backgroundColor={
-                  isSelectedRevokeInput(memberRole.assignee, "collaborator")
-                    ? "mint.primary"
-                    : "white"
-                }
-                onClick={() =>
-                  updateRevokeInput(memberRole.assignee, "collaborator")
-                }
-              >
-                {memberRole.assignee.slice(0, 5)}...
-                {memberRole.assignee.slice(-3)}
+              <Box as="span" mr={1}>
+                <FontAwesomeIcon
+                  icon={faCheckCircle}
+                  color={
+                    isSelectedRevokeInput(memberRole.assignee, "collaborator")
+                      ? "white"
+                      : "lightgray"
+                  }
+                />
               </Box>
-            </Tooltip>
-          ))}
+              {memberRole.assignee.slice(0, 5)}...
+              {memberRole.assignee.slice(-3)}
+            </Box>
+          </Tooltip>
+        ))}
       </Flex>
 
       <Button
@@ -163,7 +190,8 @@ const Collaborators: FC<CollaboratorsProps> = ({ groupId }) => {
         isLoading={isRevoking}
         disabled={isRevoking || revokeInput === null}
         w="full"
-        mt={4}
+        mt={5}
+        colorScheme="red"
       >
         {t.RBAC_REVOKE_ROLE}
       </Button>

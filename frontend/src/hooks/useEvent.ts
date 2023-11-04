@@ -491,47 +491,29 @@ export const useRevokeRole = () => {
   };
 };
 
-export const useMemberRole = () => {
+export const useMemberRole = (groupId?: number, address?: string) => {
   const { eventManagerContract } = useEventManagerContract();
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [memberRole, setMemberRole] = useState<Event.MemberRole | null>(null);
-  const [error, setError] = useState<any>(null);
-  const getMemberRole = (groupId: number, address: string) => {
-    setIsLoading(true);
-    eventManagerContract
-      ?.call("getMemberRole", [groupId, address])
-      .then((res: any) => {
-        setMemberRole(res);
-      })
-      .catch((err: any) => {
-        setError(err);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  };
-  return { memberRole, isLoading, error, getMemberRole };
+
+  const {
+    isLoading,
+    data: memberRole,
+    error,
+  } = useContractRead(eventManagerContract, "getMemberRole", [
+    groupId,
+    address,
+  ]);
+
+  return { memberRole, isLoading, error };
 };
 
-export const useMemberRoles = () => {
+export const useMemberRoles = (groupId: number) => {
   const { eventManagerContract } = useEventManagerContract();
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [memberRoles, setMemberRoles] =
-    useState<Array<Event.MemberRole> | null>(null);
-  const [error, setError] = useState<any>(null);
-  const getMemberRoles = (groupId: number) => {
-    setIsLoading(true);
-    eventManagerContract
-      ?.call("getMemberRoles", [groupId])
-      .then((res: any) => {
-        setMemberRoles(res);
-      })
-      .catch((err: any) => {
-        setError(err);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  };
-  return { memberRoles, isLoading, error, getMemberRoles };
+
+  const {
+    data: memberRoles,
+    isLoading,
+    error,
+  } = useContractRead(eventManagerContract, "getMemberRoles", [groupId]);
+
+  return { memberRoles, isLoading, error };
 };

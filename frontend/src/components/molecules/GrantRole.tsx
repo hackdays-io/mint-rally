@@ -106,7 +106,7 @@ const GrantRole: FC<GrantRoleProps> = ({ groupId }) => {
           />
         </FormControl>
 
-        <FormControl mb={3}>
+        <FormControl mb={5}>
           <FormLabel htmlFor="address">{t.RBAC_WALLET_ADDRESS}</FormLabel>
           <Controller
             control={control}
@@ -130,6 +130,7 @@ const GrantRole: FC<GrantRoleProps> = ({ groupId }) => {
           type="submit"
           isLoading={isGranting || isSubmitting}
           disabled={isGranting || isSubmitting}
+          colorScheme="mintGreen"
           w="full"
         >
           {t.RBAC_GRANT_ROLE}
