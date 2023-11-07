@@ -113,6 +113,29 @@ export const useOwnEventGroups = () => {
   return { groups, isLoading, error };
 };
 
+export const useCollaboratorAccessEventGroups = () => {
+  const { eventManagerContract } = useEventManagerContract();
+  const address = useAddress();
+  const {
+    isLoading,
+    data: _groups,
+    error,
+  } = useContractRead(eventManagerContract, "getCollaboratorAccessGroups", [
+    address,
+  ]);
+
+  const groups = useMemo(() => {
+    return _groups?.filter((group: any) => {
+      const blackList = process.env.NEXT_PUBLIC_EVENT_GROUP_BLACK_LIST
+        ? JSON.parse(`[${process.env.NEXT_PUBLIC_EVENT_GROUP_BLACK_LIST}]`)
+        : [];
+      return !blackList.includes(group.groupId.toNumber());
+    });
+  }, [_groups]);
+
+  return { groups, isLoading, error };
+};
+
 export const useEventGroups = () => {
   const { eventManagerContract } = useEventManagerContract();
   const { isLoading, data: _groups } = useContractRead(
@@ -398,4 +421,99 @@ export const useParseEventDate = (eventDate?: string) => {
   }, [eventDate]);
 
   return { parsedEventDate, parse };
+};
+
+export const useGrantRole = () => {
+  const { eventManagerContract } = useEventManagerContract();
+  const {
+    mutateAsync,
+    isLoading: isGranting,
+    error: grantError,
+    status: grantStatus,
+  } = useContractWrite(eventManagerContract, "grantRole");
+
+  const grantRole = useCallback(
+    async (params: { groupId: number; address: string; role: string }) => {
+      if (!params.groupId) return;
+      if (!params.address) return;
+      if (!params.role) return;
+
+      const bytes32Role = ethers.utils.keccak256(
+        ethers.utils.toUtf8Bytes(params.role.toUpperCase())
+      );
+      try {
+        await mutateAsync({
+          args: [params.groupId, params.address, bytes32Role],
+        });
+      } catch (_) {}
+    },
+    [mutateAsync]
+  );
+  return {
+    grantRole,
+    isGranting,
+    grantStatus,
+    grantError,
+  };
+};
+
+export const useRevokeRole = () => {
+  const { eventManagerContract } = useEventManagerContract();
+  const {
+    mutateAsync,
+    isLoading: isRevoking,
+    error: revokeError,
+    status: revokeStatus,
+  } = useContractWrite(eventManagerContract, "revokeRole");
+
+  const revokeRole = useCallback(
+    async (params: { groupId: number; address: string; role: string }) => {
+      if (!params.groupId) return;
+      if (!params.address) return;
+      if (!params.role) return;
+
+      const bytes32Role = ethers.utils.keccak256(
+        ethers.utils.toUtf8Bytes(params.role.toUpperCase())
+      );
+      try {
+        await mutateAsync({
+          args: [params.groupId, params.address, bytes32Role],
+        });
+      } catch (_) {}
+    },
+    [mutateAsync]
+  );
+  return {
+    revokeRole,
+    isRevoking,
+    revokeStatus: revokeStatus,
+    revokeError: revokeError,
+  };
+};
+
+export const useMemberRole = (groupId?: number, address?: string) => {
+  const { eventManagerContract } = useEventManagerContract();
+
+  const {
+    isLoading,
+    data: memberRole,
+    error,
+  } = useContractRead(eventManagerContract, "getMemberRole", [
+    groupId,
+    address,
+  ]);
+
+  return { memberRole, isLoading, error };
+};
+
+export const useMemberRoles = (groupId: number) => {
+  const { eventManagerContract } = useEventManagerContract();
+
+  const {
+    data: memberRoles,
+    isLoading,
+    error,
+  } = useContractRead(eventManagerContract, "getMemberRoles", [groupId]);
+
+  return { memberRoles, isLoading, error };
 };

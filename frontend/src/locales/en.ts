@@ -45,6 +45,25 @@ export default {
   EVENT_GROUP_LEADERS_COUNT: "COUNT",
   // Event group page
   OWN_EVENTS: "'s Events",
+  // RBAC
+  RBAC_EDIT_COLLABORATORS: "Edit Collaborators",
+  RBAC_GRANT: "Grant",
+  RBAC_ADMIN_ROLE: "Administrator",
+  RBAC_COLLABORATOR_ROLE: "Collaborator",
+  RBAC_ROLE: "Role",
+  RBAC_WALLET_ADDRESS: "Wallet Address",
+  RBAC_GRANT_ROLE: "Grant Role",
+  RBAC_INPUT_ADDRESS_TITLE:
+    "The address must start with 0x and be a total of 42 characters in length.",
+  RBAC_GRANT_SUCCESS: "Successfully granted.",
+  RBAC_GRANT_ERROR: "An error occurred when updating the role.",
+  RBAC_LIST: "Collaborators",
+  RBAC_ADMINS: "Administrators",
+  RBAC_COLLABORATORS: "Collaborators",
+  RBAC_REVOKE_ROLE: "Revoke Role",
+  RBAC_REVOKE_ERROR: "An error occurred when updating the role.",
+  RBAC_NO_ADMINS: "No administrators.",
+  RBAC_NO_COLLABORATORS: "No collaborators.",
   // Event index
   CREATE_NEW_EVENT: "Create new event",
   // Event new

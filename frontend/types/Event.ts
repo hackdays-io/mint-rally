@@ -28,4 +28,10 @@ export namespace Event {
     useMtx: boolean;
     attributes: { metaDataURL: string; requiredParticipateCount: number }[];
   }
+
+  export interface MemberRole {
+    assignee: string;
+    admin: boolean;
+    collaborator: boolean;
+  }
 }

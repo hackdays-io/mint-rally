@@ -24,6 +24,12 @@ contract EventManager is OwnableUpgradeable {
         bool useMtx;
     }
 
+    struct MemberRole {
+        address assignee;
+        bool admin;
+        bool collaborator;
+    }
+
     using Counters for Counters.Counter;
 
     Counters.Counter private _eventRecordIds;
@@ -47,14 +53,27 @@ contract EventManager is OwnableUpgradeable {
     // OperationController contract address
     address private operationControllerAddr;
 
-    modifier onlyGroupOwner(uint256 _groupId) {
-        bool _isGroupOwner = false;
-        for (uint256 _i = 0; _i < ownGroupIds[msg.sender].length; _i++) {
-            if (ownGroupIds[msg.sender][_i] == _groupId) {
-                _isGroupOwner = true;
-            }
-        }
-        require(_isGroupOwner, "You are not group owner");
+    // Roles
+    bytes32 private constant ADMIN_ROLE = keccak256("ADMIN");
+    bytes32 private constant COLLABORATOR_ROLE = keccak256("COLLABORATOR");
+    // groupId => address => Role => bool
+    mapping(uint256 => mapping(address => mapping(bytes32 => bool)))
+        private memberRolesByGroupId;
+    mapping(uint256 => address[]) private memberAddressesByGroupId;
+
+    modifier onlyAdminAccess(uint256 _groupId) {
+        require(
+            _hasAdminAccess(_groupId, msg.sender),
+            "You have no permission"
+        );
+        _;
+    }
+
+    modifier onlyCollaboratorAccess(uint256 _groupId) {
+        require(
+            _hasCollaboratorAccess(_groupId, msg.sender),
+            "You have no permission"
+        );
         _;
     }
 
@@ -152,6 +171,27 @@ contract EventManager is OwnableUpgradeable {
         return _groups;
     }
 
+    function getCollaboratorAccessGroups(
+        address _address
+    ) external view returns (Group[] memory) {
+        uint256[] memory _targetGroupIds = new uint256[](groups.length);
+        uint256 _count = 0;
+        for (uint256 _groupId = 1; _groupId <= groups.length; _groupId++) {
+            if (_hasCollaboratorAccess(_groupId, _address)) {
+                _targetGroupIds[_count] = _groupId;
+                _count++;
+            }
+        }
+
+        Group[] memory _groups = new Group[](_count);
+        for (uint256 _i = 0; _i < _count; _i++) {
+            uint256 _groupsIndex = _targetGroupIds[_i] - 1;
+            _groups[_i] = groups[_groupsIndex];
+        }
+
+        return _groups;
+    }
+
     function createEventRecord(
         uint256 _groupId,
         string memory _name,
@@ -161,7 +201,7 @@ contract EventManager is OwnableUpgradeable {
         bool _useMtx,
         bytes32 _secretPhrase,
         IMintNFT.NFTAttribute[] memory _eventNFTAttributes
-    ) external payable onlyGroupOwner(_groupId) whenNotPaused {
+    ) external payable onlyCollaboratorAccess(_groupId) whenNotPaused {
         require(
             _mintLimit > 0 && _mintLimit <= maxMintLimit,
             "mint limit is invalid"
@@ -259,17 +299,141 @@ contract EventManager is OwnableUpgradeable {
         return _eventRecord;
     }
 
-    function isGroupOwnerByEventId(
+    function hasCollaboratorAccessByEventId(
         address _address,
         uint256 _eventId
-    ) public view returns (bool) {
+    ) external view returns (bool) {
         uint256 _groupId = groupIdByEventId[_eventId];
-        bool isGroupOwner = false;
-        for (uint256 _i = 0; _i < ownGroupIds[_address].length; _i++) {
-            if (ownGroupIds[_address][_i] == _groupId) {
-                isGroupOwner = true;
+        return _hasCollaboratorAccess(_groupId, _address);
+    }
+
+    function grantRole(
+        uint256 _groupId,
+        address _address,
+        bytes32 _role
+    ) external whenNotPaused onlyAdminAccess(_groupId) {
+        require(_isValidRole(_role), "Invalid role");
+
+        memberRolesByGroupId[_groupId][_address][_role] = true;
+
+        if (!_isRoleAddressAdded(_groupId, _address)) {
+            memberAddressesByGroupId[_groupId].push(_address);
+        }
+    }
+
+    function _isRoleAddressAdded(
+        uint256 _groupId,
+        address _address
+    ) private view returns (bool) {
+        address[] memory _roleAddresses = memberAddressesByGroupId[_groupId];
+        for (uint256 _i = 0; _i < _roleAddresses.length; _i++) {
+            if (_roleAddresses[_i] == _address) {
+                return true;
             }
         }
-        return isGroupOwner;
+        return false;
+    }
+
+    function revokeRole(
+        uint256 _groupId,
+        address _address,
+        bytes32 _role
+    ) external whenNotPaused onlyAdminAccess(_groupId) {
+        require(_isValidRole(_role), "Invalid role");
+
+        delete memberRolesByGroupId[_groupId][_address][_role];
+
+        uint256 _count = memberAddressesByGroupId[_groupId].length;
+        if (_count > 0 && _hasNoAssignedRoles(_groupId, _address)) {
+            if (_count > 1) {
+                // find and overwrite to remove
+                uint256 _index;
+                for (uint256 i = 0; i < _count; i++) {
+                    if (memberAddressesByGroupId[_groupId][i] == _address) {
+                        _index = i;
+                        break;
+                    }
+                }
+                memberAddressesByGroupId[_groupId][
+                    _index
+                ] = memberAddressesByGroupId[_groupId][_count - 1];
+            }
+            memberAddressesByGroupId[_groupId].pop();
+        }
+    }
+
+    function _hasNoAssignedRoles(
+        uint256 _groupId,
+        address _address
+    ) private view returns (bool) {
+        return
+            !_hasRole(_groupId, _address, ADMIN_ROLE) &&
+            !_hasRole(_groupId, _address, COLLABORATOR_ROLE);
+    }
+
+    function _isValidRole(bytes32 _role) private pure returns (bool) {
+        return _role == ADMIN_ROLE || _role == COLLABORATOR_ROLE;
+    }
+
+    function _hasAdminAccess(
+        uint256 _groupId,
+        address _address
+    ) private view returns (bool) {
+        require(_groupId > 0 && _groupId <= groups.length, "Invalid groupId");
+
+        return
+            groups[_groupId - 1].ownerAddress == _address ||
+            _hasRole(_groupId, _address, ADMIN_ROLE);
+    }
+
+    function _hasCollaboratorAccess(
+        uint256 _groupId,
+        address _address
+    ) private view returns (bool) {
+        require(_groupId > 0 && _groupId <= groups.length, "Invalid groupId");
+
+        return
+            _hasAdminAccess(_groupId, _address) ||
+            _hasRole(_groupId, _address, COLLABORATOR_ROLE);
+    }
+
+    function _hasRole(
+        uint256 _groupId,
+        address _address,
+        bytes32 _role
+    ) private view returns (bool) {
+        return memberRolesByGroupId[_groupId][_address][_role];
+    }
+
+    function getMemberRole(
+        uint256 _groupId,
+        address _address
+    ) external view returns (MemberRole memory) {
+        return
+            MemberRole({
+                assignee: _address,
+                admin: memberRolesByGroupId[_groupId][_address][ADMIN_ROLE],
+                collaborator: memberRolesByGroupId[_groupId][_address][
+                    COLLABORATOR_ROLE
+                ]
+            });
+    }
+
+    function getMemberRoles(
+        uint256 _groupId
+    ) external view returns (MemberRole[] memory) {
+        uint256 _count = memberAddressesByGroupId[_groupId].length;
+        MemberRole[] memory _roles = new MemberRole[](_count);
+        for (uint256 _i = 0; _i < _count; _i++) {
+            address _address = memberAddressesByGroupId[_groupId][_i];
+            _roles[_i] = MemberRole({
+                assignee: _address,
+                admin: memberRolesByGroupId[_groupId][_address][ADMIN_ROLE],
+                collaborator: memberRolesByGroupId[_groupId][_address][
+                    COLLABORATOR_ROLE
+                ]
+            });
+        }
+        return _roles;
     }
 }
