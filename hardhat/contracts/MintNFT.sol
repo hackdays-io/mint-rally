@@ -286,8 +286,15 @@ contract MintNFT is
         return _nftAttributeRecords;
     }
 
-    function burn(uint256 tokenId) public onlyOwner {
-        _burn(tokenId);
+    // 既存の burn 関数の名前を変更
+    function burnByOwner(uint256 tokenId) public onlyOwner {
+    _burn(tokenId);
+    }
+    
+    // ユーザーが自身のNFTをバーンできるようにする新しい burn 関数
+    function burn(uint256 tokenId) public {
+    require(_isApprovedOrOwner(_msgSender(), tokenId), "caller is not owner nor approved");
+    _burn(tokenId);
     }
 
     function tokenURI(
