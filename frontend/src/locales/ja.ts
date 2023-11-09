@@ -64,6 +64,10 @@ export default {
   RBAC_REVOKE_ERROR: "権限の更新中にエラーが発生しました。",
   RBAC_NO_ADMINS: "管理者がいません。",
   RBAC_NO_COLLABORATORS: "コラボレーターがいません。",
+  RBAC_ADMIN_DESC:
+    "管理者権限: 他のアドレスに対して権限付与、イベント作成、あいことば変更、ミントロック",
+  RBAC_COLLABORATOR_DESC:
+    "コラボレーター権限: イベント作成、あいことば変更、ミントロック",
   // Event index
   CREATE_NEW_EVENT: "イベントを作成",
   // Event new

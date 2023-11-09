@@ -64,6 +64,10 @@ export default {
   RBAC_REVOKE_ERROR: "An error occurred when updating the role.",
   RBAC_NO_ADMINS: "No administrators.",
   RBAC_NO_COLLABORATORS: "No collaborators.",
+  RBAC_ADMIN_DESC:
+    "Administrative role: Grant roles to other addresses, Create events, Change secret phrase, Mintlock",
+  RBAC_COLLABORATOR_DESC:
+    "Collaborator role: Create events, Change secret phrase, Mintlock",
   // Event index
   CREATE_NEW_EVENT: "Create new event",
   // Event new
