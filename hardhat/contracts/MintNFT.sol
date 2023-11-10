@@ -373,13 +373,11 @@ contract MintNFT is
         address to,
         uint256 tokenId
     ) internal virtual override {
-        uint256 eventId = eventIdOfTokenId[tokenId];
-        if (eventId != 0) {
-            require(!isNonTransferable[eventId], "transfer is locked");
-            super._transfer(from, to, tokenId);
-        } else {
-            super._transfer(from, to, tokenId);
-        }
+        require(
+            !isNonTransferable[eventIdOfTokenId[tokenId]],
+            "transfer is locked"
+        );
+        super._transfer(from, to, tokenId);
     }
 
     function setEventIdOfTokenIds(
