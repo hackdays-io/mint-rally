@@ -9,7 +9,7 @@ cache
 artifacts
 build
 
-.openzeppelin/unknown-*.json
+.openzeppelin
 
 /circuits/**/*.ptau
 /circuits/**/*.zkey
