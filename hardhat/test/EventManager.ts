@@ -11,7 +11,6 @@ import {
 } from "../typechain";
 // eslint-disable-next-line node/no-missing-import
 import { generateProof } from "./helper/secret_phrase";
-import { group } from "console";
 
 // ToDo requiredParticipateCountに重複がある場合エラーになってしまう。
 const attributes = [
@@ -305,7 +304,7 @@ describe("EventManager", function () {
           .connect(organizer)
           .grantRole(groupId2, participant1.address, COLLABORATOR_ROLE);
 
-        const roles = await eventManager.getRoles(
+        const roles = await eventManager.getMemberRole(
           groupId1,
           participant1.address
         );
@@ -378,7 +377,7 @@ describe("EventManager", function () {
           .connect(organizer)
           .grantRole(groupId2, participant1.address, COLLABORATOR_ROLE);
 
-        const roles = await eventManager.getRoles(
+        const roles = await eventManager.getMemberRole(
           groupId1,
           participant1.address
         );
@@ -435,7 +434,7 @@ describe("EventManager", function () {
           .find((group) => group.name === groupName)!
           .groupId.toNumber();
 
-        const roles = await eventManager.getRoles(
+        const roles = await eventManager.getMemberRole(
           groupId,
           participant1.address
         );
@@ -687,7 +686,7 @@ describe("EventManager", function () {
       address: string,
       expected: { admin: boolean; collaborator: boolean }
     ) {
-      const roles = await eventManager.getRoles(groupId, address);
+      const roles = await eventManager.getMemberRole(groupId, address);
       expect(roles.admin).to.equal(expected.admin);
       expect(roles.collaborator).to.equal(expected.collaborator);
     }
@@ -755,7 +754,7 @@ describe("EventManager", function () {
           eventManager
             .connect(participant1)
             .grantRole(groupId, participant1.address, ADMIN_ROLE)
-        ).to.be.revertedWith("Not permitted");
+        ).to.be.revertedWith("You have no permission");
 
         await eventManager
           .connect(organizer)
@@ -835,7 +834,7 @@ describe("EventManager", function () {
           eventManager
             .connect(participant1)
             .grantRole(groupId, participant1.address, ADMIN_ROLE)
-        ).to.be.revertedWith("Not permitted");
+        ).to.be.revertedWith("You have no permission");
       });
 
       it("should revert if invalid group id", async () => {
@@ -951,7 +950,7 @@ describe("EventManager", function () {
           eventManager
             .connect(participant1)
             .revokeRole(groupId, participant1.address, ADMIN_ROLE)
-        ).to.be.revertedWith("Not permitted");
+        ).to.be.revertedWith("You have no permission");
 
         // revoke by myself
         await eventManager
@@ -1037,7 +1036,7 @@ describe("EventManager", function () {
           eventManager
             .connect(participant1)
             .revokeRole(groupId, participant1.address, ADMIN_ROLE)
-        ).to.be.revertedWith("Not permitted");
+        ).to.be.revertedWith("You have no permission");
       });
 
       it("should revert if invalid group id", async () => {
@@ -1074,7 +1073,7 @@ describe("EventManager", function () {
       });
     });
 
-    describe("getRoles", async () => {
+    describe("getMemberRole", async () => {
       it("should return collect values", async () => {
         const txn1 = await eventManager
           .connect(organizer)
@@ -1215,6 +1214,106 @@ describe("EventManager", function () {
             eventId
           )
         ).to.equal(true);
+      });
+    });
+
+    describe("getMemberRoles", async () => {
+      it("should return empty array if no assignee", async () => {
+        const txn1 = await eventManager
+          .connect(organizer)
+          .createGroup("group1");
+        await txn1.wait();
+
+        const groups = await eventManager.getOwnGroups(organizer.address);
+        const groupId = groups[0].groupId.toNumber();
+
+        const roles = await eventManager.getMemberRoles(groupId);
+        expect(roles.length).to.equal(0);
+      });
+
+      it("should return one value", async () => {
+        const txn1 = await eventManager
+          .connect(organizer)
+          .createGroup("group1");
+        await txn1.wait();
+
+        // other data
+        const txn2 = await eventManager
+          .connect(organizer)
+          .createGroup("group2");
+        await txn2.wait();
+
+        const groups = await eventManager.getOwnGroups(organizer.address);
+        const groupId1 = groups[0].groupId.toNumber();
+        const groupId2 = groups[1].groupId.toNumber();
+
+        // other data
+        await eventManager
+          .connect(organizer)
+          .grantRole(groupId2, participant1.address, ADMIN_ROLE);
+
+        await eventManager
+          .connect(organizer)
+          .grantRole(groupId1, organizer.address, ADMIN_ROLE);
+
+        const roles1 = await eventManager.getMemberRoles(groupId1);
+        expect(roles1.length).to.equal(1);
+        expect(roles1[0].assignee).to.equal(organizer.address);
+        expect(roles1[0].admin).to.equal(true);
+        expect(roles1[0].collaborator).to.equal(false);
+
+        await eventManager
+          .connect(organizer)
+          .grantRole(groupId1, organizer.address, COLLABORATOR_ROLE);
+
+        const roles2 = await eventManager.getMemberRoles(groupId1);
+        expect(roles2.length).to.equal(1);
+        expect(roles2[0].assignee).to.equal(organizer.address);
+        expect(roles2[0].admin).to.equal(true);
+        expect(roles2[0].collaborator).to.equal(true);
+
+        await eventManager
+          .connect(organizer)
+          .revokeRole(groupId1, organizer.address, ADMIN_ROLE);
+
+        const roles3 = await eventManager.getMemberRoles(groupId1);
+        expect(roles3.length).to.equal(1);
+        expect(roles3[0].assignee).to.equal(organizer.address);
+        expect(roles3[0].admin).to.equal(false);
+        expect(roles3[0].collaborator).to.equal(true);
+
+        await eventManager
+          .connect(organizer)
+          .revokeRole(groupId1, organizer.address, COLLABORATOR_ROLE);
+
+        const roles = await eventManager.getMemberRoles(groupId1);
+        expect(roles.length).to.equal(0);
+      });
+
+      it("should return multiple values", async () => {
+        const txn1 = await eventManager
+          .connect(organizer)
+          .createGroup("group1");
+        await txn1.wait();
+
+        const groups = await eventManager.getOwnGroups(organizer.address);
+        const groupId = groups[0].groupId.toNumber();
+
+        await eventManager
+          .connect(organizer)
+          .grantRole(groupId, organizer.address, ADMIN_ROLE);
+        await eventManager
+          .connect(organizer)
+          .grantRole(groupId, participant1.address, COLLABORATOR_ROLE);
+
+        const roles = await eventManager.getMemberRoles(groupId);
+        expect(roles.length).to.equal(2);
+        expect(roles[0].assignee).to.equal(organizer.address);
+        expect(roles[0].admin).to.equal(true);
+        expect(roles[0].collaborator).to.equal(false);
+        expect(roles[1].assignee).to.equal(participant1.address);
+        expect(roles[1].admin).to.equal(false);
+        expect(roles[1].collaborator).to.equal(true);
       });
     });
   });

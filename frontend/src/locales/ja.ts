@@ -57,6 +57,17 @@ export default {
     "アドレスは 0x から始まり、合計で 42 文字である必要があります。",
   RBAC_GRANT_SUCCESS: "権限の付与に成功しました。",
   RBAC_GRANT_ERROR: "権限の更新中にエラーが発生しました。",
+  RBAC_LIST: "付与一覧",
+  RBAC_ADMINS: "管理者",
+  RBAC_COLLABORATORS: "コラボレーター",
+  RBAC_REVOKE_ROLE: "権限を剥奪する",
+  RBAC_REVOKE_ERROR: "権限の更新中にエラーが発生しました。",
+  RBAC_NO_ADMINS: "管理者がいません。",
+  RBAC_NO_COLLABORATORS: "コラボレーターがいません。",
+  RBAC_ADMIN_DESC:
+    "管理者権限: 他のアドレスに対して権限付与、イベント作成、あいことば変更、ミントロック",
+  RBAC_COLLABORATOR_DESC:
+    "コラボレーター権限: イベント作成、あいことば変更、ミントロック",
   // Event index
   CREATE_NEW_EVENT: "イベントを作成",
   // Event new

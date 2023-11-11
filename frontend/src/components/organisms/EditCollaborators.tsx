@@ -7,9 +7,10 @@ import {
   Tabs,
   useDisclosure,
 } from "@chakra-ui/react";
-import { FC } from "react";
+import { FC, useState } from "react";
 import ModalBase from "src/components/molecules/common/ModalBase";
 import GrantRole from "src/components/molecules/GrantRole";
+import Collaborators from "src/components/molecules/Collaborators";
 import { useLocale } from "src/hooks/useLocale";
 
 type EditCollaboratorsProps = {
@@ -19,6 +20,7 @@ type EditCollaboratorsProps = {
 const EditCollaborators: FC<EditCollaboratorsProps> = ({ groupId }) => {
   const { t } = useLocale();
   const { isOpen, onClose, onOpen } = useDisclosure();
+  const [tabIndex, setTabIndex] = useState(0);
 
   return (
     <>
@@ -33,14 +35,18 @@ const EditCollaborators: FC<EditCollaboratorsProps> = ({ groupId }) => {
       </Button>
 
       <ModalBase isOpen={isOpen} onClose={onClose}>
-        <Tabs>
+        <Tabs index={tabIndex} onChange={(index) => setTabIndex(index)}>
           <TabList>
             <Tab>{t.RBAC_GRANT}</Tab>
+            <Tab>{t.RBAC_LIST}</Tab>
           </TabList>
 
           <TabPanels>
-            <TabPanel>
+            <TabPanel key={`tab-panel-0-${tabIndex}`}>
               <GrantRole groupId={groupId} />
+            </TabPanel>
+            <TabPanel key={`tab-panel-1-${tabIndex}`}>
+              <Collaborators groupId={groupId} />
             </TabPanel>
           </TabPanels>
         </Tabs>

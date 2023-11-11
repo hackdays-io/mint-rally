@@ -455,24 +455,63 @@ export const useGrantRole = () => {
   };
 };
 
-export const useRoles = () => {
+export const useRevokeRole = () => {
   const { eventManagerContract } = useEventManagerContract();
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [roles, setRoles] = useState<Event.Roles | null>(null);
-  const [error, setError] = useState<any>(null);
-  const getRoles = (groupId: number, address: string) => {
-    setIsLoading(true);
-    eventManagerContract
-      ?.call("getRoles", [groupId, address])
-      .then((res: any) => {
-        setRoles(res);
-      })
-      .catch((err: any) => {
-        setError(err);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
+  const {
+    mutateAsync,
+    isLoading: isRevoking,
+    error: revokeError,
+    status: revokeStatus,
+  } = useContractWrite(eventManagerContract, "revokeRole");
+
+  const revokeRole = useCallback(
+    async (params: { groupId: number; address: string; role: string }) => {
+      if (!params.groupId) return;
+      if (!params.address) return;
+      if (!params.role) return;
+
+      const bytes32Role = ethers.utils.keccak256(
+        ethers.utils.toUtf8Bytes(params.role.toUpperCase())
+      );
+      try {
+        await mutateAsync({
+          args: [params.groupId, params.address, bytes32Role],
+        });
+      } catch (_) {}
+    },
+    [mutateAsync]
+  );
+  return {
+    revokeRole,
+    isRevoking,
+    revokeStatus: revokeStatus,
+    revokeError: revokeError,
   };
-  return { roles, isLoading, error, getRoles };
+};
+
+export const useMemberRole = (groupId?: number, address?: string) => {
+  const { eventManagerContract } = useEventManagerContract();
+
+  const {
+    isLoading,
+    data: memberRole,
+    error,
+  } = useContractRead(eventManagerContract, "getMemberRole", [
+    groupId,
+    address,
+  ]);
+
+  return { memberRole, isLoading, error };
+};
+
+export const useMemberRoles = (groupId: number) => {
+  const { eventManagerContract } = useEventManagerContract();
+
+  const {
+    data: memberRoles,
+    isLoading,
+    error,
+  } = useContractRead(eventManagerContract, "getMemberRoles", [groupId]);
+
+  return { memberRoles, isLoading, error };
 };

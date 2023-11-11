@@ -5,6 +5,7 @@ import {
   FormLabel,
   Input,
   Select,
+  Text,
 } from "@chakra-ui/react";
 import { FC, useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -104,9 +105,13 @@ const GrantRole: FC<GrantRoleProps> = ({ groupId }) => {
               </Select>
             )}
           />
+          <Box mt={2} color="red.400">
+            <Text fontSize="xs">{t.RBAC_ADMIN_DESC}</Text>
+            <Text fontSize="xs">{t.RBAC_COLLABORATOR_DESC}</Text>
+          </Box>
         </FormControl>
 
-        <FormControl mb={3}>
+        <FormControl mb={5}>
           <FormLabel htmlFor="address">{t.RBAC_WALLET_ADDRESS}</FormLabel>
           <Controller
             control={control}
@@ -130,6 +135,7 @@ const GrantRole: FC<GrantRoleProps> = ({ groupId }) => {
           type="submit"
           isLoading={isGranting || isSubmitting}
           disabled={isGranting || isSubmitting}
+          colorScheme="mintGreen"
           w="full"
         >
           {t.RBAC_GRANT_ROLE}
