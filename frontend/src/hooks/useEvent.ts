@@ -57,7 +57,10 @@ export const useCreateEventGroup = (address: string) => {
     ) => {
       if (!fromBlock) return false;
       return data.some((event) => {
-        return event.transaction.blockNumber > fromBlock;
+        return (
+          event.transaction.blockNumber > fromBlock &&
+          event.data?.owner === address
+        );
       });
     };
     if (createStatus !== "success" || !data || !includesNewEventGroup(data))
@@ -68,7 +71,7 @@ export const useCreateEventGroup = (address: string) => {
       })[0]
       .data?.groupId.toNumber();
     setCreatedGroupId(groupId);
-  }, [data, createStatus, fromBlock]);
+  }, [data, createStatus, fromBlock, address]);
 
   const createEventGroup = useCallback(
     async (params: { groupName: string }) => {
@@ -198,7 +201,10 @@ export const useCreateEvent = (address: string) => {
     const includesNewEvent = (data: ContractEvent<Record<string, any>>[]) => {
       if (!fromBlock) return false;
       return data.some((event) => {
-        return event.transaction.blockNumber > fromBlock;
+        return (
+          event.transaction.blockNumber > fromBlock &&
+          event.data?.owner === address
+        );
       });
     };
     if (createStatus !== "success" || !data || !includesNewEvent(data)) return;
