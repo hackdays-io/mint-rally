@@ -372,7 +372,7 @@ export const useMintParticipateNFT = (
         await mutateAsync({
           args: [event.groupId, event.eventRecordId, proof?.proofCalldata],
         });
-      } catch (_) {}
+      } catch (_) { }
     },
     [event, mutateAsync]
   );
@@ -470,7 +470,7 @@ export const useMintLock = (eventId: number | BigNumber, locked: boolean) => {
   const lock = useCallback(async () => {
     try {
       await mutateAsync({ args: [eventId, locked] });
-    } catch (_) {}
+    } catch (_) { }
   }, [eventId, locked, mutateAsync]);
 
   const isSuccess = useMemo(() => {
@@ -537,7 +537,7 @@ export const useResetSecretPhrase = (eventId: number | BigNumber) => {
       try {
         const proof = await generateProof(newSecretPhrase);
         await mutateAsync({ args: [eventId, proof?.publicInputCalldata[0]] });
-      } catch (_) {}
+      } catch (_) { }
     },
     [mutateAsync, eventId]
   );

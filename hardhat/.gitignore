@@ -8,7 +8,6 @@ typechain
 cache
 artifacts
 build
-
 .openzeppelin
 
 /circuits/**/*.ptau
