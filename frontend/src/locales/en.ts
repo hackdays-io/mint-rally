@@ -13,6 +13,7 @@ export default {
   SWITCH_NETWORK: "Switch Network",
   PLEASE_SWITCH_NETWORK: "Please switch network to the correct network.",
   PLEASE_SIGN_IN: "Please sign in first!",
+  AGREEMENT: "Please connect your wallet to this website only if you agree to the Terms of Use and Privacy Policy.",
   //Connect Wallet
   CONNECT_WITH_METAMASK: "Connect with Metamask",
   CONNECT_WITH_EMAIL: "Connect with Email",

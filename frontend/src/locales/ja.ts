@@ -13,6 +13,7 @@ export default {
   SWITCH_NETWORK: "ネットワーク切替",
   PLEASE_SWITCH_NETWORK: "正しいネットワークに切り替えてください。",
   PLEASE_SIGN_IN: "ログインしてください。",
+  AGREEMENT: "利用規約、プライバシーポリシーにご同意いただいた場合のみ本ウェブサイトにウォレットを接続してください。",
   // NFT
   NFT_NAME: "NFT名",
   NFT_DESC: "NFT説明",

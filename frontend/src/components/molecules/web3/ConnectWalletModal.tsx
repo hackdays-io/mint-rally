@@ -24,9 +24,11 @@ export const ConnectWalletModal: FC<Props> = ({
 
   return (
     <>
-      <ModalBase maxWidth="500px" onClose={onClose} isOpen={isOpen}>
+      <ModalBase maxWidth="600px" onClose={onClose} isOpen={isOpen}>
         <Box mt={8} mb={4}>
           <Text mb={4} textAlign="center" fontWeight="bold" fontSize="xl">
+            Welcome to MintRally!
+            <br/>
             MintRally へようこそ
           </Text>
           <Grid gap={2} justifyContent="center">
@@ -55,6 +57,14 @@ export const ConnectWalletModal: FC<Props> = ({
             )}
           </Grid>
         </Box>
+          <Box p={4} mb={0}>
+            <Text mb={4} textAlign="center" fontWeight="normal" fontSize="sm">
+              Please connect your wallet to this website only if you agree to the Terms of Use and Privacy Policy.
+              <br/>
+              <br/>
+              利用規約、プライバシーポリシーにご同意いただいた場合のみ本ウェブサイトにウォレットを接続してください。
+            </Text>
+          </Box>
       </ModalBase>
     </>
   );

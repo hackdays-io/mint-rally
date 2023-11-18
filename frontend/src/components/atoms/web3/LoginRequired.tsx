@@ -9,12 +9,14 @@ type Props = {
   children: ReactNode;
   requiredChainID?: number;
   forbiddenText: string;
+  agreementText: string;
 };
 
 const LoginRequired: FC<Props> = ({
   children,
   requiredChainID = Number(process.env.NEXT_PUBLIC_CHAIN_ID!),
   forbiddenText,
+  agreementText,
 }) => {
   const address = useAddress();
   const chainId = useChainId()!;
@@ -46,6 +48,11 @@ const LoginRequired: FC<Props> = ({
             />
           </HStack>
           <SelectConnectWallet setConnecting={setConnecting} />
+          <Box p={4}>
+           <Text color="gray.700" fontSize="md">
+             {agreementText}
+           </Text>
+         </Box>
         </Box>
       ) : chainId !== requiredChainID ? (
         <Box
