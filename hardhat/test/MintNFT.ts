@@ -251,6 +251,10 @@ describe("MintNFT", function () {
         0
       );
 
+      // participant2がorganizerにトークンの操作を承認
+      await mintNFT.connect(participant2).approve(organizer.address, tokenId);
+
+      // 承認後にburnを実行
       await mintNFT.connect(organizer).burn(tokenId);
       expect(await mintNFT.balanceOf(participant2.address)).equal(0);
     });
