@@ -3,7 +3,6 @@ import Link from "next/link";
 
 const Footer = () => (
   <Box padding={3} textAlign="center" color="mint.front">
-    <Text>© 2023 Hackdays project</Text>
     <Box mt={2}>
       <Link href="https://github.com/hackdays-io/mint-rally" target="_blank">
         <Box
@@ -52,6 +51,7 @@ const Footer = () => (
           X
         </Box>
       </Link>
+      <Text>© 2023 Hackdays project</Text>
       <Link href="https://hackdays.notion.site/86dea1026e4943c180f806027d200815?pvs=4" target="_blank">
         <Box
           cursor="pointer"
@@ -59,7 +59,7 @@ const Footer = () => (
           py="1"
           px="3"
           ml={2}
-          backgroundColor="mint.bg"
+          //backgroundColor="mint.bg"
           borderRadius="full"
           fontSize="sm"
           color="mint.primary"
@@ -75,7 +75,7 @@ const Footer = () => (
           py="1"
           px="3"
           ml={2}
-          backgroundColor="mint.bg"
+          //backgroundColor="mint.bg"
           borderRadius="full"
           fontSize="sm"
           color="mint.primary"
@@ -91,7 +91,7 @@ const Footer = () => (
           py="1"
           px="3"
           ml={2}
-          backgroundColor="mint.bg"
+          //backgroundColor="mint.bg"
           borderRadius="full"
           fontSize="sm"
           color="mint.primary"
