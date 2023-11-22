@@ -6,8 +6,7 @@ import SafeConnectButton from "src/components/atoms/web3/SafeConnectButton";
 import WalletConnectButton from "src/components/atoms/web3/WalletConnectButton";
 import ModalBase from "../common/ModalBase";
 import { useLocale } from "../../../hooks/useLocale";
-import WelcomeModal from "src/components/atoms/web3/WelcomeModal";
-import AgreementModal from "src/components/atoms/web3/AgreementModal";
+import AgreementText from "../common/AgreementText";
 
 type Props = {
   setConnecting: (connecting: boolean) => void;
@@ -31,9 +30,7 @@ export const ConnectWalletModal: FC<Props> = ({
       <ModalBase maxWidth="600px" onClose={onClose} isOpen={isOpen}>
         <Box mt={8} mb={4}>
           <Text mb={4} textAlign="center" fontWeight="bold" fontSize="xl">
-            <WelcomeModal
-              welcomeText={t.WELCOME}
-            ></WelcomeModal>
+            {t.WELCOME}
           </Text>
           <Grid gap={2} justifyContent="center">
             {!magicLinkSelected &&
@@ -60,14 +57,9 @@ export const ConnectWalletModal: FC<Props> = ({
               />
             )}
           </Grid>
+
+          <AgreementText />
         </Box>
-          <Box p={4} mb={0}>
-            <Text mb={4} textAlign="center" fontWeight="normal" fontSize="sm">
-              <AgreementModal
-               agreementText={t.AGREEMENT}
-              ></AgreementModal>
-            </Text>
-          </Box>
       </ModalBase>
     </>
   );

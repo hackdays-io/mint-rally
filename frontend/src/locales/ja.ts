@@ -13,7 +13,8 @@ export default {
   SWITCH_NETWORK: "ネットワーク切替",
   PLEASE_SWITCH_NETWORK: "正しいネットワークに切り替えてください。",
   PLEASE_SIGN_IN: "ログインしてください。",
-  AGREEMENT: "利用規約、プライバシーポリシーにご同意いただいた場合のみ本ウェブサイトにウォレットを接続してください。",
+  AGREEMENT:
+    "利用規約、プライバシーポリシーにご同意いただいた場合のみ本ウェブサイトにウォレットを接続してください。",
   WELCOME: "MintRally へようこそ！",
   // NFT
   NFT_NAME: "NFT名",
@@ -174,4 +175,11 @@ export default {
     "大変申し訳ございませんが、現在システムメンテナンスのため、サービスの一部機能がご利用いただけません。",
   MAINTENANCE_DESC2:
     "ご不便をおかけし申し訳ございませんが、時間をおいてから再度アクセスしていただけると幸いです。",
+
+  // agreement
+  AGREEMENT_TEXT:
+    "にご同意いただいた場合のみ本ウェブサイトにウォレットを接続してください。",
+  AGREEMENT_TERMS: "利用規約",
+  AGREEMENT_PRIVACY: "プライバシーポリシー",
+  AGREEMENT_SCTA: "特定商取引法に基づく表記",
 };
