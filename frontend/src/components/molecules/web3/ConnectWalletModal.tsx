@@ -5,6 +5,9 @@ import MetamaskConnectButton from "src/components/atoms/web3/MetamaskConnectButt
 import SafeConnectButton from "src/components/atoms/web3/SafeConnectButton";
 import WalletConnectButton from "src/components/atoms/web3/WalletConnectButton";
 import ModalBase from "../common/ModalBase";
+import { useLocale } from "../../../hooks/useLocale";
+import WelcomeModal from "src/components/atoms/web3/WelcomeModal";
+import AgreementModal from "src/components/atoms/web3/AgreementModal";
 
 type Props = {
   setConnecting: (connecting: boolean) => void;
@@ -17,6 +20,7 @@ export const ConnectWalletModal: FC<Props> = ({
   isOpen,
   onClose,
 }) => {
+  const { t } = useLocale();
   const [magicLinkSelected, setMagicLinkSelected] = useState<boolean>(false);
   const [safeLinkSelected, setSafeLinkSelected] = useState<boolean>(false);
   const [walletConnectSelected, setWalletConnectSelected] =
@@ -24,10 +28,12 @@ export const ConnectWalletModal: FC<Props> = ({
 
   return (
     <>
-      <ModalBase maxWidth="500px" onClose={onClose} isOpen={isOpen}>
+      <ModalBase maxWidth="600px" onClose={onClose} isOpen={isOpen}>
         <Box mt={8} mb={4}>
           <Text mb={4} textAlign="center" fontWeight="bold" fontSize="xl">
-            MintRally へようこそ
+            <WelcomeModal
+              welcomeText={t.WELCOME}
+            ></WelcomeModal>
           </Text>
           <Grid gap={2} justifyContent="center">
             {!magicLinkSelected &&
@@ -55,6 +61,13 @@ export const ConnectWalletModal: FC<Props> = ({
             )}
           </Grid>
         </Box>
+          <Box p={4} mb={0}>
+            <Text mb={4} textAlign="center" fontWeight="normal" fontSize="sm">
+              <AgreementModal
+               agreementText={t.AGREEMENT}
+              ></AgreementModal>
+            </Text>
+          </Box>
       </ModalBase>
     </>
   );
