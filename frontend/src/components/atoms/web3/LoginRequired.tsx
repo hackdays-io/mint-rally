@@ -4,17 +4,20 @@ import { useAddress, useChainId, useSwitchChain } from "@thirdweb-dev/react";
 import { useLocale } from "../../../hooks/useLocale";
 import Image from "next/image";
 import SelectConnectWallet from "src/components/molecules/web3/SelectConnectWallet";
+import AgreementText from "src/components/molecules/common/AgreementText";
 
 type Props = {
   children: ReactNode;
   requiredChainID?: number;
   forbiddenText: string;
+  agreementText: string;
 };
 
 const LoginRequired: FC<Props> = ({
   children,
   requiredChainID = Number(process.env.NEXT_PUBLIC_CHAIN_ID!),
   forbiddenText,
+  agreementText,
 }) => {
   const address = useAddress();
   const chainId = useChainId()!;
@@ -46,6 +49,7 @@ const LoginRequired: FC<Props> = ({
             />
           </HStack>
           <SelectConnectWallet setConnecting={setConnecting} />
+          <AgreementText />
         </Box>
       ) : chainId !== requiredChainID ? (
         <Box
