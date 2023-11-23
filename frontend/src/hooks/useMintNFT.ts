@@ -347,20 +347,19 @@ export const useMintParticipateNFT = (
   }, [mintedTokenURI]);
 
   useEffect(() => {
-    const includesNewEvent = (data: ContractEvent<Record<string, any>>[]) => {
+    if (!data) return;
+    const latestEvent = data.sort((a, b) => {
+      return b.transaction.blockNumber - a.transaction.blockNumber;
+    })[0];
+    const isNewEvent = (_latestEvent: ContractEvent<Record<string, any>>) => {
       if (!fromBlock) return false;
-      return data.some((event) => {
-        return (
-          event.transaction.blockNumber > fromBlock && event.data.to === address
-        );
-      });
+      return (
+        latestEvent.data.to === address &&
+        latestEvent.transaction.blockNumber > fromBlock
+      );
     };
-    if (status !== "success" || !data || !includesNewEvent(data)) return;
-    const tokenId = data
-      .sort((a, b) => {
-        return b.transaction.blockNumber - a.transaction.blockNumber;
-      })[0]
-      .data?.tokenId.toNumber();
+    if (status !== "success" || !data || !isNewEvent(latestEvent)) return;
+    const tokenId = latestEvent.data?.tokenId.toNumber();
     setMintedNFTId(tokenId);
   }, [data, status, fromBlock, address]);
 
@@ -414,7 +413,7 @@ export const useMintParticipateNFT = (
           to,
           data,
         });
-        const { data: response } = await axios.post("/api/autotask", {
+        const { data: response } = await axios.post("/api/mtx/relay", {
           request: request.request,
           signature: request.signature.signature,
         });

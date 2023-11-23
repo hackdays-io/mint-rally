@@ -11,7 +11,10 @@ const User: FC = () => {
 
   return (
     <Container maxWidth={1000} mt={{ base: 5, md: 10 }}>
-      <LoginRequired forbiddenText={t.PLEASE_SIGN_IN}>
+      <LoginRequired 
+       forbiddenText={t.PLEASE_SIGN_IN}
+       agreementText={t.AGREEMENT}
+      >
         {address && <UserEntity address={address} />}
       </LoginRequired>
     </Container>

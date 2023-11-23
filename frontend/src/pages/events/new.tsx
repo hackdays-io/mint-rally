@@ -11,7 +11,7 @@ const EventCreate: NextPage = () => {
 
   return (
     <>
-      <Container maxW={800} py={6}>
+      <Container maxW={1000} py={6}>
         <Heading as="h1" fontSize="3xl" color="text.black" mb={10}>
           {t.CREATE_NEW_EVENT}
         </Heading>
@@ -19,6 +19,7 @@ const EventCreate: NextPage = () => {
         <LoginRequired
           requiredChainID={+process.env.NEXT_PUBLIC_CHAIN_ID!}
           forbiddenText={t.PLEASE_SIGN_IN}
+          agreementText={t.AGREEMENT}
         >
           {address && <CreateEventForm address={address} />}
         </LoginRequired>
