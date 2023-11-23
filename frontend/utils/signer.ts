@@ -40,7 +40,7 @@ export const buildRequest = async (
   // get nonce from forwarder contract
   // this nonce is used to prevent replay attack
   const nonce = (await forwarder.call("getNonce", [input.from])).toString();
-  return { value: 0, gas: 1e6, nonce, ...input };
+  return { value: 0, gas: 2e6, nonce, ...input };
 };
 
 export const buildTypedData = async (

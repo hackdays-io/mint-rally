@@ -40,6 +40,8 @@ Please update variables, testnet and localnet vars are specified below. If you h
 | NEXT_PUBLIC_BLOCK_EXPLORER_URL        | https://mumbai.polygonscan.com/                                               |
 | NEXT_PUBLIC_PINATA_JWT                | Following instraction describing how to get pinata jwt.                       |
 | NEXT_PUBLIC_PINATA_GATEWAY            | gateway.pinata.cloud                                                          |
+| OZ_RELAYER_API_KEYS                   | Openzeppelin Relayer API Keys                                                 |
+| OZ_RELAYER_API_SECRETS                | Openzeppelin Relayer API Secrets                                              |
 
 </details>
 
@@ -76,6 +78,18 @@ Generate API key
 Copy API key
 
 Set this jwt to **NEXT_PUBLIC_PINATA_JWT**
+
+## Create Relayer API key
+
+This process is needed for use meta transaction
+
+Go to [OpenZeppelin Defender](https://defender.openzeppelin.com/) and create an account.
+
+Then go to relayer page and create relayer, after that generate API Key.
+
+![generate api key](documentImages/defender-relayer-apikey.png)
+
+Set this key and secret to **OZ_RELAYER_API_KEYS** and **OZ_RELAYER_API_SECRETS**
 
 ## Start server
 
