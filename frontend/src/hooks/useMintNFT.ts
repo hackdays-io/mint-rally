@@ -414,7 +414,7 @@ export const useMintParticipateNFT = (
           to,
           data,
         });
-        const { data: response } = await axios.post("/api/autotask", {
+        const { data: response } = await axios.post("/api/mtx/relay", {
           request: request.request,
           signature: request.signature.signature,
         });

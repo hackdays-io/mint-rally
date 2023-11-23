@@ -22,29 +22,13 @@ Relayer にガス代となる MATIC を追加するときは、Metamask など�
 
 ![relayer info](documentImages/defender2.png)
 
-### 1.3 Create Autotask
+### 1.3 Create Relayer API Key
 
-Autotask はフロントエンドからリクエストを行う API です。Autotask を介して Relayer への接続が行われます。
+Relayer 名の右にある歯車アイコンからメニューを開き、Crete new API Key ボタンを押して API キーを発行してください。
 
-![create autotask](documentImages/defender3.png)
+![generate api key](documentImages/defender-relayer-apikey.png)
 
-Name には任意の名前、Trigger には Webhook、Connect to relayer は 1.2 で作成した Relayer を設定します。**Code は後ほどアップデートするので操作する必要はありません**
-
-![setup autotask](documentImages/defender4.png)
-
-#### Get AutotaskID
-
-Autotask が作成されたら、Autotask の詳細ページにいき URL の末尾にあるユニーク ID を手元にコピーしておいてください、後ほど使います。  
-このような URL`https://defender.openzeppelin.com/#/autotask/14645a02-f98e-0000-a659-000000000`の場合、`14645a02-f98e-0000-a659-000000000`をコピーしてください。
-
-### 1.4 Create Defender Team API Key
-
-CLI から Autotask のコードをアップデートするために、Defender の TeamAPI キーを発行します。**この API キーは Github などに公開しないでください。**
-
-[TeamAPIKeys](https://defender.openzeppelin.com/#/api-keys)にアクセスし、Create Team API Keys ボタンから ManageRelayers と ManageAutotasks を選択してキーを生成してください。  
-キーが生成されたら、API Key と Secret Key を手元にコピーしてください。
-
-![create team API key](documentImages/defender5.png)
+発行したキーは **OZ_RELAYER_API_KEYS** と **OZ_RELAYER_API_SECRETS** の名前でフロントエンドの環境変数にいれます。
 
 ## 2 Set .env for deployment
 
@@ -52,9 +36,6 @@ CLI から Autotask のコードをアップデートするために、Defender 
 
 | Key                      | Value                                                                                                                                                                                                                                                                                                        |
 | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| TEAM_API_KEY             | 1.4 で入手した API KEY                                                                                                                                                                                                                                                                                       |
-| TEAM_API_SECRET          | 1.4 で入手した SECRE TKEY                                                                                                                                                                                                                                                                                    |
-| MUMBAI_AUTOTASK_ID       | 1.3 で入手した AutotaskID。メインネットにはデプロイする際は`POLYGON_AUTOTASK_ID` にセットしてください。                                                                                                                                                                                                      |
 | MUMBAI_FORWARDER_ADDRESS | Hardhat から mumbai テストネットにデプロイした ForwarderAddress。メインネットにデプロイする際は`POLYGON_FORWARDER_ADDRESS` にセットしてください。は。                                                                                                                                                        |
 | MUMBAI_RELAYER_ADDRESS   | 1.2 で入手した RelayerAddress。メインネットにはデプロイする際は`POLYGON_RELAYER_ADDRESS` にセットしてください。                                                                                                                                                                                              |
 | ETHERSCAN_API_KEY        | Contract を Verify するときに使います。デプロイ対象のネットワークの scan サービスから発行してください。[Polygonscan](https://polygonscan.com/)                                                                                                                                                               |
@@ -100,20 +81,6 @@ Contract を Verify（検証）してスキャンサイトからどんなコン�
 $ yarn verify --network mumbai <address>
 ```
 
-## Upload defender autotask code
-
-メタトランザクションを仲介する Openzeppelin の Autotask にソースコードをアップロードします。
-
-```
-// build autotask script
-$ yarn build
-
-// upload script
-$ yarn upload:stg
-```
-
-メインネットにデプロイする際は`yarn upload:prd`
-
 # Deploy Frontend
 
 ## 4. Setup and Deploy on Vercel
@@ -148,7 +115,6 @@ Environment Variables の欄に以下の環境変数をセットしてくださ�
 | NEXT_PUBLIC_FORWARDER_ADDRESS         | A forwarder contract address created by step 3.1                                                                                                     |
 | NEXT_PUBLIC_CONTRACT_EVENT_MANAGER    | A event manager contract address created step 3.1                                                                                                    |
 | NEXT_PUBLIC_CONTRACT_MINT_NFT_MANAGER | A mint NFT manager contract address step 3.1                                                                                                         |
-| NEXT_PUBLIC_WEBHOOK_URL               | 1.3 で入手した webhook URL。                                                                                                                         |
 | NEXT_PUBLIC_PROVIDER_RPC              | [Alchemy](https://www.alchemy.com/)こちらから対象ネットワークを選択して発行してください。 コントラクトデプロイ時につかったものと同じでも大丈夫です。 |
 | NEXT_PUBLIC_CHAIN_ID                  | Testnet: `80001`, Mainnet: `137`.                                                                                                                    |
 | NEXT_PUBLIC_CHAIN_NAME                | A chain name: `Polygon Testnet` or `Polygon  Mainnet`.                                                                                               |
@@ -156,3 +122,5 @@ Environment Variables の欄に以下の環境変数をセットしてくださ�
 | NEXT_PUBLIC_METAMASK_RPC_URL          | A PRC URL for the wallet Testnet: `https://matic-mumbai.chainstacklabs.com`, Mainnet: `https://polygon-rpc.com`.                                     |
 | NEXT_PUBLIC_PINATA_JWT                | following instraction describing how to get pinata jwt. [link](/docs/frontend.md#create-pinata-jwt)                                                  |
 | NEXT_PUBLIC_PINATA_GATEWAY            | A general gateway uri is `gateway.pinata.cloud`. If you want to use your own gateway please refer pinata doc                                         |
+| OZ_RELAYER_API_KEYS                   | 1.3 で入手した Openzeppelin Relayer API Keys を配列でいれる                                                                                          |
+| OZ_RELAYER_API_SECRETS                | 1.3 で入手した Openzeppelin Relayer API Secrets を配列で入れる                                                                                       |
