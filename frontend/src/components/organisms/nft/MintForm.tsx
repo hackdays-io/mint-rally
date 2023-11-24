@@ -1,6 +1,6 @@
 import { Box, Button, Flex, Input, Text, VStack } from "@chakra-ui/react";
 import Link from "next/link";
-import { FC, useCallback, useEffect, useState } from "react";
+import { FC, useCallback, useEffect, useMemo, useState } from "react";
 import { useLocale } from "src/hooks/useLocale";
 import { useMintParticipateNFT } from "src/hooks/useMintNFT";
 import { Event } from "types/Event";
@@ -19,7 +19,6 @@ export const MintForm: FC<Props> = ({ event, address }) => {
   const { t } = useLocale();
   const {
     query: { secret_phrase },
-    asPath,
   } = useRouter();
   const walletMetadata = useWallet()?.getMeta();
 
@@ -64,50 +63,58 @@ export const MintForm: FC<Props> = ({ event, address }) => {
     }
   }, [event, enteredSecretPhrase, mint, mintMTX]);
 
+  const hideSecretPhraseInput = useMemo(() => {
+    return secret_phrase ? true : false;
+  }, [secret_phrase]);
+
   return (
     <>
       {!mintedNFT && (
-        <Flex
-          width="100%"
-          justifyContent="space-between"
-          alignItems="end"
-          flexWrap="wrap"
-          color="text.black"
-        >
+        <>
           <Text mb={3}>
-            {t.ENTER_SECRET_PHRASE}
+            {!hideSecretPhraseInput && t.ENTER_SECRET_PHRASE}
+            {t.PUSH_MINT_BUTTON}
             {walletMetadata?.name === "MetaMask" &&
               t.ENTER_SECRET_PHRASE_METAMASK}
           </Text>
-          <Box
-            width={{ base: "100%", md: "48%" }}
-            mb={{ base: 5, md: 0 }}
-            position="relative"
+          <Flex
+            alignItems="center"
+            justifyContent="center"
+            gap="4%"
+            flexWrap="wrap"
+            color="text.black"
           >
-            <Input
-              variant="outline"
-              type="text"
-              value={enteredSecretPhrase}
-              onChange={(e) => setEnteredSecretPhrase(e.target.value)}
-              pr={10}
-              placeholder={t.INPUT_SECRET_PHRASE}
-              backgroundColor={"#fff"}
-            />
-          </Box>
-          <Button
-            width={{ base: "100%", md: "48%" }}
-            isLoading={isLoading}
-            onClick={() => claimMint()}
-            background="mint.primary"
-            color="white"
-            rounded="full"
-          >
-            {t.CLAIM_NFT}
-            <Text as="span" fontSize="10px" ml={event.useMtx ? 2 : 0}>
-              {event.useMtx ? t.USE_MTX : ""}
-            </Text>
-          </Button>
-        </Flex>
+            <Box
+              width={{ base: "100%", md: "48%" }}
+              mb={{ base: 5, md: 0 }}
+              position="relative"
+              display={hideSecretPhraseInput ? "none" : "block"}
+            >
+              <Input
+                variant="outline"
+                type="text"
+                value={enteredSecretPhrase}
+                onChange={(e) => setEnteredSecretPhrase(e.target.value)}
+                pr={10}
+                placeholder={t.INPUT_SECRET_PHRASE}
+                backgroundColor={"#fff"}
+              />
+            </Box>
+            <Button
+              width={{ base: "100%", md: "48%" }}
+              isLoading={isLoading}
+              onClick={() => claimMint()}
+              background="mint.primary"
+              color="white"
+              rounded="full"
+            >
+              {t.CLAIM_NFT}
+              <Text as="span" fontSize="10px" ml={event.useMtx ? 2 : 0}>
+                {event.useMtx ? t.USE_MTX : ""}
+              </Text>
+            </Button>
+          </Flex>
+        </>
       )}
       {error && (
         <AlertMessage title={t.ERROR_MINTING_PARTICIPATION_NFT}>
