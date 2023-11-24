@@ -13,7 +13,10 @@ export const activeChain =
   chainId === "80001"
     ? { ...Mumbai, rpc: [process.env.NEXT_PUBLIC_PROVIDER_RPC!, ...Mumbai.rpc] }
     : chainId === "137"
-    ? Polygon
+    ? {
+        ...Polygon,
+        rpc: [process.env.NEXT_PUBLIC_PROVIDER_RPC!, ...Polygon.rpc],
+      }
     : { ...Localhost, rpc: ["http://localhost:8545"], chainId: 31337 };
 
 export const useWeb3WalletConfig = () => {
