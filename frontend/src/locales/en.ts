@@ -107,6 +107,7 @@ export default {
   YOU_ALREADY_HAVE_THIS_NFT:
     "You already have this Event's NFT. Thank you for your participation!",
   ENTER_SECRET_PHRASE: "Enter Secret Phrase. Event organaizers will tell you.",
+  PUSH_MINT_BUTTON: "Then tap Claim NFT button!",
   ENTER_SECRET_PHRASE_METAMASK:
     "After claiming NFT, please sign from Metamask.",
   CLAIM_NFT: "Claim NFT!",
