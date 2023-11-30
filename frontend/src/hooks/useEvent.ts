@@ -12,7 +12,6 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useCurrentBlock } from "./useBlockChain";
 import { Event } from "types/Event";
 import { BigNumber, ethers } from "ethers";
-import { reverse } from "lodash";
 import { useGenerateProof } from "./useSecretPhrase";
 import dayjs from "dayjs";
 
@@ -234,7 +233,6 @@ export const useCreateEvent = (address: string) => {
         const endDateTime = dayjs(
           `${params.endDate} ${params.endTime}`
         ).toISOString();
-
         await mutateAsync({
           args: [
             params.groupId,
@@ -342,7 +340,6 @@ export const useEventsByGroupId = () => {
   const [events, setEvents] = useState<Event.EventRecord[] | null>(null);
   const [error, setError] = useState<any>(null);
   const getEventsByGroupId = (groupId: number) => {
-    console.log("getEventsByGroupId", groupId);
     setIsLoading(true);
     eventManagerContract
       ?.call("getEventRecordsByGroupId", [groupId])
@@ -380,9 +377,11 @@ export const useCalcMtxGasFee = (mintLimit?: number) => {
 
       const gasPrice = (await provider.getGasPrice())?.toNumber();
       const value = ethers.utils.parseEther(
-        `${(gasPrice * mintLimit * (660000 * 1 * 0.000000000000000001)).toFixed(
-          6
-        )}`
+        `${(
+          gasPrice *
+          mintLimit *
+          (660000 * 1.15 * 0.000000000000000001)
+        ).toFixed(6)}`
       );
       setGasFee(value);
     };
@@ -395,9 +394,13 @@ export const useCalcMtxGasFee = (mintLimit?: number) => {
       if (!provider) return;
       const gasPrice = (await provider.getGasPrice())?.toNumber();
       const value = ethers.utils.parseEther(
-        `${(gasPrice * _mintLimit * 660000 * 1 * 0.000000000000000001).toFixed(
-          6
-        )}`
+        `${(
+          gasPrice *
+          _mintLimit *
+          660000 *
+          1.15 *
+          0.000000000000000001
+        ).toFixed(6)}`
       );
       return value;
     },

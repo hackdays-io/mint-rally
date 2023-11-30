@@ -96,6 +96,8 @@ export default {
   SELECT_PAST_EVENT_TO_COPY_NOTICES:
     "あいことばとガス代の肩代わりはコピーされません",
   COPY: "コピーする",
+  YOUR_EVENT_WAS_CREATED: "イベントが作成されました🎉",
+  GOTO_EVENT_PAGE: "イベントページへ",
   // Event page
   SIGN_IN_TO_GET_NFT: "NFTをGetしよう！",
   SELECT_WALLET: "NFTの取得方法を選択してください",
@@ -142,6 +144,12 @@ export default {
   SECRET_PHRASE_RESET_SUCCESS: "あいことばをリセットしました",
   SECRET_PHRASE_RESET_FAIL: "あいことばのリセット中にエラーが発生しました",
   EVENT_ADMIN_SUBMIT: "変更する",
+  DROP_NFTS: "NFTを配布する",
+  PLEASE_ENTER_WALLET_ADDRESSES: "NFTを配布するウォレットアドレスを入力してください。改行で区切って複数入力できます。",
+  YOU_CAN_DROP_UP_TO_100_NFTS_AT_ONCE: "一度に配布できるウォレットアドレスは100件までです。",
+  DROPPING_NFTS: "NFTを配布中です... しばらくお待ちください。このウィンドウから移動しても大丈夫です。",
+  DROP_NFTS_SUCCESS: "NFTを配布しました！",
+  DROPNFT_SUBMIT: "配布する",
 
   FEATUE: "特徴",
   FEATUE_DESC_1: "大切なイベントに参加した記録を残すことができます",
