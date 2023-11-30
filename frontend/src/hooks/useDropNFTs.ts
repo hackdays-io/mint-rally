@@ -1,15 +1,19 @@
 import { useForwarderContract, useMintNFTContract } from "./useMintNFT";
-import { ContractEvent, useContractEvents, useContractWrite, useSDK, useSigner, TransactionError } from "@thirdweb-dev/react";
+import {
+  ContractEvent,
+  useContractEvents,
+  useContractWrite,
+  useSDK,
+  useSigner,
+  TransactionError,
+} from "@thirdweb-dev/react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Event } from "types/Event";
 import { signMetaTxRequest } from "utils/signer";
 import axios from "axios";
 import { useCurrentBlock } from "./useBlockChain";
 
-export const useDropNFTs = (
-  event: Event.EventRecord,
-  address: string,
-) => {
+export const useDropNFTs = (event: Event.EventRecord, address: string) => {
   const { mintNFTContract } = useMintNFTContract();
   const { forwarderContract } = useForwarderContract();
   const signer = useSigner();
@@ -44,7 +48,6 @@ export const useDropNFTs = (
     subscribe: true,
   });
 
-
   const error: any = useMemo(() => {
     return dropStatus.error || dropError;
   }, [dropError, dropStatus]);
@@ -75,7 +78,7 @@ export const useDropNFTs = (
           args: [event.eventRecordId, addresses],
         });
       } catch (error) {
-        console.log('dropNFTs error', error);
+        console.log("dropNFTs error", error);
       }
     },
     [event, mutateAsync]
@@ -87,18 +90,30 @@ export const useDropNFTs = (
       setDroppedComplete(false);
       setDropStatus({ isLoading: true, status: "loading", error: null });
       try {
+        await (
+          mintNFTContract as any
+        ).contractWrapper.writeContract.callStatic.dropNFTs(
+          event?.eventRecordId,
+          addresses
+        );
+
         const to = mintNFTContract?.getAddress();
         const from = address;
         const data = mintNFTContract?.encoder.encode("dropNFTs", [
           event?.eventRecordId,
-          addresses
+          addresses,
         ]);
-        const request = await signMetaTxRequest(sdk.wallet, forwarderContract, {
-          from,
-          to,
-          data,
-        });
-        const { data: response } = await axios.post("/api/autotask", {
+        const request = await signMetaTxRequest(
+          sdk.wallet,
+          forwarderContract,
+          {
+            from,
+            to,
+            data,
+          },
+          addresses.length
+        );
+        const { data: response } = await axios.post("/api/mtx/relay", {
           request: request.request,
           signature: request.signature.signature,
         });
@@ -112,13 +127,12 @@ export const useDropNFTs = (
     [event, forwarderContract, signer]
   );
 
-
   return {
     dropNFTs,
     dropNFTsMTX,
     isLoading,
     error,
     status,
-    isDroppedComplete
+    isDroppedComplete,
   };
 };
