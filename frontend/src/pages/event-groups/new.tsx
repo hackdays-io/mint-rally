@@ -14,13 +14,14 @@ const NewEventGroupPage: NextPage = () => {
   const address = useAddress();
 
   return (
-    <Container maxW={800}>
+    <Container maxW={1000}>
       <Heading as="h1" fontSize="3xl" my={6}>
         {t.CREATE_NEW_EVENT_GROUP}
       </Heading>
       <LoginRequired
         requiredChainID={+process.env.NEXT_PUBLIC_CHAIN_ID!}
         forbiddenText={t.PLEASE_SIGN_IN}
+        agreementText={t.AGREEMENT}
       >
         {address && <CreateEventGroupForm address={address} />}
       </LoginRequired>

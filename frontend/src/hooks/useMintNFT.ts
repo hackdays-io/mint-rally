@@ -215,28 +215,40 @@ export const useGetOwnedNFTByAddress = (address?: string) => {
 
   useEffect(() => {
     setNfts([]);
-    if (!ids) return;
+    if (!ids || !mintNFTContract) return;
 
     const fetch = async () => {
       setIsLoading(true);
+      const tokenURIs: { tokenURI: any; tokenId: number }[] = [];
+      const chunkedIds = ids.reduce<number[][]>(
+        (chunkedIds, currentId, index) => {
+          const chunkIndex = Math.floor(index / 25);
+          chunkedIds[chunkIndex] = chunkedIds[chunkIndex] ?? [];
+          chunkedIds[chunkIndex].push(currentId);
+          return chunkedIds;
+        },
+        []
+      );
 
-      const tokenURIPromises = ids.map((id) => {
-        const getTokenURI = async (id: number) => {
-          const tokenURI = await mintNFTContract?.call("tokenURI", [id]);
-          return { tokenURI, tokenId: id };
-        };
-        return getTokenURI(id);
-      });
-      const tokenURIs = await Promise.all(tokenURIPromises);
+      for (const chunk of chunkedIds) {
+        const tokenURIPromises = chunk.map((id) => {
+          const getTokenURI = async (id: number) => {
+            const tokenURI = await mintNFTContract?.call("tokenURI", [id]);
+            return { tokenURI, tokenId: id };
+          };
+          return getTokenURI(id);
+        });
+        const fetchedTokenURIs = await Promise.all(tokenURIPromises);
+        tokenURIs.push(...fetchedTokenURIs);
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+      }
 
       const metaDataPromises = tokenURIs.map(({ tokenURI, tokenId }) => {
         const getMetaData = async (tokenURI: string, tokenId: number) => {
           try {
             const { data: metaData } = await axios.get(ipfs2http(tokenURI));
             return { ...metaData, tokenId };
-          } catch (error) {
-            console.log(error);
-          }
+          } catch (_) {}
         };
         return getMetaData(tokenURI, tokenId);
       });
@@ -335,20 +347,21 @@ export const useMintParticipateNFT = (
   }, [mintedTokenURI]);
 
   useEffect(() => {
-    const includesNewEvent = (data: ContractEvent<Record<string, any>>[]) => {
+    if (!data) return;
+    const latestEvent = data.sort((a, b) => {
+      return b.transaction.blockNumber - a.transaction.blockNumber;
+    })[0];
+    const isNewEvent = (_latestEvent: ContractEvent<Record<string, any>>) => {
       if (!fromBlock) return false;
-      return data.some((event) => {
-        return event.transaction.blockNumber > fromBlock;
-      });
+      return (
+        latestEvent.data.to === address &&
+        latestEvent.transaction.blockNumber > fromBlock
+      );
     };
-    if (status !== "success" || !data || !includesNewEvent(data)) return;
-    const tokenId = data
-      .sort((a, b) => {
-        return b.transaction.blockNumber - a.transaction.blockNumber;
-      })[0]
-      .data?.tokenId.toNumber();
+    if (status !== "success" || !data || !isNewEvent(latestEvent)) return;
+    const tokenId = latestEvent.data?.tokenId.toNumber();
     setMintedNFTId(tokenId);
-  }, [data, status, fromBlock]);
+  }, [data, status, fromBlock, address]);
 
   const checkCanMint = useCallback(
     async (eventId: number, proof: any) => {
@@ -400,7 +413,7 @@ export const useMintParticipateNFT = (
           to,
           data,
         });
-        const { data: response } = await axios.post("/api/autotask", {
+        const { data: response } = await axios.post("/api/mtx/relay", {
           request: request.request,
           signature: request.signature.signature,
         });
@@ -429,13 +442,20 @@ export const useIsHoldingEventNftByAddress = (
   eventId?: BigNumber
 ) => {
   const { mintNFTContract } = useMintNFTContract();
+  const [isHoldingEventNft, setIsHoldingEventNft] = useState<boolean>();
   const { data, isLoading } = useContractRead(
     mintNFTContract,
     "isHoldingEventNFTByAddress",
     [address, eventId]
   );
 
-  return { isHoldingEventNft: data, isLoading };
+  useEffect(() => {
+    if (isHoldingEventNft === undefined && data !== undefined) {
+      setIsHoldingEventNft(data);
+    }
+  }, [data, isHoldingEventNft]);
+
+  return { isHoldingEventNft, isLoading };
 };
 
 export const useIsMintLocked = (eventId: number | BigNumber) => {

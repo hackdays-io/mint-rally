@@ -12,7 +12,6 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useCurrentBlock } from "./useBlockChain";
 import { Event } from "types/Event";
 import { BigNumber, ethers } from "ethers";
-import { reverse } from "lodash";
 import { useGenerateProof } from "./useSecretPhrase";
 import dayjs from "dayjs";
 
@@ -57,7 +56,10 @@ export const useCreateEventGroup = (address: string) => {
     ) => {
       if (!fromBlock) return false;
       return data.some((event) => {
-        return event.transaction.blockNumber > fromBlock;
+        return (
+          event.transaction.blockNumber > fromBlock &&
+          event.data?.owner === address
+        );
       });
     };
     if (createStatus !== "success" || !data || !includesNewEventGroup(data))
@@ -68,14 +70,14 @@ export const useCreateEventGroup = (address: string) => {
       })[0]
       .data?.groupId.toNumber();
     setCreatedGroupId(groupId);
-  }, [data, createStatus, fromBlock]);
+  }, [data, createStatus, fromBlock, address]);
 
   const createEventGroup = useCallback(
     async (params: { groupName: string }) => {
       if (!params.groupName) return;
       try {
         await mutateAsync({ args: [params.groupName] });
-      } catch (_) { }
+      } catch (_) {}
     },
     [mutateAsync]
   );
@@ -198,7 +200,10 @@ export const useCreateEvent = (address: string) => {
     const includesNewEvent = (data: ContractEvent<Record<string, any>>[]) => {
       if (!fromBlock) return false;
       return data.some((event) => {
-        return event.transaction.blockNumber > fromBlock;
+        return (
+          event.transaction.blockNumber > fromBlock &&
+          event.data?.owner === address
+        );
       });
     };
     if (createStatus !== "success" || !data || !includesNewEvent(data)) return;
@@ -243,7 +248,7 @@ export const useCreateEvent = (address: string) => {
             value: params.useMtx ? value : 0,
           },
         });
-      } catch (_) { }
+      } catch (_) {}
     },
     [mutateAsync, provider, getGasFee]
   );
@@ -372,9 +377,11 @@ export const useCalcMtxGasFee = (mintLimit?: number) => {
 
       const gasPrice = (await provider.getGasPrice())?.toNumber();
       const value = ethers.utils.parseEther(
-        `${(gasPrice * mintLimit * (660000 * 1 * 0.000000000000000001)).toFixed(
-          6
-        )}`
+        `${(
+          gasPrice *
+          mintLimit *
+          (660000 * 1.15 * 0.000000000000000001)
+        ).toFixed(6)}`
       );
       setGasFee(value);
     };
@@ -387,9 +394,13 @@ export const useCalcMtxGasFee = (mintLimit?: number) => {
       if (!provider) return;
       const gasPrice = (await provider.getGasPrice())?.toNumber();
       const value = ethers.utils.parseEther(
-        `${(gasPrice * _mintLimit * 660000 * 1 * 0.000000000000000001).toFixed(
-          6
-        )}`
+        `${(
+          gasPrice *
+          _mintLimit *
+          660000 *
+          1.15 *
+          0.000000000000000001
+        ).toFixed(6)}`
       );
       return value;
     },
@@ -443,7 +454,7 @@ export const useGrantRole = () => {
         await mutateAsync({
           args: [params.groupId, params.address, bytes32Role],
         });
-      } catch (_) { }
+      } catch (_) {}
     },
     [mutateAsync]
   );
