@@ -47,6 +47,7 @@ interface EventFormData {
   secretPhrase: string;
   mintLimit: number;
   useMtx: "true" | "false";
+  useNtt: "true" | "false";
   nfts: NFT.NFTImage[];
 }
 
@@ -80,6 +81,7 @@ const CreateEventForm: FC<Props> = ({ address }) => {
       secretPhrase: "",
       mintLimit: 10,
       useMtx: undefined,
+      useNtt: undefined,
       nfts: [
         { name: "", requiredParticipateCount: 0, description: "", image: "" },
       ],
@@ -114,6 +116,7 @@ const CreateEventForm: FC<Props> = ({ address }) => {
           secretPhrase: formData.secretPhrase,
           mintLimit: Number(formData.mintLimit),
           useMtx: formData.useMtx === "true",
+          useNtt: formData.useNtt === "false",
           attributes: nftAttributes,
         };
         await createEvent(params);
@@ -435,6 +438,32 @@ const CreateEventForm: FC<Props> = ({ address }) => {
                     MATIC
                   </Text>
                 )}
+              </FormControl>
+
+              <FormControl mb={5}>
+                <FormLabel>{t.EVENT_USE_NTT}</FormLabel>
+
+                <Controller
+                  control={control}
+                  name="useNtt"
+                  rules={{
+                    required: "required",
+                  }}
+                  render={({
+                    field: { onChange, value },
+                    formState: { errors },
+                  }) => (
+                    <>
+                      <RadioGroup onChange={onChange}>
+                        <Radio value="false" mr={6}>
+                          {t.EVENT_USE_NTT_FALSE}
+                        </Radio>
+                        <Radio value="true">{t.EVENT_USE_NTT_TRUE}</Radio>
+                      </RadioGroup>
+                      <ErrorMessage>{errors.useNtt?.message}</ErrorMessage>
+                    </>
+                  )}
+                />
               </FormControl>
 
               <FormControl mb={5}>

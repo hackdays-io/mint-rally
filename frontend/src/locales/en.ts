@@ -52,6 +52,10 @@ export default {
   EVENT_USE_MTX: "Taking on gas fee for participants",
   EVENT_USE_MTX_TRUE: "Yes",
   EVENT_USE_MTX_FALSE: "No",
+  // NFTをトランスファー不可にする（NFTを受け取った人は、NFTを他の人に送ることができなくなります）
+  EVENT_USE_NTT: "Make NFT non-transferable? (NFT recipients cannot transfer NFTs to others.))",
+  EVENT_USE_NTT_TRUE: "Yes",
+  EVENT_USE_NTT_FALSE: "No",
   EVENT_ESTIMATED_GAS_MTX: "Estimated deposit amount required to take on",
   EVENT_SECRETPHRASE: "SecretPhrase to mint",
   EVENT_SECRETPHRASE_DESC:

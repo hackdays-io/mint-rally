@@ -53,6 +53,10 @@ export default {
     "ガス代を肩代わりして、参加者が無料でNFTを受け取れるようにする。",
   EVENT_USE_MTX_TRUE: "肩代わりする",
   EVENT_USE_MTX_FALSE: "肩代わりしない",
+  EVENT_USE_NTT:
+    "NFTをトランスファー不可にする（NFTを受け取った人は、NFTを他の人に送ることができなくなります）",
+  EVENT_USE_NTT_TRUE: "トランスファーを不可にする",
+  EVENT_USE_NTT_FALSE: "トランスファーを不可にしない",
   EVENT_ESTIMATED_GAS_MTX: "肩代わりに必要な予想デポジット金額",
   EVENT_SECRETPHRASE: "NFT受け取りのひみつの「あいことば」",
   EVENT_SECRETPHRASE_DESC:

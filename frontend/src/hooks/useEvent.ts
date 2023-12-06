@@ -214,6 +214,7 @@ export const useCreateEvent = (address: string) => {
             `${startDateTime}/${endDateTime}`,
             params.mintLimit,
             params.useMtx,
+            params.useNtt,
             proof?.publicInputCalldata[0],
             params.attributes,
           ],
