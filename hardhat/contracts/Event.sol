@@ -159,6 +159,7 @@ contract EventManager is OwnableUpgradeable {
         string memory _date,
         uint256 _mintLimit,
         bool _useMtx,
+        bool _isNtt,
         bytes32 _secretPhrase,
         IMintNFT.NFTAttribute[] memory _eventNFTAttributes
     ) external payable onlyGroupOwner(_groupId) whenNotPaused {
@@ -195,6 +196,10 @@ contract EventManager is OwnableUpgradeable {
             _secretPhrase,
             _eventNFTAttributes
         );
+
+        if (_isNtt) {
+            _mintNFT.changeNonTransferable(_newEventId, true);
+        }
 
         eventIdsByGroupId[_groupId].push(_newEventId);
         groupIdByEventId[_newEventId] = _groupId;

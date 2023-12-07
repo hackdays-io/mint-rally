@@ -4,7 +4,7 @@ import { ethers } from "hardhat";
 // eslint-disable-next-line node/no-missing-import
 import { generateProof } from "../../test/helper/secret_phrase";
 // eslint-disable-next-line node/no-missing-import
-import { EventManager } from "../typechain";
+import { EventManager } from "../../typechain";
 dotenv.config();
 
 type eventParams = {
@@ -15,6 +15,7 @@ type eventParams = {
   endTime: string;
   mintLimit: number;
   useMtx: boolean;
+  isNtt: boolean;
   secretPhrase?: string;
   attributes: any;
 };
@@ -43,6 +44,12 @@ class EventCreator {
   public async createEvents(_events: eventParams[]) {
     // create new group
     console.log("creating group...");
+
+    // undefinedのエラーが出たため、暫定的に追加してみました
+    if (!this.eventManager) {
+      throw new Error("EventManager is undefined");
+    }
+
     const datestring = new Date().toISOString().replace(/:/g, "-");
     const txn1 = await this.eventManager.createGroup(`group-${datestring}`);
     await txn1.wait();
@@ -59,6 +66,7 @@ class EventCreator {
         event.date,
         event.mintLimit,
         event.useMtx,
+        event.isNtt,
         this.publicInputCalldata[0],
         event.attributes,
         {
@@ -87,6 +95,7 @@ const main = async () => {
       endTime: "12:00",
       mintLimit: 1,
       useMtx: false,
+      isNtt: false,
       attributes: [
         {
           metaDataURL: "ipfs://hogehoge/count0.json",

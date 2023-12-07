@@ -120,6 +120,7 @@ type eventGroupParams = {
   date: string;
   mintLimit: BigNumberish;
   useMtx: boolean;
+  isNtt: boolean;
   secretPhrase: BytesLike;
   eventNFTAttributes: {
     metaDataURL: string;
@@ -150,6 +151,7 @@ const createEventRecord = async (
     params.date,
     params.mintLimit,
     params.useMtx,
+    params.isNtt,
     params.secretPhrase,
     params.eventNFTAttributes
   );
@@ -188,6 +190,7 @@ describe("MintNFT", function () {
       "event1 description",
       "2022-07-3O",
       10,
+      false,
       false,
       publicInputCalldata[0],
       attributes
@@ -295,6 +298,7 @@ describe("MintNFT", function () {
         date: "2022-07-3O",
         mintLimit: 10,
         useMtx: false,
+        isNtt: false,
         secretPhrase: publicInputCalldata[0],
         eventNFTAttributes: attributes,
       });
@@ -307,6 +311,7 @@ describe("MintNFT", function () {
         date: "2022-07-3O",
         mintLimit: 10,
         useMtx: false,
+        isNtt: false,
         secretPhrase: publicInputCalldata[0],
         eventNFTAttributes: attributes,
       });
@@ -319,6 +324,7 @@ describe("MintNFT", function () {
         date: "2022-07-3O",
         mintLimit: 10,
         useMtx: false,
+        isNtt: false,
         secretPhrase: publicInputCalldata[0],
         eventNFTAttributes: attributes,
       });
@@ -471,6 +477,7 @@ describe("nft revolution", () => {
       date: "2022-07-3O",
       mintLimit: 10,
       useMtx: false,
+      isNtt: false,
       secretPhrase: publicInputCalldata[0],
       eventNFTAttributes: attributes,
     });
@@ -481,6 +488,7 @@ describe("nft revolution", () => {
       date: "2022-07-3O",
       mintLimit: 1,
       useMtx: false,
+      isNtt: false,
       secretPhrase: publicInputCalldata[0],
       eventNFTAttributes: attributes,
     });
@@ -587,6 +595,7 @@ describe("mint locked flag", () => {
         date: "2022-07-3O",
         mintLimit: 10,
         useMtx: false,
+        isNtt: false,
         secretPhrase:
           "0x10c7da1d87ac3a86d34053a76768cc39c581d469b68863a9fba17bcdaa048f98",
         eventNFTAttributes: attributes,
@@ -657,6 +666,7 @@ describe("non transferable flag", () => {
       "event1 description",
       "2022-07-3O",
       10,
+      false,
       false,
       correctProofCalldata,
       attributes
@@ -745,6 +755,7 @@ describe("reset secret phrase", () => {
         date: "2022-07-3O",
         mintLimit: 10,
         useMtx: false,
+        isNtt: false,
         secretPhrase: correctProofCalldata,
         eventNFTAttributes: attributes,
       },
