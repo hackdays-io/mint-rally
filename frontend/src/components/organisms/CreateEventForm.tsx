@@ -47,7 +47,7 @@ interface EventFormData {
   secretPhrase: string;
   mintLimit: number;
   useMtx: "true" | "false";
-  useNtt: "true" | "false";
+  isNtt: "true" | "false";
   nfts: NFT.NFTImage[];
 }
 
@@ -81,7 +81,7 @@ const CreateEventForm: FC<Props> = ({ address }) => {
       secretPhrase: "",
       mintLimit: 10,
       useMtx: undefined,
-      useNtt: undefined,
+      isNtt: undefined,
       nfts: [
         { name: "", requiredParticipateCount: 0, description: "", image: "" },
       ],
@@ -116,7 +116,7 @@ const CreateEventForm: FC<Props> = ({ address }) => {
           secretPhrase: formData.secretPhrase,
           mintLimit: Number(formData.mintLimit),
           useMtx: formData.useMtx === "true",
-          useNtt: formData.useNtt === "false",
+          isNtt: formData.isNtt === "false",
           attributes: nftAttributes,
         };
         await createEvent(params);
@@ -445,7 +445,7 @@ const CreateEventForm: FC<Props> = ({ address }) => {
 
                 <Controller
                   control={control}
-                  name="useNtt"
+                  name="isNtt"
                   rules={{
                     required: "required",
                   }}
@@ -460,7 +460,7 @@ const CreateEventForm: FC<Props> = ({ address }) => {
                         </Radio>
                         <Radio value="true">{t.EVENT_USE_NTT_TRUE}</Radio>
                       </RadioGroup>
-                      <ErrorMessage>{errors.useNtt?.message}</ErrorMessage>
+                      <ErrorMessage>{errors.isNtt?.message}</ErrorMessage>
                     </>
                   )}
                 />
