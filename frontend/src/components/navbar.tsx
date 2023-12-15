@@ -71,13 +71,9 @@ const Login: FC = () => {
         <Box marginLeft={3} cursor="pointer">
           <NextLink href="/users/me">
             <a>
-              <Image
-                src="/user.png"
-                alt="Loggedin"
-                width={50}
-                height={50}
-                objectFit="contain"
-              />
+              <Button backgroundColor="yellow.900" color="white">
+                My Page
+              </Button>
             </a>
           </NextLink>
         </Box>
@@ -119,13 +115,15 @@ const Navbar = () => {
           pr={8}
         >
           <NextLink href="/">
-            <Image
-              src={"/images/logo.svg"}
-              height={75}
-              width={200}
-              objectFit="contain"
-              alt="Mint Rally Logo"
-            />
+            <a>
+              <Image
+                src={"/images/logo.svg"}
+                height={75}
+                width={200}
+                objectFit="contain"
+                alt="Mint Rally Logo"
+              />
+            </a>
           </NextLink>
         </Flex>
         <Box pr={4} display={{ base: "none", md: "block" }}>
@@ -237,7 +235,9 @@ const Navbar = () => {
                 </Box>
               )}
 
-              <Login />
+              <Box mt={10}>
+                <Login />
+              </Box>
             </DrawerBody>
           </DrawerContent>
         </DrawerOverlay>

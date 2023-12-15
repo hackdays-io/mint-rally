@@ -16,19 +16,50 @@ export class ipfsUploader {
     try {
       if (nfts.length === 0) return;
       const renamedFiles = nfts.map(
-        ({ name, fileObject, description, requiredParticipateCount }) => ({
+        ({
+          name,
+          fileObject,
+          animationFileObject,
+          description,
+          requiredParticipateCount,
+          image,
+          animation_url,
+        }) => ({
           name: name,
-          fileObject: this.renameFile(
-            fileObject!,
-            `${requiredParticipateCount}.png`
-          ),
+          image: image,
+          fileObject: fileObject
+            ? this.renameFile(
+                fileObject!,
+                `${requiredParticipateCount}.${fileObject!.name
+                  .split(".")
+                  .pop()}`
+              )
+            : undefined,
+          animation_url: animation_url,
+          animationFileObject: animationFileObject
+            ? this.renameFile(
+                animationFileObject!,
+                `animation_${requiredParticipateCount}.${animationFileObject!.name
+                  .split(".")
+                  .pop()}`
+              )
+            : undefined,
           description,
           requiredParticipateCount,
         })
       );
 
+      // create array of fileobject and animationfileobject
+      const files = renamedFiles.reduce<File[]>(
+        (acc, { fileObject, animationFileObject }) => {
+          if (fileObject) acc.push(fileObject);
+          if (animationFileObject) acc.push(animationFileObject);
+          return acc;
+        },
+        []
+      );
       const rootCid = await this.ipfsClient.put(
-        renamedFiles.map((f) => f.fileObject),
+        files,
         new Date().toISOString()
       );
       return { rootCid, renamedFiles };

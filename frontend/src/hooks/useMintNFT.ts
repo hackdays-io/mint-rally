@@ -190,6 +190,7 @@ export const useCopyPastAttribute = () => {
           const nftImage: NFT.NFTImage = {
             name: metaData.name,
             image: metaData.image,
+            animation_url: metaData.animation_url,
             description: metaData.description,
             requiredParticipateCount: Number(requiredParticipateCount),
             fileObject: null,

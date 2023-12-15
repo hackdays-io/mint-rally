@@ -28,6 +28,7 @@ export default {
   // NFT
   NFT_NAME: "NFT Name",
   NFT_DESC: "NFT Description",
+  NFT_ANIMATION: "Animation movie (optional)",
   TIMES_PARTICIPATE:
     "How many events do users need participate in to get this NFT?",
   NFT_DEFAULT: "This NFT will be default.",
@@ -89,12 +90,16 @@ export default {
   EVENT_SECRETPHRASE: "SecretPhrase to mint",
   EVENT_SECRETPHRASE_DESC:
     "Please do not forget this phrase. you can't get this phrase after submitting",
-  EVENT_DISTRIBUTED_NFT: "NFTs to be distributed at the event",
+  EVENT_DISTRIBUTED_NFT: "NFTs",
+  EVENT_SELECT_FILE: "Select File",
+  EVENT_REMOVE_FILE: "Remove File",
   SELECT_PAST_EVENT_TO_COPY:
     "New events can be created using information from previous events. The content can be changed.",
   COPY: "Copy",
   SELECT_PAST_EVENT_TO_COPY_NOTICES:
     "Secret phrase and taking of gas fee setting will not be copied.",
+  YOUR_EVENT_WAS_CREATED: "Your event was created🎉",
+  GOTO_EVENT_PAGE: "Go to event page",
   // Event page
   SIGN_IN_TO_GET_NFT: "Sign in to get NFT!",
   GET_NFT_USING_METAMASK: "Get NFT with Metamask",
@@ -141,6 +146,14 @@ export default {
   SECRET_PHRASE_RESET_NEW_PLACEHOLDER: "Input new secret phrase",
   SECRET_PHRASE_RESET_SUCCESS: "Successfully reset secret phrase.",
   SECRET_PHRASE_RESET_FAIL: "Failed to reset secret phrase.",
+  DROP_NFTS: "Drop NFTs",
+  PLEASE_ENTER_WALLET_ADDRESSES:
+    "Please provide wallet addresses to drop NFTs. one address per line.",
+  YOU_CAN_DROP_UP_TO_100_NFTS_AT_ONCE: "You can drop up to 100 NFTs at a time.",
+  DROPPING_NFTS:
+    "Dropping NFTs... It will take a long time. You can move from this window.",
+  DROP_NFTS_SUCCESS: "Successfully dropped NFTs.",
+  DROPNFT_SUBMIT: "Drop",
 
   FEATUE: "FEATURES",
   FEATUE_DESC_1:
@@ -183,4 +196,15 @@ export default {
   AGREEMENT_TERMS: "Terms",
   AGREEMENT_PRIVACY: "Privacy",
   AGREEMENT_SCTA: "SCTA",
+
+  // about meta data
+  ABOUT_METADATA: "About NFT Metadata",
+  ABOUT_METADATA_DESC:
+    "MintRally stores NFT metadata on IPFS, and the saved metadata includes the following:",
+  ABOUT_METADATA_NAME: "name: Name of the NFT",
+  ABOUT_METADATA_IMAGE: "image: Image of the NFT",
+  ABOUT_METADATA_ANIMATION: "animation_url: Animation file (optional)",
+  ABOUT_METADATA_DESCRIPTION: "description: Description of the NFT",
+  ABOUT_METADATA_TRAITS:
+    "traits: Event group ID, event name, number of participations required to get the NFT",
 };
