@@ -10,6 +10,7 @@ type Props = {
   event: Event.EventRecord;
   address: string;
 };
+
 type FormData = {
   addresses: string;
 };
@@ -36,10 +37,12 @@ const DropNFTs: FC<Props> = ({ event, address }) => {
   return (
     <Box>
       <form onSubmit={handleSubmit(submit)}>
-        <FormLabel fontWeight="bold" htmlFor="addressList">
+        <FormLabel mb={0} fontWeight="bold" htmlFor="addressList">
           {t.DROP_NFTS}
         </FormLabel>
-        <Text>{t.PLEASE_ENTER_WALLET_ADDRESSES}</Text>
+        <Text color="grey.600" fontSize="sm" mb={3}>
+          {t.PLEASE_ENTER_WALLET_ADDRESSES}
+        </Text>
         <Controller
           control={control}
           name="addresses"
