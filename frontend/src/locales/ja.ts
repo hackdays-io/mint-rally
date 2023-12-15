@@ -19,6 +19,7 @@ export default {
   // NFT
   NFT_NAME: "NFT名",
   NFT_DESC: "NFT説明",
+  NFT_ANIMATION: "動画アニメーション（任意）",
   NFT_DEFAULT: "このNFTは一般参加者に配布されます。",
   TIMES_PARTICIPATE: "このNFTを取得するために必要なイベント参加回数",
   // Connect Wallet
@@ -90,7 +91,9 @@ export default {
   EVENT_SECRETPHRASE: "NFT受け取りのひみつの「あいことば」",
   EVENT_SECRETPHRASE_DESC:
     "ひみつの「あいことば」は忘れないようにしてください。あとから確認することはできません。",
-  EVENT_DISTRIBUTED_NFT: "イベントで配布されるNFT",
+  EVENT_DISTRIBUTED_NFT: "配布するNFT",
+  EVENT_SELECT_FILE: "ファイルを選択",
+  EVENT_REMOVE_FILE: "ファイルを削除",
   SELECT_PAST_EVENT_TO_COPY:
     "過去に開催したイベント情報を用いて新しいイベントを作成することができます。内容は後から変更できます。",
   SELECT_PAST_EVENT_TO_COPY_NOTICES:
@@ -145,9 +148,12 @@ export default {
   SECRET_PHRASE_RESET_FAIL: "あいことばのリセット中にエラーが発生しました",
   EVENT_ADMIN_SUBMIT: "変更する",
   DROP_NFTS: "NFTを配布する",
-  PLEASE_ENTER_WALLET_ADDRESSES: "NFTを配布するウォレットアドレスを入力してください。改行で区切って複数入力できます。",
-  YOU_CAN_DROP_UP_TO_100_NFTS_AT_ONCE: "一度に配布できるウォレットアドレスは100件までです。",
-  DROPPING_NFTS: "NFTを配布中です... しばらくお待ちください。このウィンドウから移動しても大丈夫です。",
+  PLEASE_ENTER_WALLET_ADDRESSES:
+    "NFTを配布するウォレットアドレスを入力してください。改行で区切って複数入力できます。",
+  YOU_CAN_DROP_UP_TO_100_NFTS_AT_ONCE:
+    "一度に配布できるウォレットアドレスは100件までです。",
+  DROPPING_NFTS:
+    "NFTを配布中です... しばらくお待ちください。このウィンドウから移動しても大丈夫です。",
   DROP_NFTS_SUCCESS: "NFTを配布しました！",
   DROPNFT_SUBMIT: "配布する",
 
@@ -190,4 +196,15 @@ export default {
   AGREEMENT_TERMS: "利用規約",
   AGREEMENT_PRIVACY: "プライバシーポリシー",
   AGREEMENT_SCTA: "特定商取引法に基づく表記",
+
+  // about meta data
+  ABOUT_METADATA: "NFTのデータについて",
+  ABOUT_METADATA_DESC:
+    "MintRallyではNFTのデータをIPFSに保存しており、保存されるメタデータは以下の通りです。",
+  ABOUT_METADATA_NAME: "name: NFTの名前",
+  ABOUT_METADATA_IMAGE: "image: NFTの画像",
+  ABOUT_METADATA_ANIMATION: "animation_url: 動画ファイル（任意）",
+  ABOUT_METADATA_DESCRIPTION: "description: NFTの説明",
+  ABOUT_METADATA_TRAITS:
+    "traits: イベントグループID、イベント名、NFTを取得するために必要な参加回数",
 };

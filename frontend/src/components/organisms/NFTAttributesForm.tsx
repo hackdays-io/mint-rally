@@ -15,21 +15,35 @@ import {
   Textarea,
 } from "@chakra-ui/react";
 import { FC } from "react";
-import { Controller, Control, UseFieldArrayRemove } from "react-hook-form";
+import {
+  Controller,
+  Control,
+  UseFieldArrayRemove,
+  UseFormSetValue,
+} from "react-hook-form";
 import { useLocale } from "../../hooks/useLocale";
 import ErrorMessage from "../atoms/form/ErrorMessage";
 import ImageSelectorWithPreview from "../ImageSelectorWithPreview";
 import { NFT } from "types/NFT";
 import ordinal from "ordinal";
+import AnimationFileInput from "../atoms/form/AnimationFileInput";
+import { EventFormData } from "./CreateEventForm";
 
 type Props = {
   control: Control<any, any>;
   nfts: NFT.NFTImage[];
   append: (v: any) => void;
   remove: UseFieldArrayRemove;
+  setValue: UseFormSetValue<EventFormData>;
 };
 
-const NFTAttributesForm: FC<Props> = ({ control, nfts, append, remove }) => {
+const NFTAttributesForm: FC<Props> = ({
+  control,
+  nfts,
+  append,
+  remove,
+  setValue,
+}) => {
   const { t, locale } = useLocale();
 
   const validateUniqRequiredParticipateCount = (v: number) => {
@@ -59,7 +73,7 @@ const NFTAttributesForm: FC<Props> = ({ control, nfts, append, remove }) => {
     <Box>
       {nfts.map((nft, index) => (
         <Flex
-          key={index}
+          key={`nft-${index}`}
           w="full"
           flexDirection={{ base: "column", md: "row" }}
           mb={10}
@@ -142,6 +156,32 @@ const NFTAttributesForm: FC<Props> = ({ control, nfts, append, remove }) => {
                     />
                     <ErrorMessage>
                       {parseErrorJson(errors, index, "description")}
+                    </ErrorMessage>
+                  </>
+                )}
+              />
+            </Box>
+            <Box mt={2}>
+              <Text mb={2}>{t.NFT_ANIMATION}</Text>
+              <Controller
+                control={control}
+                name={`nfts.${index}.animationFileObject`}
+                render={({
+                  field: { onChange, value },
+                  formState: { errors },
+                }) => (
+                  <>
+                    <AnimationFileInput
+                      onChange={(newFile) => {
+                        onChange(newFile);
+                      }}
+                      value={nfts[index].animation_url || value}
+                      removeAnimationURL={() => {
+                        setValue(`nfts.${index}.animation_url`, "");
+                      }}
+                    />
+                    <ErrorMessage>
+                      {parseErrorJson(errors, index, "animation_url")}
                     </ErrorMessage>
                   </>
                 )}

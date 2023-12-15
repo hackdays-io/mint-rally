@@ -1,7 +1,6 @@
 import { FC, useCallback, useEffect, useMemo, useState } from "react";
 import {
   Box,
-  Divider,
   Flex,
   Grid,
   Radio,
@@ -28,7 +27,6 @@ import {
   useCalcMtxGasFee,
   useCreateEvent,
   useCollaboratorAccessEventGroups,
-  useOwnEventGroups,
   useEventsByGroupId,
   useParseEventDate,
 } from "src/hooks/useEvent";
@@ -37,12 +35,13 @@ import { NFT } from "types/NFT";
 import { formatEther } from "ethers/lib/utils";
 import { useRouter } from "next/router";
 import { useCopyPastAttribute } from "src/hooks/useMintNFT";
+import AboutNFTMetadata from "../molecules/nft/AboutNFTMetadata";
 
 type Props = {
   address: string;
 };
 
-interface EventFormData {
+export interface EventFormData {
   eventGroupId: string;
   eventName: string;
   description: string;
@@ -92,7 +91,13 @@ const CreateEventForm: FC<Props> = ({ address }) => {
       mintLimit: 10,
       useMtx: undefined,
       nfts: [
-        { name: "", requiredParticipateCount: 0, description: "", image: "" },
+        {
+          name: "",
+          requiredParticipateCount: 0,
+          description: "",
+          image: "",
+          animation_url: "",
+        },
       ],
     },
   });
@@ -186,6 +191,7 @@ const CreateEventForm: FC<Props> = ({ address }) => {
       );
       if (foundEvent && copiedPastEventId) {
         const pastAttributeRecords = await copyPastAttribute(copiedPastEventId);
+        console.log(pastAttributeRecords);
 
         setValue("eventName", foundEvent.name);
         setValue("description", foundEvent.description);
@@ -321,7 +327,7 @@ const CreateEventForm: FC<Props> = ({ address }) => {
                         {events?.map((event: Event.EventRecord) => (
                           <option
                             value={Number(event.eventRecordId)}
-                            key={`eventSelector_${event.eventRecordId}`}
+                            key={`eventSelector_${event.eventRecordId}_${event.name}`}
                           >
                             {event.name}（{parse(event.date || "")}）
                           </option>
@@ -612,14 +618,23 @@ const CreateEventForm: FC<Props> = ({ address }) => {
                   p={5}
                   mt={10}
                 >
-                  <Text fontSize="18px" fontWeight="bold" mb={5}>
-                    {t.EVENT_DISTRIBUTED_NFT}
-                  </Text>
+                  <Flex
+                    justifyContent="space-between"
+                    alignItems="center"
+                    mb={5}
+                  >
+                    <Text fontSize="18px" fontWeight="bold">
+                      {t.EVENT_DISTRIBUTED_NFT}
+                    </Text>
+
+                    <AboutNFTMetadata />
+                  </Flex>
                   <NFTAttributesForm
                     control={control}
                     nfts={watch("nfts")}
                     append={append}
                     remove={remove}
+                    setValue={setValue}
                   />
                 </Box>
 

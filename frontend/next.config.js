@@ -6,7 +6,7 @@ const nextConfig = {
     defaultLocale: "en",
   },
   images: {
-    domains: ["localhost", "ipfs.mintrally.xyz"],
+    domains: ["localhost", "ipfs.mintrally.xyz", "gateway.pinata.cloud"],
   },
 };
 
