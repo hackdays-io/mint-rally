@@ -71,13 +71,9 @@ const Login: FC = () => {
         <Box marginLeft={3} cursor="pointer">
           <NextLink href="/users/me">
             <a>
-              <Image
-                src="/user.png"
-                alt="Loggedin"
-                width={50}
-                height={50}
-                objectFit="contain"
-              />
+              <Button backgroundColor="yellow.900" color="white">
+                My Page
+              </Button>
             </a>
           </NextLink>
         </Box>
@@ -239,7 +235,9 @@ const Navbar = () => {
                 </Box>
               )}
 
-              <Login />
+              <Box mt={10}>
+                <Login />
+              </Box>
             </DrawerBody>
           </DrawerContent>
         </DrawerOverlay>

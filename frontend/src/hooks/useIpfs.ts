@@ -27,20 +27,42 @@ export const useIpfs = () => {
     setErrors(null);
     setNftAttributes([]);
     try {
-      const imageUpdatedNfts = nfts.filter((nft) => nft.fileObject);
-      let baseNftAttributes = nfts.filter((nft) => !nft.fileObject);
+      const imageUpdatedNfts = nfts.filter(
+        (nft) => nft.fileObject || nft.animationFileObject
+      );
+      let baseNftAttributes = nfts.filter(
+        (nft) => !nft.fileObject && !nft.animationFileObject
+      );
       const uploader = new ipfsUploader();
 
       if (imageUpdatedNfts.length !== 0) {
         const uploadResult = await uploader.uploadNFTsToIpfs(imageUpdatedNfts);
         if (uploadResult) {
           const nftAttributes: NFT.NFTImage[] = uploadResult.renamedFiles.map(
-            ({ name, fileObject, description, requiredParticipateCount }) => ({
-              name: name,
-              image: `ipfs://${uploadResult.rootCid}/${fileObject.name}`,
-              description: description,
+            ({
+              name,
+              fileObject,
+              animationFileObject,
+              description,
               requiredParticipateCount,
-            })
+              image,
+              animation_url,
+            }) => {
+              const attribute: NFT.NFTImage = {
+                name: name,
+                image: fileObject
+                  ? `ipfs://${uploadResult.rootCid}/${fileObject.name}`
+                  : image,
+                description: description,
+                requiredParticipateCount,
+              };
+              if (animationFileObject) {
+                attribute.animation_url = `ipfs://${uploadResult.rootCid}/${animationFileObject.name}`;
+              } else if (animation_url) {
+                attribute.animation_url = animation_url;
+              }
+              return attribute;
+            }
           );
           baseNftAttributes = nftAttributes.concat(baseNftAttributes);
         } else {
@@ -53,6 +75,7 @@ export const useIpfs = () => {
         const attribute: NFT.Metadata = {
           name: nftAttribute.name,
           image: nftAttribute.image,
+          animation_url: nftAttribute.animation_url,
           description: nftAttribute.description,
           external_link: "https://mintrally.xyz",
           traits: {
