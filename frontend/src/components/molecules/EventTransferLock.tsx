@@ -1,7 +1,7 @@
 import { Box, Button, Flex, Grid, Spinner, Text } from "@chakra-ui/react";
 import { BigNumber } from "ethers";
 import { FC, useEffect } from "react";
-import { useIsMintLocked, useMintLock } from "src/hooks/useMintNFT";
+import { useIsNonTransferable, useTransferLock } from "src/hooks/useMintNFT";
 import AlertMessage from "../atoms/form/AlertMessage";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLock, faLockOpen } from "@fortawesome/free-solid-svg-icons";
@@ -13,7 +13,8 @@ type Props = {
 
 const EventTransferLock: FC<Props> = ({ eventId }) => {
   const { t } = useLocale();
-  const { isMintLocked, isLoading, refetch } = useIsMintLocked(eventId);
+  const { isNonTransferable, refetch, isLoading } =
+    useIsNonTransferable(eventId);
 
   const {
     lock,
@@ -21,7 +22,7 @@ const EventTransferLock: FC<Props> = ({ eventId }) => {
     error,
     isSuccess,
     status,
-  } = useMintLock(eventId, !isMintLocked);
+  } = useTransferLock(eventId, !isNonTransferable);
 
   useEffect(() => {
     refetch();
@@ -46,8 +47,8 @@ const EventTransferLock: FC<Props> = ({ eventId }) => {
             >
               <Box
                 as="span"
-                color={isMintLocked ? "mintGreen.800" : "yellow.800"}
-                background={isMintLocked ? "gray.300" : "yellow.300"}
+                color={isNonTransferable ? "mintGreen.800" : "yellow.800"}
+                background={isNonTransferable ? "gray.300" : "yellow.300"}
                 width="40px"
                 height="40px"
                 borderRadius="full"
@@ -56,16 +57,18 @@ const EventTransferLock: FC<Props> = ({ eventId }) => {
                 alignItems="center"
                 mr={2}
               >
-                <FontAwesomeIcon icon={isMintLocked ? faLock : faLockOpen} />
+                <FontAwesomeIcon
+                  icon={isNonTransferable ? faLock : faLockOpen}
+                />
               </Box>
               <Box>
                 <Text fontSize="sm" color="yellow.800">
-                  {isMintLocked
+                  {isNonTransferable
                     ? t.EVENT_ISNONTRANSFERABLE_TRUE
                     : t.EVENT_ISNONTRANSFERABLE_FALSE}
                 </Text>
                 <Text fontSize="xs" color="gray.600">
-                  {isMintLocked
+                  {isNonTransferable
                     ? t.EVENT_ISNONTRANSFERABLE_TRUE_DESC
                     : t.EVENT_ISNONTRANSFERABLE_FALSE_DESC}
                 </Text>

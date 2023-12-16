@@ -68,12 +68,13 @@ contract MintNFT is
     event MintLocked(uint256 indexed eventId, bool isLocked);
     event ResetSecretPhrase(address indexed executor, uint256 indexed eventId);
     event NonTransferable(uint256 indexed eventId, bool isNonTransferable);
+    event DroppedNFTs(address indexed executor, uint256 indexed eventId);
 
-    modifier onlyGroupOwner(uint256 _eventId) {
+    modifier onlyCollaboratorAccess(uint256 _eventId) {
         IEventManager eventManager = IEventManager(eventManagerAddr);
         require(
-            eventManager.isGroupOwnerByEventId(msg.sender, _eventId),
-            "you are not event group owner"
+            eventManager.hasCollaboratorAccessByEventId(_msgSender(), _eventId),
+            "you have no permission"
         );
         _;
     }
@@ -137,21 +138,43 @@ contract MintNFT is
         uint256[24] memory _proof
     ) external whenNotPaused {
         canMint(_eventId, _proof);
-        remainingEventNftCount[_eventId] = remainingEventNftCount[_eventId] - 1;
 
         ISecretPhraseVerifier secretPhraseVerifier = ISecretPhraseVerifier(
             secretPhraseVerifierAddr
         );
         secretPhraseVerifier.submitProof(_proof, _eventId);
+        _mintNFT(_groupId, _eventId, _msgSender());
+    }
 
+    function dropNFTs(
+        uint256 _eventId,
+        address[] memory _addresses
+    ) external onlyCollaboratorAccess(_eventId) whenNotPaused {
+        uint256 groupId = getGroupIdByEvent(_eventId);
+        require(
+            remainingEventNftCount[_eventId] >= _addresses.length,
+            "remaining count is not enough"
+        );
+        for (uint256 index = 0; index < _addresses.length; index++) {
+            address addr = _addresses[index];
+            if (!isHoldingEventNFTByAddress(addr, _eventId)) {
+                _mintNFT(groupId, _eventId, addr);
+            }
+        }
+        emit DroppedNFTs(_msgSender(), _eventId);
+    }
+
+    function _mintNFT(
+        uint256 _groupId,
+        uint256 _eventId,
+        address _address
+    ) internal {
+        remainingEventNftCount[_eventId] = remainingEventNftCount[_eventId] - 1;
         isHoldingEventNFT[
-            Hashing.hashingAddressUint256(_msgSender(), _eventId)
+            Hashing.hashingAddressUint256(_address, _eventId)
         ] = true;
 
-        bytes32 groupHash = Hashing.hashingAddressUint256(
-            _msgSender(),
-            _groupId
-        );
+        bytes32 groupHash = Hashing.hashingAddressUint256(_address, _groupId);
         uint256 participationCount = countOfParticipation[groupHash];
         countOfParticipation[groupHash] = participationCount + 1;
 
@@ -175,10 +198,9 @@ contract MintNFT is
         eventIdOfTokenId[tokenId] = _eventId;
 
         _tokenIds.increment();
+        _safeMint(_address, tokenId);
 
-        _safeMint(_msgSender(), tokenId);
-
-        emit MintedNFTAttributeURL(_msgSender(), metaDataURL);
+        emit MintedNFTAttributeURL(_address, metaDataURL);
     }
 
     function canMint(
@@ -204,7 +226,7 @@ contract MintNFT is
     function changeMintLocked(
         uint256 _eventId,
         bool _locked
-    ) external onlyGroupOwner(_eventId) whenNotPaused {
+    ) external onlyCollaboratorAccess(_eventId) whenNotPaused {
         isMintLocked[_eventId] = _locked;
         emit MintLocked(_eventId, _locked);
     }
@@ -212,7 +234,14 @@ contract MintNFT is
     function changeNonTransferable(
         uint256 _eventId,
         bool _isNonTransferable
-    ) external onlyGroupOwner(_eventId) whenNotPaused {
+    ) external whenNotPaused {
+        IEventManager eventManager = IEventManager(eventManagerAddr);
+
+        require(
+            _msgSender() == eventManagerAddr ||
+                eventManager.hasAdminAccessByEventId(_msgSender(), _eventId),
+            "you have no permission"
+        );
         isNonTransferable[_eventId] = _isNonTransferable;
 
         emit NonTransferable(_eventId, _isNonTransferable);
@@ -221,7 +250,7 @@ contract MintNFT is
     function resetSecretPhrase(
         uint256 _eventId,
         bytes32 _secretPhrase
-    ) external onlyGroupOwner(_eventId) whenNotPaused {
+    ) external onlyCollaboratorAccess(_eventId) whenNotPaused {
         eventSecretPhrases[_eventId] = _secretPhrase;
         emit ResetSecretPhrase(_msgSender(), _eventId);
     }
@@ -267,6 +296,48 @@ contract MintNFT is
         uint256 _eventId
     ) external view returns (uint256) {
         return remainingEventNftCount[_eventId];
+    }
+
+    function getNFTAttributeRecordsByEventId(
+        uint256 _eventId,
+        uint256 _limit,
+        uint256 _offset
+    ) external view returns (NFTAttribute[] memory) {
+        if (_limit == 0) {
+            _limit = 100; // default limit
+        }
+        require(_limit <= 100, "limit is too large");
+        // create array of nft attributes
+        NFTAttribute[] memory _nftAttributeRecordsList = new NFTAttribute[](
+            _limit
+        );
+
+        require(
+            _offset <= type(uint256).max - _limit,
+            "limit + offset must be <= 2^256 - 1"
+        );
+
+        uint256 limitWithOffset = _limit + _offset;
+        uint256 count;
+
+        for (uint256 i = _offset; i < limitWithOffset; i++) {
+            string memory ipfsUrl = eventNftAttributes[
+                Hashing.hashingDoubleUint256(_eventId, i)
+            ];
+            if (
+                keccak256(abi.encodePacked(ipfsUrl)) !=
+                keccak256(abi.encodePacked(""))
+            ) {
+                _nftAttributeRecordsList[count] = NFTAttribute(ipfsUrl, i);
+                count++;
+            }
+        }
+
+        NFTAttribute[] memory _nftAttributeRecords = new NFTAttribute[](count);
+        for (uint256 j = 0; j < count; j++) {
+            _nftAttributeRecords[j] = _nftAttributeRecordsList[j];
+        }
+        return _nftAttributeRecords;
     }
 
     function burn(uint256 tokenId) public onlyOwner {
@@ -366,6 +437,12 @@ contract MintNFT is
         uint256 _tokenId
     ) public view returns (uint256) {
         return eventIdOfTokenId[_tokenId];
+    }
+
+    function getGroupIdByEvent(uint256 _eventId) public view returns (uint256) {
+        IEventManager eventManager = IEventManager(eventManagerAddr);
+        EventRecord memory _event = eventManager.getEventById(_eventId);
+        return _event.groupId;
     }
 
     function _transfer(

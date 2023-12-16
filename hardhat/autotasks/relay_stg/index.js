@@ -6,8 +6,6 @@ import {
 
 // TODO: deploy forwarder contract and copy abi
 import ForwarderAbi from "../../artifacts/contracts/Forwarder.sol/MintRallyForwarder.json";
-// TODO: deploy forwarder contract and copy address
-import { MintRallyFowarder as ForwarderAddress } from "../../scripts/deployed_contract_addr_stg.json";
 
 async function relay(forwarder, request, signature, whitelist) {
   // Decide if we want to relay this request based on a whitelist
@@ -24,22 +22,32 @@ async function relay(forwarder, request, signature, whitelist) {
 }
 
 async function handler(event) {
-  if (!event.request || !event.request.body) throw new Error(`Missing payload`);
-  const { request, signature } = event.request.body;
+  try {
+    if (!event.request || !event.request.body)
+      throw new Error(`Missing payload`);
+    const { request, signature } = event.request.body;
 
-  // Initialize Relayer provider and signer, and forwarder contract
-  // eslint-disable-next-line node/no-unsupported-features/es-syntax
-  const credentials = { ...event };
-  const provider = new DefenderRelayProvider(credentials);
-  const signer = new DefenderRelaySigner(credentials, provider, {
-    speed: "fast",
-  });
-  const forwarder = new Contract(ForwarderAddress, ForwarderAbi.abi, signer);
+    // Initialize Relayer provider and signer, and forwarder contract
+    // eslint-disable-next-line node/no-unsupported-features/es-syntax
+    const credentials = { ...event };
+    const provider = new DefenderRelayProvider(credentials);
+    const signer = new DefenderRelaySigner(credentials, provider, {
+      speed: "fast",
+    });
+    const forwarder = new Contract(
+      process.env.MUMBAI_FORWARDER_ADDRESS,
+      ForwarderAbi.abi,
+      signer
+    );
 
-  // Relay transaction!
-  const tx = await relay(forwarder, request, signature);
-  console.log(`Sent meta-tx: ${tx.hash}`);
-  return { txHash: tx.hash };
+    // Relay transaction!
+    const tx = await relay(forwarder, request, signature);
+    console.log(`Sent meta-tx: ${tx.hash}`);
+    return { txHash: tx.hash };
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
 }
 
 export default {

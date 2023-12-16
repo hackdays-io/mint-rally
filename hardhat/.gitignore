@@ -7,8 +7,8 @@ typechain
 #Hardhat files
 cache
 artifacts
-
-.openzeppelin/unknown-*.json
+build
+.openzeppelin
 
 /circuits/**/*.ptau
 /circuits/**/*.zkey

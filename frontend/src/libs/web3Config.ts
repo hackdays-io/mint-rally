@@ -11,10 +11,13 @@ import { useMemo } from "react";
 export const chainId = process.env.NEXT_PUBLIC_CHAIN_ID!;
 export const activeChain =
   chainId === "80001"
-    ? Mumbai
+    ? { ...Mumbai, rpc: [process.env.NEXT_PUBLIC_PROVIDER_RPC!, ...Mumbai.rpc] }
     : chainId === "137"
-    ? Polygon
-    : { ...Localhost, chainId: 31337 };
+    ? {
+        ...Polygon,
+        rpc: [process.env.NEXT_PUBLIC_PROVIDER_RPC!, ...Polygon.rpc],
+      }
+    : { ...Localhost, rpc: ["http://localhost:8545"], chainId: 31337 };
 
 export const useWeb3WalletConfig = () => {
   const { t, locale } = useLocale();

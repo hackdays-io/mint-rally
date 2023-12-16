@@ -31,10 +31,8 @@ const ResetSecretPhrase: FC<Props> = ({ eventId }) => {
     <>
       <Box>
         <form onSubmit={handleSubmit(submit)}>
-          <Text fontWeight="bold" mb={2}>
-            {t.SECRET_PHRASE_RESET}
-          </Text>
-          <FormLabel fontWeight="bold" fontSize="sm">
+          <Text fontWeight="bold">{t.SECRET_PHRASE_RESET}</Text>
+          <FormLabel color="grey.600" fontSize="sm">
             {t.SECRET_PHRASE_RESET_NEW}
           </FormLabel>
           <Flex alignItems="center">

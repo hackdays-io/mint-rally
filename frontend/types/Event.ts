@@ -26,7 +26,13 @@ export namespace Event {
     secretPhrase: string;
     mintLimit: number;
     useMtx: boolean;
-    isNtt: boolean;
+    nonTransferable: boolean;
     attributes: { metaDataURL: string; requiredParticipateCount: number }[];
+  }
+
+  export interface MemberRole {
+    assignee: string;
+    admin: boolean;
+    collaborator: boolean;
   }
 }

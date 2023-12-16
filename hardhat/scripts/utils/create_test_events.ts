@@ -15,7 +15,7 @@ type eventParams = {
   endTime: string;
   mintLimit: number;
   useMtx: boolean;
-  isNtt: boolean;
+  nonTransferable: boolean;
   secretPhrase?: string;
   attributes: any;
 };
@@ -66,7 +66,7 @@ class EventCreator {
         event.date,
         event.mintLimit,
         event.useMtx,
-        event.isNtt,
+        event.nonTransferable,
         this.publicInputCalldata[0],
         event.attributes,
         {
@@ -95,7 +95,7 @@ const main = async () => {
       endTime: "12:00",
       mintLimit: 1,
       useMtx: false,
-      isNtt: false,
+      nonTransferable: false,
       attributes: [
         {
           metaDataURL: "ipfs://hogehoge/count0.json",

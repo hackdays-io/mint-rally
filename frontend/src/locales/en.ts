@@ -13,6 +13,9 @@ export default {
   SWITCH_NETWORK: "Switch Network",
   PLEASE_SWITCH_NETWORK: "Please switch network to the correct network.",
   PLEASE_SIGN_IN: "Please sign in first!",
+  AGREEMENT:
+    "Please connect your wallet to this website only if you agree to the Terms of Use and Privacy Policy.",
+  WELCOME: "Welcome to MintRally!",
   //Connect Wallet
   CONNECT_WITH_METAMASK: "Connect with Metamask",
   CONNECT_WITH_EMAIL: "Connect with Email",
@@ -25,6 +28,7 @@ export default {
   // NFT
   NFT_NAME: "NFT Name",
   NFT_DESC: "NFT Description",
+  NFT_ANIMATION: "Animation movie (optional)",
   TIMES_PARTICIPATE:
     "How many events do users need participate in to get this NFT?",
   NFT_DEFAULT: "This NFT will be default.",
@@ -36,8 +40,38 @@ export default {
   EVENT_GROUP_NFT_TITLE: "NFTs (You can edit in each event.)",
   EVENT_GROUP_CREATED: "Event Group Created!",
   EVENT_GROUP_APPEND_NFT: "Add NFT",
+  // Event group tab
+  EVENT_GROUP_TAB_EVENTS: "Event List",
+  EVENT_GROUP_TAB_LEADERS: "Leader Board",
+  // Event group leaders
+  EVENT_GROUP_LEADERS_RANK: "RANK",
+  EVENT_GROUP_LEADERS_ADDRESS: "ADDRESS",
+  EVENT_GROUP_LEADERS_COUNT: "COUNT",
   // Event group page
   OWN_EVENTS: "'s Events",
+  // RBAC
+  RBAC_EDIT_COLLABORATORS: "Edit Collaborators",
+  RBAC_GRANT: "Grant",
+  RBAC_ADMIN_ROLE: "Administrator",
+  RBAC_COLLABORATOR_ROLE: "Collaborator",
+  RBAC_ROLE: "Role",
+  RBAC_WALLET_ADDRESS: "Wallet Address",
+  RBAC_GRANT_ROLE: "Grant Role",
+  RBAC_INPUT_ADDRESS_TITLE:
+    "The address must start with 0x and be a total of 42 characters in length.",
+  RBAC_GRANT_SUCCESS: "Successfully granted.",
+  RBAC_GRANT_ERROR: "An error occurred when updating the role.",
+  RBAC_LIST: "Collaborators",
+  RBAC_ADMINS: "Administrators",
+  RBAC_COLLABORATORS: "Collaborators",
+  RBAC_REVOKE_ROLE: "Revoke Role",
+  RBAC_REVOKE_ERROR: "An error occurred when updating the role.",
+  RBAC_NO_ADMINS: "No administrators.",
+  RBAC_NO_COLLABORATORS: "No collaborators.",
+  RBAC_ADMIN_DESC:
+    "Administrative role: Grant roles to other addresses, Create events, Change secret phrase, Mintlock",
+  RBAC_COLLABORATOR_DESC:
+    "Collaborator role: Create events, Change secret phrase, Mintlock",
   // Event index
   CREATE_NEW_EVENT: "Create new event",
   // Event new
@@ -52,15 +86,25 @@ export default {
   EVENT_USE_MTX: "Taking on gas fee for participants",
   EVENT_USE_MTX_TRUE: "Yes",
   EVENT_USE_MTX_FALSE: "No",
-  // NFTをトランスファー不可にする（NFTを受け取った人は、NFTを他の人に送ることができなくなります）
-  EVENT_USE_NTT: "Make NFT non-transferable? (NFT recipients cannot transfer NFTs to others.))",
-  EVENT_USE_NTT_TRUE: "Yes",
-  EVENT_USE_NTT_FALSE: "No",
+  EVENT_USE_NTT: "Transfer setting for NFTs",
+  EVENT_USE_NTT_DESC:
+    "If you set it to non-transferable, the person who receives the NFT in this event will not be able to transfer it to others. This setting can be changed later.",
+  EVENT_USE_NTT_TRUE: "Non-transferable",
+  EVENT_USE_NTT_FALSE: "Transferable",
   EVENT_ESTIMATED_GAS_MTX: "Estimated deposit amount required to take on",
   EVENT_SECRETPHRASE: "SecretPhrase to mint",
   EVENT_SECRETPHRASE_DESC:
     "Please do not forget this phrase. you can't get this phrase after submitting",
-  EVENT_DISTRIBUTED_NFT: "NFTs to be distributed at the event",
+  EVENT_DISTRIBUTED_NFT: "NFTs",
+  EVENT_SELECT_FILE: "Select File",
+  EVENT_REMOVE_FILE: "Remove File",
+  SELECT_PAST_EVENT_TO_COPY:
+    "New events can be created using information from previous events. The content can be changed.",
+  COPY: "Copy",
+  SELECT_PAST_EVENT_TO_COPY_NOTICES:
+    "Secret phrase and taking of gas fee setting will not be copied.",
+  YOUR_EVENT_WAS_CREATED: "Your event was created🎉",
+  GOTO_EVENT_PAGE: "Go to event page",
   // Event page
   SIGN_IN_TO_GET_NFT: "Sign in to get NFT!",
   GET_NFT_USING_METAMASK: "Get NFT with Metamask",
@@ -73,6 +117,7 @@ export default {
   YOU_ALREADY_HAVE_THIS_NFT:
     "You already have this Event's NFT. Thank you for your participation!",
   ENTER_SECRET_PHRASE: "Enter Secret Phrase. Event organaizers will tell you.",
+  PUSH_MINT_BUTTON: "Then tap Claim NFT button!",
   ENTER_SECRET_PHRASE_METAMASK:
     "After claiming NFT, please sign from Metamask.",
   CLAIM_NFT: "Claim NFT!",
@@ -114,6 +159,14 @@ export default {
   SECRET_PHRASE_RESET_NEW_PLACEHOLDER: "Input new secret phrase",
   SECRET_PHRASE_RESET_SUCCESS: "Successfully reset secret phrase.",
   SECRET_PHRASE_RESET_FAIL: "Failed to reset secret phrase.",
+  DROP_NFTS: "Drop NFTs",
+  PLEASE_ENTER_WALLET_ADDRESSES:
+    "Please provide wallet addresses to drop NFTs. one address per line.",
+  YOU_CAN_DROP_UP_TO_100_NFTS_AT_ONCE: "You can drop up to 100 NFTs at a time.",
+  DROPPING_NFTS:
+    "Dropping NFTs... It will take a long time. You can move from this window.",
+  DROP_NFTS_SUCCESS: "Successfully dropped NFTs.",
+  DROPNFT_SUBMIT: "Drop",
 
   FEATUE: "FEATURES",
   FEATUE_DESC_1:
@@ -149,4 +202,22 @@ export default {
     "We apologize for the inconvenience, some features of the service are currently unavailable due to system maintenance.",
   MAINTENANCE_DESC2:
     "We would appreciate it if you could access the site again after a few minutes.",
+
+  // footer
+  AGREEMENT_TEXT:
+    "Please connect your wallet to this website only if you agree to the",
+  AGREEMENT_TERMS: "Terms",
+  AGREEMENT_PRIVACY: "Privacy",
+  AGREEMENT_SCTA: "SCTA",
+
+  // about meta data
+  ABOUT_METADATA: "About NFT Metadata",
+  ABOUT_METADATA_DESC:
+    "MintRally stores NFT metadata on IPFS, and the saved metadata includes the following:",
+  ABOUT_METADATA_NAME: "name: Name of the NFT",
+  ABOUT_METADATA_IMAGE: "image: Image of the NFT",
+  ABOUT_METADATA_ANIMATION: "animation_url: Animation file (optional)",
+  ABOUT_METADATA_DESCRIPTION: "description: Description of the NFT",
+  ABOUT_METADATA_TRAITS:
+    "traits: Event group ID, event name, number of participations required to get the NFT",
 };
