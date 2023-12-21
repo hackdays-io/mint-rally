@@ -1,5 +1,9 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {
+import { withSentryConfig } from "@sentry/nextjs";
+import { NextConfig } from "next";
+
+const isProduction = process.env.NODE_ENV === "production";
+
+const nextConfig: NextConfig = {
   reactStrictMode: true,
   i18n: {
     locales: ["en", "ja"],
@@ -10,15 +14,8 @@ const nextConfig = {
   },
 };
 
-module.exports = nextConfig;
-
-
-// Injected content via Sentry wizard below
-
-const { withSentryConfig } = require("@sentry/nextjs");
-
-module.exports = withSentryConfig(
-  module.exports,
+const nextConfigWithSentry = withSentryConfig(
+  nextConfig,
   {
     // For all available options, see:
     // https://github.com/getsentry/sentry-webpack-plugin#options
@@ -54,3 +51,5 @@ module.exports = withSentryConfig(
     automaticVercelMonitors: true,
   }
 );
+
+module.exports = isProduction ? nextConfigWithSentry : nextConfig;
