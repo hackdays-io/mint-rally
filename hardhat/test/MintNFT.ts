@@ -204,8 +204,8 @@ describe("MintNFT", function () {
         .connect(organizer)
         .mintParticipateNFT(createdGroupId, createdEventIds[0], proofCalldata);
       await mintNftTxn.wait();
-
-      const nftAttribute = await mintNFT.tokenURI(0);
+  
+      const nftAttribute = await mintNFT.tokenURI(1); // トークンIDを適切に指定
       expect(nftAttribute).equal("ipfs://hogehoge/count0.json");
     });
 
@@ -236,27 +236,106 @@ describe("MintNFT", function () {
     });
   });
 
-  describe("burn", () => {
-    it("success to burn", async () => {
-      const { proofCalldata } = await generateProof();
-      const mintNftTxn = await mintNFT
-        .connect(participant2)
-        .mintParticipateNFT(createdGroupId, createdEventIds[0], proofCalldata);
-      await mintNftTxn.wait();
+  /**
+ * 零知識証明データを生成するダミー関数。
+ * 実際の実装では、零知識証明スキームに基づいた正しい値を生成する必要あり
+ * @returns {uint256[24]} 零知識証明データの配列
+ */
+async function generateProofData(): Promise<{ proofCalldata: uint256[24] }> {
+  const proofCalldata = [];
+  for (let i = 0; i < 24; i++) {
+    // ランダムな値で配列を埋める
+    proofCalldata.push(getRandomUint256());
+  }
+  return { proofCalldata };
+}
 
-      expect(await mintNFT.balanceOf(participant2.address)).equal(1);
+/**
+ * ランダムな uint256 値を生成
+ * この関数はダミーの値を生成するために使用
+ * @returns {uint256} ランダムな値
+ */
+function getRandomUint256(): uint256 {
+  // ここでは単純なランダム値を生成しているが、
+  // 実際には適切な値を設定する必要あり
+  return Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
+}
 
-      const tokenId = await mintNFT.tokenOfOwnerByIndex(
-        participant2.address,
-        0
-      );
+// テストでの使用例
+const dummyProofData = generateProofData();
+console.log(dummyProofData);
 
-      // participant2がorganizerにトークンの操作を承認
-      await mintNFT.connect(participant2).approve(organizer.address, tokenId);
+let proofCalldata; // proofCalldata を外部で宣言
 
-      // 承認後にburnを実行
-      await mintNFT.connect(organizer).burn(tokenId);
-      expect(await mintNFT.balanceOf(participant2.address)).equal(0);
+  beforeEach(async function () {
+  // proofCalldata の生成
+  const proofData = await generateProofData();
+  proofCalldata = proofData.inputs; // ここで proofCalldata に値を割り当てる
+  });
+
+  describe("burn function", function () {
+    it("should allow a token owner to burn their token", async function () {
+      // トークンをミントするための引数を準備
+      const groupId = createdGroupId; // グループID
+      const eventId = createdEventIds[0]; // イベントID
+     const proofCalldata = await generateProof(); // 零知識証明データ
+      // トークンをミント
+      const mintTx = await mintNFT.connect(participant1).mintParticipateNFT(createdGroupId, createdEventIds[0], proofCalldata);
+      await mintTx.wait();
+  
+      // ミントされたトークンの数を確認
+      expect(await mintNFT.balanceOf(participant1.address)).to.equal(1);
+  
+      // トークンをバーン
+      const tokenId = await mintNFT.tokenOfOwnerByIndex(participant1.address, 0);
+      await expect(mintNFT.connect(participant1).burn(tokenId))
+          .to.emit(mintNFT, 'TokenBurned')
+          .withArgs(tokenId);
+    });
+  
+    it("should fail if a non-owner tries to burn a token", async function () {
+      // トークンをミント
+      const mintTx = await mintNFT.connect(participant1).mintParticipateNFT(createdGroupId, createdEventIds[0], proofCalldata);
+      await mintTx.wait();
+  
+      // ミントされたトークンのIDを取得
+      const tokenId = await mintNFT.tokenOfOwnerByIndex(participant1.address, 0);
+  
+      // 非所有者がトークンをバーンしようとする
+      await expect(mintNFT.connect(participant2).burn(tokenId))
+          .to.be.revertedWith("caller is not owner nor approved");
+    });
+  });
+  
+  describe("burnByOwner function", function () {
+    it("should allow the contract owner to burn any token", async function () {
+      // トークンをミント
+      const mintTx = await mintNFT.connect(participant1).mintParticipateNFT(createdGroupId, createdEventIds[0], proofCalldata);
+      await mintTx.wait();
+  
+      // ミントされたトークンのIDを取得
+      const tokenId = await mintNFT.tokenOfOwnerByIndex(participant1.address, 0);
+  
+      // コントラクト所有者がトークンをバーン
+      await expect(mintNFT.connect(organizer).burnByOwner(tokenId))
+          .to.emit(mintNFT, 'TokenBurned')
+          .withArgs(tokenId);
+  
+      // トークンがバーンされたことを確認
+      expect(await mintNFT.balanceOf(participant1.address)).to.equal(0);
+    });
+  
+    it("should fail if a non-contract owner tries to burn a token", async function () {
+      // トークンをミント
+      const mintTx = await mintNFT.connect(participant1).mintParticipateNFT(createdGroupId, createdEventIds[0], proofCalldata);
+      await mintTx.wait();
+  
+      // ミントされたトークンのIDを取得
+      const tokenId = await mintNFT.tokenOfOwnerByIndex(participant1.address, 0);
+  
+      // 非コントラクト所有者がトークンをバーンしようとする
+      await expect(mintNFT.connect(participant2).burnByOwner(tokenId))
+          .to.be.revertedWith("Ownable: caller is not the owner");
     });
   });
 

@@ -163,11 +163,23 @@ contract MintNFT is
             metaDataURL = specialMetaDataURL;
         }
 
-        nftMetaDataURL[_tokenIds.current()] = metaDataURL;
-        tokenIdsByEvent[_eventId].push(_tokenIds.current());
-        _safeMint(_msgSender(), _tokenIds.current());
+//        nftMetaDataURL[_tokenIds.current()] = metaDataURL;
+//        tokenIdsByEvent[_eventId].push(_tokenIds.current());
+//        _safeMint(_msgSender(), _tokenIds.current());
 
         _tokenIds.increment();
+        
+        // 追記
+       uint256 newTokenId = _tokenIds.current();
+
+        // トークンIDの重複チェック
+        require(!_exists(newTokenId), "Token already minted");
+
+        nftMetaDataURL[newTokenId] = metaDataURL;
+        tokenIdsByEvent[_eventId].push(newTokenId);
+        _safeMint(_msgSender(), newTokenId);
+        // 追記ここまで
+
         emit MintedNFTAttributeURL(_msgSender(), metaDataURL);
     }
 
@@ -286,15 +298,22 @@ contract MintNFT is
         return _nftAttributeRecords;
     }
 
+    // 新しいイベント定義
+ //   event BurnByOwner(uint256 indexed tokenId);
+ //   event Burn(uint256 indexed tokenId);
+    event TokenBurned(uint256 tokenId);
+
     // 既存の burn 関数の名前を変更
     function burnByOwner(uint256 tokenId) public onlyOwner {
-    _burn(tokenId);
+        require(_exists(tokenId), "Token does not exist");
+        _burn(tokenId);
     }
     
     // ユーザーが自身のNFTをバーンできるようにする新しい burn 関数
     function burn(uint256 tokenId) public {
-    require(_isApprovedOrOwner(_msgSender(), tokenId), "caller is not owner nor approved");
+    require(_isApprovedOrOwner(_msgSender(), tokenId), "ERC721Burnable: caller is not owner nor approved");
     _burn(tokenId);
+    emit TokenBurned(tokenId);
     }
 
     function tokenURI(
