@@ -1,9 +1,7 @@
-import { withSentryConfig } from "@sentry/nextjs";
-import { NextConfig } from "next";
-
+const { withSentryConfig } = require("@sentry/nextjs");
 const isProduction = process.env.NODE_ENV === "production";
 
-const nextConfig: NextConfig = {
+const nextConfig = {
   reactStrictMode: true,
   i18n: {
     locales: ["en", "ja"],
