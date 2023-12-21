@@ -20,6 +20,7 @@
     "@fortawesome/free-solid-svg-icons": "^6.2.0",
     "@fortawesome/react-fontawesome": "^0.2.0",
     "@openzeppelin/defender-relay-client": "^1.52.0",
+    "@sentry/nextjs": "^7.90.0",
     "@thirdweb-dev/chains": "^0.1.54",
     "@thirdweb-dev/react": "^3.16.4",
     "@thirdweb-dev/sdk": "^3.10.66",
