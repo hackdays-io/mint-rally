@@ -47,7 +47,8 @@ const nextConfigWithSentry = withSentryConfig(
     // https://docs.sentry.io/product/crons/
     // https://vercel.com/docs/cron-jobs
     automaticVercelMonitors: true,
+    autoInstrumentServerFunctions: false,
   }
 );
 
-module.exports = isProduction ? nextConfigWithSentry : nextConfig;
+module.exports = nextConfigWithSentry;
