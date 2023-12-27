@@ -100,6 +100,8 @@ Use `yarn upload:prd` when deploying to the mainnet.
 
 ## 4. Setup and Deploy on Vercel
 
+NOTE: When deploying on Vercel, please be aware that using the `hobby` plan may result in a timeout and failure during proof generation. Therefore, it is recommended to use the `pro` plan (a paid plan).
+
 ### 4.1 Create a New Project
 
 After creating an account on Vercel, go to the new project creation screen by selecting `Add New`, then `Project`.

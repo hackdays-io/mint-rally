@@ -85,6 +85,8 @@ $ yarn verify --network mumbai <address>
 
 ## 4. Setup and Deploy on Vercel
 
+注意：Vercelにデプロイした際、`hobby`プランではproof生成時にタイムアウトとなり処理が失敗する可能性がありますので、`pro`プラン（課金プラン）の使用をお勧めします。
+
 ### 4.1 Create new project
 
 Vercel でアカウント作成したら、`Add New`、`Project`で新規プロジェクト作成画面に入ってください。
