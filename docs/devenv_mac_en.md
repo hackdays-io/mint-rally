@@ -1,4 +1,4 @@
-## Install the development platforms that are prerequisites for developing MintRally.
+## Install the development platforms that are prerequisites for developing MintRally
 Install the following in order:
 - Homebrew
 - Node
