@@ -52,6 +52,7 @@ export interface EventFormData {
   secretPhrase: string;
   mintLimit: number;
   useMtx: "true" | "false";
+  nonTransferable: "true" | "false";
   nfts: NFT.NFTImage[];
 }
 
@@ -89,7 +90,8 @@ const CreateEventForm: FC<Props> = ({ address }) => {
       endTime: "",
       secretPhrase: "",
       mintLimit: 10,
-      useMtx: undefined,
+      useMtx: "false",
+      nonTransferable: "false",
       nfts: [
         {
           name: "",
@@ -138,6 +140,7 @@ const CreateEventForm: FC<Props> = ({ address }) => {
           secretPhrase: formData.secretPhrase,
           mintLimit: Number(formData.mintLimit),
           useMtx: formData.useMtx === "true",
+          nonTransferable: formData.nonTransferable === "true",
           attributes: nftAttributes,
         };
         await createEvent(params);
@@ -191,7 +194,6 @@ const CreateEventForm: FC<Props> = ({ address }) => {
       );
       if (foundEvent && copiedPastEventId) {
         const pastAttributeRecords = await copyPastAttribute(copiedPastEventId);
-        console.log(pastAttributeRecords);
 
         setValue("eventName", foundEvent.name);
         setValue("description", foundEvent.description);
@@ -557,7 +559,7 @@ const CreateEventForm: FC<Props> = ({ address }) => {
                       formState: { errors },
                     }) => (
                       <>
-                        <RadioGroup onChange={onChange}>
+                        <RadioGroup onChange={onChange} value={value}>
                           <Radio value="false" mr={6}>
                             {t.EVENT_USE_MTX_FALSE}
                           </Radio>
@@ -577,6 +579,38 @@ const CreateEventForm: FC<Props> = ({ address }) => {
                       MATIC
                     </Text>
                   )}
+                </FormControl>
+
+                <FormControl mb={5}>
+                  <FormLabel mb={0}>{t.EVENT_USE_NTT}</FormLabel>
+
+                  <Text fontSize="sm" mb={3} color="gray.600">
+                    {t.EVENT_USE_NTT_DESC}
+                  </Text>
+
+                  <Controller
+                    control={control}
+                    name="nonTransferable"
+                    rules={{
+                      required: "required",
+                    }}
+                    render={({
+                      field: { onChange, value },
+                      formState: { errors },
+                    }) => (
+                      <>
+                        <RadioGroup onChange={onChange} value={value}>
+                          <Radio value="false" mr={6}>
+                            {t.EVENT_USE_NTT_FALSE}
+                          </Radio>
+                          <Radio value="true">{t.EVENT_USE_NTT_TRUE}</Radio>
+                        </RadioGroup>
+                        <ErrorMessage>
+                          {errors.nonTransferable?.message}
+                        </ErrorMessage>
+                      </>
+                    )}
+                  />
                 </FormControl>
 
                 <FormControl mb={5}>

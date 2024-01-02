@@ -26,6 +26,7 @@ export namespace Event {
     secretPhrase: string;
     mintLimit: number;
     useMtx: boolean;
+    nonTransferable: boolean;
     attributes: { metaDataURL: string; requiredParticipateCount: number }[];
   }
 

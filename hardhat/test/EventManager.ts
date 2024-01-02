@@ -126,6 +126,7 @@ describe("EventManager", function () {
           "2022-07-3O",
           100,
           false,
+          false,
           publicInputCalldata[0],
           attributes
         )
@@ -139,6 +140,7 @@ describe("EventManager", function () {
         "event-1 description",
         "2022-07-3O",
         100,
+        false,
         false,
         publicInputCalldata[0],
         attributes
@@ -173,6 +175,7 @@ describe("EventManager", function () {
           "2022-08-01",
           100,
           false,
+          false,
           publicInputCalldata[0],
           attributes
         );
@@ -197,6 +200,7 @@ describe("EventManager", function () {
         "2022-07-3O",
         10,
         true,
+        false,
         publicInputCalldata[0],
         attributes,
         { value: ethers.utils.parseUnits(String(250000 * 10 * 1.33), "gwei") }
@@ -220,6 +224,7 @@ describe("EventManager", function () {
             "2022-07-3O",
             11 + i,
             true,
+            false,
             publicInputCalldata[0],
             attributes,
             {
@@ -322,6 +327,7 @@ describe("EventManager", function () {
               "2022-07-3O",
               100,
               false,
+              false,
               publicInputCalldata[0],
               attributes
             )
@@ -340,6 +346,7 @@ describe("EventManager", function () {
             "event1 description",
             "2022-07-3O",
             100,
+            false,
             false,
             publicInputCalldata[0],
             attributes
@@ -395,6 +402,7 @@ describe("EventManager", function () {
               "2022-07-3O",
               100,
               false,
+              false,
               publicInputCalldata[0],
               attributes
             )
@@ -413,6 +421,7 @@ describe("EventManager", function () {
             "event1 description",
             "2022-07-3O",
             100,
+            false,
             false,
             publicInputCalldata[0],
             attributes
@@ -450,6 +459,7 @@ describe("EventManager", function () {
               "event1 description",
               "2022-07-3O",
               100,
+              false,
               false,
               publicInputCalldata[0],
               attributes
@@ -629,6 +639,7 @@ describe("EventManager", function () {
           "2023-07-3O",
           100,
           false,
+          false,
           publicInputCalldata[0],
           attributes,
           { value: ethers.utils.parseUnits(String(250000 * 10 * 1.33), "gwei") }
@@ -644,6 +655,7 @@ describe("EventManager", function () {
           `event_x description`,
           "2023-07-3O",
           100,
+          false,
           false,
           publicInputCalldata[0],
           attributes,
@@ -1151,6 +1163,7 @@ describe("EventManager", function () {
             "2022-07-3O",
             100,
             false,
+            false,
             publicInputCalldata[0],
             attributes
           );
@@ -1163,6 +1176,7 @@ describe("EventManager", function () {
             "event1 description",
             "2022-07-3O",
             100,
+            false,
             false,
             publicInputCalldata[0],
             attributes

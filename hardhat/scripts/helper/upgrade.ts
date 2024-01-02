@@ -1,21 +1,9 @@
 import { ethers, network, upgrades } from "hardhat";
 import { MintNFT } from "../../typechain";
+import { eventManagerAddress, mintNFTAddress } from "./getAddresses";
 
 export const upgradeMintNFT = async (params?: any[]) => {
-  let contractAddress = "";
-  switch (network.name) {
-    case "mumbai":
-      contractAddress = process.env.MUMBAI_MINTNFT_ADDRESS!;
-      break;
-    case "polygon":
-      contractAddress = process.env.POLYGON_MINTNFT_ADDRESS!;
-      break;
-    case "local":
-      contractAddress = process.env.LOCAL_MINTNFT_ADDRESS!;
-      break;
-    default:
-      break;
-  }
+  let contractAddress = mintNFTAddress();
 
   const MintNFTFactory = await ethers.getContractFactory("MintNFT");
   const deployedMintNFT: MintNFT = (await upgrades.upgradeProxy(
@@ -37,20 +25,7 @@ export const upgradeMintNFT = async (params?: any[]) => {
 };
 
 export const upgradeEventManager = async (params?: any[]) => {
-  let contractAddress = "";
-  switch (network.name) {
-    case "mumbai":
-      contractAddress = process.env.MUMBAI_EVENTMANAGER_ADDRESS!;
-      break;
-    case "polygon":
-      contractAddress = process.env.POLYGON_EVENTMANAGER_ADDRESS!;
-      break;
-    case "local":
-      contractAddress = process.env.LOCAL_EVENTMANAGER_ADDRESS!;
-      break;
-    default:
-      break;
-  }
+  let contractAddress = eventManagerAddress();
 
   const EventManagerFactory = await ethers.getContractFactory("EventManager");
   const deployedEventManager: any = await upgrades.upgradeProxy(
