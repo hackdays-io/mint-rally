@@ -117,21 +117,23 @@ contract EventManager is OwnableUpgradeable {
     event CreateGroup(address indexed owner, uint256 groupId);
     event CreateEvent(address indexed owner, uint256 eventId);
 
-    // Currently, reinitializer(2) was executed as constructor.
+    // Currently, reinitializer(3) was executed as constructor.
     function initialize(
+        address _owner,
         address _relayerAddr,
         uint256 _mtxPrice,
         uint256 _maxMintLimit,
         address _operationControllerAddr
-    ) public reinitializer(2) {
+    ) public reinitializer(3) {
         __Ownable_init();
+        _transferOwnership(_owner);
         if (_groupIds.current() == 0 && _eventRecordIds.current() == 0) {
             _groupIds.increment();
             _eventRecordIds.increment();
         }
-        setRelayerAddr(_relayerAddr);
-        setMtxPrice(_mtxPrice);
-        setMaxMintLimit(_maxMintLimit);
+        relayerAddr = _relayerAddr;
+        mtxPrice = _mtxPrice;
+        maxMintLimit = _maxMintLimit;
         operationControllerAddr = _operationControllerAddr;
     }
 

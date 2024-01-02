@@ -33,49 +33,18 @@ async function main() {
     tokenIdsArr.push(tokenIds.map((tokenId) => tokenId.toNumber()));
   }
 
-  // eventIds and tokenIdsArr length should be 100, create chunked array of eventIds and tokenIdsArr devide by 20
-  const chunkedEventIds = eventIds.reduce((resultArray: any[], item, index) => {
-    const chunkIndex = Math.floor(index / 20);
+  // @todo コントラクトをアップグレード後、以下のコメントアウトを外す
+  await (await mintNFT.setEventIdOfTokenIdsBatch(eventIds, tokenIdsArr)).wait();
 
-    if (!resultArray[chunkIndex]) {
-      resultArray[chunkIndex] = [];
-    }
+  const lastEventIdOfTokenIds = tokenIdsArr[eventIds.length - 1];
 
-    resultArray[chunkIndex].push(item);
+  console.log("lastEventIdOfTokenIds", lastEventIdOfTokenIds);
 
-    return resultArray;
-  }, []);
-
-  const chunkedTokenIdsArr = tokenIdsArr.reduce(
-    (resultArray: any[], item, index) => {
-      const chunkIndex = Math.floor(index / 20);
-
-      if (!resultArray[chunkIndex]) {
-        resultArray[chunkIndex] = [];
-      }
-
-      resultArray[chunkIndex].push(item);
-
-      return resultArray;
-    },
-    []
+  const eventIdOfTokenId = await mintNFT.getEventIdOfTokenId(
+    lastEventIdOfTokenIds[lastEventIdOfTokenIds.length - 1]
   );
 
-  console.log("chunkedEventIds", chunkedEventIds);
-  console.log("chunkedTokenIdsArr", chunkedTokenIdsArr);
-
-  // @todo コントラクトをアップグレード後、以下のコメントアウトを外す
-  // await (await mintNFT.setEventIdOfTokenIdsBatch(eventIds, tokenIdsArr)).wait();
-
-  // const lastEventIdOfTokenIds = tokenIdsArr[eventIds.length - 1];
-
-  // console.log("lastEventIdOfTokenIds", lastEventIdOfTokenIds);
-
-  // const eventIdOfTokenId = await mintNFT.getEventIdOfTokenId(
-  //   lastEventIdOfTokenIds[lastEventIdOfTokenIds.length - 1]
-  // );
-
-  // console.log("check eventIdOfTokenId", eventIdOfTokenId.toNumber());
+  console.log("check eventIdOfTokenId", eventIdOfTokenId.toNumber());
 }
 
 main().catch((error) => {
