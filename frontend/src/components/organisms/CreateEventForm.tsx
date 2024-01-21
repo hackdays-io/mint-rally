@@ -1,7 +1,6 @@
 import { FC, useCallback, useEffect, useMemo, useState } from "react";
 import {
   Box,
-  Divider,
   Flex,
   Grid,
   Radio,
@@ -27,7 +26,7 @@ import { useIpfs } from "src/hooks/useIpfs";
 import {
   useCalcMtxGasFee,
   useCreateEvent,
-  useOwnEventGroups,
+  useCollaboratorAccessEventGroups,
   useEventsByGroupId,
   useParseEventDate,
 } from "src/hooks/useEvent";
@@ -36,12 +35,13 @@ import { NFT } from "types/NFT";
 import { formatEther } from "ethers/lib/utils";
 import { useRouter } from "next/router";
 import { useCopyPastAttribute } from "src/hooks/useMintNFT";
+import AboutNFTMetadata from "../molecules/nft/AboutNFTMetadata";
 
 type Props = {
   address: string;
 };
 
-interface EventFormData {
+export interface EventFormData {
   eventGroupId: string;
   eventName: string;
   description: string;
@@ -52,6 +52,7 @@ interface EventFormData {
   secretPhrase: string;
   mintLimit: number;
   useMtx: "true" | "false";
+  nonTransferable: "true" | "false";
   nfts: NFT.NFTImage[];
 }
 
@@ -89,9 +90,16 @@ const CreateEventForm: FC<Props> = ({ address }) => {
       endTime: "",
       secretPhrase: "",
       mintLimit: 10,
-      useMtx: undefined,
+      useMtx: "false",
+      nonTransferable: "false",
       nfts: [
-        { name: "", requiredParticipateCount: 0, description: "", image: "" },
+        {
+          name: "",
+          requiredParticipateCount: 0,
+          description: "",
+          image: "",
+          animation_url: "",
+        },
       ],
     },
   });
@@ -101,7 +109,8 @@ const CreateEventForm: FC<Props> = ({ address }) => {
   const { gasFee } = useCalcMtxGasFee(watch("mintLimit"));
 
   // state for loading event groups
-  const { groups, isLoading: isLoadingEventGroups } = useOwnEventGroups();
+  const { groups, isLoading: isLoadingEventGroups } =
+    useCollaboratorAccessEventGroups();
   const {
     events,
     isLoading: eventLoading,
@@ -131,6 +140,7 @@ const CreateEventForm: FC<Props> = ({ address }) => {
           secretPhrase: formData.secretPhrase,
           mintLimit: Number(formData.mintLimit),
           useMtx: formData.useMtx === "true",
+          nonTransferable: formData.nonTransferable === "true",
           attributes: nftAttributes,
         };
         await createEvent(params);
@@ -253,11 +263,11 @@ const CreateEventForm: FC<Props> = ({ address }) => {
         <Link href="/event-groups/new">please create event group first</Link>
       ) : createdEventId ? (
         <Box>
-          <Text>Your Event Created🎉</Text>
+          <Text>{t.YOUR_EVENT_WAS_CREATED}</Text>
 
           <Link href={`/events/${createdEventId}`}>
             <Button mt={10} backgroundColor="mint.bg" size="md">
-              Go to Event Page
+              {t.GOTO_EVENT_PAGE}
             </Button>
           </Link>
         </Box>
@@ -319,7 +329,7 @@ const CreateEventForm: FC<Props> = ({ address }) => {
                         {events?.map((event: Event.EventRecord) => (
                           <option
                             value={Number(event.eventRecordId)}
-                            key={`eventSelector_${event.eventRecordId}`}
+                            key={`eventSelector_${event.eventRecordId}_${event.name}`}
                           >
                             {event.name}（{parse(event.date || "")}）
                           </option>
@@ -549,7 +559,7 @@ const CreateEventForm: FC<Props> = ({ address }) => {
                       formState: { errors },
                     }) => (
                       <>
-                        <RadioGroup onChange={onChange}>
+                        <RadioGroup onChange={onChange} value={value}>
                           <Radio value="false" mr={6}>
                             {t.EVENT_USE_MTX_FALSE}
                           </Radio>
@@ -569,6 +579,38 @@ const CreateEventForm: FC<Props> = ({ address }) => {
                       MATIC
                     </Text>
                   )}
+                </FormControl>
+
+                <FormControl mb={5}>
+                  <FormLabel mb={0}>{t.EVENT_USE_NTT}</FormLabel>
+
+                  <Text fontSize="sm" mb={3} color="gray.600">
+                    {t.EVENT_USE_NTT_DESC}
+                  </Text>
+
+                  <Controller
+                    control={control}
+                    name="nonTransferable"
+                    rules={{
+                      required: "required",
+                    }}
+                    render={({
+                      field: { onChange, value },
+                      formState: { errors },
+                    }) => (
+                      <>
+                        <RadioGroup onChange={onChange} value={value}>
+                          <Radio value="false" mr={6}>
+                            {t.EVENT_USE_NTT_FALSE}
+                          </Radio>
+                          <Radio value="true">{t.EVENT_USE_NTT_TRUE}</Radio>
+                        </RadioGroup>
+                        <ErrorMessage>
+                          {errors.nonTransferable?.message}
+                        </ErrorMessage>
+                      </>
+                    )}
+                  />
                 </FormControl>
 
                 <FormControl mb={5}>
@@ -610,14 +652,23 @@ const CreateEventForm: FC<Props> = ({ address }) => {
                   p={5}
                   mt={10}
                 >
-                  <Text fontSize="18px" fontWeight="bold" mb={5}>
-                    {t.EVENT_DISTRIBUTED_NFT}
-                  </Text>
+                  <Flex
+                    justifyContent="space-between"
+                    alignItems="center"
+                    mb={5}
+                  >
+                    <Text fontSize="18px" fontWeight="bold">
+                      {t.EVENT_DISTRIBUTED_NFT}
+                    </Text>
+
+                    <AboutNFTMetadata />
+                  </Flex>
                   <NFTAttributesForm
                     control={control}
                     nfts={watch("nfts")}
                     append={append}
                     remove={remove}
+                    setValue={setValue}
                   />
                 </Box>
 

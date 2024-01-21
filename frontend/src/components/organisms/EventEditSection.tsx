@@ -1,18 +1,22 @@
 import { Box, Divider, Heading, Text } from "@chakra-ui/react";
 import { FC, useMemo } from "react";
-import { useOwnEventGroups } from "src/hooks/useEvent";
+import { useCollaboratorAccessEventGroups } from "src/hooks/useEvent";
 import { Event } from "types/Event";
 import EventMintLock from "../molecules/EventMintLock";
+import EventTransferLock from "../molecules/EventTransferLock";
 import ResetSecretPhrase from "../molecules/ResetSecretPhrase";
 import { useLocale } from "src/hooks/useLocale";
+import DropNFTs from "./nft/DropNFTs";
+import { useAddress } from "@thirdweb-dev/react";
 
 type Props = {
   event: Event.EventRecord;
 };
 
 const EventEditSection: FC<Props> = ({ event }) => {
+  const address = useAddress();
   const { t } = useLocale();
-  const { groups } = useOwnEventGroups();
+  const { groups } = useCollaboratorAccessEventGroups();
 
   const isOrganizer = useMemo(() => {
     return groups?.find(
@@ -41,7 +45,14 @@ const EventEditSection: FC<Props> = ({ event }) => {
 
           <Divider my={3} />
 
+          <EventTransferLock eventId={event.eventRecordId} />
+
+          <Divider my={3} />
+
           <ResetSecretPhrase eventId={event.eventRecordId} />
+
+          <Divider my={3} />
+          {address && <DropNFTs event={event} address={address} />}
         </Box>
       )}
     </>

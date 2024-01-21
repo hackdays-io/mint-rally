@@ -12,6 +12,14 @@ async function main() {
     process.env.POLYGON_MINTNFT_ADDRESS!,
     MintNFTFactory
   );
+
+  const OperationController = await ethers.getContractFactory(
+    "OperationController"
+  );
+  await upgrades.forceImport(
+    process.env.POLYGON_OPERATION_CONTROLLER_ADDRESS!,
+    OperationController
+  );
 }
 
 main().catch((error) => {

@@ -3,8 +3,8 @@ import dayjs from "dayjs";
 import { readFileSync, writeFileSync } from "fs";
 import type { NextApiRequest, NextApiResponse } from "next";
 import path from "path";
-const wc = require("./circuits/witness_calculator.js");
 const snarkjs = require("snarkjs");
+import wc from "./circuits/witness_calculator.js";
 
 export default async function handler(
   req: NextApiRequest,
@@ -47,6 +47,7 @@ export default async function handler(
       publicInputCalldata: JSON.parse("[" + calldata.split("][")[1]),
     });
   } catch (error) {
+    console.log(error);
     res.status(500).send(error);
   }
 

@@ -19,41 +19,31 @@ import { faCircleInfo } from "@fortawesome/free-solid-svg-icons";
 import MintNFTLoginRequired from "src/components/atoms/events/MintNFTLoginRequired";
 import EventEditSection from "src/components/organisms/EventEditSection";
 import { HoldersOfEvent } from "src/components/molecules/HoldersOfEvent";
-import dayjs from "dayjs";
 
 const MintNFTSection: FC<{ event: Event.EventRecord }> = ({ event }) => {
   const address = useAddress();
   const walletInstance = useWallet();
   const { t } = useLocale();
-  const { isHoldingEventNft, isLoading } = useIsHoldingEventNftByAddress(
-    address,
-    event.eventRecordId
-  );
+  const { isHoldingEventNft, isLoading: checkIsHoldingEventNft } =
+    useIsHoldingEventNftByAddress(address, event.eventRecordId);
   const { nfts, isLoading: checkHoldingNFTs } =
     useGetOwnedNFTByAddress(address);
+
   const holdingNFT = useMemo(() => {
+    if (!nfts || !event) return null;
     return nfts.find(
       (nft) =>
-        nft.traits.EventName === event?.name &&
-        nft.traits.EventGroupId === event?.groupId.toString()
+        nft.traits.EventName === event.name &&
+        nft.traits.EventGroupId === event.groupId.toString()
     );
-  }, [nfts, address]);
+  }, [nfts, address, event]);
+
   return (
     <>
-      {isLoading || checkHoldingNFTs || !address ? (
+      {(checkIsHoldingEventNft || (isHoldingEventNft && checkHoldingNFTs)) && (
         <Spinner />
-      ) : isHoldingEventNft && holdingNFT ? (
-        <Box mx="auto" cursor="pointer" mb={10} maxW={350}>
-          <NFTItem
-            shareURL={false}
-            nft={holdingNFT}
-            tokenId={holdingNFT.tokenId || 0}
-            address={address}
-            showShareButtons={true}
-            showViewButtons={true}
-          />
-        </Box>
-      ) : (
+      )}
+      {!checkIsHoldingEventNft && !isHoldingEventNft && (
         <Box
           rounded="lg"
           overflow="hidden"
@@ -65,8 +55,20 @@ const MintNFTSection: FC<{ event: Event.EventRecord }> = ({ event }) => {
           {walletInstance?.walletId == "magicLink" && !event.useMtx ? (
             <Text>{t.MAGICLINK_IS_NOT_SUPPORTED_USE_OTHERS}</Text>
           ) : (
-            <MintForm event={event} address={address} />
+            <MintForm event={event} address={address!} />
           )}
+        </Box>
+      )}
+      {holdingNFT && (
+        <Box mx="auto" cursor="pointer" mb={10} maxW={350}>
+          <NFTItem
+            shareURL={false}
+            nft={holdingNFT}
+            tokenId={holdingNFT.tokenId || 0}
+            address={address}
+            showShareButtons={true}
+            showViewButtons={true}
+          />
         </Box>
       )}
     </>

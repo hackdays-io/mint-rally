@@ -9,21 +9,9 @@ import "solidity-coverage";
 import "@openzeppelin/hardhat-upgrades";
 import "hardhat-contract-sizer";
 import "hardhat-interface-generator";
+import "hardhat-watcher";
 
 dotenv.config();
-
-// This is a sample Hardhat task. To learn how to create your own go to
-// https://hardhat.org/guides/create-task.html
-task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
-  const accounts = await hre.ethers.getSigners();
-
-  for (const account of accounts) {
-    console.log(account.address);
-  }
-});
-
-// You need to export an object to set up your config
-// Go to https://hardhat.org/config/ to learn more
 
 const config: HardhatUserConfig = {
   solidity: {
@@ -62,6 +50,23 @@ const config: HardhatUserConfig = {
   },
   mocha: {
     timeout: 600000,
+  },
+  watcher: {
+    compilation: {
+      tasks: ["compile"],
+      files: ["./contracts"],
+      ignoredFiles: ["**/.vscode"],
+      verbose: true,
+      clearOnStart: true,
+      start: "echo Running my compilation task now..",
+    },
+    test: {
+      tasks: [{ command: "test", params: { testFiles: ["{path}"] } }],
+      files: ["./test/**/*", "./contracts"],
+      verbose: true,
+      clearOnStart: true,
+      start: "echo Running my test task now..",
+    },
   },
 };
 

@@ -10,7 +10,7 @@ import {
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 // eslint-disable-next-line node/no-missing-import
 import { generateProof, wrongProofCalldata } from "./helper/secret_phrase";
-import { BigNumberish, BytesLike, Signer } from "ethers";
+import { BigNumberish, BytesLike, Signer, utils } from "ethers";
 
 // ToDo requiredParticipateCountに重複がある場合エラーになってしまう。
 const attributes = [
@@ -27,6 +27,10 @@ const attributes = [
     requiredParticipateCount: 5,
   },
 ];
+
+const ADMIN_ROLE = utils.keccak256(utils.toUtf8Bytes("ADMIN"));
+const COLLABORATOR_ROLE = utils.keccak256(utils.toUtf8Bytes("COLLABORATOR"));
+
 // deploy functions
 /**
  * deploy secretPhraseVerifier
@@ -120,6 +124,7 @@ type eventGroupParams = {
   date: string;
   mintLimit: BigNumberish;
   useMtx: boolean;
+  nonTransferable: boolean;
   secretPhrase: BytesLike;
   eventNFTAttributes: {
     metaDataURL: string;
@@ -150,6 +155,7 @@ const createEventRecord = async (
     params.date,
     params.mintLimit,
     params.useMtx,
+    params.nonTransferable,
     params.secretPhrase,
     params.eventNFTAttributes
   );
@@ -189,6 +195,7 @@ describe("MintNFT", function () {
       "2022-07-3O",
       10,
       false,
+      false,
       publicInputCalldata[0],
       attributes
     );
@@ -207,6 +214,8 @@ describe("MintNFT", function () {
   
       const nftAttribute = await mintNFT.tokenURI(1); // トークンIDを適切に指定
       expect(nftAttribute).equal("ipfs://hogehoge/count0.json");
+
+      expect(await mintNFT.getEventIdOfTokenId(0)).equal(createdEventIds[0]);
     });
 
     it("fail to mint when event MintLocked", async () => {
@@ -376,6 +385,7 @@ let proofCalldata; // proofCalldata を外部で宣言
         date: "2022-07-3O",
         mintLimit: 10,
         useMtx: false,
+        nonTransferable: false,
         secretPhrase: publicInputCalldata[0],
         eventNFTAttributes: attributes,
       });
@@ -388,6 +398,7 @@ let proofCalldata; // proofCalldata を外部で宣言
         date: "2022-07-3O",
         mintLimit: 10,
         useMtx: false,
+        nonTransferable: false,
         secretPhrase: publicInputCalldata[0],
         eventNFTAttributes: attributes,
       });
@@ -400,6 +411,7 @@ let proofCalldata; // proofCalldata を外部で宣言
         date: "2022-07-3O",
         mintLimit: 10,
         useMtx: false,
+        nonTransferable: false,
         secretPhrase: publicInputCalldata[0],
         eventNFTAttributes: attributes,
       });
@@ -418,6 +430,8 @@ let proofCalldata; // proofCalldata を外部で宣言
             proofCalldata
           );
         await mintNftTxn.wait();
+        expect(await mintNFT.getEventIdOfTokenId(0)).equal(createdEventIds[0]);
+
         const { proofCalldata: proofCalldata2 } = await generateProof();
         const mintNftTxn2 = await mintNFT
           .connect(participant1)
@@ -427,6 +441,8 @@ let proofCalldata; // proofCalldata を外部で宣言
             proofCalldata2
           );
         await mintNftTxn2.wait();
+        expect(await mintNFT.getEventIdOfTokenId(1)).equal(createdEventIds[0]);
+
         const { proofCalldata: proofCalldata3 } = await generateProof();
         const mintNftTxn3 = await mintNFT
           .connect(participant2)
@@ -436,6 +452,8 @@ let proofCalldata; // proofCalldata を外部で宣言
             proofCalldata3
           );
         await mintNftTxn3.wait();
+        expect(await mintNFT.getEventIdOfTokenId(2)).equal(createdEventIds[0]);
+
         const { proofCalldata: proofCalldata4 } = await generateProof();
         const mintNftTxn4 = await mintNFT
           .connect(participant1)
@@ -445,6 +463,8 @@ let proofCalldata; // proofCalldata を外部で宣言
             proofCalldata4
           );
         await mintNftTxn4.wait();
+        expect(await mintNFT.getEventIdOfTokenId(3)).equal(createdEventIds[1]);
+
         const { proofCalldata: proofCalldata5 } = await generateProof();
         const mintNftTxn5 = await mintNFT
           .connect(participant1)
@@ -454,6 +474,7 @@ let proofCalldata; // proofCalldata を外部で宣言
             proofCalldata5
           );
         await mintNftTxn5.wait();
+        expect(await mintNFT.getEventIdOfTokenId(4)).equal(createdEventIds[2]);
       });
       it("get owners of the tokens", async () => {
         const tokens = [0, 1, 2, 3, 4];
@@ -630,6 +651,7 @@ describe("nft revolution", () => {
       date: "2022-07-3O",
       mintLimit: 10,
       useMtx: false,
+      nonTransferable: false,
       secretPhrase: publicInputCalldata[0],
       eventNFTAttributes: attributes,
     });
@@ -640,6 +662,7 @@ describe("nft revolution", () => {
       date: "2022-07-3O",
       mintLimit: 1,
       useMtx: false,
+      nonTransferable: false,
       secretPhrase: publicInputCalldata[0],
       eventNFTAttributes: attributes,
     });
@@ -717,6 +740,145 @@ describe("nft revolution", () => {
   });
 });
 
+describe("bulk mint by event owner", () => {
+  let mintNFT: MintNFT;
+  let eventManager: EventManager;
+
+  let createdGroupId: number;
+  let createdEventIds: number[] = [];
+
+  let organizer: SignerWithAddress;
+  let participant1: SignerWithAddress;
+  let participant2: SignerWithAddress;
+  let participant3: SignerWithAddress;
+  let participant4: SignerWithAddress;
+  let participant5: SignerWithAddress;
+  let participant6: SignerWithAddress;
+  let relayer: SignerWithAddress;
+
+  before(async () => {
+    [
+      organizer,
+      participant1,
+      participant2,
+      participant3,
+      participant4,
+      participant5,
+      participant6,
+      relayer,
+    ] = await ethers.getSigners();
+
+    // generate proof
+    const { publicInputCalldata } = await generateProof();
+
+    [, mintNFT, eventManager] = await deployAll(relayer);
+
+    // Create a Group and an Event
+    await createGroup(eventManager, "First Group");
+    const groupsList = await eventManager.getGroups();
+    createdGroupId = groupsList[0].groupId.toNumber();
+    await createEventRecord(eventManager, {
+      groupId: createdGroupId,
+      name: "event1",
+      description: "event1 description",
+      date: "2022-07-3O",
+      mintLimit: 10,
+      useMtx: false,
+      nonTransferable: false,
+      secretPhrase: publicInputCalldata[0],
+      eventNFTAttributes: attributes,
+    });
+    await createEventRecord(eventManager, {
+      groupId: createdGroupId,
+      name: "event2",
+      description: "event1 description",
+      date: "2022-07-3O",
+      mintLimit: 10,
+      useMtx: false,
+      nonTransferable: false,
+      secretPhrase: publicInputCalldata[0],
+      eventNFTAttributes: attributes,
+    });
+
+    const eventsList = await eventManager.getEventRecords(0, 0);
+    createdEventIds = eventsList.map((event) => event.eventRecordId.toNumber());
+  });
+
+  it("drop NFTs by event owner", async () => {
+    await expect(
+      mintNFT
+        .connect(organizer)
+        .dropNFTs(createdEventIds[1], [
+          participant1.address,
+          participant2.address,
+          participant3.address,
+          participant4.address,
+          participant5.address,
+          participant6.address,
+        ])
+    )
+      .to.emit(mintNFT, "DroppedNFTs")
+      .withArgs(organizer.address, createdEventIds[1]);
+    console.log(await mintNFT.ownerOf(0));
+    console.log(await mintNFT.ownerOf(1));
+
+    console.log(participant1.address);
+
+    expect(await mintNFT.ownerOf(0)).to.equal(participant1.address);
+    expect(await mintNFT.ownerOf(1)).to.equal(participant2.address);
+    expect(await mintNFT.ownerOf(2)).to.equal(participant3.address);
+    expect(await mintNFT.ownerOf(3)).to.equal(participant4.address);
+    expect(await mintNFT.ownerOf(4)).to.equal(participant5.address);
+    expect(await mintNFT.ownerOf(5)).to.equal(participant6.address);
+    it("should return NFTs by specified Event ID", async () => {
+      expect(await mintNFT.getNFTHoldersByEvent(createdEventIds[1])).to.equal([
+        participant1,
+        participant2,
+        participant3,
+        participant4,
+        participant5,
+        participant6,
+      ]);
+    });
+  });
+  it("prohibit drop NFTs by not event owner", async () => {
+    await expect(
+      mintNFT
+        .connect(participant1)
+        .dropNFTs(createdEventIds[0], [
+          participant1.address,
+          participant2.address,
+          participant3.address,
+          participant4.address,
+          participant5.address,
+          participant6.address,
+        ])
+    ).revertedWith("you have no permission");
+  });
+  it("should raise error when the number of NFTs to be dropped is greater than the remaining count", async () => {
+    const [
+      participant7,
+      participant8,
+      participant9,
+      participant10,
+      participant11,
+      participant12,
+    ] = await ethers.getSigners();
+    await expect(
+      mintNFT
+        .connect(organizer)
+        .dropNFTs(createdEventIds[1], [
+          participant7.address,
+          participant8.address,
+          participant9.address,
+          participant10.address,
+          participant11.address,
+          participant12.address,
+        ])
+    ).revertedWith("remaining count is not enough");
+  });
+});
+
 describe("mint locked flag", () => {
   let mintNFT: MintNFT;
   let eventManager: EventManager;
@@ -746,6 +908,7 @@ describe("mint locked flag", () => {
         date: "2022-07-3O",
         mintLimit: 10,
         useMtx: false,
+        nonTransferable: false,
         secretPhrase:
           "0x10c7da1d87ac3a86d34053a76768cc39c581d469b68863a9fba17bcdaa048f98",
         eventNFTAttributes: attributes,
@@ -770,13 +933,134 @@ describe("mint locked flag", () => {
   it("No one but the owner should be able to change mintable flag", async () => {
     await expect(
       mintNFT.connect(participant1).changeMintLocked(1, false)
-    ).to.be.revertedWith("you are not event group owner");
+    ).to.be.revertedWith("you have no permission");
+  });
+
+  it("should change flag by admin", async () => {
+    await expect(
+      mintNFT.connect(participant1).changeMintLocked(1, false)
+    ).to.be.revertedWith("you have no permission");
+
+    eventManager
+      .connect(organizer)
+      .grantRole(createdGroupId, participant1.address, ADMIN_ROLE);
+    await mintNFT.connect(participant1).changeMintLocked(1, false);
+
+    // Clean up
+    eventManager
+      .connect(organizer)
+      .revokeRole(createdGroupId, participant1.address, ADMIN_ROLE);
+  });
+
+  it("should change flag by collaborator", async () => {
+    await expect(
+      mintNFT.connect(participant1).changeMintLocked(1, false)
+    ).to.be.revertedWith("you have no permission");
+
+    eventManager
+      .connect(organizer)
+      .grantRole(createdGroupId, participant1.address, COLLABORATOR_ROLE);
+    await mintNFT.connect(participant1).changeMintLocked(1, false);
+
+    // Clean up
+    eventManager
+      .connect(organizer)
+      .revokeRole(createdGroupId, participant1.address, COLLABORATOR_ROLE);
   });
 
   it("should not change if paused", async () => {
     await operationController.connect(organizer).pause();
     await expect(mintNFT.connect(organizer).changeMintLocked(1, false)).to.be
       .reverted;
+    await operationController.connect(organizer).unpause();
+  });
+});
+
+describe("non transferable flag", () => {
+  let mintNFT: MintNFT;
+  let eventManager: EventManager;
+  let operationController: OperationController;
+
+  let createdGroupId: number;
+  const createdEventIds: number[] = [];
+
+  let organizer: SignerWithAddress;
+  let participant1: SignerWithAddress;
+  let participant2: SignerWithAddress;
+  let relayer: SignerWithAddress;
+
+  let correctProofCalldata!: any;
+
+  before(async () => {
+    [organizer, participant1, participant2, relayer] =
+      await ethers.getSigners();
+
+    // generate proof
+    const { publicInputCalldata, proofCalldata } = await generateProof();
+    [, mintNFT, eventManager, operationController] = await deployAll(relayer);
+    correctProofCalldata = publicInputCalldata[0];
+
+    // Create a Group and an Event
+    await createGroup(eventManager, "First Group", organizer);
+    const groupsList = await eventManager.getGroups();
+    createdGroupId = groupsList[0].groupId.toNumber();
+
+    const createEventTxn = await eventManager.createEventRecord(
+      createdGroupId,
+      "event1",
+      "event1 description",
+      "2022-07-3O",
+      10,
+      false,
+      false,
+      correctProofCalldata,
+      attributes
+    );
+    await createEventTxn.wait();
+    const eventsList = await eventManager.getEventRecords(0, 0);
+    createdEventIds.push(eventsList[0].eventRecordId.toNumber());
+
+    const mintNftTxn = await mintNFT
+      .connect(participant1)
+      .mintParticipateNFT(createdGroupId, createdEventIds[0], proofCalldata);
+    await mintNftTxn.wait();
+  });
+
+  it("should get non transferable flag", async () => {
+    const flag = await mintNFT.connect(organizer).getIsNonTransferable(1);
+    expect(flag).equal(false);
+    expect(await mintNFT.ownerOf(0)).equal(participant1.address);
+    await expect(
+      mintNFT
+        .connect(participant1)
+        .transferFrom(participant1.address, participant2.address, 0)
+    ).not.to.be.reverted;
+    expect(await mintNFT.ownerOf(0)).equal(participant2.address);
+  });
+
+  it("should change non transferable flag by owner", async () => {
+    await mintNFT.connect(organizer).changeNonTransferable(1, true);
+    const flag = await mintNFT.connect(organizer).getIsNonTransferable(1);
+    expect(flag).equal(true);
+    expect(await mintNFT.ownerOf(0)).equal(participant2.address);
+    await expect(
+      mintNFT
+        .connect(participant2)
+        .transferFrom(participant2.address, participant1.address, 0)
+    ).to.be.reverted;
+    expect(await mintNFT.ownerOf(0)).equal(participant2.address);
+  });
+
+  it("No one but the owner should be able to change non transferable flag", async () => {
+    await expect(
+      mintNFT.connect(participant1).changeNonTransferable(1, false)
+    ).to.be.revertedWith("you have no permission");
+  });
+
+  it("should not change if paused", async () => {
+    await operationController.connect(organizer).pause();
+    await expect(mintNFT.connect(organizer).changeNonTransferable(1, false)).to
+      .be.reverted;
     await operationController.connect(organizer).unpause();
   });
 });
@@ -816,6 +1100,7 @@ describe("reset secret phrase", () => {
         date: "2022-07-3O",
         mintLimit: 10,
         useMtx: false,
+        nonTransferable: false,
         secretPhrase: correctProofCalldata,
         eventNFTAttributes: attributes,
       },
@@ -838,7 +1123,45 @@ describe("reset secret phrase", () => {
       "0x1f376ca3150d51a164c711287cff6e77e2127d635a1534b41d5624472f000000";
     await expect(
       mintNFT.connect(participant1).resetSecretPhrase(1, newProofCalldata)
-    ).to.be.revertedWith("you are not event group owner");
+    ).to.be.revertedWith("you have no permission");
+  });
+
+  it("should reset secret phrase by admin", async () => {
+    const newProofCalldata =
+      "0x1f376ca3150d51a164c711287cff6e77e2127d635a1534b41d5624472f000000";
+
+    await expect(
+      mintNFT.connect(participant1).resetSecretPhrase(1, newProofCalldata)
+    ).to.be.revertedWith("you have no permission");
+
+    eventManager
+      .connect(organizer)
+      .grantRole(createdGroupId, participant1.address, ADMIN_ROLE);
+    await mintNFT.connect(participant1).resetSecretPhrase(1, newProofCalldata);
+
+    // Clean up
+    eventManager
+      .connect(organizer)
+      .revokeRole(createdGroupId, participant1.address, ADMIN_ROLE);
+  });
+
+  it("should reset secret phrase by collaborator", async () => {
+    const newProofCalldata =
+      "0x1f376ca3150d51a164c711287cff6e77e2127d635a1534b41d5624472f000000";
+
+    await expect(
+      mintNFT.connect(participant1).resetSecretPhrase(1, newProofCalldata)
+    ).to.be.revertedWith("you have no permission");
+
+    eventManager
+      .connect(organizer)
+      .grantRole(createdGroupId, participant1.address, COLLABORATOR_ROLE);
+    await mintNFT.connect(participant1).resetSecretPhrase(1, newProofCalldata);
+
+    // Clean up
+    eventManager
+      .connect(organizer)
+      .revokeRole(createdGroupId, participant1.address, COLLABORATOR_ROLE);
   });
 
   it("cannot change if paused", async () => {

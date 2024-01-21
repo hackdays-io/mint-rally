@@ -12,7 +12,6 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useCurrentBlock } from "./useBlockChain";
 import { Event } from "types/Event";
 import { BigNumber, ethers } from "ethers";
-import { reverse } from "lodash";
 import { useGenerateProof } from "./useSecretPhrase";
 import dayjs from "dayjs";
 
@@ -57,7 +56,10 @@ export const useCreateEventGroup = (address: string) => {
     ) => {
       if (!fromBlock) return false;
       return data.some((event) => {
-        return event.transaction.blockNumber > fromBlock;
+        return (
+          event.transaction.blockNumber > fromBlock &&
+          event.data?.owner === address
+        );
       });
     };
     if (createStatus !== "success" || !data || !includesNewEventGroup(data))
@@ -68,7 +70,7 @@ export const useCreateEventGroup = (address: string) => {
       })[0]
       .data?.groupId.toNumber();
     setCreatedGroupId(groupId);
-  }, [data, createStatus, fromBlock]);
+  }, [data, createStatus, fromBlock, address]);
 
   const createEventGroup = useCallback(
     async (params: { groupName: string }) => {
@@ -100,6 +102,29 @@ export const useOwnEventGroups = () => {
     data: _groups,
     error,
   } = useContractRead(eventManagerContract, "getOwnGroups", [address]);
+
+  const groups = useMemo(() => {
+    return _groups?.filter((group: any) => {
+      const blackList = process.env.NEXT_PUBLIC_EVENT_GROUP_BLACK_LIST
+        ? JSON.parse(`[${process.env.NEXT_PUBLIC_EVENT_GROUP_BLACK_LIST}]`)
+        : [];
+      return !blackList.includes(group.groupId.toNumber());
+    });
+  }, [_groups]);
+
+  return { groups, isLoading, error };
+};
+
+export const useCollaboratorAccessEventGroups = () => {
+  const { eventManagerContract } = useEventManagerContract();
+  const address = useAddress();
+  const {
+    isLoading,
+    data: _groups,
+    error,
+  } = useContractRead(eventManagerContract, "getCollaboratorAccessGroups", [
+    address,
+  ]);
 
   const groups = useMemo(() => {
     return _groups?.filter((group: any) => {
@@ -175,7 +200,10 @@ export const useCreateEvent = (address: string) => {
     const includesNewEvent = (data: ContractEvent<Record<string, any>>[]) => {
       if (!fromBlock) return false;
       return data.some((event) => {
-        return event.transaction.blockNumber > fromBlock;
+        return (
+          event.transaction.blockNumber > fromBlock &&
+          event.data?.owner === address
+        );
       });
     };
     if (createStatus !== "success" || !data || !includesNewEvent(data)) return;
@@ -205,15 +233,15 @@ export const useCreateEvent = (address: string) => {
         const endDateTime = dayjs(
           `${params.endDate} ${params.endTime}`
         ).toISOString();
-
         await mutateAsync({
           args: [
-            params.groupId,
+            Number(params.groupId),
             params.eventName,
             params.description,
             `${startDateTime}/${endDateTime}`,
             params.mintLimit,
             params.useMtx,
+            params.nonTransferable,
             proof?.publicInputCalldata[0],
             params.attributes,
           ],
@@ -313,7 +341,6 @@ export const useEventsByGroupId = () => {
   const [events, setEvents] = useState<Event.EventRecord[] | null>(null);
   const [error, setError] = useState<any>(null);
   const getEventsByGroupId = (groupId: number) => {
-    console.log("getEventsByGroupId", groupId);
     setIsLoading(true);
     eventManagerContract
       ?.call("getEventRecordsByGroupId", [groupId])
@@ -351,9 +378,11 @@ export const useCalcMtxGasFee = (mintLimit?: number) => {
 
       const gasPrice = (await provider.getGasPrice())?.toNumber();
       const value = ethers.utils.parseEther(
-        `${(gasPrice * mintLimit * (660000 * 1 * 0.000000000000000001)).toFixed(
-          6
-        )}`
+        `${(
+          gasPrice *
+          mintLimit *
+          (660000 * 1.15 * 0.000000000000000001)
+        ).toFixed(6)}`
       );
       setGasFee(value);
     };
@@ -366,9 +395,13 @@ export const useCalcMtxGasFee = (mintLimit?: number) => {
       if (!provider) return;
       const gasPrice = (await provider.getGasPrice())?.toNumber();
       const value = ethers.utils.parseEther(
-        `${(gasPrice * _mintLimit * 660000 * 1 * 0.000000000000000001).toFixed(
-          6
-        )}`
+        `${(
+          gasPrice *
+          _mintLimit *
+          660000 *
+          1.15 *
+          0.000000000000000001
+        ).toFixed(6)}`
       );
       return value;
     },
@@ -398,4 +431,99 @@ export const useParseEventDate = (eventDate?: string) => {
   }, [eventDate]);
 
   return { parsedEventDate, parse };
+};
+
+export const useGrantRole = () => {
+  const { eventManagerContract } = useEventManagerContract();
+  const {
+    mutateAsync,
+    isLoading: isGranting,
+    error: grantError,
+    status: grantStatus,
+  } = useContractWrite(eventManagerContract, "grantRole");
+
+  const grantRole = useCallback(
+    async (params: { groupId: number; address: string; role: string }) => {
+      if (!params.groupId) return;
+      if (!params.address) return;
+      if (!params.role) return;
+
+      const bytes32Role = ethers.utils.keccak256(
+        ethers.utils.toUtf8Bytes(params.role.toUpperCase())
+      );
+      try {
+        await mutateAsync({
+          args: [params.groupId, params.address, bytes32Role],
+        });
+      } catch (_) {}
+    },
+    [mutateAsync]
+  );
+  return {
+    grantRole,
+    isGranting,
+    grantStatus,
+    grantError,
+  };
+};
+
+export const useRevokeRole = () => {
+  const { eventManagerContract } = useEventManagerContract();
+  const {
+    mutateAsync,
+    isLoading: isRevoking,
+    error: revokeError,
+    status: revokeStatus,
+  } = useContractWrite(eventManagerContract, "revokeRole");
+
+  const revokeRole = useCallback(
+    async (params: { groupId: number; address: string; role: string }) => {
+      if (!params.groupId) return;
+      if (!params.address) return;
+      if (!params.role) return;
+
+      const bytes32Role = ethers.utils.keccak256(
+        ethers.utils.toUtf8Bytes(params.role.toUpperCase())
+      );
+      try {
+        await mutateAsync({
+          args: [params.groupId, params.address, bytes32Role],
+        });
+      } catch (_) {}
+    },
+    [mutateAsync]
+  );
+  return {
+    revokeRole,
+    isRevoking,
+    revokeStatus: revokeStatus,
+    revokeError: revokeError,
+  };
+};
+
+export const useMemberRole = (groupId?: number, address?: string) => {
+  const { eventManagerContract } = useEventManagerContract();
+
+  const {
+    isLoading,
+    data: memberRole,
+    error,
+  } = useContractRead(eventManagerContract, "getMemberRole", [
+    groupId,
+    address,
+  ]);
+
+  return { memberRole, isLoading, error };
+};
+
+export const useMemberRoles = (groupId: number) => {
+  const { eventManagerContract } = useEventManagerContract();
+
+  const {
+    data: memberRoles,
+    isLoading,
+    error,
+  } = useContractRead(eventManagerContract, "getMemberRoles", [groupId]);
+
+  return { memberRoles, isLoading, error };
 };

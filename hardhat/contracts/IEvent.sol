@@ -10,7 +10,12 @@ struct EventRecord {
 }
 
 interface IEventManager {
-    function isGroupOwnerByEventId(
+    function hasAdminAccessByEventId(
+        address _addr,
+        uint256 _eventId
+    ) external view returns (bool);
+
+    function hasCollaboratorAccessByEventId(
         address _addr,
         uint256 _eventId
     ) external view returns (bool);
@@ -18,4 +23,8 @@ interface IEventManager {
     function getEventRecordsByGroupId(
         uint256 _groupId
     ) external view returns (EventRecord[] memory);
+
+    function getEventById(
+        uint256 _eventId
+    ) external view returns (EventRecord memory);
 }

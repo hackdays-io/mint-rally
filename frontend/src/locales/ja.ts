@@ -13,9 +13,13 @@ export default {
   SWITCH_NETWORK: "ネットワーク切替",
   PLEASE_SWITCH_NETWORK: "正しいネットワークに切り替えてください。",
   PLEASE_SIGN_IN: "ログインしてください。",
+  AGREEMENT:
+    "利用規約、プライバシーポリシーにご同意いただいた場合のみ本ウェブサイトにウォレットを接続してください。",
+  WELCOME: "MintRally へようこそ！",
   // NFT
   NFT_NAME: "NFT名",
   NFT_DESC: "NFT説明",
+  NFT_ANIMATION: "動画アニメーション（任意）",
   NFT_DEFAULT: "このNFTは一般参加者に配布されます。",
   TIMES_PARTICIPATE: "このNFTを取得するために必要なイベント参加回数",
   // Connect Wallet
@@ -45,6 +49,29 @@ export default {
   EVENT_GROUP_LEADERS_COUNT: "所持数",
   // Event group page
   OWN_EVENTS: "のイベント",
+  // RBAC
+  RBAC_EDIT_COLLABORATORS: "権限管理",
+  RBAC_GRANT: "権限付与",
+  RBAC_ADMIN_ROLE: "管理者",
+  RBAC_COLLABORATOR_ROLE: "コラボレーター",
+  RBAC_ROLE: "権限",
+  RBAC_WALLET_ADDRESS: "ウォレットアドレス",
+  RBAC_GRANT_ROLE: "権限を付与する",
+  RBAC_INPUT_ADDRESS_TITLE:
+    "アドレスは 0x から始まり、合計で 42 文字である必要があります。",
+  RBAC_GRANT_SUCCESS: "権限の付与に成功しました。",
+  RBAC_GRANT_ERROR: "権限の更新中にエラーが発生しました。",
+  RBAC_LIST: "付与一覧",
+  RBAC_ADMINS: "管理者",
+  RBAC_COLLABORATORS: "コラボレーター",
+  RBAC_REVOKE_ROLE: "権限を剥奪する",
+  RBAC_REVOKE_ERROR: "権限の更新中にエラーが発生しました。",
+  RBAC_NO_ADMINS: "管理者がいません。",
+  RBAC_NO_COLLABORATORS: "コラボレーターがいません。",
+  RBAC_ADMIN_DESC:
+    "管理者権限: 他のアドレスに対して権限付与、イベント作成、あいことば変更、ミントロック",
+  RBAC_COLLABORATOR_DESC:
+    "コラボレーター権限: イベント作成、あいことば変更、ミントロック",
   // Event index
   CREATE_NEW_EVENT: "イベントを作成",
   // Event new
@@ -60,16 +87,25 @@ export default {
     "ガス代を肩代わりして、参加者が無料でNFTを受け取れるようにする。",
   EVENT_USE_MTX_TRUE: "肩代わりする",
   EVENT_USE_MTX_FALSE: "肩代わりしない",
+  EVENT_USE_NTT: "NFTの譲渡設定",
+  EVENT_USE_NTT_DESC:
+    "譲渡不可にすると、このイベントで配布されるNFTは他の人に譲渡することができなくなります。この設定は後から変更できます。",
+  EVENT_USE_NTT_TRUE: "譲渡不可",
+  EVENT_USE_NTT_FALSE: "譲渡可",
   EVENT_ESTIMATED_GAS_MTX: "肩代わりに必要な予想デポジット金額",
   EVENT_SECRETPHRASE: "NFT受け取りのひみつの「あいことば」",
   EVENT_SECRETPHRASE_DESC:
     "ひみつの「あいことば」は忘れないようにしてください。あとから確認することはできません。",
-  EVENT_DISTRIBUTED_NFT: "イベントで配布されるNFT",
+  EVENT_DISTRIBUTED_NFT: "配布するNFT",
+  EVENT_SELECT_FILE: "ファイルを選択",
+  EVENT_REMOVE_FILE: "ファイルを削除",
   SELECT_PAST_EVENT_TO_COPY:
     "過去に開催したイベント情報を用いて新しいイベントを作成することができます。内容は後から変更できます。",
   SELECT_PAST_EVENT_TO_COPY_NOTICES:
     "あいことばとガス代の肩代わりはコピーされません",
   COPY: "コピーする",
+  YOUR_EVENT_WAS_CREATED: "イベントが作成されました🎉",
+  GOTO_EVENT_PAGE: "イベントページへ",
   // Event page
   SIGN_IN_TO_GET_NFT: "NFTをGetしよう！",
   SELECT_WALLET: "NFTの取得方法を選択してください",
@@ -81,8 +117,8 @@ export default {
     "接続用のメールアドレスを入力しログインしてください。",
   YOU_ALREADY_HAVE_THIS_NFT:
     "既にこのイベントのNFTは取得済みです。ご参加ありがとうございました！",
-  ENTER_SECRET_PHRASE:
-    "イベント主催者から聞いた「あいことば」を入力し、NFT取得ボタンを押してください。",
+  ENTER_SECRET_PHRASE: "イベント主催者から聞いた「あいことば」を入力し、",
+  PUSH_MINT_BUTTON: "NFT取得ボタンを押してください。",
   PREPARING_PROOF: "あいことばを暗号化しています、10秒ほどかかります🤫",
   ENTER_SECRET_PHRASE_METAMASK:
     "Metamaskが立ち上がるので、「承認」ボタンを押してください。",
@@ -104,18 +140,35 @@ export default {
   EVENT_ADMIN_MENU: "管理者メニュー",
   EVENT_MINTLOCK_SETTING: "Mintロック設定",
   EVENT_MINTLOCK_SETTING_DESC:
-    "ロック中は、NFTのMint（参加証明の受け取り）ができなくなります。",
-  EVENT_ISLOCKED_TRUE: "ロック中",
-  EVENT_ISLOCKED_FALSE: "ロックされていません",
+    "Mintロック中は、NFTのMint（参加証明の受け取り）ができなくなります。",
+  EVENT_ISLOCKED_TRUE: "Mintロック中",
+  EVENT_ISLOCKED_FALSE: "Mintロックされていません",
   EVENT_ISLOCKED_TRUE_DESC: "NFTの配布をストップしています。",
   EVENT_ISLOCKED_FALSE_DESC: "NFTをMintすることが可能です。",
   EVENT_MINTLOCK_FAIL: "MintLock中にエラーが発生しました",
+  EVENT_TRANSFERLOCK_SETTING: "Transferロック設定",
+  EVENT_TRANSFERLOCK_SETTING_DESC:
+    "Transferロック中は、NFTのTransfer（参加証明の他者への送信）ができなくなります。",
+  EVENT_ISNONTRANSFERABLE_TRUE: "Transferロック中",
+  EVENT_ISNONTRANSFERABLE_FALSE: "Transferはロックされていません",
+  EVENT_ISNONTRANSFERABLE_TRUE_DESC: "NFTのTransferを制限しています。",
+  EVENT_ISNONTRANSFERABLE_FALSE_DESC: "NFTをTransferすることが可能です。",
+  EVENT_TRANSFERLOCK_FAIL: "TransferLock中にエラーが発生しました",
   SECRET_PHRASE_RESET: "あいことばのリセット",
   SECRET_PHRASE_RESET_NEW: "新しいあいことば",
   SECRET_PHRASE_RESET_NEW_PLACEHOLDER: "新しいあいことばを入力",
   SECRET_PHRASE_RESET_SUCCESS: "あいことばをリセットしました",
   SECRET_PHRASE_RESET_FAIL: "あいことばのリセット中にエラーが発生しました",
   EVENT_ADMIN_SUBMIT: "変更する",
+  DROP_NFTS: "NFTを配布する",
+  PLEASE_ENTER_WALLET_ADDRESSES:
+    "NFTを配布するウォレットアドレスを入力してください。改行で区切って複数入力できます。",
+  YOU_CAN_DROP_UP_TO_100_NFTS_AT_ONCE:
+    "一度に配布できるウォレットアドレスは100件までです。",
+  DROPPING_NFTS:
+    "NFTを配布中です... しばらくお待ちください。このウィンドウから移動しても大丈夫です。",
+  DROP_NFTS_SUCCESS: "NFTを配布しました！",
+  DROPNFT_SUBMIT: "配布する",
 
   FEATUE: "特徴",
   FEATUE_DESC_1: "大切なイベントに参加した記録を残すことができます",
@@ -149,4 +202,22 @@ export default {
     "大変申し訳ございませんが、現在システムメンテナンスのため、サービスの一部機能がご利用いただけません。",
   MAINTENANCE_DESC2:
     "ご不便をおかけし申し訳ございませんが、時間をおいてから再度アクセスしていただけると幸いです。",
+
+  // agreement
+  AGREEMENT_TEXT:
+    "にご同意いただいた場合のみ本ウェブサイトにウォレットを接続してください。",
+  AGREEMENT_TERMS: "利用規約",
+  AGREEMENT_PRIVACY: "プライバシーポリシー",
+  AGREEMENT_SCTA: "特定商取引法に基づく表記",
+
+  // about meta data
+  ABOUT_METADATA: "NFTのデータについて",
+  ABOUT_METADATA_DESC:
+    "MintRallyではNFTのデータをIPFSに保存しており、保存されるメタデータは以下の通りです。",
+  ABOUT_METADATA_NAME: "name: NFTの名前",
+  ABOUT_METADATA_IMAGE: "image: NFTの画像",
+  ABOUT_METADATA_ANIMATION: "animation_url: 動画ファイル（任意）",
+  ABOUT_METADATA_DESCRIPTION: "description: NFTの説明",
+  ABOUT_METADATA_TRAITS:
+    "traits: イベントグループID、イベント名、NFTを取得するために必要な参加回数",
 };

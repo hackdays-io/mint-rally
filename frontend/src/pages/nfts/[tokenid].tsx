@@ -9,6 +9,7 @@ import {
   Th,
   Td,
   Grid,
+  AspectRatio,
 } from "@chakra-ui/react";
 import { BigNumber } from "ethers";
 import { GetServerSideProps } from "next";
@@ -101,13 +102,22 @@ const Entity: FC<Props> = (props: Props) => {
                 <Box
                   width={{ md: 350 }}
                   textAlign={{ base: "center", md: "left" }}
+                  mb={3}
                 >
-                  <Image
-                    width={500}
-                    height={500}
-                    src={ipfs2http(props.nft.image)}
-                    alt={props.nft.name}
-                  />
+                  {props.nft.animation_url ? (
+                    <AspectRatio ratio={1 / 1}>
+                      <video controls autoPlay loop muted>
+                        <source src={ipfs2http(props.nft.animation_url)} />
+                      </video>
+                    </AspectRatio>
+                  ) : (
+                    <Image
+                      width={500}
+                      height={500}
+                      src={ipfs2http(props.nft.image)}
+                      alt={props.nft.name}
+                    />
+                  )}
                 </Box>
 
                 <Flex justifyContent="center" width={{ md: 350 }}>

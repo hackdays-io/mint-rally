@@ -18,6 +18,11 @@ interface IMintNFT {
         view
         returns (bool);
 
+    function changeNonTransferable(
+        uint256 _eventId,
+        bool _isNonTransferable
+    ) external;
+
     function getApproved(uint256 tokenId) external view returns (address);
 
     function getRemainingNFTCount(uint256 _eventId)
