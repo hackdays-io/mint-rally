@@ -245,49 +245,12 @@ describe("MintNFT", function () {
     });
   });
 
-  /**
- * 零知識証明データを生成するダミー関数。
- * 実際の実装では、零知識証明スキームに基づいた正しい値を生成する必要あり
- * @returns {uint256[24]} 零知識証明データの配列
- */
-async function generateProofData(): Promise<{ proofCalldata: uint256[24] }> {
-  const proofCalldata = [];
-  for (let i = 0; i < 24; i++) {
-    // ランダムな値で配列を埋める
-    proofCalldata.push(getRandomUint256());
-  }
-  return { proofCalldata };
-}
-
-/**
- * ランダムな uint256 値を生成
- * この関数はダミーの値を生成するために使用
- * @returns {uint256} ランダムな値
- */
-function getRandomUint256(): uint256 {
-  // ここでは単純なランダム値を生成しているが、
-  // 実際には適切な値を設定する必要あり
-  return Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
-}
-
-// テストでの使用例
-const dummyProofData = generateProofData();
-console.log(dummyProofData);
-
-let proofCalldata; // proofCalldata を外部で宣言
-
-  beforeEach(async function () {
-  // proofCalldata の生成
-  const proofData = await generateProofData();
-  proofCalldata = proofData.inputs; // ここで proofCalldata に値を割り当てる
-  });
-
   describe("burn function", function () {
     it("should allow a token owner to burn their token", async function () {
+      const { proofCalldata } = await generateProof();
       // トークンをミントするための引数を準備
       const groupId = createdGroupId; // グループID
       const eventId = createdEventIds[0]; // イベントID
-     const proofCalldata = await generateProof(); // 零知識証明データ
       // トークンをミント
       const mintTx = await mintNFT.connect(participant1).mintParticipateNFT(createdGroupId, createdEventIds[0], proofCalldata);
       await mintTx.wait();
@@ -303,6 +266,7 @@ let proofCalldata; // proofCalldata を外部で宣言
     });
   
     it("should fail if a non-owner tries to burn a token", async function () {
+      const { proofCalldata } = await generateProof();
       // トークンをミント
       const mintTx = await mintNFT.connect(participant1).mintParticipateNFT(createdGroupId, createdEventIds[0], proofCalldata);
       await mintTx.wait();
@@ -318,6 +282,7 @@ let proofCalldata; // proofCalldata を外部で宣言
   
   describe("burnByOwner function", function () {
     it("should allow the contract owner to burn any token", async function () {
+      const { proofCalldata } = await generateProof();
       // トークンをミント
       const mintTx = await mintNFT.connect(participant1).mintParticipateNFT(createdGroupId, createdEventIds[0], proofCalldata);
       await mintTx.wait();
@@ -335,6 +300,7 @@ let proofCalldata; // proofCalldata を外部で宣言
     });
   
     it("should fail if a non-contract owner tries to burn a token", async function () {
+      const { proofCalldata } = await generateProof();
       // トークンをミント
       const mintTx = await mintNFT.connect(participant1).mintParticipateNFT(createdGroupId, createdEventIds[0], proofCalldata);
       await mintTx.wait();
