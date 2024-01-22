@@ -235,12 +235,13 @@ export const useCreateEvent = (address: string) => {
         ).toISOString();
         await mutateAsync({
           args: [
-            params.groupId,
+            Number(params.groupId),
             params.eventName,
             params.description,
             `${startDateTime}/${endDateTime}`,
             params.mintLimit,
             params.useMtx,
+            params.nonTransferable,
             proof?.publicInputCalldata[0],
             params.attributes,
           ],

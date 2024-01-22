@@ -60,6 +60,7 @@ describe("EventManager", function () {
     const deployedMintNFT: any = await upgrades.deployProxy(
       MintNFTFactory,
       [
+        organizer.address,
         "0xdCb93093424447bF4FE9Df869750950922F1E30B",
         secretPhraseVerifier.address,
         operationController.address,
@@ -81,7 +82,12 @@ describe("EventManager", function () {
       );
       const deployedEventManagerContract: any = await upgrades.deployProxy(
         eventManagerContractFactory,
-        [relayer.address, 250000, 1000000, operationController.address],
+        [
+          organizer.address,
+          relayer.address,
+          250000,
+          1000000,
+          operationController.address],
         {
           initializer: "initialize",
         }
@@ -126,6 +132,7 @@ describe("EventManager", function () {
           "2022-07-3O",
           100,
           false,
+          false,
           publicInputCalldata[0],
           attributes
         )
@@ -139,6 +146,7 @@ describe("EventManager", function () {
         "event-1 description",
         "2022-07-3O",
         100,
+        false,
         false,
         publicInputCalldata[0],
         attributes
@@ -173,6 +181,7 @@ describe("EventManager", function () {
           "2022-08-01",
           100,
           false,
+          false,
           publicInputCalldata[0],
           attributes
         );
@@ -197,6 +206,7 @@ describe("EventManager", function () {
         "2022-07-3O",
         10,
         true,
+        false,
         publicInputCalldata[0],
         attributes,
         { value: ethers.utils.parseUnits(String(250000 * 10 * 1.33), "gwei") }
@@ -220,6 +230,7 @@ describe("EventManager", function () {
             "2022-07-3O",
             11 + i,
             true,
+            false,
             publicInputCalldata[0],
             attributes,
             {
@@ -322,6 +333,7 @@ describe("EventManager", function () {
               "2022-07-3O",
               100,
               false,
+              false,
               publicInputCalldata[0],
               attributes
             )
@@ -340,6 +352,7 @@ describe("EventManager", function () {
             "event1 description",
             "2022-07-3O",
             100,
+            false,
             false,
             publicInputCalldata[0],
             attributes
@@ -395,6 +408,7 @@ describe("EventManager", function () {
               "2022-07-3O",
               100,
               false,
+              false,
               publicInputCalldata[0],
               attributes
             )
@@ -413,6 +427,7 @@ describe("EventManager", function () {
             "event1 description",
             "2022-07-3O",
             100,
+            false,
             false,
             publicInputCalldata[0],
             attributes
@@ -451,6 +466,7 @@ describe("EventManager", function () {
               "2022-07-3O",
               100,
               false,
+              false,
               publicInputCalldata[0],
               attributes
             )
@@ -466,7 +482,13 @@ describe("EventManager", function () {
       );
       const deployedEventManagerContract: any = await upgrades.deployProxy(
         eventManagerContractFactory,
-        [relayer.address, 500000, 1000000, operationController.address],
+        [
+          organizer.address,
+          relayer.address,
+          500000,
+          1000000,
+          operationController.address
+        ],
         {
           initializer: "initialize",
         }
@@ -515,7 +537,13 @@ describe("EventManager", function () {
       );
       const deployedEventManagerContract: any = await upgrades.deployProxy(
         eventManagerContractFactory,
-        [relayer.address, 500000, 1000000, operationController.address],
+        [
+          organizer.address,
+          relayer.address,
+          500000,
+          1000000,
+          operationController.address
+        ],
         {
           initializer: "initialize",
         }
@@ -584,7 +612,13 @@ describe("EventManager", function () {
       );
       const deployedEventManagerContract: any = await upgrades.deployProxy(
         eventManagerContractFactory,
-        [relayer.address, 250000, 1000000, operationController.address],
+        [
+          organizer.address,
+          relayer.address,
+          250000,
+          1000000,
+          operationController.address
+        ],
         {
           initializer: "initialize",
         }
@@ -629,6 +663,7 @@ describe("EventManager", function () {
           "2023-07-3O",
           100,
           false,
+          false,
           publicInputCalldata[0],
           attributes,
           { value: ethers.utils.parseUnits(String(250000 * 10 * 1.33), "gwei") }
@@ -644,6 +679,7 @@ describe("EventManager", function () {
           `event_x description`,
           "2023-07-3O",
           100,
+          false,
           false,
           publicInputCalldata[0],
           attributes,
@@ -671,7 +707,13 @@ describe("EventManager", function () {
       );
       const deployedEventManagerContract: any = await upgrades.deployProxy(
         eventManagerContractFactory,
-        [relayer.address, 250000, 1000000, operationController.address],
+        [
+          organizer.address,
+          relayer.address,
+          250000,
+          1000000,
+          operationController.address
+        ],
         {
           initializer: "initialize",
         }
@@ -1151,6 +1193,7 @@ describe("EventManager", function () {
             "2022-07-3O",
             100,
             false,
+            false,
             publicInputCalldata[0],
             attributes
           );
@@ -1163,6 +1206,7 @@ describe("EventManager", function () {
             "event1 description",
             "2022-07-3O",
             100,
+            false,
             false,
             publicInputCalldata[0],
             attributes

@@ -59,10 +59,15 @@ contract MintNFT is
     // Create a mapping to store NFT holders by event ID
     mapping(uint256 => uint256[]) private tokenIdsByEvent;
     address private operationControllerAddr;
+    // Create a mapping to store event ID by token ID
+    mapping(uint256 => uint256) private eventIdOfTokenId;
+    // is non transferable via EventId
+    mapping(uint256 => bool) private isNonTransferable;
 
     event MintedNFTAttributeURL(address indexed holder, string url);
     event MintLocked(uint256 indexed eventId, bool isLocked);
     event ResetSecretPhrase(address indexed executor, uint256 indexed eventId);
+    event NonTransferable(uint256 indexed eventId, bool isNonTransferable);
     event DroppedNFTs(address indexed executor, uint256 indexed eventId);
 
     modifier onlyCollaboratorAccess(uint256 _eventId) {
@@ -82,15 +87,17 @@ contract MintNFT is
         _;
     }
 
-    // Currently, reinitializer(4) was executed as constructor.
+    // Currently, reinitializer(5) was executed as constructor.
     function initialize(
-        MinimalForwarderUpgradeable trustedForwarder,
+        address _owner,
+        MinimalForwarderUpgradeable _trustedForwarder,
         address _secretPhraseVerifierAddr,
         address _operationControllerAddr
-    ) public reinitializer(4) {
+    ) public reinitializer(5) {
         __ERC721_init("MintRally", "MR");
         __Ownable_init();
-        __ERC2771Context_init(address(trustedForwarder));
+        _transferOwnership(_owner);
+        __ERC2771Context_init(address(_trustedForwarder));
         secretPhraseVerifierAddr = _secretPhraseVerifierAddr;
         operationControllerAddr = _operationControllerAddr;
     }
@@ -141,6 +148,24 @@ contract MintNFT is
         _mintNFT(_groupId, _eventId, _msgSender());
     }
 
+    function dropNFTs(
+        uint256 _eventId,
+        address[] memory _addresses
+    ) external onlyCollaboratorAccess(_eventId) whenNotPaused {
+        uint256 groupId = getGroupIdByEvent(_eventId);
+        require(
+            remainingEventNftCount[_eventId] >= _addresses.length,
+            "remaining count is not enough"
+        );
+        for (uint256 index = 0; index < _addresses.length; index++) {
+            address addr = _addresses[index];
+            if (!isHoldingEventNFTByAddress(addr, _eventId)) {
+                _mintNFT(groupId, _eventId, addr);
+            }
+        }
+        emit DroppedNFTs(_msgSender(), _eventId);
+    }
+
     function _mintNFT(
         uint256 _groupId,
         uint256 _eventId,
@@ -168,30 +193,16 @@ contract MintNFT is
             metaDataURL = specialMetaDataURL;
         }
 
-        nftMetaDataURL[_tokenIds.current()] = metaDataURL;
-        tokenIdsByEvent[_eventId].push(_tokenIds.current());
-        _safeMint(_address, _tokenIds.current());
+        uint256 tokenId = _tokenIds.current();
+
+        nftMetaDataURL[tokenId] = metaDataURL;
+        tokenIdsByEvent[_eventId].push(tokenId);
+        eventIdOfTokenId[tokenId] = _eventId;
 
         _tokenIds.increment();
-        emit MintedNFTAttributeURL(_address, metaDataURL);
-    }
+        _safeMint(_address, tokenId);
 
-    function dropNFTs(
-        uint256 _eventId,
-        address[] memory _addresses
-    ) external onlyCollaboratorAccess(_eventId) whenNotPaused {
-        uint256 groupId = getGroupIdByEvent(_eventId);
-        require(
-            remainingEventNftCount[_eventId] >= _addresses.length,
-            "remaining count is not enough"
-        );
-        for (uint256 index = 0; index < _addresses.length; index++) {
-            address addr = _addresses[index];
-            if (!isHoldingEventNFTByAddress(addr, _eventId)) {
-                _mintNFT(groupId, _eventId, addr);
-            }
-        }
-        emit DroppedNFTs(_msgSender(), _eventId);
+        emit MintedNFTAttributeURL(_address, metaDataURL);
     }
 
     function canMint(
@@ -222,6 +233,22 @@ contract MintNFT is
         emit MintLocked(_eventId, _locked);
     }
 
+    function changeNonTransferable(
+        uint256 _eventId,
+        bool _isNonTransferable
+    ) external whenNotPaused {
+        IEventManager eventManager = IEventManager(eventManagerAddr);
+
+        require(
+            _msgSender() == eventManagerAddr ||
+                eventManager.hasAdminAccessByEventId(_msgSender(), _eventId),
+            "you have no permission"
+        );
+        isNonTransferable[_eventId] = _isNonTransferable;
+
+        emit NonTransferable(_eventId, _isNonTransferable);
+    }
+
     function resetSecretPhrase(
         uint256 _eventId,
         bytes32 _secretPhrase
@@ -232,6 +259,12 @@ contract MintNFT is
 
     function getIsMintLocked(uint256 _eventId) external view returns (bool) {
         return isMintLocked[_eventId];
+    }
+
+    function getIsNonTransferable(
+        uint256 _eventId
+    ) external view returns (bool) {
+        return isNonTransferable[_eventId];
     }
 
     function isHoldingEventNFTByAddress(
@@ -396,9 +429,73 @@ contract MintNFT is
         return holders;
     }
 
+    function getTokenIdsByEvent(
+        uint256 eventId
+    ) external view returns (uint256[] memory) {
+        return tokenIdsByEvent[eventId];
+    }
+
+    function getEventIdOfTokenId(
+        uint256 _tokenId
+    ) public view returns (uint256) {
+        return eventIdOfTokenId[_tokenId];
+    }
+
     function getGroupIdByEvent(uint256 _eventId) public view returns (uint256) {
         IEventManager eventManager = IEventManager(eventManagerAddr);
         EventRecord memory _event = eventManager.getEventById(_eventId);
         return _event.groupId;
+    }
+
+    function _transfer(
+        address from,
+        address to,
+        uint256 tokenId
+    ) internal virtual override {
+        require(
+            !isNonTransferable[eventIdOfTokenId[tokenId]],
+            "transfer is locked"
+        );
+        super._transfer(from, to, tokenId);
+    }
+
+    function setEventIdOfTokenIds(
+        uint256 eventId,
+        uint256[] memory tokenIds
+    ) external onlyOwner {
+        _setEventIdOfTokenIds(eventId, tokenIds);
+    }
+
+    function setEventIdOfTokenIdsBatch(
+        uint256[] memory eventIds,
+        uint256[][] memory tokenIdsArr
+    ) external onlyOwner {
+        uint256 eventIdsLength = eventIds.length;
+
+        require(eventIdsLength == tokenIdsArr.length, "length is not match");
+
+        for (uint256 i = 0; i < eventIdsLength; ) {
+            if (tokenIdsArr[i].length != 0) {
+                _setEventIdOfTokenIds(eventIds[i], tokenIdsArr[i]);
+            }
+
+            unchecked {
+                ++i;
+            }
+        }
+    }
+
+    function _setEventIdOfTokenIds(
+        uint256 eventId,
+        uint256[] memory tokenIds
+    ) internal {
+        uint256 tokenIdsLength = tokenIds.length;
+        for (uint256 i = 0; i < tokenIdsLength; ) {
+            eventIdOfTokenId[tokenIds[i]] = eventId;
+
+            unchecked {
+                ++i;
+            }
+        }
     }
 }
