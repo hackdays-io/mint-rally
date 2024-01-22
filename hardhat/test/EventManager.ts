@@ -60,6 +60,7 @@ describe("EventManager", function () {
     const deployedMintNFT: any = await upgrades.deployProxy(
       MintNFTFactory,
       [
+        organizer.address,
         "0xdCb93093424447bF4FE9Df869750950922F1E30B",
         secretPhraseVerifier.address,
         operationController.address,
@@ -81,7 +82,12 @@ describe("EventManager", function () {
       );
       const deployedEventManagerContract: any = await upgrades.deployProxy(
         eventManagerContractFactory,
-        [relayer.address, 250000, 1000000, operationController.address],
+        [
+          organizer.address,
+          relayer.address,
+          250000,
+          1000000,
+          operationController.address],
         {
           initializer: "initialize",
         }
@@ -476,7 +482,13 @@ describe("EventManager", function () {
       );
       const deployedEventManagerContract: any = await upgrades.deployProxy(
         eventManagerContractFactory,
-        [relayer.address, 500000, 1000000, operationController.address],
+        [
+          organizer.address,
+          relayer.address,
+          500000,
+          1000000,
+          operationController.address
+        ],
         {
           initializer: "initialize",
         }
@@ -525,7 +537,13 @@ describe("EventManager", function () {
       );
       const deployedEventManagerContract: any = await upgrades.deployProxy(
         eventManagerContractFactory,
-        [relayer.address, 500000, 1000000, operationController.address],
+        [
+          organizer.address,
+          relayer.address,
+          500000,
+          1000000,
+          operationController.address
+        ],
         {
           initializer: "initialize",
         }
@@ -594,7 +612,13 @@ describe("EventManager", function () {
       );
       const deployedEventManagerContract: any = await upgrades.deployProxy(
         eventManagerContractFactory,
-        [relayer.address, 250000, 1000000, operationController.address],
+        [
+          organizer.address,
+          relayer.address,
+          250000,
+          1000000,
+          operationController.address
+        ],
         {
           initializer: "initialize",
         }
@@ -683,7 +707,13 @@ describe("EventManager", function () {
       );
       const deployedEventManagerContract: any = await upgrades.deployProxy(
         eventManagerContractFactory,
-        [relayer.address, 250000, 1000000, operationController.address],
+        [
+          organizer.address,
+          relayer.address,
+          250000,
+          1000000,
+          operationController.address
+        ],
         {
           initializer: "initialize",
         }

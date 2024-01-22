@@ -63,6 +63,7 @@ const deployOperationController = async () => {
  * @returns deployed mintNFT
  */
 const deployMintNFT = async (
+  deployer: SignerWithAddress,
   secretPhraseVerifier: SecretPhraseVerifier,
   operationController: OperationController
 ) => {
@@ -70,6 +71,7 @@ const deployMintNFT = async (
   const deployedMintNFT: any = await upgrades.deployProxy(
     MintNFTFactory,
     [
+      deployer.address,
       "0xdCb93093424447bF4FE9Df869750950922F1E30B",
       secretPhraseVerifier.address,
       operationController.address,
@@ -87,13 +89,20 @@ const deployMintNFT = async (
  * @returns deployed eventManager
  */
 const deployEventManager = async (
+  deployer: SignerWithAddress,
   relayer: SignerWithAddress,
   operationController: OperationController
 ) => {
   const EventManager = await ethers.getContractFactory("EventManager");
   const deployedEventManager: any = await upgrades.deployProxy(
     EventManager,
-    [relayer.address, 250000, 1000000, operationController.address],
+    [
+      deployer.address,
+      relayer.address,
+      250000,
+      1000000,
+      operationController.address
+    ],
     {
       initializer: "initialize",
     }
@@ -105,14 +114,15 @@ const deployEventManager = async (
  * @param relayer address
  * @returns deployed contracts array
  */
-const deployAll = async (relayer: SignerWithAddress) => {
+const deployAll = async (deployer: SignerWithAddress, relayer: SignerWithAddress) => {
   const secretPhraseVerifier = await deploySecretPhraseVerifier();
   const operationController = await deployOperationController();
   const mintNFT = await deployMintNFT(
+    deployer,
     secretPhraseVerifier,
     operationController
   );
-  const eventManager = await deployEventManager(relayer, operationController);
+  const eventManager = await deployEventManager(deployer, relayer, operationController);
   await mintNFT.setEventManagerAddr(eventManager.address);
   await eventManager.setMintNFTAddr(mintNFT.address);
   return [secretPhraseVerifier, mintNFT, eventManager, operationController];
@@ -182,7 +192,7 @@ describe("MintNFT", function () {
     // generate proof
     const { publicInputCalldata } = await generateProof();
     // Deploy all contracts
-    [, mintNFT, eventManager, operationController] = await deployAll(relayer);
+    [, mintNFT, eventManager, operationController] = await deployAll(organizer, relayer);
     // Create a Group and an Event
     await createGroup(eventManager, "First Group");
     const groupsList = await eventManager.getGroups();
@@ -286,7 +296,7 @@ describe("MintNFT", function () {
       const { publicInputCalldata } = await generateProof();
 
       // Deploy all contracts
-      [, mintNFT, eventManager] = await deployAll(relayer);
+      [, mintNFT, eventManager] = await deployAll(organizer, relayer);
 
       // Create a Group and an Event
       await createGroup(eventManager, "First Group");
@@ -555,7 +565,7 @@ describe("nft revolution", () => {
     // generate proof
     const { publicInputCalldata } = await generateProof();
 
-    [, mintNFT, eventManager] = await deployAll(relayer);
+    [, mintNFT, eventManager] = await deployAll(organizer, relayer);
 
     // Create a Group and an Event
     await createGroup(eventManager, "First Group");
@@ -688,7 +698,7 @@ describe("bulk mint by event owner", () => {
     // generate proof
     const { publicInputCalldata } = await generateProof();
 
-    [, mintNFT, eventManager] = await deployAll(relayer);
+    [, mintNFT, eventManager] = await deployAll(organizer, relayer);
 
     // Create a Group and an Event
     await createGroup(eventManager, "First Group");
@@ -810,7 +820,7 @@ describe("mint locked flag", () => {
 
   before(async () => {
     [organizer, participant1, relayer] = await ethers.getSigners();
-    [, mintNFT, eventManager, operationController] = await deployAll(relayer);
+    [, mintNFT, eventManager, operationController] = await deployAll(organizer, relayer);
 
     // Create a Group and an Event
     await createGroup(eventManager, "First Group", organizer);
@@ -914,7 +924,7 @@ describe("non transferable flag", () => {
 
     // generate proof
     const { publicInputCalldata, proofCalldata } = await generateProof();
-    [, mintNFT, eventManager, operationController] = await deployAll(relayer);
+    [, mintNFT, eventManager, operationController] = await deployAll(organizer, relayer);
     correctProofCalldata = publicInputCalldata[0];
 
     // Create a Group and an Event
@@ -999,7 +1009,7 @@ describe("reset secret phrase", () => {
   before(async () => {
     [organizer, participant1, relayer] = await ethers.getSigners();
     // deploy all contracts
-    [, mintNFT, eventManager, operationController] = await deployAll(relayer);
+    [, mintNFT, eventManager, operationController] = await deployAll(organizer, relayer);
     // generate proof
     const { publicInputCalldata } = await generateProof();
     correctProofCalldata = publicInputCalldata[0];
