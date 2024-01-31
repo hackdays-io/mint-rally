@@ -194,7 +194,7 @@ contract EventManager is OwnableUpgradeable {
         return _groups;
     }
 
-    function transferOwner(
+    function transferGroupOwner(
         uint256 _groupId,
         address _newOwnerAddress
     ) external whenNotPaused {
