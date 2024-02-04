@@ -43,6 +43,7 @@ export default {
   // Event group tab
   EVENT_GROUP_TAB_EVENTS: "Event List",
   EVENT_GROUP_TAB_LEADERS: "Leader Board",
+  EVENT_GROUP_TAB_TRANSFER: "Transfer Owner",
   // Event group leaders
   EVENT_GROUP_LEADERS_RANK: "RANK",
   EVENT_GROUP_LEADERS_ADDRESS: "ADDRESS",
