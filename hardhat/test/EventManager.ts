@@ -39,9 +39,10 @@ describe("EventManager", function () {
   let participant1: SignerWithAddress;
   let participant2: SignerWithAddress;
   let relayer: SignerWithAddress;
+  let newOwner: SignerWithAddress;
 
   before(async () => {
-    [organizer, participant1, participant2, relayer] =
+    [organizer, participant1, participant2, relayer, newOwner] =
       await ethers.getSigners();
     const SecretPhraseVerifierFactory = await ethers.getContractFactory(
       "SecretPhraseVerifier"
@@ -696,6 +697,51 @@ describe("EventManager", function () {
       expect(ownEventRecords[1].name).to.equal("event1");
       expect(ownEventRecords[2].name).to.equal("event0");
     });
+  });
+
+  describe("GetOwnTransfer", function () {
+    let eventManager: EventManager;
+    before(async () => {
+      const eventManagerContractFactory = await ethers.getContractFactory("EventManager");
+      const deployedEventManagerContract = await upgrades.deployProxy(
+        eventManagerContractFactory,
+        [
+          organizer.address,
+          relayer.address,
+          250000,
+          1000000,
+          operationController.address
+        ],
+        { initializer: "initialize" }
+      );
+      eventManager = deployedEventManagerContract as EventManager;
+      await eventManager.deployed();
+      await eventManager.setMintNFTAddr(mintNFT.address);
+      await mintNFT.setEventManagerAddr(eventManager.address);
+  
+      const createGroupTx = await eventManager.connect(organizer).createGroup("transferGroup");
+      await createGroupTx.wait();
+  
+      const createdGroups = await eventManager.getGroups();
+      expect(createdGroups.some(group => group.name === "transferGroup")).to.be.true;
+    });
+  
+    it("Should transfer group ownership", async function () {
+      const groups = await eventManager.getGroups();
+      const group = groups.find(group => group.name === "transferGroup");
+      expect(group, "Group not found").to.exist;
+    
+      const groupId = group!.groupId;
+    
+      const transferTx = await eventManager.connect(organizer).transferGroupOwner(groupId, newOwner.address);
+      await transferTx.wait();
+    
+      const updatedGroups = await eventManager.getGroups();
+      const updatedGroup = updatedGroups.find(group => group.groupId.eq(groupId));
+    
+      expect(updatedGroup, "Updated group not found").to.exist;
+      expect(updatedGroup!.ownerAddress).to.equal(newOwner.address);
+    });    
   });
 
   describe("Role", async () => {

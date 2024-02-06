@@ -194,6 +194,44 @@ contract EventManager is OwnableUpgradeable {
         return _groups;
     }
 
+    function transferGroupOwner(
+        uint256 _groupId,
+        address _newOwnerAddress
+    ) external whenNotPaused {
+        bool isOwner = false;
+        require(
+            _newOwnerAddress != address(0),
+            "New owner address is blank"
+        );
+
+        for (uint256 i = 0; i < ownGroupIds[msg.sender].length; i++) {
+            if (ownGroupIds[msg.sender][i] == _groupId) {
+                isOwner = true;
+                break;
+            }
+        }
+        require(isOwner, "Caller is not the owner of the group");
+
+        for (uint256 i = 0; i < groups.length; i++) {
+            if (groups[i].groupId == _groupId) {
+                groups[i].ownerAddress = _newOwnerAddress;
+                break;
+            }
+        }
+
+        // Update the mapping of ownGroupIds for the new owner
+        ownGroupIds[_newOwnerAddress].push(_groupId);
+
+        // Remove the groupId from the list for the current owner
+        for (uint256 i = 0; i < ownGroupIds[msg.sender].length; i++) {
+            if (ownGroupIds[msg.sender][i] == _groupId) {
+                ownGroupIds[msg.sender][i] = ownGroupIds[msg.sender][ownGroupIds[msg.sender].length - 1];
+                ownGroupIds[msg.sender].pop();
+                break;
+            }
+        }
+    }
+
     function createEventRecord(
         uint256 _groupId,
         string memory _name,
