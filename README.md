@@ -45,9 +45,9 @@ Solves the problem of organizers struggling with event retention rates.
 ## Development
 
 - [Frontend](docs/frontend.md)
-- [Contract](docs/contract.md)
+- [Contract](docs/contract_en.md)
 - [Run Localnode](docs/localnode.md)
 
 ## Deployment
 
-- [Deploy](docs/deploy.md)
+- [Deploy](docs/deploy_en.md)
