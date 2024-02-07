@@ -27,8 +27,6 @@ const EventGroupTab: FC<Props> = ({ group }) => {
         return 1;
       case router.asPath.includes("role"):
         return 2;
-      case router.asPath.includes("transfer"):
-        return 3;
       default:
         break;
     }
@@ -83,21 +81,6 @@ const EventGroupTab: FC<Props> = ({ group }) => {
             {t.RBAC_EDIT_COLLABORATORS}
           </Tab>
         )}
-        {(group.ownerAddress === address) && (
-          <Tab
-            _selected={{
-              borderColor: "mintGreen.300",
-              borderWidth: 1,
-              borderBottom: "none",
-              backgroundColor: "mintGreen.50",
-            }}
-            onClick={() =>
-              router.push(`/event-groups/${router.query.eventgroupid}/transfer`)
-            }
-          >
-          {t.EVENT_GROUP_TAB_TRANSFER}
-          </Tab>
-        )}  
       </TabList>
     </Tabs>
   );
