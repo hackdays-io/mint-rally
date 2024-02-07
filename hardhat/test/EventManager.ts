@@ -88,7 +88,8 @@ describe("EventManager", function () {
           relayer.address,
           250000,
           1000000,
-          operationController.address],
+          operationController.address,
+        ],
         {
           initializer: "initialize",
         }
@@ -488,7 +489,7 @@ describe("EventManager", function () {
           relayer.address,
           500000,
           1000000,
-          operationController.address
+          operationController.address,
         ],
         {
           initializer: "initialize",
@@ -543,7 +544,7 @@ describe("EventManager", function () {
           relayer.address,
           500000,
           1000000,
-          operationController.address
+          operationController.address,
         ],
         {
           initializer: "initialize",
@@ -618,7 +619,7 @@ describe("EventManager", function () {
           relayer.address,
           250000,
           1000000,
-          operationController.address
+          operationController.address,
         ],
         {
           initializer: "initialize",
@@ -699,10 +700,12 @@ describe("EventManager", function () {
     });
   });
 
-  describe("GetOwnTransfer", function () {
+  describe("Transfer Owner", function () {
     let eventManager: EventManager;
     before(async () => {
-      const eventManagerContractFactory = await ethers.getContractFactory("EventManager");
+      const eventManagerContractFactory = await ethers.getContractFactory(
+        "EventManager"
+      );
       const deployedEventManagerContract = await upgrades.deployProxy(
         eventManagerContractFactory,
         [
@@ -710,7 +713,7 @@ describe("EventManager", function () {
           relayer.address,
           250000,
           1000000,
-          operationController.address
+          operationController.address,
         ],
         { initializer: "initialize" }
       );
@@ -718,30 +721,56 @@ describe("EventManager", function () {
       await eventManager.deployed();
       await eventManager.setMintNFTAddr(mintNFT.address);
       await mintNFT.setEventManagerAddr(eventManager.address);
-  
-      const createGroupTx = await eventManager.connect(organizer).createGroup("transferGroup");
+
+      const createGroupTx = await eventManager
+        .connect(organizer)
+        .createGroup("transferGroup");
       await createGroupTx.wait();
-  
+
       const createdGroups = await eventManager.getGroups();
-      expect(createdGroups.some(group => group.name === "transferGroup")).to.be.true;
+      expect(createdGroups.some((group) => group.name === "transferGroup")).to
+        .be.true;
     });
-  
+
     it("Should transfer group ownership", async function () {
       const groups = await eventManager.getGroups();
-      const group = groups.find(group => group.name === "transferGroup");
-      expect(group, "Group not found").to.exist;
-    
+      const group = groups.find((group) => group.name === "transferGroup");
       const groupId = group!.groupId;
-    
-      const transferTx = await eventManager.connect(organizer).transferGroupOwner(groupId, newOwner.address);
+
+      const transferTx = await eventManager
+        .connect(organizer)
+        .transferGroupOwner(groupId, newOwner.address);
       await transferTx.wait();
-    
+      expect(transferTx)
+        .to.emit(eventManager, "TransferOwner")
+        .withArgs(groupId, organizer.address, newOwner.address);
+
       const updatedGroups = await eventManager.getGroups();
-      const updatedGroup = updatedGroups.find(group => group.groupId.eq(groupId));
-    
+      const updatedGroup = updatedGroups.find((group) =>
+        group.groupId.eq(groupId)
+      );
+
       expect(updatedGroup, "Updated group not found").to.exist;
       expect(updatedGroup!.ownerAddress).to.equal(newOwner.address);
-    });    
+
+      const ownGroups = await eventManager.getOwnGroups(newOwner.address);
+      expect(ownGroups.some((group) => group.groupId.eq(groupId))).to.be.true;
+      const ownGroups2 = await eventManager.getOwnGroups(organizer.address);
+      expect(ownGroups2.every((group) => !group.groupId.eq(groupId))).to.be
+        .true;
+    });
+
+    it("Should revert if not group owner", async function () {
+      const groups = await eventManager.getGroups();
+      const group = groups.find((group) => group.name === "transferGroup");
+      const groupId = group!.groupId;
+
+      await expect(
+        eventManager
+          .connect(participant1)
+          .transferGroupOwner(groupId, newOwner.address)
+      ).to.be.revertedWith("You have no permission");
+    });
   });
 
   describe("Role", async () => {
@@ -758,7 +787,7 @@ describe("EventManager", function () {
           relayer.address,
           250000,
           1000000,
-          operationController.address
+          operationController.address,
         ],
         {
           initializer: "initialize",
