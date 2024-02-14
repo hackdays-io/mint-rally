@@ -2,6 +2,7 @@ import { ethers, network, upgrades } from "hardhat";
 import { EventManager, MintNFT, OperationController } from "../../typechain";
 
 export const deployMintNFT = async (params: {
+  ownerAddress: string;
   forwarderAddress: string;
   secretPhraseVerifierAddress: string;
   operationControllerAddress: string;
@@ -10,6 +11,7 @@ export const deployMintNFT = async (params: {
   const deployedMintNFT: MintNFT = (await upgrades.deployProxy(
     mintNFT,
     [
+      params.ownerAddress,
       params.forwarderAddress,
       params.secretPhraseVerifierAddress,
       params.operationControllerAddress,
@@ -26,9 +28,10 @@ export const deployMintNFT = async (params: {
 };
 
 export const deployEventManager = async (params: {
+  ownerAddress: string;
+  operationControllerAddress: string;
   mtxPrice: number;
   maxMintLimit: number;
-  operationControllerAddress: string;
 }) => {
   let relayerAddress = "";
   switch (network.name) {
@@ -49,6 +52,7 @@ export const deployEventManager = async (params: {
   const deployedEventManager: EventManager = (await upgrades.deployProxy(
     eventManager,
     [
+      params.ownerAddress,
       relayerAddress,
       params.mtxPrice,
       params.maxMintLimit,
