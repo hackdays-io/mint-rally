@@ -43,6 +43,7 @@ export default {
   // Event group tab
   EVENT_GROUP_TAB_EVENTS: "Event List",
   EVENT_GROUP_TAB_LEADERS: "Leader Board",
+  EVENT_GROUP_TAB_TRANSFER: "Transfer Owner",
   // Event group leaders
   EVENT_GROUP_LEADERS_RANK: "RANK",
   EVENT_GROUP_LEADERS_ADDRESS: "ADDRESS",
@@ -86,6 +87,11 @@ export default {
   EVENT_USE_MTX: "Taking on gas fee for participants",
   EVENT_USE_MTX_TRUE: "Yes",
   EVENT_USE_MTX_FALSE: "No",
+  EVENT_USE_NTT: "Transfer setting for NFTs",
+  EVENT_USE_NTT_DESC:
+    "If you set it to non-transferable, the person who receives the NFT in this event will not be able to transfer it to others. This setting can be changed later.",
+  EVENT_USE_NTT_TRUE: "Non-transferable",
+  EVENT_USE_NTT_FALSE: "Transferable",
   EVENT_ESTIMATED_GAS_MTX: "Estimated deposit amount required to take on",
   EVENT_SECRETPHRASE: "SecretPhrase to mint",
   EVENT_SECRETPHRASE_DESC:
@@ -134,12 +140,20 @@ export default {
   EVENT_ADMIN_MENU: "Admin Menu",
   EVENT_MINTLOCK_SETTING: "MintLock Setting",
   EVENT_MINTLOCK_SETTING_DESC:
-    "While locked, participants will not be able to Mint (receive proof of participation) for NFT.",
-  EVENT_ISLOCKED_TRUE: "Locked",
-  EVENT_ISLOCKED_FALSE: "Unlocked",
+    "While mint locked, participants will not be able to Mint (receive proof of participation) for NFT.",
+  EVENT_ISLOCKED_TRUE: "MintLocked",
+  EVENT_ISLOCKED_FALSE: "MintUnlocked",
   EVENT_ISLOCKED_TRUE_DESC: "NFT cannot be Minted.",
   EVENT_ISLOCKED_FALSE_DESC: "NFT can be Minted.",
   EVENT_MINTLOCK_FAIL: "Failed to change MintLock.",
+  EVENT_TRANSFERLOCK_SETTING: "TransferLock Setting",
+  EVENT_TRANSFERLOCK_SETTING_DESC:
+    "While transfer locked, participants will not be able to Transfer (send proof of participation) to others.",
+  EVENT_ISNONTRANSFERABLE_TRUE: "Non-Transferable",
+  EVENT_ISNONTRANSFERABLE_FALSE: "Transferable",
+  EVENT_ISNONTRANSFERABLE_TRUE_DESC: "NFT cannot be Transfer",
+  EVENT_ISNONTRANSFERABLE_FALSE_DESC: "NFT can be Transfer",
+  EVENT_TRANSFERLOCK_FAIL: "Failed to change TransferLock.",
   EVENT_ADMIN_SUBMIT: "Confirm",
   SECRET_PHRASE_RESET: "Reset Secret Phrase",
   SECRET_PHRASE_RESET_NEW: "New secret phrase",

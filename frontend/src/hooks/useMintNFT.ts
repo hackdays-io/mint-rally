@@ -470,6 +470,17 @@ export const useIsMintLocked = (eventId: number | BigNumber) => {
   return { isMintLocked: data, isLoading, refetch };
 };
 
+export const useIsNonTransferable = (eventId: number | BigNumber) => {
+  const { mintNFTContract } = useMintNFTContract();
+  const { data, isLoading, refetch } = useContractRead(
+    mintNFTContract,
+    "getIsNonTransferable",
+    [eventId]
+  );
+
+  return { isNonTransferable: data, isLoading, refetch };
+};
+
 export const useMintLock = (eventId: number | BigNumber, locked: boolean) => {
   const { mintNFTContract } = useMintNFTContract();
   const { mutateAsync, isLoading, error, status } = useContractWrite(
@@ -479,6 +490,47 @@ export const useMintLock = (eventId: number | BigNumber, locked: boolean) => {
 
   const fromBlock = useCurrentBlock();
   const { data } = useContractEvents(mintNFTContract, "MintLocked", {
+    queryFilter: {
+      filters: {
+        eventId: eventId,
+        fromBlock,
+      },
+    },
+    subscribe: true,
+  });
+
+  const lock = useCallback(async () => {
+    try {
+      await mutateAsync({ args: [eventId, locked] });
+    } catch (_) {}
+  }, [eventId, locked, mutateAsync]);
+
+  const isSuccess = useMemo(() => {
+    const includesEvent = (data: ContractEvent<Record<string, any>>[]) => {
+      if (!fromBlock) return false;
+      return data.some((event) => {
+        return event.transaction.blockNumber > fromBlock;
+      });
+    };
+    if (status !== "success" || !data || !includesEvent(data)) return false;
+    return true;
+  }, [data, status, eventId, locked]);
+
+  return { lock, isLoading, error, status, isSuccess };
+};
+
+export const useTransferLock = (
+  eventId: number | BigNumber,
+  locked: boolean
+) => {
+  const { mintNFTContract } = useMintNFTContract();
+  const { mutateAsync, isLoading, error, status } = useContractWrite(
+    mintNFTContract,
+    "changeNonTransferable"
+  );
+
+  const fromBlock = useCurrentBlock();
+  const { data } = useContractEvents(mintNFTContract, "NonTransferable", {
     queryFilter: {
       filters: {
         eventId: eventId,

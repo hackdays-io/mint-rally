@@ -61,6 +61,11 @@ contract EventManager is OwnableUpgradeable {
         private memberRolesByGroupId;
     mapping(uint256 => address[]) private memberAddressesByGroupId;
 
+    modifier onlyGroupOwner(uint256 _groupId) {
+        require(_isGroupOwner(_groupId, msg.sender), "You have no permission");
+        _;
+    }
+
     modifier onlyAdminAccess(uint256 _groupId) {
         require(
             _hasAdminAccess(_groupId, msg.sender),
@@ -116,22 +121,29 @@ contract EventManager is OwnableUpgradeable {
 
     event CreateGroup(address indexed owner, uint256 groupId);
     event CreateEvent(address indexed owner, uint256 eventId);
+    event TransferGroupOwner(
+        address indexed prevOwner,
+        address indexed newOwner,
+        uint256 groupId
+    );
 
-    // Currently, reinitializer(2) was executed as constructor.
+    // Currently, reinitializer(3) was executed as constructor.
     function initialize(
+        address _owner,
         address _relayerAddr,
         uint256 _mtxPrice,
         uint256 _maxMintLimit,
         address _operationControllerAddr
-    ) public reinitializer(2) {
+    ) public reinitializer(3) {
         __Ownable_init();
+        _transferOwnership(_owner);
         if (_groupIds.current() == 0 && _eventRecordIds.current() == 0) {
             _groupIds.increment();
             _eventRecordIds.increment();
         }
-        setRelayerAddr(_relayerAddr);
-        setMtxPrice(_mtxPrice);
-        setMaxMintLimit(_maxMintLimit);
+        relayerAddr = _relayerAddr;
+        mtxPrice = _mtxPrice;
+        maxMintLimit = _maxMintLimit;
         operationControllerAddr = _operationControllerAddr;
     }
 
@@ -192,6 +204,41 @@ contract EventManager is OwnableUpgradeable {
         return _groups;
     }
 
+    function transferGroupOwner(
+        uint256 _groupId,
+        address _newOwnerAddress
+    ) external whenNotPaused onlyGroupOwner(_groupId) {
+        require(_newOwnerAddress != address(0), "New owner address is blank");
+
+        for (uint256 i = 0; i < groups.length; i++) {
+            if (groups[i].groupId == _groupId) {
+                groups[i].ownerAddress = _newOwnerAddress;
+                break;
+            }
+        }
+
+        ownGroupIds[_newOwnerAddress].push(_groupId);
+
+        for (uint256 i = 0; i < ownGroupIds[msg.sender].length; i++) {
+            if (ownGroupIds[msg.sender][i] == _groupId) {
+                ownGroupIds[msg.sender][i] = ownGroupIds[msg.sender][
+                    ownGroupIds[msg.sender].length - 1
+                ];
+                ownGroupIds[msg.sender].pop();
+                break;
+            }
+        }
+
+        emit TransferGroupOwner(msg.sender, _newOwnerAddress, _groupId);
+    }
+
+    function _isGroupOwner(
+        uint256 _groupId,
+        address _address
+    ) private view returns (bool) {
+        return groups[_groupId - 1].ownerAddress == _address;
+    }
+
     function createEventRecord(
         uint256 _groupId,
         string memory _name,
@@ -199,6 +246,7 @@ contract EventManager is OwnableUpgradeable {
         string memory _date,
         uint256 _mintLimit,
         bool _useMtx,
+        bool _nonTransferable,
         bytes32 _secretPhrase,
         IMintNFT.NFTAttribute[] memory _eventNFTAttributes
     ) external payable onlyCollaboratorAccess(_groupId) whenNotPaused {
@@ -235,6 +283,10 @@ contract EventManager is OwnableUpgradeable {
             _secretPhrase,
             _eventNFTAttributes
         );
+
+        if (_nonTransferable) {
+            _mintNFT.changeNonTransferable(_newEventId, true);
+        }
 
         eventIdsByGroupId[_groupId].push(_newEventId);
         groupIdByEventId[_newEventId] = _groupId;
@@ -297,6 +349,14 @@ contract EventManager is OwnableUpgradeable {
         uint256 _eventRecordIndex = _eventId - 1;
         EventRecord memory _eventRecord = eventRecords[_eventRecordIndex];
         return _eventRecord;
+    }
+
+    function hasAdminAccessByEventId(
+        address _address,
+        uint256 _eventId
+    ) external view returns (bool) {
+        uint256 _groupId = groupIdByEventId[_eventId];
+        return _hasAdminAccess(_groupId, _address);
     }
 
     function hasCollaboratorAccessByEventId(
@@ -382,7 +442,7 @@ contract EventManager is OwnableUpgradeable {
         require(_groupId > 0 && _groupId <= groups.length, "Invalid groupId");
 
         return
-            groups[_groupId - 1].ownerAddress == _address ||
+            _isGroupOwner(_groupId, _address) ||
             _hasRole(_groupId, _address, ADMIN_ROLE);
     }
 

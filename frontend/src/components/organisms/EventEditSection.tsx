@@ -3,6 +3,7 @@ import { FC, useMemo } from "react";
 import { useCollaboratorAccessEventGroups } from "src/hooks/useEvent";
 import { Event } from "types/Event";
 import EventMintLock from "../molecules/EventMintLock";
+import EventTransferLock from "../molecules/EventTransferLock";
 import ResetSecretPhrase from "../molecules/ResetSecretPhrase";
 import { useLocale } from "src/hooks/useLocale";
 import DropNFTs from "./nft/DropNFTs";
@@ -41,6 +42,10 @@ const EventEditSection: FC<Props> = ({ event }) => {
           <Divider my={3} />
 
           <EventMintLock eventId={event.eventRecordId} />
+
+          <Divider my={3} />
+
+          <EventTransferLock eventId={event.eventRecordId} />
 
           <Divider my={3} />
 

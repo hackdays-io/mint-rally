@@ -10,6 +10,11 @@ struct EventRecord {
 }
 
 interface IEventManager {
+    function hasAdminAccessByEventId(
+        address _addr,
+        uint256 _eventId
+    ) external view returns (bool);
+
     function hasCollaboratorAccessByEventId(
         address _addr,
         uint256 _eventId

@@ -39,9 +39,10 @@ describe("EventManager", function () {
   let participant1: SignerWithAddress;
   let participant2: SignerWithAddress;
   let relayer: SignerWithAddress;
+  let newOwner: SignerWithAddress;
 
   before(async () => {
-    [organizer, participant1, participant2, relayer] =
+    [organizer, participant1, participant2, relayer, newOwner] =
       await ethers.getSigners();
     const SecretPhraseVerifierFactory = await ethers.getContractFactory(
       "SecretPhraseVerifier"
@@ -60,6 +61,7 @@ describe("EventManager", function () {
     const deployedMintNFT: any = await upgrades.deployProxy(
       MintNFTFactory,
       [
+        organizer.address,
         "0xdCb93093424447bF4FE9Df869750950922F1E30B",
         secretPhraseVerifier.address,
         operationController.address,
@@ -81,7 +83,13 @@ describe("EventManager", function () {
       );
       const deployedEventManagerContract: any = await upgrades.deployProxy(
         eventManagerContractFactory,
-        [relayer.address, 250000, 1000000, operationController.address],
+        [
+          organizer.address,
+          relayer.address,
+          250000,
+          1000000,
+          operationController.address,
+        ],
         {
           initializer: "initialize",
         }
@@ -126,6 +134,7 @@ describe("EventManager", function () {
           "2022-07-3O",
           100,
           false,
+          false,
           publicInputCalldata[0],
           attributes
         )
@@ -139,6 +148,7 @@ describe("EventManager", function () {
         "event-1 description",
         "2022-07-3O",
         100,
+        false,
         false,
         publicInputCalldata[0],
         attributes
@@ -173,6 +183,7 @@ describe("EventManager", function () {
           "2022-08-01",
           100,
           false,
+          false,
           publicInputCalldata[0],
           attributes
         );
@@ -197,6 +208,7 @@ describe("EventManager", function () {
         "2022-07-3O",
         10,
         true,
+        false,
         publicInputCalldata[0],
         attributes,
         { value: ethers.utils.parseUnits(String(250000 * 10 * 1.33), "gwei") }
@@ -220,6 +232,7 @@ describe("EventManager", function () {
             "2022-07-3O",
             11 + i,
             true,
+            false,
             publicInputCalldata[0],
             attributes,
             {
@@ -322,6 +335,7 @@ describe("EventManager", function () {
               "2022-07-3O",
               100,
               false,
+              false,
               publicInputCalldata[0],
               attributes
             )
@@ -340,6 +354,7 @@ describe("EventManager", function () {
             "event1 description",
             "2022-07-3O",
             100,
+            false,
             false,
             publicInputCalldata[0],
             attributes
@@ -395,6 +410,7 @@ describe("EventManager", function () {
               "2022-07-3O",
               100,
               false,
+              false,
               publicInputCalldata[0],
               attributes
             )
@@ -413,6 +429,7 @@ describe("EventManager", function () {
             "event1 description",
             "2022-07-3O",
             100,
+            false,
             false,
             publicInputCalldata[0],
             attributes
@@ -451,6 +468,7 @@ describe("EventManager", function () {
               "2022-07-3O",
               100,
               false,
+              false,
               publicInputCalldata[0],
               attributes
             )
@@ -466,7 +484,13 @@ describe("EventManager", function () {
       );
       const deployedEventManagerContract: any = await upgrades.deployProxy(
         eventManagerContractFactory,
-        [relayer.address, 500000, 1000000, operationController.address],
+        [
+          organizer.address,
+          relayer.address,
+          500000,
+          1000000,
+          operationController.address,
+        ],
         {
           initializer: "initialize",
         }
@@ -515,7 +539,13 @@ describe("EventManager", function () {
       );
       const deployedEventManagerContract: any = await upgrades.deployProxy(
         eventManagerContractFactory,
-        [relayer.address, 500000, 1000000, operationController.address],
+        [
+          organizer.address,
+          relayer.address,
+          500000,
+          1000000,
+          operationController.address,
+        ],
         {
           initializer: "initialize",
         }
@@ -584,7 +614,13 @@ describe("EventManager", function () {
       );
       const deployedEventManagerContract: any = await upgrades.deployProxy(
         eventManagerContractFactory,
-        [relayer.address, 250000, 1000000, operationController.address],
+        [
+          organizer.address,
+          relayer.address,
+          250000,
+          1000000,
+          operationController.address,
+        ],
         {
           initializer: "initialize",
         }
@@ -629,6 +665,7 @@ describe("EventManager", function () {
           "2023-07-3O",
           100,
           false,
+          false,
           publicInputCalldata[0],
           attributes,
           { value: ethers.utils.parseUnits(String(250000 * 10 * 1.33), "gwei") }
@@ -644,6 +681,7 @@ describe("EventManager", function () {
           `event_x description`,
           "2023-07-3O",
           100,
+          false,
           false,
           publicInputCalldata[0],
           attributes,
@@ -662,6 +700,79 @@ describe("EventManager", function () {
     });
   });
 
+  describe("Transfer Owner", function () {
+    let eventManager: EventManager;
+    before(async () => {
+      const eventManagerContractFactory = await ethers.getContractFactory(
+        "EventManager"
+      );
+      const deployedEventManagerContract = await upgrades.deployProxy(
+        eventManagerContractFactory,
+        [
+          organizer.address,
+          relayer.address,
+          250000,
+          1000000,
+          operationController.address,
+        ],
+        { initializer: "initialize" }
+      );
+      eventManager = deployedEventManagerContract as EventManager;
+      await eventManager.deployed();
+      await eventManager.setMintNFTAddr(mintNFT.address);
+      await mintNFT.setEventManagerAddr(eventManager.address);
+
+      const createGroupTx = await eventManager
+        .connect(organizer)
+        .createGroup("transferGroup");
+      await createGroupTx.wait();
+
+      const createdGroups = await eventManager.getGroups();
+      expect(createdGroups.some((group) => group.name === "transferGroup")).to
+        .be.true;
+    });
+
+    it("Should transfer group ownership", async function () {
+      const groups = await eventManager.getGroups();
+      const group = groups.find((group) => group.name === "transferGroup");
+      const groupId = group!.groupId;
+
+      const transferTx = await eventManager
+        .connect(organizer)
+        .transferGroupOwner(groupId, newOwner.address);
+      await transferTx.wait();
+      expect(transferTx)
+        .to.emit(eventManager, "TransferOwner")
+        .withArgs(groupId, organizer.address, newOwner.address);
+
+      const updatedGroups = await eventManager.getGroups();
+      const updatedGroup = updatedGroups.find((group) =>
+        group.groupId.eq(groupId)
+      );
+
+      expect(updatedGroup, "Updated group not found").to.exist;
+      expect(updatedGroup!.ownerAddress).to.equal(newOwner.address);
+
+      const ownGroups = await eventManager.getOwnGroups(newOwner.address);
+      expect(ownGroups.some((group) => group.groupId.eq(groupId))).to.be.true;
+      const ownGroups2 = await eventManager.getOwnGroups(organizer.address);
+      expect(ownGroups2.every((group) => !group.groupId.eq(groupId))).to.be
+        .true;
+    });
+
+    it("Should revert if not group owner", async function () {
+      const groups = await eventManager.getGroups();
+      const group = groups.find((group) => group.name === "transferGroup");
+      const groupId = group!.groupId;
+
+      await expect(
+        eventManager
+          .connect(participant1)
+          .transferGroupOwner(groupId, newOwner.address)
+      ).to.be.revertedWith("You have no permission");
+    });
+  });
+
   describe("Role", async () => {
     let eventManager: EventManager;
 
@@ -671,7 +782,13 @@ describe("EventManager", function () {
       );
       const deployedEventManagerContract: any = await upgrades.deployProxy(
         eventManagerContractFactory,
-        [relayer.address, 250000, 1000000, operationController.address],
+        [
+          organizer.address,
+          relayer.address,
+          250000,
+          1000000,
+          operationController.address,
+        ],
         {
           initializer: "initialize",
         }
@@ -1151,6 +1268,7 @@ describe("EventManager", function () {
             "2022-07-3O",
             100,
             false,
+            false,
             publicInputCalldata[0],
             attributes
           );
@@ -1163,6 +1281,7 @@ describe("EventManager", function () {
             "event1 description",
             "2022-07-3O",
             100,
+            false,
             false,
             publicInputCalldata[0],
             attributes
