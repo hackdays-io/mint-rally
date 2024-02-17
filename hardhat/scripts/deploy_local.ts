@@ -3,6 +3,7 @@
 //
 // When running the script with `npx hardhat run <script>` you'll find the Hardhat
 // Runtime Environment's members available in the global scope.
+import { ethers } from "hardhat";
 import {
   deployEventManager,
   deployForwarder,
@@ -12,17 +13,20 @@ import {
 } from "./helper/deploy";
 
 async function main() {
+  const [owner] = await ethers.getSigners();
   const forwarder = await deployForwarder();
   const secretPhraseVerifier = await deploySecretPhraseVerifier();
   const operationController = await deployOperationController();
 
   const mintNFT = await deployMintNFT({
+    ownerAddress: owner.address,
     forwarderAddress: forwarder.address,
     secretPhraseVerifierAddress: secretPhraseVerifier.address,
     operationControllerAddress: operationController.address,
   });
 
   const eventManager = await deployEventManager({
+    ownerAddress: owner.address,
     mtxPrice: 500000,
     maxMintLimit: 1000000,
     operationControllerAddress: operationController.address,
