@@ -182,11 +182,13 @@ describe("MintNFT", function () {
 
   let organizer: SignerWithAddress;
   let participant1: SignerWithAddress;
-  let relayer: SignerWithAddress;
   let participant2: SignerWithAddress;
+  let participant3: SignerWithAddress;
+  let participant4: SignerWithAddress;
+  let relayer: SignerWithAddress;
 
   before(async () => {
-    [organizer, participant1, relayer, participant2] =
+    [organizer, participant1, participant2, participant3, participant4, relayer] =
       await ethers.getSigners();
 
     // generate proof
@@ -221,7 +223,7 @@ describe("MintNFT", function () {
         .connect(organizer)
         .mintParticipateNFT(createdGroupId, createdEventIds[0], proofCalldata);
       await mintNftTxn.wait();
-
+  
       const nftAttribute = await mintNFT.tokenURI(0);
       expect(nftAttribute).equal("ipfs://hogehoge/count0.json");
 
@@ -255,23 +257,60 @@ describe("MintNFT", function () {
     });
   });
 
-  describe("burn", () => {
-    it("success to burn", async () => {
+  describe("burn function", function () {
+    it("should allow a token owner to burn their token", async function () {
       const { proofCalldata } = await generateProof();
-      const mintNftTxn = await mintNFT
-        .connect(participant2)
-        .mintParticipateNFT(createdGroupId, createdEventIds[0], proofCalldata);
-      await mintNftTxn.wait();
+      
+      const mintTx = await mintNFT.connect(participant1).mintParticipateNFT(createdGroupId, createdEventIds[0], proofCalldata);
+      await mintTx.wait();
+      
+      expect(await mintNFT.balanceOf(participant1.address)).to.equal(1);
+      
+      const tokenId = await mintNFT.tokenOfOwnerByIndex(participant1.address, 0);
+      await expect(mintNFT.connect(participant1).burn(tokenId))
+          .to.emit(mintNFT, 'Burn')
+          .withArgs(tokenId, participant1.address);
+    });
+  
+    it("should fail if a non-owner tries to burn a token", async function () {
+      const { proofCalldata } = await generateProof();
 
-      expect(await mintNFT.balanceOf(participant2.address)).equal(1);
-
-      const tokenId = await mintNFT.tokenOfOwnerByIndex(
-        participant2.address,
-        0
-      );
-
-      await mintNFT.connect(organizer).burn(tokenId);
-      expect(await mintNFT.balanceOf(participant2.address)).equal(0);
+      const mintTx = await mintNFT.connect(participant2).mintParticipateNFT(createdGroupId, createdEventIds[0], proofCalldata);
+      await mintTx.wait();
+      
+      const tokenId = await mintNFT.tokenOfOwnerByIndex(participant2.address, 0);
+      
+      await expect(mintNFT.connect(participant1).burn(tokenId))
+          .to.be.revertedWith("caller is not owner nor approved");
+    });
+  });
+  
+  describe("burnByAdmin function", function () {
+    it("should allow the contract owner to burn any token", async function () {
+      const { proofCalldata } = await generateProof();
+      
+      const mintTx = await mintNFT.connect(participant3).mintParticipateNFT(createdGroupId, createdEventIds[0], proofCalldata);
+      await mintTx.wait();
+      
+      const tokenId = await mintNFT.tokenOfOwnerByIndex(participant3.address, 0);
+      
+      await expect(mintNFT.connect(organizer).burnByAdmin(tokenId))
+          .to.emit(mintNFT, 'BurnByAdmin')
+          .withArgs(tokenId, organizer.address);
+      
+      expect(await mintNFT.balanceOf(participant1.address)).to.equal(0);
+    });
+  
+    it("should fail if a non-contract owner tries to burn a token", async function () {
+      const { proofCalldata } = await generateProof();
+      
+      const mintTx = await mintNFT.connect(participant4).mintParticipateNFT(createdGroupId, createdEventIds[0], proofCalldata);
+      await mintTx.wait();
+      
+      const tokenId = await mintNFT.tokenOfOwnerByIndex(participant4.address, 0);
+      
+      await expect(mintNFT.connect(participant4).burnByAdmin(tokenId))
+          .to.be.revertedWith("Ownable: caller is not the owner");
     });
   });
 
