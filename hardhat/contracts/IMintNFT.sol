@@ -45,6 +45,11 @@ interface IMintNFT {
         string memory _secretPhrase
     ) external;
 
+    function getCountOfParticipation(uint256 _groupId, address _address)
+        external
+        view
+        returns (uint256);
+
     function name() external view returns (string memory);
 
     function owner() external view returns (address);
