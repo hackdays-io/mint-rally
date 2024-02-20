@@ -27,7 +27,11 @@ const config: Config = {
   // may want to replace "en" with "zh-Hans".
   i18n: {
     defaultLocale: 'en',
-    locales: ['en'],
+    locales: ['en', 'ja'],
+    localeConfigs: {
+      en: {label: 'English' },
+      ja: {label: '日本語'}
+    }
   },
 
   presets: [
@@ -71,6 +75,16 @@ const config: Config = {
           sidebarId: 'tutorialSidebar',
           position: 'left',
           label: 'Document',
+        },
+        {
+          type: 'localeDropdown',
+          position: 'right',
+          dropdownItemsAfter: [
+            {
+              to: '/help-us-translate',
+              label: 'Help us translate',
+            },
+          ],
         },
         {
           href: 'https://github.com/hackdays-io/mint-rally',

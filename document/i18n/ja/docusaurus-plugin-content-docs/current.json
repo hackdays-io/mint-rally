@@ -1,0 +1,30 @@
+{
+  "version.label": {
+    "message": "Next",
+    "description": "The label for version current"
+  },
+  "sidebar.tutorialSidebar.category.Developer": {
+    "message": "Developer",
+    "description": "The label for category Developer in sidebar tutorialSidebar"
+  },
+  "sidebar.tutorialSidebar.category.Developer.link.generated-index.description": {
+    "message": "Developer",
+    "description": "The generated-index page description for category Developer in sidebar tutorialSidebar"
+  },
+  "sidebar.tutorialSidebar.category.Meta Transaction": {
+    "message": "Meta Transaction",
+    "description": "The label for category Meta Transaction in sidebar tutorialSidebar"
+  },
+  "sidebar.tutorialSidebar.category.Meta Transaction.link.generated-index.description": {
+    "message": "About Meta Transaction",
+    "description": "The generated-index page description for category Meta Transaction in sidebar tutorialSidebar"
+  },
+  "sidebar.tutorialSidebar.category.Secret Phrase (ZKP)": {
+    "message": "Secret Phrase (ZKP)",
+    "description": "The label for category Secret Phrase (ZKP) in sidebar tutorialSidebar"
+  },
+  "sidebar.tutorialSidebar.category.Secret Phrase (ZKP).link.generated-index.description": {
+    "message": "About Secret Phrase (ZKP)",
+    "description": "The generated-index page description for category Secret Phrase (ZKP) in sidebar tutorialSidebar"
+  }
+}

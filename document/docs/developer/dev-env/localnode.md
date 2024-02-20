@@ -1,4 +1,8 @@
-# Use Localhost node in development
+---
+sidebar_position: 4
+---
+
+# Localhost Network
 
 ### 1. Run local node
 
@@ -30,7 +34,6 @@ Otherwise, please run this command.
 $ yarn localchain
 ```
 
-
 ### 2. Setup localnetwork in metamask and add a local wallet address
 
 _You need to do this step only once, if you are already done this, skip to step4_
@@ -38,8 +41,6 @@ _You need to do this step only once, if you are already done this, skip to step4
 #### 2.1 Use this params to add localnetwork to metamask
 
 Go to add network page
-
-<img src="https://github.com/hackdays-io/mint-rally/assets/18475563/7fd6966e-6f65-41af-9bd1-960137478e85" width="300px">
 
 Add Localnetwork
 
