@@ -18,7 +18,7 @@ sidebar_position: 1
 
 ### Polygon
 
-| 契約 Name        | Address                                    |
+| Contract Name        | Address                                    |
 | -------------------- | ------------------------------------------ |
 | Forwarder            | 0xc4579f8A0c6dd6A0B02914B0F48eF53f4d740980 |
 | MintNFT              | 0x7d895Ca96caa5344EC0b732c6e1DEfa560671e14 |

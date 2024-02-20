@@ -1,3 +1,7 @@
+---
+sidebar_position: 1
+---
+
 # Setting Up Contract Development Environment (Until Test Code Execution)
 
 ## Installing Necessary Libraries

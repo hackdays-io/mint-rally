@@ -1,4 +1,8 @@
-# Deploy contract on testnet and frontend on vercel
+---
+sidebar_position: 3
+---
+
+# テストネットへのデプロイ
 
 # Deploy contract
 
@@ -36,7 +40,7 @@ Relayer 名の右にある歯車アイコンからメニューを開き、Crete 
 
 | Key                      | Value                                                                                                                                                                                                                                                                                                        |
 | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| MUMBAI_FORWARDER_ADDRESS | Hardhat から mumbai テストネットにデプロイした ForwarderAddress。メインネットにデプロイする際は`POLYGON_FORWARDER_ADDRESS` にセットしてください。                                                                                                                                                        |
+| MUMBAI_FORWARDER_ADDRESS | Hardhat から mumbai テストネットにデプロイした ForwarderAddress。メインネットにデプロイする際は`POLYGON_FORWARDER_ADDRESS` にセットしてください。                                                                                                                                                            |
 | MUMBAI_RELAYER_ADDRESS   | 1.2 で入手した RelayerAddress。メインネットにはデプロイする際は`POLYGON_RELAYER_ADDRESS` にセットしてください。                                                                                                                                                                                              |
 | ETHERSCAN_API_KEY        | Contract を Verify するときに使います。デプロイ対象のネットワークの scan サービスから発行してください。[Polygonscan](https://polygonscan.com/)                                                                                                                                                               |
 | STAGING_ALCHEMY_KEY      | デプロイ時にブロックチェーンと通信するためにつかいます。[Alchemy](https://www.alchemy.com/)こちらから対象ネットワークを選択して発行してください。 `https://polygon-mumbai.g.alchemy.com/v2/vGk7cESxz`のような URL を入力します。メインネットにはデプロイする際は`MAINNET_ALCHEMY_KEY` にセットしてください。 |
@@ -85,7 +89,7 @@ $ yarn verify --network mumbai <address>
 
 ## 4. Setup and Deploy on Vercel
 
-注意：Vercelにデプロイした際、`hobby`プランではproof生成時にタイムアウトとなり処理が失敗する可能性がありますので、`pro`プラン（課金プラン）の使用をお勧めします。
+注意：Vercel にデプロイした際、`hobby`プランでは proof 生成時にタイムアウトとなり処理が失敗する可能性がありますので、`pro`プラン（課金プラン）の使用をお勧めします。
 
 ### 4.1 Create new project
 
