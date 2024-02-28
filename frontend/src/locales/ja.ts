@@ -73,6 +73,15 @@ export default {
     "管理者権限: 他のアドレスに対して権限付与、イベント作成、あいことば変更、ミントロック",
   RBAC_COLLABORATOR_DESC:
     "コラボレーター権限: イベント作成、あいことば変更、ミントロック",
+  //Transfer owner
+  TRANSFER_OWNER: "権限を譲与する",
+  TRANSFER_OWNER_SUCCESS: "権限の譲与に成功しました。",
+  TRANSFER_OWNER_ERROR: "権限の更新中にエラーが発生しました。",
+  TRANSFER_OWNER_WALLET_ADDRESS: "ウォレットアドレス",
+  TRANSFER_OWNER_NEW_ADDRESS_INPUT:
+    "アドレスは 0x から始まり、合計で 42 文字である必要があります。",
+  TRANSFER_OWNER_ADDRESS_REQUIRED: "TRANSFER_OWNER_ADDRESS_REQUIRED",
+  TRANSFER_OWNER_ADDRESS_PATTERN: "TRANSFER_OWNER_ADDRESS_PATTERN,",
   // Event index
   CREATE_NEW_EVENT: "イベントを作成",
   // Event new

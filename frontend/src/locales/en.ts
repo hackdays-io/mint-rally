@@ -73,7 +73,16 @@ export default {
     "Administrative role: Grant roles to other addresses, Create events, Change secret phrase, Mintlock",
   RBAC_COLLABORATOR_DESC:
     "Collaborator role: Create events, Change secret phrase, Mintlock",
-  // Event index
+  //Transfer owner
+  TRANSFER_OWNER: "Transfer Owner",
+  TRANSFER_OWNER_SUCCESS: "Successfully transfered",
+  TRANSFER_OWNER_ERROR: "An error occurred when transfering the owner",
+  TRANSFER_OWNER_WALLET_ADDRESS: "Wallet Address",
+  TRANSFER_OWNER_NEW_ADDRESS_INPUT:
+    "The address must start with 0x and be a total of 42 characters in length.",
+  TRANSFER_OWNER_ADDRESS_REQUIRED: "TRANSFER_OWNER_ADDRESS_REQUIRED",
+  TRANSFER_OWNER_ADDRESS_PATTERN: "TRANSFER_OWNER_ADDRESS_PATTERN,",
+    // Event index
   CREATE_NEW_EVENT: "Create new event",
   // Event new
   EVENT_GROUP: "Event Group",
