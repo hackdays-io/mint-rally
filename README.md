@@ -42,12 +42,8 @@ Solves the problem of organizers struggling with event retention rates.
 - contract: Solidity, ERC721Enumerable, Hardhat, circom
 - image: IPFS, Pinata
 
-## Development
+## Document
 
-- [Frontend](docs/frontend.md)
-- [Contract](docs/contract.md)
-- [Run Localnode](docs/localnode.md)
-
-## Deployment
-
-- [Deploy](docs/deploy.md)
+[https://mintrally-docs.vercel.app/](https://mintrally-docs.vercel.app/)
+[Develop](http://localhost:3000/docs/developer/dev-env)
+[Contribution Guide](/CONTRIBUTING.md)
