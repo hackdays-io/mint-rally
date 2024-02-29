@@ -527,3 +527,33 @@ export const useMemberRoles = (groupId: number) => {
 
   return { memberRoles, isLoading, error };
 };
+
+export const useTransferGroupOwner = () => {
+  const { eventManagerContract } = useEventManagerContract();
+  const {
+    mutateAsync,
+    isLoading: isTransferring,
+    error: transferError,
+    status: transferStatus,
+  } = useContractWrite(eventManagerContract, "transferGroupOwner"); 
+
+  const transferGroupOwner = useCallback(
+    async (params: { groupId: number; newOwnerAddress: string}) => {
+      if (!params.groupId) return;
+      if (!params.newOwnerAddress) return; 
+      try {
+        await mutateAsync({
+          args: [params.groupId, params.newOwnerAddress],
+        });
+      } catch (_) {}
+    },
+    [mutateAsync]
+  );
+
+  return {
+    transferGroupOwner,
+    isTransferring,
+    transferStatus,
+    transferError,
+  };
+};
