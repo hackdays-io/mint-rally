@@ -41,6 +41,12 @@ contract MintNFT is
         uint256 tokenId;
     }
 
+    struct TokenUriWithIds {
+        uint256 eventId;
+        uint256 tokenId;
+        string tokenUri;
+    }
+
     // NFT meta data url via tokenId
     mapping(uint256 => string) private nftMetaDataURL;
     // Holding NFT via hash of eventId and address
@@ -445,6 +451,20 @@ contract MintNFT is
         IEventManager eventManager = IEventManager(eventManagerAddr);
         EventRecord memory _event = eventManager.getEventById(_eventId);
         return _event.groupId;
+    }
+
+    function getOwnerTokensDetails(
+        address _address
+    ) public view returns (TokenUriWithIds[] memory) {
+        uint256 balance = balanceOf(_address);
+        TokenUriWithIds[] memory tokenUrisWithIds = new TokenUriWithIds[](balance);
+        for (uint256 index = 0; index < balance; index++) {
+            uint256 tokenId = tokenOfOwnerByIndex(_address, index);
+            uint256 eventId = eventIdOfTokenId[tokenId];
+
+            tokenUrisWithIds[index] = TokenUriWithIds(eventId, tokenId, tokenURI(tokenId));
+        }
+        return tokenUrisWithIds;
     }
 
     function _transfer(

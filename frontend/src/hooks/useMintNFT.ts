@@ -216,42 +216,20 @@ export const useGetOwnedNFTByAddress = (address?: string) => {
 
   useEffect(() => {
     setNfts([]);
-    if (!ids || !mintNFTContract) return;
+    if (!mintNFTContract) return;
 
     const fetch = async () => {
       setIsLoading(true);
-      const tokenURIs: { tokenURI: any; tokenId: number }[] = [];
-      const chunkedIds = ids.reduce<number[][]>(
-        (chunkedIds, currentId, index) => {
-          const chunkIndex = Math.floor(index / 25);
-          chunkedIds[chunkIndex] = chunkedIds[chunkIndex] ?? [];
-          chunkedIds[chunkIndex].push(currentId);
-          return chunkedIds;
-        },
-        []
-      );
+      const ownerTokensDetails: { eventId: number; tokenId: number; tokenUri: any }[] = await mintNFTContract?.call("getOwnerTokensDetails", [address]);
 
-      for (const chunk of chunkedIds) {
-        const tokenURIPromises = chunk.map((id) => {
-          const getTokenURI = async (id: number) => {
-            const tokenURI = await mintNFTContract?.call("tokenURI", [id]);
-            return { tokenURI, tokenId: id };
-          };
-          return getTokenURI(id);
-        });
-        const fetchedTokenURIs = await Promise.all(tokenURIPromises);
-        tokenURIs.push(...fetchedTokenURIs);
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-      }
-
-      const metaDataPromises = tokenURIs.map(({ tokenURI, tokenId }) => {
+      const metaDataPromises = ownerTokensDetails.map(({ eventId, tokenId, tokenUri }) => {
         const getMetaData = async (tokenURI: string, tokenId: number) => {
           try {
             const { data: metaData } = await axios.get(ipfs2http(tokenURI));
             return { ...metaData, tokenId };
           } catch (_) {}
         };
-        return getMetaData(tokenURI, tokenId);
+        return getMetaData(tokenUri, tokenId);
       });
       const _nfts = await Promise.all(metaDataPromises);
       setNfts(_nfts.filter((nft) => nft));
