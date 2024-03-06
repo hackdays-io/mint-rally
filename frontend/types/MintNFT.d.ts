@@ -36,9 +36,9 @@ interface MintNFTInterface extends ethers.utils.Interface {
     "getNFTAttributeRecordsByEventId(uint256,uint256,uint256)": FunctionFragment;
     "getNFTHoldersByEvent(uint256)": FunctionFragment;
     "getNFTHoldersByEventGroup(uint256)": FunctionFragment;
-    "getOwnerTokensDetails(address)": FunctionFragment;
     "getRemainingNFTCount(uint256)": FunctionFragment;
     "getTokenIdsByEvent(uint256)": FunctionFragment;
+    "getTokensOfOwner(address)": FunctionFragment;
     "initialize(address,address,address,address)": FunctionFragment;
     "isApprovedForAll(address,address)": FunctionFragment;
     "isHoldingEventNFTByAddress(address,uint256)": FunctionFragment;
@@ -52,8 +52,6 @@ interface MintNFTInterface extends ethers.utils.Interface {
     "resetSecretPhrase(uint256,bytes32)": FunctionFragment;
     "safeTransferFrom(address,address,uint256)": FunctionFragment;
     "setApprovalForAll(address,bool)": FunctionFragment;
-    "setEventIdOfTokenIds(uint256,uint256[])": FunctionFragment;
-    "setEventIdOfTokenIdsBatch(uint256[],uint256[][])": FunctionFragment;
     "setEventInfo(uint256,uint256,bytes32,tuple[])": FunctionFragment;
     "setEventManagerAddr(address)": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
@@ -149,16 +147,16 @@ interface MintNFTInterface extends ethers.utils.Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "getOwnerTokensDetails",
-    values: [string]
-  ): string;
-  encodeFunctionData(
     functionFragment: "getRemainingNFTCount",
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "getTokenIdsByEvent",
     values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getTokensOfOwner",
+    values: [string]
   ): string;
   encodeFunctionData(
     functionFragment: "initialize",
@@ -234,14 +232,6 @@ interface MintNFTInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "setApprovalForAll",
     values: [string, boolean]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "setEventIdOfTokenIds",
-    values: [BigNumberish, BigNumberish[]]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "setEventIdOfTokenIdsBatch",
-    values: [BigNumberish[], BigNumberish[][]]
   ): string;
   encodeFunctionData(
     functionFragment: "setEventInfo",
@@ -332,15 +322,15 @@ interface MintNFTInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "getOwnerTokensDetails",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "getRemainingNFTCount",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
     functionFragment: "getTokenIdsByEvent",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getTokensOfOwner",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
@@ -381,14 +371,6 @@ interface MintNFTInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "setApprovalForAll",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "setEventIdOfTokenIds",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "setEventIdOfTokenIdsBatch",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -662,7 +644,17 @@ export class MintNFT extends BaseContract {
       ]
     >;
 
-    getOwnerTokensDetails(
+    getRemainingNFTCount(
+      _eventId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    getTokenIdsByEvent(
+      eventId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber[]]>;
+
+    getTokensOfOwner(
       _address: string,
       overrides?: CallOverrides
     ): Promise<
@@ -674,16 +666,6 @@ export class MintNFT extends BaseContract {
         })[]
       ]
     >;
-
-    getRemainingNFTCount(
-      _eventId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
-
-    getTokenIdsByEvent(
-      eventId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber[]]>;
 
     initialize(
       _owner: string,
@@ -786,18 +768,6 @@ export class MintNFT extends BaseContract {
     setApprovalForAll(
       operator: string,
       approved: boolean,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    setEventIdOfTokenIds(
-      eventId: BigNumberish,
-      tokenIds: BigNumberish[],
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    setEventIdOfTokenIdsBatch(
-      eventIds: BigNumberish[],
-      tokenIdsArr: BigNumberish[][],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -972,17 +942,6 @@ export class MintNFT extends BaseContract {
     })[]
   >;
 
-  getOwnerTokensDetails(
-    _address: string,
-    overrides?: CallOverrides
-  ): Promise<
-    ([BigNumber, BigNumber, string] & {
-      eventId: BigNumber;
-      tokenId: BigNumber;
-      tokenUri: string;
-    })[]
-  >;
-
   getRemainingNFTCount(
     _eventId: BigNumberish,
     overrides?: CallOverrides
@@ -992,6 +951,17 @@ export class MintNFT extends BaseContract {
     eventId: BigNumberish,
     overrides?: CallOverrides
   ): Promise<BigNumber[]>;
+
+  getTokensOfOwner(
+    _address: string,
+    overrides?: CallOverrides
+  ): Promise<
+    ([BigNumber, BigNumber, string] & {
+      eventId: BigNumber;
+      tokenId: BigNumber;
+      tokenUri: string;
+    })[]
+  >;
 
   initialize(
     _owner: string,
@@ -1091,18 +1061,6 @@ export class MintNFT extends BaseContract {
   setApprovalForAll(
     operator: string,
     approved: boolean,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  setEventIdOfTokenIds(
-    eventId: BigNumberish,
-    tokenIds: BigNumberish[],
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  setEventIdOfTokenIdsBatch(
-    eventIds: BigNumberish[],
-    tokenIdsArr: BigNumberish[][],
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -1271,17 +1229,6 @@ export class MintNFT extends BaseContract {
       })[]
     >;
 
-    getOwnerTokensDetails(
-      _address: string,
-      overrides?: CallOverrides
-    ): Promise<
-      ([BigNumber, BigNumber, string] & {
-        eventId: BigNumber;
-        tokenId: BigNumber;
-        tokenUri: string;
-      })[]
-    >;
-
     getRemainingNFTCount(
       _eventId: BigNumberish,
       overrides?: CallOverrides
@@ -1291,6 +1238,17 @@ export class MintNFT extends BaseContract {
       eventId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber[]>;
+
+    getTokensOfOwner(
+      _address: string,
+      overrides?: CallOverrides
+    ): Promise<
+      ([BigNumber, BigNumber, string] & {
+        eventId: BigNumber;
+        tokenId: BigNumber;
+        tokenUri: string;
+      })[]
+    >;
 
     initialize(
       _owner: string,
@@ -1388,18 +1346,6 @@ export class MintNFT extends BaseContract {
     setApprovalForAll(
       operator: string,
       approved: boolean,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    setEventIdOfTokenIds(
-      eventId: BigNumberish,
-      tokenIds: BigNumberish[],
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    setEventIdOfTokenIdsBatch(
-      eventIds: BigNumberish[],
-      tokenIdsArr: BigNumberish[][],
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -1716,11 +1662,6 @@ export class MintNFT extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    getOwnerTokensDetails(
-      _address: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     getRemainingNFTCount(
       _eventId: BigNumberish,
       overrides?: CallOverrides
@@ -1728,6 +1669,11 @@ export class MintNFT extends BaseContract {
 
     getTokenIdsByEvent(
       eventId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    getTokensOfOwner(
+      _address: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -1830,18 +1776,6 @@ export class MintNFT extends BaseContract {
     setApprovalForAll(
       operator: string,
       approved: boolean,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    setEventIdOfTokenIds(
-      eventId: BigNumberish,
-      tokenIds: BigNumberish[],
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    setEventIdOfTokenIdsBatch(
-      eventIds: BigNumberish[],
-      tokenIdsArr: BigNumberish[][],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -2007,11 +1941,6 @@ export class MintNFT extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    getOwnerTokensDetails(
-      _address: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
     getRemainingNFTCount(
       _eventId: BigNumberish,
       overrides?: CallOverrides
@@ -2019,6 +1948,11 @@ export class MintNFT extends BaseContract {
 
     getTokenIdsByEvent(
       eventId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    getTokensOfOwner(
+      _address: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -2121,18 +2055,6 @@ export class MintNFT extends BaseContract {
     setApprovalForAll(
       operator: string,
       approved: boolean,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    setEventIdOfTokenIds(
-      eventId: BigNumberish,
-      tokenIds: BigNumberish[],
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    setEventIdOfTokenIdsBatch(
-      eventIds: BigNumberish[],
-      tokenIdsArr: BigNumberish[][],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

@@ -453,16 +453,22 @@ contract MintNFT is
         return _event.groupId;
     }
 
-    function getOwnerTokensDetails(
+    function getTokensOfOwner(
         address _address
     ) public view returns (TokenUriWithIds[] memory) {
         uint256 balance = balanceOf(_address);
-        TokenUriWithIds[] memory tokenUrisWithIds = new TokenUriWithIds[](balance);
+        TokenUriWithIds[] memory tokenUrisWithIds = new TokenUriWithIds[](
+            balance
+        );
         for (uint256 index = 0; index < balance; index++) {
             uint256 tokenId = tokenOfOwnerByIndex(_address, index);
             uint256 eventId = eventIdOfTokenId[tokenId];
 
-            tokenUrisWithIds[index] = TokenUriWithIds(eventId, tokenId, tokenURI(tokenId));
+            tokenUrisWithIds[index] = TokenUriWithIds(
+                eventId,
+                tokenId,
+                tokenURI(tokenId)
+            );
         }
         return tokenUrisWithIds;
     }
@@ -477,45 +483,5 @@ contract MintNFT is
             "transfer is locked"
         );
         super._transfer(from, to, tokenId);
-    }
-
-    function setEventIdOfTokenIds(
-        uint256 eventId,
-        uint256[] memory tokenIds
-    ) external onlyOwner {
-        _setEventIdOfTokenIds(eventId, tokenIds);
-    }
-
-    function setEventIdOfTokenIdsBatch(
-        uint256[] memory eventIds,
-        uint256[][] memory tokenIdsArr
-    ) external onlyOwner {
-        uint256 eventIdsLength = eventIds.length;
-
-        require(eventIdsLength == tokenIdsArr.length, "length is not match");
-
-        for (uint256 i = 0; i < eventIdsLength; ) {
-            if (tokenIdsArr[i].length != 0) {
-                _setEventIdOfTokenIds(eventIds[i], tokenIdsArr[i]);
-            }
-
-            unchecked {
-                ++i;
-            }
-        }
-    }
-
-    function _setEventIdOfTokenIds(
-        uint256 eventId,
-        uint256[] memory tokenIds
-    ) internal {
-        uint256 tokenIdsLength = tokenIds.length;
-        for (uint256 i = 0; i < tokenIdsLength; ) {
-            eventIdOfTokenId[tokenIds[i]] = eventId;
-
-            unchecked {
-                ++i;
-            }
-        }
     }
 }

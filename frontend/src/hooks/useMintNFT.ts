@@ -220,17 +220,23 @@ export const useGetOwnedNFTByAddress = (address?: string) => {
 
     const fetch = async () => {
       setIsLoading(true);
-      const ownerTokensDetails: { eventId: number; tokenId: number; tokenUri: any }[] = await mintNFTContract?.call("getOwnerTokensDetails", [address]);
+      const ownerTokensDetails: {
+        eventId: number;
+        tokenId: number;
+        tokenUri: any;
+      }[] = await mintNFTContract?.call("getTokensOfOwner", [address]);
 
-      const metaDataPromises = ownerTokensDetails.map(({ eventId, tokenId, tokenUri }) => {
-        const getMetaData = async (tokenURI: string, tokenId: number) => {
-          try {
-            const { data: metaData } = await axios.get(ipfs2http(tokenURI));
-            return { ...metaData, tokenId };
-          } catch (_) {}
-        };
-        return getMetaData(tokenUri, tokenId);
-      });
+      const metaDataPromises = ownerTokensDetails.map(
+        ({ eventId, tokenId, tokenUri }) => {
+          const getMetaData = async (tokenURI: string, tokenId: number) => {
+            try {
+              const { data: metaData } = await axios.get(ipfs2http(tokenURI));
+              return { ...metaData, tokenId };
+            } catch (_) {}
+          };
+          return getMetaData(tokenUri, tokenId);
+        }
+      );
       const _nfts = await Promise.all(metaDataPromises);
       setNfts(_nfts.filter((nft) => nft));
       setIsLoading(false);

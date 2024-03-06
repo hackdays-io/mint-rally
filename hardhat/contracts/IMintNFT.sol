@@ -13,10 +13,10 @@ interface IMintNFT {
 
     function burn(uint256 tokenId) external;
 
-    function canMint(uint256 _eventId, string memory _secretPhrase)
-        external
-        view
-        returns (bool);
+    function canMint(
+        uint256 _eventId,
+        string memory _secretPhrase
+    ) external view returns (bool);
 
     function changeNonTransferable(
         uint256 _eventId,
@@ -25,17 +25,16 @@ interface IMintNFT {
 
     function getApproved(uint256 tokenId) external view returns (address);
 
-    function getRemainingNFTCount(uint256 _eventId)
-        external
-        view
-        returns (uint256);
+    function getRemainingNFTCount(
+        uint256 _eventId
+    ) external view returns (uint256);
 
     function initialize(address trustedForwarder) external;
 
-    function isApprovedForAll(address owner, address operator)
-        external
-        view
-        returns (bool);
+    function isApprovedForAll(
+        address owner,
+        address operator
+    ) external view returns (bool);
 
     function isTrustedForwarder(address forwarder) external view returns (bool);
 
@@ -83,20 +82,16 @@ interface IMintNFT {
 
     function tokenByIndex(uint256 index) external view returns (uint256);
 
-    function tokenOfOwnerByIndex(address owner, uint256 index)
-        external
-        view
-        returns (uint256);
+    function tokenOfOwnerByIndex(
+        address owner,
+        uint256 index
+    ) external view returns (uint256);
 
     function tokenURI(uint256 _tokenId) external view returns (string memory);
 
     function totalSupply() external view returns (uint256);
 
-    function transferFrom(
-        address from,
-        address to,
-        uint256 tokenId
-    ) external;
+    function transferFrom(address from, address to, uint256 tokenId) external;
 
     function transferOwnership(address newOwner) external;
 }
