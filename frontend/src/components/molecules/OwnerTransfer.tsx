@@ -9,6 +9,8 @@ import {
   import { FC, useState } from "react";
   import { useForm } from "react-hook-form";
   import { useLocale } from "src/hooks/useLocale";
+  import { useEffect } from 'react';
+  import { useRouter } from 'next/router';
   import { useTransferGroupOwner } from "src/hooks/useEvent";
   import AlertMessage from "src/components/atoms/form/AlertMessage";
   
@@ -21,6 +23,7 @@ import {
   };
   
   const OwnerTransfer: FC<OwnerTransferProps> = ({ groupId }) => {
+    const router = useRouter();
     const { t } = useLocale();
     const { handleSubmit, register, formState: { isSubmitting } } = useForm<OwnerTransferFormData>({
       mode: "all",
@@ -33,15 +36,12 @@ import {
     const [errorMessage, setErrorMessage] = useState<string>("");
   
     const onSubmit = async (data: OwnerTransferFormData) => {
-      try {
-        const params = {
+        try {
+            const params = {
             groupId,
             newOwnerAddress: data.newOwnerAddress
         };
         await transferGroupOwner(params);
-        if (transferStatus === "success") {
-          setSuccessMessage(t.TRANSFER_OWNER_SUCCESS);
-        }
       } catch (error) {
         console.error(error);
         if (transferError) {
@@ -50,6 +50,15 @@ import {
       }
     };
   
+    useEffect(() => {
+        if (transferStatus === 'success') {
+          setSuccessMessage(t.TRANSFER_OWNER_SUCCESS);
+          router.push(`/event-groups/${groupId}`);
+        } else if (transferError) {
+          setErrorMessage(t.TRANSFER_OWNER_ERROR);
+        }
+    }, [transferStatus, transferError, groupId, router]);
+
     return (
       <>
         {successMessage && (
@@ -74,7 +83,7 @@ import {
               })}
             />
           </FormControl>
-          title={t.TRANSFER_OWNER_NEW_ADDRESS_INPUT}
+          {t.TRANSFER_OWNER_NEW_ADDRESS_INPUT}
           <Button
             type="submit"
             isLoading={isTransferring || isSubmitting}
