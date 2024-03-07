@@ -9,8 +9,6 @@ import {
   import { FC, useState } from "react";
   import { useForm } from "react-hook-form";
   import { useLocale } from "src/hooks/useLocale";
-  import { useEffect } from 'react';
-  import { useRouter } from 'next/router';
   import { useTransferGroupOwner } from "src/hooks/useEvent";
   import AlertMessage from "src/components/atoms/form/AlertMessage";
   
@@ -23,7 +21,6 @@ import {
   };
   
   const OwnerTransfer: FC<OwnerTransferProps> = ({ groupId }) => {
-    const router = useRouter();
     const { t } = useLocale();
     const { handleSubmit, register, formState: { isSubmitting } } = useForm<OwnerTransferFormData>({
       mode: "all",
@@ -36,28 +33,22 @@ import {
     const [errorMessage, setErrorMessage] = useState<string>("");
   
     const onSubmit = async (data: OwnerTransferFormData) => {
-        try {
-          const params = {
+      try {
+        const params = {
             groupId,
             newOwnerAddress: data.newOwnerAddress
-          };
-          await transferGroupOwner(params);
-        } catch (error) {
-          console.error(error);
-          if (transferError) {
-            setErrorMessage(t.TRANSFER_OWNER_ERROR);
-          }
-        }
-      };
-      
-      useEffect(() => {
-        if (transferStatus === 'success') {
+        };
+        await transferGroupOwner(params);
+        if (transferStatus === "success") {
           setSuccessMessage(t.TRANSFER_OWNER_SUCCESS);
-          router.push(`/event-groups/${groupId}`);
-        } else if (transferError) {
+        }
+      } catch (error) {
+        console.error(error);
+        if (transferError) {
           setErrorMessage(t.TRANSFER_OWNER_ERROR);
         }
-      }, [transferStatus, transferError, groupId, router]);
+      }
+    };
   
     return (
       <>
@@ -83,7 +74,7 @@ import {
               })}
             />
           </FormControl>
-          {t.TRANSFER_OWNER_NEW_ADDRESS_INPUT}
+          title={t.TRANSFER_OWNER_NEW_ADDRESS_INPUT}
           <Button
             type="submit"
             isLoading={isTransferring || isSubmitting}
