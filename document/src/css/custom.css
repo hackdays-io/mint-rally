@@ -1,0 +1,46 @@
+/**
+ * Any CSS included here will be global. The classic template
+ * bundles Infima by default. Infima is a CSS framework designed to
+ * work well for content-centric websites.
+ */
+
+@font-face {
+  font-family: 'Noto Sans JP';
+  font-style: normal;
+  font-weight: 400;
+  src: url('/font/NotoSansJP-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Noto Sans JP';
+  font-style: normal;
+  font-weight: 700;
+  src: url('/font/NotoSansJP-Bold.ttf') format('truetype');
+}
+
+/* You can override the default Infima variables here. */
+:root {
+  --ifm-color-primary: #079a93;
+  --ifm-color-primary-dark: #0a7b77;
+  --ifm-color-primary-darker: #0c615f;
+  --ifm-color-primary-darkest: #10514f;
+  --ifm-color-primary-light: #0dbfb3;
+  --ifm-color-primary-lighter: #26dbcc;
+  --ifm-color-primary-lightest: #56f0de;
+  --ifm-code-font-size: 95%;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+  --ifm-font-family-base: 'Noto Sans JP', sans-serif;
+  --ifm-heading-font-family: 'Noto Sans JP', sans-serif;
+}
+
+/* For readability concerns, you should choose a lighter palette in dark mode. */
+[data-theme='dark'] {
+  --ifm-color-primary: #0dbfb3;
+  --ifm-color-primary-dark: #079a93;
+  --ifm-color-primary-darker: #0a7b77;
+  --ifm-color-primary-darkest: #0c615f;
+  --ifm-color-primary-light: #56f0de;
+  --ifm-color-primary-lighter: #95faeb;
+  --ifm-color-primary-lightest: #c1fdf4;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+}

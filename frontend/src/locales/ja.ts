@@ -43,6 +43,7 @@ export default {
   // Event group tab
   EVENT_GROUP_TAB_EVENTS: "イベント一覧",
   EVENT_GROUP_TAB_LEADERS: "リーダーボード",
+  EVENT_GROUP_TAB_TRANSFER: "権限譲与",
   // Event group leaders
   EVENT_GROUP_LEADERS_RANK: "ランク",
   EVENT_GROUP_LEADERS_ADDRESS: "アドレス",
