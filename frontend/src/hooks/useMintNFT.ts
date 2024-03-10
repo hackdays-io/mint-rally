@@ -239,7 +239,6 @@ export const useGetOwnedNFTByAddress = (address?: string) => {
         }
       );
       const _nfts = await Promise.all(metaDataPromises);
-      console.log(_nfts, "nfts");
       setNfts(_nfts.filter((nft) => nft));
       setIsLoading(false);
     };
