@@ -210,7 +210,6 @@ export const useCopyPastAttribute = () => {
 
 export const useGetOwnedNFTByAddress = (address?: string) => {
   const { mintNFTContract } = useMintNFTContract();
-  const ids = useGetOwnedNftIdsByAddress(address);
   const [nfts, setNfts] = useState<NFT.Metadata[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -226,6 +225,8 @@ export const useGetOwnedNFTByAddress = (address?: string) => {
         tokenUri: any;
       }[] = await mintNFTContract?.call("getTokensOfOwner", [address]);
 
+      console.log(ownerTokensDetails, "owner Tokens");
+
       const metaDataPromises = ownerTokensDetails.map(
         ({ eventId, tokenId, tokenUri }) => {
           const getMetaData = async (tokenURI: string, tokenId: number) => {
@@ -238,12 +239,13 @@ export const useGetOwnedNFTByAddress = (address?: string) => {
         }
       );
       const _nfts = await Promise.all(metaDataPromises);
+      console.log(_nfts, "nfts");
       setNfts(_nfts.filter((nft) => nft));
       setIsLoading(false);
     };
 
     fetch();
-  }, [ids, address]);
+  }, [address, mintNFTContract]);
 
   return { nfts, isLoading };
 };
