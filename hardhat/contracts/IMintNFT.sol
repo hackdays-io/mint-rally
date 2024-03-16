@@ -44,6 +44,11 @@ interface IMintNFT {
         string memory _secretPhrase
     ) external;
 
+    function isHoldingEventNFTByAddress(
+        address _address,
+        uint256 _eventId
+    ) external view returns (bool);
+
     function name() external view returns (string memory);
 
     function owner() external view returns (address);
