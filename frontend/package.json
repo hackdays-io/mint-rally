@@ -46,6 +46,7 @@
     "react-hook-form": "^7.33.1",
     "react-rewards": "^2.0.4",
     "snarkjs": "^0.7.0",
+    "stripe": "^14.21.0",
     "uuid": "^9.0.0"
   },
   "devDependencies": {
