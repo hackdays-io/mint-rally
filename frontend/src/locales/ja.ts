@@ -5,6 +5,7 @@ export default {
   EVENTGROUPS: "イベントグループ",
   EVENTS: "イベント一覧",
   RECENT_EVENTS: "最近のイベント",
+  PURCHASE: "ポイント購入",
   HELP: "ヘルプ",
   SIGN_IN: "ログイン",
   CONNECT: "接続",
@@ -221,4 +222,9 @@ export default {
   ABOUT_METADATA_DESCRIPTION: "description: NFTの説明",
   ABOUT_METADATA_TRAITS:
     "traits: イベントグループID、イベント名、NFTを取得するために必要な参加回数",
+  
+  //Purchace points
+  POINTS_TO_BE_PURCHASED:"購入するポイント数を入力",
+  PAYMENT:"お支払い",
+  INCORRECT_INPUT:"入力値は数値ではありません",
 };
