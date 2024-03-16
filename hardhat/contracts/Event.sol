@@ -4,11 +4,16 @@ pragma solidity ^0.8.4;
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/metatx/MinimalForwarderUpgradeable.sol";
 import "./IMintNFT.sol";
 import "./IOperationController.sol";
 import "hardhat/console.sol";
+import "./ERC2771ContextUpgradeable.sol";
 
-contract EventManager is OwnableUpgradeable {
+contract EventManager is 
+    OwnableUpgradeable,
+    ERC2771ContextUpgradeable
+{
     struct Group {
         uint256 groupId;
         address ownerAddress;
@@ -60,11 +65,6 @@ contract EventManager is OwnableUpgradeable {
     mapping(uint256 => mapping(address => mapping(bytes32 => bool)))
         private memberRolesByGroupId;
     mapping(uint256 => address[]) private memberAddressesByGroupId;
-
-    modifier onlyGroupOwner(uint256 _groupId) {
-        require(_isGroupOwner(_groupId, msg.sender), "You have no permission");
-        _;
-    }
 
     modifier onlyAdminAccess(uint256 _groupId) {
         require(
@@ -121,30 +121,57 @@ contract EventManager is OwnableUpgradeable {
 
     event CreateGroup(address indexed owner, uint256 groupId);
     event CreateEvent(address indexed owner, uint256 eventId);
-    event TransferGroupOwner(
-        address indexed prevOwner,
-        address indexed newOwner,
-        uint256 groupId
-    );
 
-    // Currently, reinitializer(3) was executed as constructor.
+    // Currently, reinitializer(2) was executed as constructor.
     function initialize(
-        address _owner,
+        MinimalForwarderUpgradeable trustedForwarder,
         address _relayerAddr,
         uint256 _mtxPrice,
         uint256 _maxMintLimit,
         address _operationControllerAddr
-    ) public reinitializer(3) {
+    ) public reinitializer(2) {
         __Ownable_init();
-        _transferOwnership(_owner);
+        __ERC2771Context_init(address(trustedForwarder));
         if (_groupIds.current() == 0 && _eventRecordIds.current() == 0) {
             _groupIds.increment();
             _eventRecordIds.increment();
         }
-        relayerAddr = _relayerAddr;
-        mtxPrice = _mtxPrice;
-        maxMintLimit = _maxMintLimit;
+        setRelayerAddr(_relayerAddr);
+        setMtxPrice(_mtxPrice);
+        setMaxMintLimit(_maxMintLimit);
         operationControllerAddr = _operationControllerAddr;
+    }
+
+    function _msgSender()
+        internal
+        view
+        virtual
+        override(ContextUpgradeable, ERC2771ContextUpgradeable)
+        returns (address sender)
+    {
+        if (isTrustedForwarder(msg.sender)) {
+            // The assembly code is more direct than the Solidity version using `abi.decode`.
+            /// @solidity memory-safe-assembly
+            assembly {
+                sender := shr(96, calldataload(sub(calldatasize(), 20)))
+            }
+        } else {
+            return super._msgSender();
+        }
+    }
+
+    function _msgData()
+        internal
+        view
+        virtual
+        override(ContextUpgradeable, ERC2771ContextUpgradeable)
+        returns (bytes calldata)
+    {
+        if (isTrustedForwarder(msg.sender)) {
+            return msg.data[:msg.data.length - 20];
+        } else {
+            return super._msgData();
+        }
     }
 
     function createGroup(string memory _name) external whenNotPaused {
@@ -204,41 +231,6 @@ contract EventManager is OwnableUpgradeable {
         return _groups;
     }
 
-    function transferGroupOwner(
-        uint256 _groupId,
-        address _newOwnerAddress
-    ) external whenNotPaused onlyGroupOwner(_groupId) {
-        require(_newOwnerAddress != address(0), "New owner address is blank");
-
-        for (uint256 i = 0; i < groups.length; i++) {
-            if (groups[i].groupId == _groupId) {
-                groups[i].ownerAddress = _newOwnerAddress;
-                break;
-            }
-        }
-
-        ownGroupIds[_newOwnerAddress].push(_groupId);
-
-        for (uint256 i = 0; i < ownGroupIds[msg.sender].length; i++) {
-            if (ownGroupIds[msg.sender][i] == _groupId) {
-                ownGroupIds[msg.sender][i] = ownGroupIds[msg.sender][
-                    ownGroupIds[msg.sender].length - 1
-                ];
-                ownGroupIds[msg.sender].pop();
-                break;
-            }
-        }
-
-        emit TransferGroupOwner(msg.sender, _newOwnerAddress, _groupId);
-    }
-
-    function _isGroupOwner(
-        uint256 _groupId,
-        address _address
-    ) private view returns (bool) {
-        return groups[_groupId - 1].ownerAddress == _address;
-    }
-
     function createEventRecord(
         uint256 _groupId,
         string memory _name,
@@ -246,7 +238,6 @@ contract EventManager is OwnableUpgradeable {
         string memory _date,
         uint256 _mintLimit,
         bool _useMtx,
-        bool _nonTransferable,
         bytes32 _secretPhrase,
         IMintNFT.NFTAttribute[] memory _eventNFTAttributes
     ) external payable onlyCollaboratorAccess(_groupId) whenNotPaused {
@@ -283,10 +274,6 @@ contract EventManager is OwnableUpgradeable {
             _secretPhrase,
             _eventNFTAttributes
         );
-
-        if (_nonTransferable) {
-            _mintNFT.changeNonTransferable(_newEventId, true);
-        }
 
         eventIdsByGroupId[_groupId].push(_newEventId);
         groupIdByEventId[_newEventId] = _groupId;
@@ -349,14 +336,6 @@ contract EventManager is OwnableUpgradeable {
         uint256 _eventRecordIndex = _eventId - 1;
         EventRecord memory _eventRecord = eventRecords[_eventRecordIndex];
         return _eventRecord;
-    }
-
-    function hasAdminAccessByEventId(
-        address _address,
-        uint256 _eventId
-    ) external view returns (bool) {
-        uint256 _groupId = groupIdByEventId[_eventId];
-        return _hasAdminAccess(_groupId, _address);
     }
 
     function hasCollaboratorAccessByEventId(
@@ -442,7 +421,7 @@ contract EventManager is OwnableUpgradeable {
         require(_groupId > 0 && _groupId <= groups.length, "Invalid groupId");
 
         return
-            _isGroupOwner(_groupId, _address) ||
+            groups[_groupId - 1].ownerAddress == _address ||
             _hasRole(_groupId, _address, ADMIN_ROLE);
     }
 
