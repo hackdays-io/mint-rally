@@ -44,6 +44,11 @@ interface IMintNFT {
         string memory _secretPhrase
     ) external;
 
+    function getCountOfParticipation(uint256 _groupId, address _address)
+        external
+        view
+        returns (uint256);
+        
     function isHoldingEventNFTByAddress(
         address _address,
         uint256 _eventId
