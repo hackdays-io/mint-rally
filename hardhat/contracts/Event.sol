@@ -4,11 +4,16 @@ pragma solidity ^0.8.4;
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/metatx/MinimalForwarderUpgradeable.sol";
 import "./IMintNFT.sol";
 import "./IOperationController.sol";
+import "./ERC2771ContextUpgradeable.sol";
 import "hardhat/console.sol";
 
-contract EventManager is OwnableUpgradeable {
+contract EventManager is 
+    OwnableUpgradeable,
+    ERC2771ContextUpgradeable
+{
     struct Group {
         uint256 groupId;
         address ownerAddress;
@@ -129,23 +134,58 @@ contract EventManager is OwnableUpgradeable {
 
     // Currently, reinitializer(3) was executed as constructor.
     function initialize(
+        MinimalForwarderUpgradeable _trustedForwarder,
         address _owner,
         address _relayerAddr,
         uint256 _mtxPrice,
         uint256 _maxMintLimit,
         address _operationControllerAddr
-    ) public reinitializer(3) {
+    ) public reinitializer(4) {
         __Ownable_init();
         _transferOwnership(_owner);
         if (_groupIds.current() == 0 && _eventRecordIds.current() == 0) {
             _groupIds.increment();
             _eventRecordIds.increment();
         }
+        __ERC2771Context_init(address(_trustedForwarder));
         relayerAddr = _relayerAddr;
         mtxPrice = _mtxPrice;
         maxMintLimit = _maxMintLimit;
         operationControllerAddr = _operationControllerAddr;
     }
+
+    function _msgSender()
+        internal
+        view
+        virtual
+        override(ContextUpgradeable, ERC2771ContextUpgradeable)
+        returns (address sender)
+    {
+        if (isTrustedForwarder(msg.sender)) {
+            // The assembly code is more direct than the Solidity version using `abi.decode`.
+            /// @solidity memory-safe-assembly
+            assembly {
+                sender := shr(96, calldataload(sub(calldatasize(), 20)))
+            }
+        } else {
+            return super._msgSender();
+        }
+    }
+
+    function _msgData()
+        internal
+        view
+        virtual
+        override(ContextUpgradeable, ERC2771ContextUpgradeable)
+        returns (bytes calldata)
+    {
+        if (isTrustedForwarder(msg.sender)) {
+            return msg.data[:msg.data.length - 20];
+        } else {
+            return super._msgData();
+        }
+    }
+
 
     function createGroup(string memory _name) external whenNotPaused {
         uint256 _newGroupId = _groupIds.current();
