@@ -24,17 +24,32 @@ interface MintNFTInterface extends ethers.utils.Interface {
     "approve(address,uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
     "burn(uint256)": FunctionFragment;
-    "canMint(uint256,string)": FunctionFragment;
+    "canMint(uint256,uint256[24])": FunctionFragment;
+    "changeMintLocked(uint256,bool)": FunctionFragment;
+    "changeNonTransferable(uint256,bool)": FunctionFragment;
+    "dropNFTs(uint256,address[])": FunctionFragment;
     "getApproved(uint256)": FunctionFragment;
+    "getEventIdOfTokenId(uint256)": FunctionFragment;
+    "getGroupIdByEvent(uint256)": FunctionFragment;
+    "getIsMintLocked(uint256)": FunctionFragment;
+    "getIsNonTransferable(uint256)": FunctionFragment;
+    "getNFTAttributeRecordsByEventId(uint256,uint256,uint256)": FunctionFragment;
+    "getNFTHoldersByEvent(uint256)": FunctionFragment;
+    "getNFTHoldersByEventGroup(uint256)": FunctionFragment;
     "getRemainingNFTCount(uint256)": FunctionFragment;
-    "initialize(address)": FunctionFragment;
+    "getTokenIdsByEvent(uint256)": FunctionFragment;
+    "getTokensOfOwner(address)": FunctionFragment;
+    "initialize(address,address,address,address)": FunctionFragment;
     "isApprovedForAll(address,address)": FunctionFragment;
+    "isHoldingEventNFTByAddress(address,uint256)": FunctionFragment;
     "isTrustedForwarder(address)": FunctionFragment;
-    "mintParticipateNFT(uint256,uint256,string)": FunctionFragment;
+    "mintParticipateNFT(uint256,uint256,uint256[24])": FunctionFragment;
     "name()": FunctionFragment;
     "owner()": FunctionFragment;
     "ownerOf(uint256)": FunctionFragment;
+    "ownerOfTokens(uint256[])": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
+    "resetSecretPhrase(uint256,bytes32)": FunctionFragment;
     "safeTransferFrom(address,address,uint256)": FunctionFragment;
     "setApprovalForAll(address,bool)": FunctionFragment;
     "setEventInfo(uint256,uint256,bytes32,tuple[])": FunctionFragment;
@@ -57,20 +72,103 @@ interface MintNFTInterface extends ethers.utils.Interface {
   encodeFunctionData(functionFragment: "burn", values: [BigNumberish]): string;
   encodeFunctionData(
     functionFragment: "canMint",
-    values: [BigNumberish, string]
+    values: [
+      BigNumberish,
+      [
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish
+      ]
+    ]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "changeMintLocked",
+    values: [BigNumberish, boolean]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "changeNonTransferable",
+    values: [BigNumberish, boolean]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "dropNFTs",
+    values: [BigNumberish, string[]]
   ): string;
   encodeFunctionData(
     functionFragment: "getApproved",
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
+    functionFragment: "getEventIdOfTokenId",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getGroupIdByEvent",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getIsMintLocked",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getIsNonTransferable",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getNFTAttributeRecordsByEventId",
+    values: [BigNumberish, BigNumberish, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getNFTHoldersByEvent",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getNFTHoldersByEventGroup",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
     functionFragment: "getRemainingNFTCount",
     values: [BigNumberish]
   ): string;
-  encodeFunctionData(functionFragment: "initialize", values: [string]): string;
+  encodeFunctionData(
+    functionFragment: "getTokenIdsByEvent",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getTokensOfOwner",
+    values: [string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "initialize",
+    values: [string, string, string, string]
+  ): string;
   encodeFunctionData(
     functionFragment: "isApprovedForAll",
     values: [string, string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "isHoldingEventNFTByAddress",
+    values: [string, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "isTrustedForwarder",
@@ -78,7 +176,36 @@ interface MintNFTInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "mintParticipateNFT",
-    values: [BigNumberish, BigNumberish, string]
+    values: [
+      BigNumberish,
+      BigNumberish,
+      [
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish
+      ]
+    ]
   ): string;
   encodeFunctionData(functionFragment: "name", values?: undefined): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
@@ -87,8 +214,16 @@ interface MintNFTInterface extends ethers.utils.Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
+    functionFragment: "ownerOfTokens",
+    values: [BigNumberish[]]
+  ): string;
+  encodeFunctionData(
     functionFragment: "renounceOwnership",
     values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "resetSecretPhrase",
+    values: [BigNumberish, BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "safeTransferFrom",
@@ -146,16 +281,65 @@ interface MintNFTInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "burn", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "canMint", data: BytesLike): Result;
   decodeFunctionResult(
+    functionFragment: "changeMintLocked",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "changeNonTransferable",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "dropNFTs", data: BytesLike): Result;
+  decodeFunctionResult(
     functionFragment: "getApproved",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getEventIdOfTokenId",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getGroupIdByEvent",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getIsMintLocked",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getIsNonTransferable",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getNFTAttributeRecordsByEventId",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getNFTHoldersByEvent",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getNFTHoldersByEventGroup",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
     functionFragment: "getRemainingNFTCount",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "getTokenIdsByEvent",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getTokensOfOwner",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "isApprovedForAll",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "isHoldingEventNFTByAddress",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -170,7 +354,15 @@ interface MintNFTInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "ownerOf", data: BytesLike): Result;
   decodeFunctionResult(
+    functionFragment: "ownerOfTokens",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "renounceOwnership",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "resetSecretPhrase",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -219,17 +411,25 @@ interface MintNFTInterface extends ethers.utils.Interface {
   events: {
     "Approval(address,address,uint256)": EventFragment;
     "ApprovalForAll(address,address,bool)": EventFragment;
+    "DroppedNFTs(address,uint256)": EventFragment;
     "Initialized(uint8)": EventFragment;
+    "MintLocked(uint256,bool)": EventFragment;
     "MintedNFTAttributeURL(address,string)": EventFragment;
+    "NonTransferable(uint256,bool)": EventFragment;
     "OwnershipTransferred(address,address)": EventFragment;
+    "ResetSecretPhrase(address,uint256)": EventFragment;
     "Transfer(address,address,uint256)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "Approval"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ApprovalForAll"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "DroppedNFTs"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Initialized"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "MintLocked"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "MintedNFTAttributeURL"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "NonTransferable"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "ResetSecretPhrase"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Transfer"): EventFragment;
 }
 
@@ -249,14 +449,30 @@ export type ApprovalForAllEvent = TypedEvent<
   }
 >;
 
+export type DroppedNFTsEvent = TypedEvent<
+  [string, BigNumber] & { executor: string; eventId: BigNumber }
+>;
+
 export type InitializedEvent = TypedEvent<[number] & { version: number }>;
+
+export type MintLockedEvent = TypedEvent<
+  [BigNumber, boolean] & { eventId: BigNumber; isLocked: boolean }
+>;
 
 export type MintedNFTAttributeURLEvent = TypedEvent<
   [string, string] & { holder: string; url: string }
 >;
 
+export type NonTransferableEvent = TypedEvent<
+  [BigNumber, boolean] & { eventId: BigNumber; isNonTransferable: boolean }
+>;
+
 export type OwnershipTransferredEvent = TypedEvent<
   [string, string] & { previousOwner: string; newOwner: string }
+>;
+
+export type ResetSecretPhraseEvent = TypedEvent<
+  [string, BigNumber] & { executor: string; eventId: BigNumber }
 >;
 
 export type TransferEvent = TypedEvent<
@@ -322,28 +538,152 @@ export class MintNFT extends BaseContract {
 
     canMint(
       _eventId: BigNumberish,
-      _secretPhrase: string,
+      _proof: [
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish
+      ],
       overrides?: CallOverrides
     ): Promise<[boolean]>;
+
+    changeMintLocked(
+      _eventId: BigNumberish,
+      _locked: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    changeNonTransferable(
+      _eventId: BigNumberish,
+      _isNonTransferable: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    dropNFTs(
+      _eventId: BigNumberish,
+      _addresses: string[],
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
 
     getApproved(
       tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[string]>;
 
+    getEventIdOfTokenId(
+      _tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    getGroupIdByEvent(
+      _eventId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    getIsMintLocked(
+      _eventId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[boolean]>;
+
+    getIsNonTransferable(
+      _eventId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[boolean]>;
+
+    getNFTAttributeRecordsByEventId(
+      _eventId: BigNumberish,
+      _limit: BigNumberish,
+      _offset: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<
+      [
+        ([string, BigNumber] & {
+          metaDataURL: string;
+          requiredParticipateCount: BigNumber;
+        })[]
+      ]
+    >;
+
+    getNFTHoldersByEvent(
+      _eventId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<
+      [([string, BigNumber] & { holderAddress: string; tokenId: BigNumber })[]]
+    >;
+
+    getNFTHoldersByEventGroup(
+      _groupId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<
+      [
+        ([string, BigNumber, BigNumber] & {
+          holderAddress: string;
+          eventId: BigNumber;
+          tokenId: BigNumber;
+        })[]
+      ]
+    >;
+
     getRemainingNFTCount(
       _eventId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
+    getTokenIdsByEvent(
+      eventId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber[]]>;
+
+    getTokensOfOwner(
+      _address: string,
+      overrides?: CallOverrides
+    ): Promise<
+      [
+        ([BigNumber, BigNumber, string] & {
+          eventId: BigNumber;
+          tokenId: BigNumber;
+          tokenUri: string;
+        })[]
+      ]
+    >;
+
     initialize(
-      trustedForwarder: string,
+      _owner: string,
+      _trustedForwarder: string,
+      _secretPhraseVerifierAddr: string,
+      _operationControllerAddr: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     isApprovedForAll(
       owner: string,
       operator: string,
+      overrides?: CallOverrides
+    ): Promise<[boolean]>;
+
+    isHoldingEventNFTByAddress(
+      _addr: string,
+      _eventId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
@@ -355,7 +695,32 @@ export class MintNFT extends BaseContract {
     mintParticipateNFT(
       _groupId: BigNumberish,
       _eventId: BigNumberish,
-      _secretPhrase: string,
+      _proof: [
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish
+      ],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -368,7 +733,20 @@ export class MintNFT extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[string]>;
 
+    ownerOfTokens(
+      _tokenIdArray: BigNumberish[],
+      overrides?: CallOverrides
+    ): Promise<
+      [([string, BigNumber] & { holderAddress: string; tokenId: BigNumber })[]]
+    >;
+
     renounceOwnership(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    resetSecretPhrase(
+      _eventId: BigNumberish,
+      _secretPhrase: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -462,28 +840,146 @@ export class MintNFT extends BaseContract {
 
   canMint(
     _eventId: BigNumberish,
-    _secretPhrase: string,
+    _proof: [
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      BigNumberish
+    ],
     overrides?: CallOverrides
   ): Promise<boolean>;
+
+  changeMintLocked(
+    _eventId: BigNumberish,
+    _locked: boolean,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  changeNonTransferable(
+    _eventId: BigNumberish,
+    _isNonTransferable: boolean,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  dropNFTs(
+    _eventId: BigNumberish,
+    _addresses: string[],
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
   getApproved(
     tokenId: BigNumberish,
     overrides?: CallOverrides
   ): Promise<string>;
 
+  getEventIdOfTokenId(
+    _tokenId: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  getGroupIdByEvent(
+    _eventId: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  getIsMintLocked(
+    _eventId: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<boolean>;
+
+  getIsNonTransferable(
+    _eventId: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<boolean>;
+
+  getNFTAttributeRecordsByEventId(
+    _eventId: BigNumberish,
+    _limit: BigNumberish,
+    _offset: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<
+    ([string, BigNumber] & {
+      metaDataURL: string;
+      requiredParticipateCount: BigNumber;
+    })[]
+  >;
+
+  getNFTHoldersByEvent(
+    _eventId: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<
+    ([string, BigNumber] & { holderAddress: string; tokenId: BigNumber })[]
+  >;
+
+  getNFTHoldersByEventGroup(
+    _groupId: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<
+    ([string, BigNumber, BigNumber] & {
+      holderAddress: string;
+      eventId: BigNumber;
+      tokenId: BigNumber;
+    })[]
+  >;
+
   getRemainingNFTCount(
     _eventId: BigNumberish,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
+  getTokenIdsByEvent(
+    eventId: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber[]>;
+
+  getTokensOfOwner(
+    _address: string,
+    overrides?: CallOverrides
+  ): Promise<
+    ([BigNumber, BigNumber, string] & {
+      eventId: BigNumber;
+      tokenId: BigNumber;
+      tokenUri: string;
+    })[]
+  >;
+
   initialize(
-    trustedForwarder: string,
+    _owner: string,
+    _trustedForwarder: string,
+    _secretPhraseVerifierAddr: string,
+    _operationControllerAddr: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   isApprovedForAll(
     owner: string,
     operator: string,
+    overrides?: CallOverrides
+  ): Promise<boolean>;
+
+  isHoldingEventNFTByAddress(
+    _addr: string,
+    _eventId: BigNumberish,
     overrides?: CallOverrides
   ): Promise<boolean>;
 
@@ -495,7 +991,32 @@ export class MintNFT extends BaseContract {
   mintParticipateNFT(
     _groupId: BigNumberish,
     _eventId: BigNumberish,
-    _secretPhrase: string,
+    _proof: [
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      BigNumberish
+    ],
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -505,7 +1026,20 @@ export class MintNFT extends BaseContract {
 
   ownerOf(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
+  ownerOfTokens(
+    _tokenIdArray: BigNumberish[],
+    overrides?: CallOverrides
+  ): Promise<
+    ([string, BigNumber] & { holderAddress: string; tokenId: BigNumber })[]
+  >;
+
   renounceOwnership(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  resetSecretPhrase(
+    _eventId: BigNumberish,
+    _secretPhrase: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -593,28 +1127,146 @@ export class MintNFT extends BaseContract {
 
     canMint(
       _eventId: BigNumberish,
-      _secretPhrase: string,
+      _proof: [
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish
+      ],
       overrides?: CallOverrides
     ): Promise<boolean>;
+
+    changeMintLocked(
+      _eventId: BigNumberish,
+      _locked: boolean,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    changeNonTransferable(
+      _eventId: BigNumberish,
+      _isNonTransferable: boolean,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    dropNFTs(
+      _eventId: BigNumberish,
+      _addresses: string[],
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     getApproved(
       tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<string>;
 
+    getEventIdOfTokenId(
+      _tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    getGroupIdByEvent(
+      _eventId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    getIsMintLocked(
+      _eventId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<boolean>;
+
+    getIsNonTransferable(
+      _eventId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<boolean>;
+
+    getNFTAttributeRecordsByEventId(
+      _eventId: BigNumberish,
+      _limit: BigNumberish,
+      _offset: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<
+      ([string, BigNumber] & {
+        metaDataURL: string;
+        requiredParticipateCount: BigNumber;
+      })[]
+    >;
+
+    getNFTHoldersByEvent(
+      _eventId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<
+      ([string, BigNumber] & { holderAddress: string; tokenId: BigNumber })[]
+    >;
+
+    getNFTHoldersByEventGroup(
+      _groupId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<
+      ([string, BigNumber, BigNumber] & {
+        holderAddress: string;
+        eventId: BigNumber;
+        tokenId: BigNumber;
+      })[]
+    >;
+
     getRemainingNFTCount(
       _eventId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    getTokenIdsByEvent(
+      eventId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber[]>;
+
+    getTokensOfOwner(
+      _address: string,
+      overrides?: CallOverrides
+    ): Promise<
+      ([BigNumber, BigNumber, string] & {
+        eventId: BigNumber;
+        tokenId: BigNumber;
+        tokenUri: string;
+      })[]
+    >;
+
     initialize(
-      trustedForwarder: string,
+      _owner: string,
+      _trustedForwarder: string,
+      _secretPhraseVerifierAddr: string,
+      _operationControllerAddr: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
     isApprovedForAll(
       owner: string,
       operator: string,
+      overrides?: CallOverrides
+    ): Promise<boolean>;
+
+    isHoldingEventNFTByAddress(
+      _addr: string,
+      _eventId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<boolean>;
 
@@ -626,7 +1278,32 @@ export class MintNFT extends BaseContract {
     mintParticipateNFT(
       _groupId: BigNumberish,
       _eventId: BigNumberish,
-      _secretPhrase: string,
+      _proof: [
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish
+      ],
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -636,7 +1313,20 @@ export class MintNFT extends BaseContract {
 
     ownerOf(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
+    ownerOfTokens(
+      _tokenIdArray: BigNumberish[],
+      overrides?: CallOverrides
+    ): Promise<
+      ([string, BigNumber] & { holderAddress: string; tokenId: BigNumber })[]
+    >;
+
     renounceOwnership(overrides?: CallOverrides): Promise<void>;
+
+    resetSecretPhrase(
+      _eventId: BigNumberish,
+      _secretPhrase: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     "safeTransferFrom(address,address,uint256)"(
       from: string,
@@ -750,6 +1440,22 @@ export class MintNFT extends BaseContract {
       { owner: string; operator: string; approved: boolean }
     >;
 
+    "DroppedNFTs(address,uint256)"(
+      executor?: string | null,
+      eventId?: BigNumberish | null
+    ): TypedEventFilter<
+      [string, BigNumber],
+      { executor: string; eventId: BigNumber }
+    >;
+
+    DroppedNFTs(
+      executor?: string | null,
+      eventId?: BigNumberish | null
+    ): TypedEventFilter<
+      [string, BigNumber],
+      { executor: string; eventId: BigNumber }
+    >;
+
     "Initialized(uint8)"(
       version?: null
     ): TypedEventFilter<[number], { version: number }>;
@@ -757,6 +1463,22 @@ export class MintNFT extends BaseContract {
     Initialized(
       version?: null
     ): TypedEventFilter<[number], { version: number }>;
+
+    "MintLocked(uint256,bool)"(
+      eventId?: BigNumberish | null,
+      isLocked?: null
+    ): TypedEventFilter<
+      [BigNumber, boolean],
+      { eventId: BigNumber; isLocked: boolean }
+    >;
+
+    MintLocked(
+      eventId?: BigNumberish | null,
+      isLocked?: null
+    ): TypedEventFilter<
+      [BigNumber, boolean],
+      { eventId: BigNumber; isLocked: boolean }
+    >;
 
     "MintedNFTAttributeURL(address,string)"(
       holder?: string | null,
@@ -767,6 +1489,22 @@ export class MintNFT extends BaseContract {
       holder?: string | null,
       url?: null
     ): TypedEventFilter<[string, string], { holder: string; url: string }>;
+
+    "NonTransferable(uint256,bool)"(
+      eventId?: BigNumberish | null,
+      isNonTransferable?: null
+    ): TypedEventFilter<
+      [BigNumber, boolean],
+      { eventId: BigNumber; isNonTransferable: boolean }
+    >;
+
+    NonTransferable(
+      eventId?: BigNumberish | null,
+      isNonTransferable?: null
+    ): TypedEventFilter<
+      [BigNumber, boolean],
+      { eventId: BigNumber; isNonTransferable: boolean }
+    >;
 
     "OwnershipTransferred(address,address)"(
       previousOwner?: string | null,
@@ -782,6 +1520,22 @@ export class MintNFT extends BaseContract {
     ): TypedEventFilter<
       [string, string],
       { previousOwner: string; newOwner: string }
+    >;
+
+    "ResetSecretPhrase(address,uint256)"(
+      executor?: string | null,
+      eventId?: BigNumberish | null
+    ): TypedEventFilter<
+      [string, BigNumber],
+      { executor: string; eventId: BigNumber }
+    >;
+
+    ResetSecretPhrase(
+      executor?: string | null,
+      eventId?: BigNumberish | null
+    ): TypedEventFilter<
+      [string, BigNumber],
+      { executor: string; eventId: BigNumber }
     >;
 
     "Transfer(address,address,uint256)"(
@@ -819,12 +1573,92 @@ export class MintNFT extends BaseContract {
 
     canMint(
       _eventId: BigNumberish,
-      _secretPhrase: string,
+      _proof: [
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish
+      ],
       overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    changeMintLocked(
+      _eventId: BigNumberish,
+      _locked: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    changeNonTransferable(
+      _eventId: BigNumberish,
+      _isNonTransferable: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    dropNFTs(
+      _eventId: BigNumberish,
+      _addresses: string[],
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     getApproved(
       tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    getEventIdOfTokenId(
+      _tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    getGroupIdByEvent(
+      _eventId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    getIsMintLocked(
+      _eventId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    getIsNonTransferable(
+      _eventId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    getNFTAttributeRecordsByEventId(
+      _eventId: BigNumberish,
+      _limit: BigNumberish,
+      _offset: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    getNFTHoldersByEvent(
+      _eventId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    getNFTHoldersByEventGroup(
+      _groupId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -833,14 +1667,33 @@ export class MintNFT extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    getTokenIdsByEvent(
+      eventId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    getTokensOfOwner(
+      _address: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     initialize(
-      trustedForwarder: string,
+      _owner: string,
+      _trustedForwarder: string,
+      _secretPhraseVerifierAddr: string,
+      _operationControllerAddr: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     isApprovedForAll(
       owner: string,
       operator: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    isHoldingEventNFTByAddress(
+      _addr: string,
+      _eventId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -852,7 +1705,32 @@ export class MintNFT extends BaseContract {
     mintParticipateNFT(
       _groupId: BigNumberish,
       _eventId: BigNumberish,
-      _secretPhrase: string,
+      _proof: [
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish
+      ],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -865,7 +1743,18 @@ export class MintNFT extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    ownerOfTokens(
+      _tokenIdArray: BigNumberish[],
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     renounceOwnership(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    resetSecretPhrase(
+      _eventId: BigNumberish,
+      _secretPhrase: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -963,12 +1852,92 @@ export class MintNFT extends BaseContract {
 
     canMint(
       _eventId: BigNumberish,
-      _secretPhrase: string,
+      _proof: [
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish
+      ],
       overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    changeMintLocked(
+      _eventId: BigNumberish,
+      _locked: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    changeNonTransferable(
+      _eventId: BigNumberish,
+      _isNonTransferable: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    dropNFTs(
+      _eventId: BigNumberish,
+      _addresses: string[],
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     getApproved(
       tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    getEventIdOfTokenId(
+      _tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    getGroupIdByEvent(
+      _eventId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    getIsMintLocked(
+      _eventId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    getIsNonTransferable(
+      _eventId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    getNFTAttributeRecordsByEventId(
+      _eventId: BigNumberish,
+      _limit: BigNumberish,
+      _offset: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    getNFTHoldersByEvent(
+      _eventId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    getNFTHoldersByEventGroup(
+      _groupId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -977,14 +1946,33 @@ export class MintNFT extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    getTokenIdsByEvent(
+      eventId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    getTokensOfOwner(
+      _address: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     initialize(
-      trustedForwarder: string,
+      _owner: string,
+      _trustedForwarder: string,
+      _secretPhraseVerifierAddr: string,
+      _operationControllerAddr: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     isApprovedForAll(
       owner: string,
       operator: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    isHoldingEventNFTByAddress(
+      _addr: string,
+      _eventId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -996,7 +1984,32 @@ export class MintNFT extends BaseContract {
     mintParticipateNFT(
       _groupId: BigNumberish,
       _eventId: BigNumberish,
-      _secretPhrase: string,
+      _proof: [
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish,
+        BigNumberish
+      ],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1009,7 +2022,18 @@ export class MintNFT extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    ownerOfTokens(
+      _tokenIdArray: BigNumberish[],
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     renounceOwnership(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    resetSecretPhrase(
+      _eventId: BigNumberish,
+      _secretPhrase: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
