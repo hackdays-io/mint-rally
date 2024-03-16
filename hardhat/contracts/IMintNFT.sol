@@ -104,4 +104,15 @@ interface IMintNFT {
     function transferFrom(address from, address to, uint256 tokenId) external;
 
     function transferOwnership(address newOwner) external;
+
+    function isHoldingEventNFTByAddress(
+        address _addr,
+        uint256 _eventId
+    ) external view returns (bool);
+
+    function getNFTAttributeRecordsByEventId(
+        uint256 _eventId,
+        uint256 _limit,
+        uint256 _offset
+    ) external view returns (NFTAttribute[] memory);
 }
