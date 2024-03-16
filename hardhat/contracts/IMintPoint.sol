@@ -12,7 +12,7 @@ interface IMintPoint {
 
     function register() external;
 
-    function mint(address to, uint256 id) external;
+    function mint(address to, uint256 id, uint256 amount) external;
 
-    function burn(uint256 tokenId) external;
+    function burn(uint256 tokenId, uint256 amount) external;
 }
