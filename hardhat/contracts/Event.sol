@@ -67,13 +67,13 @@ contract EventManager is
     mapping(uint256 => address[]) private memberAddressesByGroupId;
 
     modifier onlyGroupOwner(uint256 _groupId) {
-        require(_isGroupOwner(_groupId, msg.sender), "You have no permission");
+        require(_isGroupOwner(_groupId, _msgSender()), "You have no permission");
         _;
     }
 
     modifier onlyAdminAccess(uint256 _groupId) {
         require(
-            _hasAdminAccess(_groupId, msg.sender),
+            _hasAdminAccess(_groupId, _msgSender()),
             "You have no permission"
         );
         _;
@@ -81,7 +81,7 @@ contract EventManager is
 
     modifier onlyCollaboratorAccess(uint256 _groupId) {
         require(
-            _hasCollaboratorAccess(_groupId, msg.sender),
+            _hasCollaboratorAccess(_groupId, _msgSender()),
             "You have no permission"
         );
         _;
@@ -140,7 +140,7 @@ contract EventManager is
         uint256 _mtxPrice,
         uint256 _maxMintLimit,
         address _operationControllerAddr
-    ) public reinitializer(4) {
+    ) public reinitializer(3) {
         __Ownable_init();
         _transferOwnership(_owner);
         if (_groupIds.current() == 0 && _eventRecordIds.current() == 0) {
@@ -192,11 +192,11 @@ contract EventManager is
         _groupIds.increment();
 
         groups.push(
-            Group({groupId: _newGroupId, ownerAddress: msg.sender, name: _name})
+            Group({groupId: _newGroupId, ownerAddress: _msgSender(), name: _name})
         );
-        ownGroupIds[msg.sender].push(_newGroupId);
+        ownGroupIds[_msgSender()].push(_newGroupId);
 
-        emit CreateGroup(msg.sender, _newGroupId);
+        emit CreateGroup(_msgSender(), _newGroupId);
     }
 
     function getGroups() public view returns (Group[] memory) {
@@ -259,17 +259,17 @@ contract EventManager is
 
         ownGroupIds[_newOwnerAddress].push(_groupId);
 
-        for (uint256 i = 0; i < ownGroupIds[msg.sender].length; i++) {
-            if (ownGroupIds[msg.sender][i] == _groupId) {
-                ownGroupIds[msg.sender][i] = ownGroupIds[msg.sender][
-                    ownGroupIds[msg.sender].length - 1
+        for (uint256 i = 0; i < ownGroupIds[_msgSender()].length; i++) {
+            if (ownGroupIds[_msgSender()][i] == _groupId) {
+                ownGroupIds[_msgSender()][i] = ownGroupIds[_msgSender()][
+                    ownGroupIds[_msgSender()].length - 1
                 ];
-                ownGroupIds[msg.sender].pop();
+                ownGroupIds[_msgSender()].pop();
                 break;
             }
         }
 
-        emit TransferGroupOwner(msg.sender, _newOwnerAddress, _groupId);
+        emit TransferGroupOwner(_msgSender(), _newOwnerAddress, _groupId);
     }
 
     function _isGroupOwner(
@@ -331,7 +331,7 @@ contract EventManager is
         eventIdsByGroupId[_groupId].push(_newEventId);
         groupIdByEventId[_newEventId] = _groupId;
 
-        emit CreateEvent(msg.sender, _newEventId);
+        emit CreateEvent(_msgSender(), _newEventId);
     }
 
     function getEventRecordCount() public view returns (uint256) {
