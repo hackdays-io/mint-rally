@@ -16,16 +16,28 @@ const User: FC = () => {
   const [connecting, setConnecting] = useState<boolean>(false);
   const [value, setValue] = useState('');
   const [isValid, setIsValid] = useState(true);
+  const [valueURL, setValueURL] = useState('');
 
   const handleOpenConnectWallet = useCallback(() => {
     onConnectWalletOpen();
     onClose();
   }, [onConnectWalletOpen, onClose]);
 
-  const handlePayment = () => {
+  const handlePayment = async () => {
     const isNumeric = /^-?\d*\.?\d+$/.test(value);
     setIsValid(isNumeric);
-    if(isNumeric){}
+    if(isNumeric){
+      try {
+        const response = await fetch(`/api/points/checkout?amount=${value}&signature=${address}`);
+        const data = await response.json();
+        // データを処理する
+        console.log(data.sessionURL);
+        setValueURL(data.sessionURL);
+        window.location.href = data.sessionURL;
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    }
   };
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => setValue(event.target.value);
@@ -34,19 +46,22 @@ const User: FC = () => {
     <Container maxWidth={1000} mt={{ base: 5, md: 10 }}>
         {address ?
             <>
-                <Text pb={5}>{t.PURCHASE}</Text>
-                <Flex mb={5}>
-                    <Input w={500} value={value} onChange={handleChange} placeholder={t.POINTS_TO_BE_PURCHASED}/>
-                    <Text pl={1}>pt</Text>
-                </Flex>
-                {!isValid && <Text pb={5} color="red">{t.INCORRECT_INPUT}</Text>}
-                <Button
-                    backgroundColor="yellow.900"
-                    color="white"
-                    onClick={handlePayment}
-                >
-                    {t.PAYMENT}
-                </Button>
+                
+                
+                  <Text pb={5}>{t.PURCHASE}</Text>
+                  <Flex mb={5}>
+                      <Input w={500} value={value} onChange={handleChange} placeholder={t.POINTS_TO_BE_PURCHASED}/>
+                      <Text pl={1}>pt</Text>
+                  </Flex>
+                  {!isValid && <Text pb={5} color="red">{t.INCORRECT_INPUT}</Text>}
+                  <Button
+                      backgroundColor="yellow.900"
+                      color="white"
+                      onClick={handlePayment}
+                  >
+                      {t.PAYMENT}
+                  </Button>
+                 
             </>
             : 
             <Button

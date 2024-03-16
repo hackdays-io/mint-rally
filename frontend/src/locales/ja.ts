@@ -227,4 +227,6 @@ export default {
   POINTS_TO_BE_PURCHASED:"購入するポイント数を入力",
   PAYMENT:"お支払い",
   INCORRECT_INPUT:"入力値は数値ではありません",
+  POINTS_IN_PROGRESS:"決済とポイントの付与を実行中です。",
+  POINTS_AWARDED:"ポイントが付与されました！",
 };

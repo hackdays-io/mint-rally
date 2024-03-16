@@ -226,5 +226,8 @@ export default {
     //Purchace points
     POINTS_TO_BE_PURCHASED:"Enter the number of points to be purchased",
     PAYMENT:"Payment",
-    INCORRECT_INPUT:"Input values are not numerical",
+    INCORRECT_INPUT:"Input values are not numerical.",
+    PAYMENT_COMPLETED:"Payment has been completed.",
+    POINTS_IN_PROGRESS:"Settlement and the awarding of points are in progress.",
+    POINTS_AWARDED:"Points awarded!",
 };
