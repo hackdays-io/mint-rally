@@ -34,7 +34,6 @@ contract MintPoint is ERC1155SupplyUpgradeable, IMintPoint {
 
     function mint(address to, uint256 tokenId, uint256 amount) external {
         require(tokenId < tokenIds, "MintPoint: tokenId is not registered.");
-        require(balanceOf(to, tokenId) < 1, "MintPoint: already minted.");
         _mint(to, tokenId, amount, "");
 
         emit Mint(to, tokenId);
