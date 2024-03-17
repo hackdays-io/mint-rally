@@ -13,7 +13,12 @@ contract SubscriptionNFT is
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
     uint256 private _tokenIds;
     address public mintPointAddr;
-    mapping(address => uint256) private subscriptionEnds;
+    mapping(uint256 => AirDropInfo) private airDropInfos;
+
+    struct AirDropInfo {
+        uint256[] dates;
+        uint256 dropIndex;
+    }
 
     function initialize() public initializer {
         __ERC721_init("SubscriptionNFT", "SNFT");
@@ -42,14 +47,16 @@ contract SubscriptionNFT is
         mintPointAddr = _mintPointAddr;
     }
 
-    function mintNFT(address recipient, string memory tokenURI, uint256 subscriptionEnd)
+    function mintNFT(address recipient, string memory tokenURI, AirDropInfo calldata airDropInfo)
         public onlyRole(MINTER_ROLE)
         returns (uint256)
     {
-        subscriptionEnds[recipient] = subscriptionEnd;
 
         _tokenIds++;
         uint256 newItemId = _tokenIds;
+
+        airDropInfos[newItemId] = airDropInfo;
+
         _setTokenURI(newItemId, tokenURI);
         _mint(recipient, newItemId);
 
@@ -58,12 +65,12 @@ contract SubscriptionNFT is
 
     function airdrop() public onlyRole(MINTER_ROLE) {
         for (uint256 i = 1; i <= _tokenIds; i++) {
-            address owner = ownerOf(i);
-            if (subscriptionEnds[owner] > block.timestamp) {
-                IMintPoint(mintPointAddr).mintByMinter(owner, i, 1000);
+            AirDropInfo memory airDropInfo = airDropInfos[i];
+            if (airDropInfo.dates[airDropInfo.dropIndex] > block.timestamp) {
+                address owner = ownerOf(i);
+                IMintPoint(mintPointAddr).mintByMinter(owner, 1, 1000);
             }
-            // TODO: 一ヶ月に一回しかエアドロップできないような制限をつける
-            //　不平等にならないように気をつける必要あり（期限が5月15日か16日か、など日数がわずかに違うだけで、その月のエアドロをもらえるか否かが決まってしまうなど）
+            airDropInfos[i].dropIndex++;
         }
     }
 }
