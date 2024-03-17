@@ -10,10 +10,10 @@ import { MintRallyForwarder } from "types/MintRallyForwarder";
 const getOzSigner = async () => {
   if (process.env.DEV_RELAYER_PRIVATE_KEY) {
     const developmentProvider = new providers.JsonRpcProvider(
-      "http://localhost:8545"
+      process.env.NEXT_PUBLIC_PROVIDER_RPC!
     );
     return new Wallet(
-      process.env.DEVELOPMENT_RELAYER_PRIVATE_KEY!,
+      process.env.DEV_RELAYER_PRIVATE_KEY!,
       developmentProvider
     );
   } else {
