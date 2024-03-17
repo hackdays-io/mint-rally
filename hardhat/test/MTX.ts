@@ -11,6 +11,21 @@ import {
 import { generateProof } from "./helper/secret_phrase";
 import { signMetaTxRequest } from "./helper/signfor_mtx";
 
+const attributes = [
+  {
+    metaDataURL: "ipfs://hogehoge/count0.json",
+    requiredParticipateCount: 0,
+  },
+  {
+    metaDataURL: "ipfs://hogehoge/count1.json",
+    requiredParticipateCount: 1,
+  },
+  {
+    metaDataURL: "ipfs://hogehoge/count5.json",
+    requiredParticipateCount: 5,
+  },
+];
+
 describe("MTX Event", function () {
   let mintNFT: MintNFT;
   let secretPhraseVerifier: SecretPhraseVerifier;
@@ -65,7 +80,7 @@ describe("MTX Event", function () {
     eventManager = (await upgrades.deployProxy(
       eventManagerContractFactory,
       [
-        "0xdCb93093424447bF4FE9Df869750950922F1E30B",
+        mintRallyForwarder.address,
         organizer.address,
         relayer.address,
         250000,
@@ -77,6 +92,9 @@ describe("MTX Event", function () {
       }
     )) as EventManager;
     await eventManager.deployed();
+
+    await eventManager.setMintNFTAddr(mintNFT.address);
+    await mintNFT.setEventManagerAddr(eventManager.address);
   });
 
   it("should create group with mtx", async function () {
@@ -99,9 +117,6 @@ describe("MTX Event", function () {
 
     const groups = await eventManager.getGroups();
     expect(groups.length).to.equal(1);
-
-    const ownGroups = await eventManager.getOwnGroups(organizer.address);
-    console.log(ownGroups);
   });
 
   it("should create event with mtx", async function () {
@@ -122,7 +137,7 @@ describe("MTX Event", function () {
           false,
           false,
           publicInputCalldata[0],
-          [],
+          attributes,
         ]),
       }
     );

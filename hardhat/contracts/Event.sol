@@ -10,10 +10,7 @@ import "./IOperationController.sol";
 import "./ERC2771ContextUpgradeable.sol";
 import "hardhat/console.sol";
 
-contract EventManager is 
-    OwnableUpgradeable,
-    ERC2771ContextUpgradeable
-{
+contract EventManager is OwnableUpgradeable, ERC2771ContextUpgradeable {
     struct Group {
         uint256 groupId;
         address ownerAddress;
@@ -68,8 +65,9 @@ contract EventManager is
     //mapping(address => uint256) private userPoints;
 
     modifier onlyGroupOwner(uint256 _groupId) {
-        require(_isGroupOwner(_groupId, _msgSender()),
-        "You have no permission"
+        require(
+            _isGroupOwner(_groupId, _msgSender()),
+            "You have no permission"
         );
         _;
     }
@@ -189,13 +187,16 @@ contract EventManager is
         }
     }
 
-
     function createGroup(string memory _name) external whenNotPaused {
         uint256 _newGroupId = _groupIds.current();
         _groupIds.increment();
 
         groups.push(
-            Group({groupId: _newGroupId, ownerAddress: _msgSender(), name: _name})
+            Group({
+                groupId: _newGroupId,
+                ownerAddress: _msgSender(),
+                name: _name
+            })
         );
         ownGroupIds[_msgSender()].push(_newGroupId);
 
@@ -281,7 +282,7 @@ contract EventManager is
     ) private view returns (bool) {
         return groups[_groupId - 1].ownerAddress == _address;
     }
-    
+
     function createEventRecord(
         uint256 _groupId,
         string memory _name,
@@ -291,7 +292,7 @@ contract EventManager is
         bool _useMtx,
         bool _nonTransferable,
         bytes32 _secretPhrase,
-    //    uint256 _points,
+        //    uint256 _points,
         IMintNFT.NFTAttribute[] memory _eventNFTAttributes
     ) external payable onlyCollaboratorAccess(_groupId) whenNotPaused {
         require(
