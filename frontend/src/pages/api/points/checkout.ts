@@ -1,6 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
 import { Stripe } from "stripe";
+import { ethers } from "ethers";
 
 const UNIT_AMOUNT_STD = 5; // 1ポイントあたりの価格（単位：円）
 
@@ -23,13 +24,14 @@ export default async function handler(
   // todo: 購入ポイント数の価格計算
   const unit_amount = Number(amount) * UNIT_AMOUNT_STD;
 
-  // todo: signatureからウォレットアドレスを複合
+  const walletAddress = ethers.utils.verifyMessage(amount, signature);
+
   // ここのmetadataがwebhookで飛んでくるので、それでどのアドレスにいくらポイント付与するかがわかる
-  const walletAddress = "0x019281ce34F8b8739991713D5E09D0C290B53886";
   const metadata = {
     walletAddress,
     amount, // number型で送信してもwebhook経由で取得するとstring型に変換されてしまうのでstring型のままで送信
   };
+  console.log("metadata:", metadata);
 
   const session = await stripeClient.checkout.sessions.create({
     mode: "payment",
