@@ -10,19 +10,23 @@ export default async function handler(
 ) {
   if (req.method !== "GET") res.status(405).send("Method not allowed");
   const { amount, signature } = req.query;
-  if (!amount || !signature) {
+  if (
+    !amount ||
+    typeof amount !== "string" ||
+    !signature ||
+    typeof signature !== "string"
+  )
     return res.status(400).send("Invalid request parameters");
-  }
 
   // todo: 購入ポイント数の価格計算
   const unit_amount = Number(amount) * 1;
 
   // todo: signatureからウォレットアドレスを複合
   // ここのmetadataがwebhookで飛んでくるので、それでどのアドレスにいくらポイント付与するかがわかる
-  const walletAddress = "0x1234567890";
+  const walletAddress = "0x019281ce34F8b8739991713D5E09D0C290B53886";
   const metadata = {
     walletAddress,
-    amount: Number(amount),
+    amount, // number型で送信してもwebhook経由で取得するとstring型に変換されてしまうのでstring型のままで送信
   };
 
   const session = await stripeClient.checkout.sessions.create({
