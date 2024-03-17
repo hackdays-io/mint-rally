@@ -6,7 +6,7 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 contract SubscriptionNFT is
     Initializable,
-    ERC721EnumerableUpgradeable,
+    ERC721URIStorageUpgradeable,
     OwnableUpgradeable
 {
     uint256 private _tokenIds;
@@ -17,10 +17,10 @@ contract SubscriptionNFT is
         __Ownable_init();
     }
 
-    function mintNFT(address recipient, string memory tokenURI)
-        public onlyOwner
-        returns (uint256)
-    {
+    function mintNFT(
+        address recipient,
+        string memory tokenURI
+    ) public onlyOwner returns (uint256) {
         _tokenIds++;
 
         uint256 newItemId = _tokenIds;
@@ -29,5 +29,4 @@ contract SubscriptionNFT is
 
         return newItemId;
     }
-
 }
