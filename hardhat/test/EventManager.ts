@@ -96,7 +96,7 @@ describe("EventManager", function () {
         }
       );
       eventManager = await deployedEventManagerContract.deployed();
-      
+
       await eventManager.setMintNFTAddr(mintNFT.address);
       await mintNFT.setEventManagerAddr(eventManager.address);
 
@@ -127,7 +127,7 @@ describe("EventManager", function () {
 
       // revert if paused
       await operationController.connect(organizer).pause();
-      
+
       await expect(
         eventManager.createEventRecord(
           groupsAfterCreate[0].groupId.toNumber(),
