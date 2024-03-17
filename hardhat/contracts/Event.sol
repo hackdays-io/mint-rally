@@ -65,9 +65,12 @@ contract EventManager is
     mapping(uint256 => mapping(address => mapping(bytes32 => bool)))
         private memberRolesByGroupId;
     mapping(uint256 => address[]) private memberAddressesByGroupId;
+    //mapping(address => uint256) private userPoints;
 
     modifier onlyGroupOwner(uint256 _groupId) {
-        require(_isGroupOwner(_groupId, _msgSender()), "You have no permission");
+        require(_isGroupOwner(_groupId, _msgSender()),
+        "You have no permission"
+        );
         _;
     }
 
@@ -278,7 +281,7 @@ contract EventManager is
     ) private view returns (bool) {
         return groups[_groupId - 1].ownerAddress == _address;
     }
-
+    
     function createEventRecord(
         uint256 _groupId,
         string memory _name,
@@ -288,6 +291,7 @@ contract EventManager is
         bool _useMtx,
         bool _nonTransferable,
         bytes32 _secretPhrase,
+    //    uint256 _points,
         IMintNFT.NFTAttribute[] memory _eventNFTAttributes
     ) external payable onlyCollaboratorAccess(_groupId) whenNotPaused {
         require(

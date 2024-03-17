@@ -97,6 +97,7 @@ const deployEventManager = async (
   const deployedEventManager: any = await upgrades.deployProxy(
     EventManager,
     [
+      "0xdCb93093424447bF4FE9Df869750950922F1E30B",
       deployer.address,
       relayer.address,
       250000,
