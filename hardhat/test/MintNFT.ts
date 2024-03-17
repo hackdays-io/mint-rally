@@ -97,6 +97,7 @@ const deployEventManager = async (
   const deployedEventManager: any = await upgrades.deployProxy(
     EventManager,
     [
+      "0xdCb93093424447bF4FE9Df869750950922F1E30B",
       deployer.address,
       relayer.address,
       250000,
@@ -369,6 +370,12 @@ describe("MintNFT", function () {
           );
         await mintNftTxn2.wait();
         expect(await mintNFT.getEventIdOfTokenId(1)).equal(createdEventIds[0]);
+        expect(
+          await mintNFT.getCountOfParticipation(
+            createdGroupId1,
+            participant1.address
+          )
+        ).equal(1);
 
         const { proofCalldata: proofCalldata3 } = await generateProof();
         const mintNftTxn3 = await mintNFT
@@ -380,6 +387,12 @@ describe("MintNFT", function () {
           );
         await mintNftTxn3.wait();
         expect(await mintNFT.getEventIdOfTokenId(2)).equal(createdEventIds[0]);
+        expect(
+          await mintNFT.getCountOfParticipation(
+            createdGroupId1,
+            participant2.address
+          )
+        ).equal(1);
 
         const { proofCalldata: proofCalldata4 } = await generateProof();
         const mintNftTxn4 = await mintNFT
@@ -391,6 +404,12 @@ describe("MintNFT", function () {
           );
         await mintNftTxn4.wait();
         expect(await mintNFT.getEventIdOfTokenId(3)).equal(createdEventIds[1]);
+        expect(
+          await mintNFT.getCountOfParticipation(
+            createdGroupId1,
+            participant1.address
+          )
+        ).equal(2);
 
         const { proofCalldata: proofCalldata5 } = await generateProof();
         const mintNftTxn5 = await mintNFT
@@ -402,6 +421,12 @@ describe("MintNFT", function () {
           );
         await mintNftTxn5.wait();
         expect(await mintNFT.getEventIdOfTokenId(4)).equal(createdEventIds[2]);
+        expect(
+          await mintNFT.getCountOfParticipation(
+            createdGroupId2,
+            participant1.address
+          )
+        ).equal(1);
       });
       it("get owners of the tokens", async () => {
         const tokens = [0, 1, 2, 3, 4];
