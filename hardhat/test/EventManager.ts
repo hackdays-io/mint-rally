@@ -84,6 +84,7 @@ describe("EventManager", function () {
       const deployedEventManagerContract: any = await upgrades.deployProxy(
         eventManagerContractFactory,
         [
+          "0xdCb93093424447bF4FE9Df869750950922F1E30B",
           organizer.address,
           relayer.address,
           250000,
@@ -95,6 +96,7 @@ describe("EventManager", function () {
         }
       );
       eventManager = await deployedEventManagerContract.deployed();
+
       await eventManager.setMintNFTAddr(mintNFT.address);
       await mintNFT.setEventManagerAddr(eventManager.address);
 
@@ -102,7 +104,6 @@ describe("EventManager", function () {
         await generateProof();
       publicInputCalldata = _publicInputCalldata;
     });
-
     it("Should create", async () => {
       // does not exist any groups
       const groupsBeforeCreate = await eventManager.getGroups();
@@ -126,6 +127,7 @@ describe("EventManager", function () {
 
       // revert if paused
       await operationController.connect(organizer).pause();
+
       await expect(
         eventManager.createEventRecord(
           groupsAfterCreate[0].groupId.toNumber(),
@@ -485,6 +487,7 @@ describe("EventManager", function () {
       const deployedEventManagerContract: any = await upgrades.deployProxy(
         eventManagerContractFactory,
         [
+          "0xdCb93093424447bF4FE9Df869750950922F1E30B",
           organizer.address,
           relayer.address,
           500000,
@@ -540,6 +543,7 @@ describe("EventManager", function () {
       const deployedEventManagerContract: any = await upgrades.deployProxy(
         eventManagerContractFactory,
         [
+          "0xdCb93093424447bF4FE9Df869750950922F1E30B",
           organizer.address,
           relayer.address,
           500000,
@@ -615,6 +619,7 @@ describe("EventManager", function () {
       const deployedEventManagerContract: any = await upgrades.deployProxy(
         eventManagerContractFactory,
         [
+          "0xdCb93093424447bF4FE9Df869750950922F1E30B",
           organizer.address,
           relayer.address,
           250000,
@@ -709,6 +714,7 @@ describe("EventManager", function () {
       const deployedEventManagerContract = await upgrades.deployProxy(
         eventManagerContractFactory,
         [
+          "0xdCb93093424447bF4FE9Df869750950922F1E30B",
           organizer.address,
           relayer.address,
           250000,
@@ -783,6 +789,7 @@ describe("EventManager", function () {
       const deployedEventManagerContract: any = await upgrades.deployProxy(
         eventManagerContractFactory,
         [
+          "0xdCb93093424447bF4FE9Df869750950922F1E30B",
           organizer.address,
           relayer.address,
           250000,

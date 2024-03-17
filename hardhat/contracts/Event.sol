@@ -4,11 +4,13 @@ pragma solidity ^0.8.4;
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/metatx/MinimalForwarderUpgradeable.sol";
 import "./IMintNFT.sol";
 import "./IOperationController.sol";
+import "./ERC2771ContextUpgradeable.sol";
 import "hardhat/console.sol";
 
-contract EventManager is OwnableUpgradeable {
+contract EventManager is OwnableUpgradeable, ERC2771ContextUpgradeable {
     struct Group {
         uint256 groupId;
         address ownerAddress;
@@ -60,15 +62,19 @@ contract EventManager is OwnableUpgradeable {
     mapping(uint256 => mapping(address => mapping(bytes32 => bool)))
         private memberRolesByGroupId;
     mapping(uint256 => address[]) private memberAddressesByGroupId;
+    //mapping(address => uint256) private userPoints;
 
     modifier onlyGroupOwner(uint256 _groupId) {
-        require(_isGroupOwner(_groupId, msg.sender), "You have no permission");
+        require(
+            _isGroupOwner(_groupId, _msgSender()),
+            "You have no permission"
+        );
         _;
     }
 
     modifier onlyAdminAccess(uint256 _groupId) {
         require(
-            _hasAdminAccess(_groupId, msg.sender),
+            _hasAdminAccess(_groupId, _msgSender()),
             "You have no permission"
         );
         _;
@@ -76,7 +82,7 @@ contract EventManager is OwnableUpgradeable {
 
     modifier onlyCollaboratorAccess(uint256 _groupId) {
         require(
-            _hasCollaboratorAccess(_groupId, msg.sender),
+            _hasCollaboratorAccess(_groupId, _msgSender()),
             "You have no permission"
         );
         _;
@@ -129,6 +135,7 @@ contract EventManager is OwnableUpgradeable {
 
     // Currently, reinitializer(3) was executed as constructor.
     function initialize(
+        MinimalForwarderUpgradeable _trustedForwarder,
         address _owner,
         address _relayerAddr,
         uint256 _mtxPrice,
@@ -141,10 +148,43 @@ contract EventManager is OwnableUpgradeable {
             _groupIds.increment();
             _eventRecordIds.increment();
         }
+        __ERC2771Context_init(address(_trustedForwarder));
         relayerAddr = _relayerAddr;
         mtxPrice = _mtxPrice;
         maxMintLimit = _maxMintLimit;
         operationControllerAddr = _operationControllerAddr;
+    }
+
+    function _msgSender()
+        internal
+        view
+        virtual
+        override(ContextUpgradeable, ERC2771ContextUpgradeable)
+        returns (address sender)
+    {
+        if (isTrustedForwarder(msg.sender)) {
+            // The assembly code is more direct than the Solidity version using `abi.decode`.
+            /// @solidity memory-safe-assembly
+            assembly {
+                sender := shr(96, calldataload(sub(calldatasize(), 20)))
+            }
+        } else {
+            return super._msgSender();
+        }
+    }
+
+    function _msgData()
+        internal
+        view
+        virtual
+        override(ContextUpgradeable, ERC2771ContextUpgradeable)
+        returns (bytes calldata)
+    {
+        if (isTrustedForwarder(msg.sender)) {
+            return msg.data[:msg.data.length - 20];
+        } else {
+            return super._msgData();
+        }
     }
 
     function createGroup(string memory _name) external whenNotPaused {
@@ -152,11 +192,15 @@ contract EventManager is OwnableUpgradeable {
         _groupIds.increment();
 
         groups.push(
-            Group({groupId: _newGroupId, ownerAddress: msg.sender, name: _name})
+            Group({
+                groupId: _newGroupId,
+                ownerAddress: _msgSender(),
+                name: _name
+            })
         );
-        ownGroupIds[msg.sender].push(_newGroupId);
+        ownGroupIds[_msgSender()].push(_newGroupId);
 
-        emit CreateGroup(msg.sender, _newGroupId);
+        emit CreateGroup(_msgSender(), _newGroupId);
     }
 
     function getGroups() public view returns (Group[] memory) {
@@ -219,17 +263,17 @@ contract EventManager is OwnableUpgradeable {
 
         ownGroupIds[_newOwnerAddress].push(_groupId);
 
-        for (uint256 i = 0; i < ownGroupIds[msg.sender].length; i++) {
-            if (ownGroupIds[msg.sender][i] == _groupId) {
-                ownGroupIds[msg.sender][i] = ownGroupIds[msg.sender][
-                    ownGroupIds[msg.sender].length - 1
+        for (uint256 i = 0; i < ownGroupIds[_msgSender()].length; i++) {
+            if (ownGroupIds[_msgSender()][i] == _groupId) {
+                ownGroupIds[_msgSender()][i] = ownGroupIds[_msgSender()][
+                    ownGroupIds[_msgSender()].length - 1
                 ];
-                ownGroupIds[msg.sender].pop();
+                ownGroupIds[_msgSender()].pop();
                 break;
             }
         }
 
-        emit TransferGroupOwner(msg.sender, _newOwnerAddress, _groupId);
+        emit TransferGroupOwner(_msgSender(), _newOwnerAddress, _groupId);
     }
 
     function _isGroupOwner(
@@ -248,6 +292,7 @@ contract EventManager is OwnableUpgradeable {
         bool _useMtx,
         bool _nonTransferable,
         bytes32 _secretPhrase,
+        //    uint256 _points,
         IMintNFT.NFTAttribute[] memory _eventNFTAttributes
     ) external payable onlyCollaboratorAccess(_groupId) whenNotPaused {
         require(
@@ -291,7 +336,7 @@ contract EventManager is OwnableUpgradeable {
         eventIdsByGroupId[_groupId].push(_newEventId);
         groupIdByEventId[_newEventId] = _groupId;
 
-        emit CreateEvent(msg.sender, _newEventId);
+        emit CreateEvent(_msgSender(), _newEventId);
     }
 
     function getEventRecordCount() public view returns (uint256) {
