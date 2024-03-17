@@ -117,11 +117,11 @@ export const deployForwarder = async () => {
   return deployedForwarder;
 };
 
-export const deployMintPoint = async () => {
+export const deployMintPoint = async (params: { forwarderAddress: string }) => {
   const mintPoint = await ethers.getContractFactory("MintPoint");
   const deployedMintPoint: MintPoint = (await upgrades.deployProxy(
     mintPoint,
-    [],
+    [params.forwarderAddress],
     {
       initializer: "initialize",
     }
