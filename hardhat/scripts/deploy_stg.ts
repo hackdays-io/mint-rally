@@ -9,7 +9,9 @@ import {
   EventManager,
   SecretPhraseVerifier,
   OperationController,
+  MintPoint,
 } from "../typechain";
+import { deployMintPoint } from "./helper/deploy";
 
 async function main() {
   let mintNFT: MintNFT;
@@ -69,6 +71,8 @@ async function main() {
   await mintNFT.setEventManagerAddr(eventManager.address);
   await eventManager.setMintNFTAddr(mintNFT.address);
 
+  const mintPoint = await deployMintPoint();
+
   console.log("forwarder address:", forwarder.address);
   console.log("secretPhraseVerifier address:", secretPhraseVerifier.address);
   console.log("operationController address:", operationController.address);
@@ -84,6 +88,7 @@ async function main() {
   );
   console.log(`NEXT_PUBLIC_CONTRACT_MINT_NFT_MANAGER=${mintNFT.address}`);
   console.log(`NEXT_PUBLIC_CONTRACT_EVENT_MANAGER=${eventManager.address}`);
+  console.log(`NEXT_PUBLIC_CONTRACT_MINT_POINT=${mintPoint.address}`);
 }
 
 // We recommend this pattern to be able to use async/await everywhere

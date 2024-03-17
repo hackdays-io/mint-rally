@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { Contract } from "ethers";
+import { Contract, providers, Wallet } from "ethers";
 import {
   DefenderRelayProvider,
   DefenderRelaySigner,
@@ -8,24 +8,34 @@ import MintRallyForwarderABI from "../../../contracts/Fowarder.json";
 import { MintRallyForwarder } from "types/MintRallyForwarder";
 
 const getOzSigner = async () => {
-  const apiKeys = JSON.parse(process.env.OZ_RELAYER_API_KEYS!);
-  const apiSecrets = JSON.parse(process.env.OZ_RELAYER_API_SECRETS!);
+  if (process.env.DEV_RELAYER_PRIVATE_KEY) {
+    const developmentProvider = new providers.JsonRpcProvider(
+      "http://localhost:8545"
+    );
+    return new Wallet(
+      process.env.DEVELOPMENT_RELAYER_PRIVATE_KEY!,
+      developmentProvider
+    );
+  } else {
+    const apiKeys = JSON.parse(process.env.OZ_RELAYER_API_KEYS!);
+    const apiSecrets = JSON.parse(process.env.OZ_RELAYER_API_SECRETS!);
 
-  const randomIndex = Math.floor(Math.random() * apiKeys.length);
-  const apiKey = apiKeys[randomIndex];
-  const apiSecret = apiSecrets[randomIndex];
+    const randomIndex = Math.floor(Math.random() * apiKeys.length);
+    const apiKey = apiKeys[randomIndex];
+    const apiSecret = apiSecrets[randomIndex];
 
-  const credentials = {
-    apiKey,
-    apiSecret,
-  };
+    const credentials = {
+      apiKey,
+      apiSecret,
+    };
 
-  const ozProvider = new DefenderRelayProvider(credentials);
-  const ozSigner = new DefenderRelaySigner(credentials, ozProvider, {
-    speed: "fast",
-  });
+    const ozProvider = new DefenderRelayProvider(credentials);
+    const ozSigner = new DefenderRelaySigner(credentials, ozProvider, {
+      speed: "fast",
+    });
 
-  return ozSigner;
+    return ozSigner;
+  }
 };
 
 export default async function handler(

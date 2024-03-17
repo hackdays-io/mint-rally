@@ -10,25 +10,25 @@ contract MintPoint is ERC1155SupplyUpgradeable, IMintPoint {
     string public name;
     string public symbol;
 
-    constructor() {
-    _disableInitializers();
-    }
-
     function initialize() public initializer {
         __ERC1155_init("");
         __ERC1155Supply_init();
 
         name = "MintPoint";
         symbol = "MNT";
+        register();
     }
 
     function supportsInterface(
-    bytes4 interfaceId
+        bytes4 interfaceId
     ) public view override(IMintPoint, ERC1155Upgradeable) returns (bool) {
         return super.supportsInterface(interfaceId);
     }
 
-    function isApprovedForAll(address account, address operator) public view override(ERC1155Upgradeable) returns (bool) {
+    function isApprovedForAll(
+        address account,
+        address operator
+    ) public view override(ERC1155Upgradeable) returns (bool) {
         return super.isApprovedForAll(account, operator);
     }
 
@@ -40,7 +40,7 @@ contract MintPoint is ERC1155SupplyUpgradeable, IMintPoint {
         emit Mint(to, tokenId);
     }
 
-    function register() external {
+    function register() public {
         uint256 tokenId = tokenIds;
 
         tokenIds++;
@@ -50,7 +50,10 @@ contract MintPoint is ERC1155SupplyUpgradeable, IMintPoint {
 
     function burn(uint256 tokenId, uint256 amount) external {
         require(tokenId < tokenIds, "MintPoint: tokenId is not registered.");
-        require(balanceOf(_msgSender(), tokenId) >= amount, "MintPoint: not minted.");
+        require(
+            balanceOf(_msgSender(), tokenId) >= amount,
+            "MintPoint: not minted."
+        );
         _burn(_msgSender(), tokenId, amount);
     }
 }

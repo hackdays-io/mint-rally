@@ -1,5 +1,10 @@
 import { ethers, network, upgrades } from "hardhat";
-import { EventManager, MintNFT, OperationController } from "../../typechain";
+import {
+  EventManager,
+  MintNFT,
+  MintPoint,
+  OperationController,
+} from "../../typechain";
 
 export const deployMintNFT = async (params: {
   ownerAddress: string;
@@ -110,4 +115,20 @@ export const deployForwarder = async () => {
   console.log("forwarder address:", deployedForwarder.address);
 
   return deployedForwarder;
+};
+
+export const deployMintPoint = async () => {
+  const mintPoint = await ethers.getContractFactory("MintPoint");
+  const deployedMintPoint: MintPoint = (await upgrades.deployProxy(
+    mintPoint,
+    [],
+    {
+      initializer: "initialize",
+    }
+  )) as any;
+  await deployedMintPoint.deployed();
+
+  console.log("mintPoint address:", deployedMintPoint.address);
+
+  return deployedMintPoint;
 };
