@@ -9,6 +9,8 @@ import {
 import MintPointABI from "../../../contracts/MintPoint.json";
 import { MintPoint } from "types/MintPoint";
 
+const TOKEN_ID = 1;
+
 const stripeClient = new Stripe(process.env.STRIPE_SK!);
 
 const reqToBuffer = async (req: NextApiRequest) => {
@@ -89,10 +91,9 @@ export default async function handler(
         MintPointABI.abi,
         ozSigner
       ) as any;
-      const tokenId = 0;
       let txReceipt: ContractReceipt;
       try {
-        const tx = await mintPoint.mint(to, tokenId, Number(amount));
+        const tx = await mintPoint.mint(to, TOKEN_ID, Number(amount));
         console.log(`txHash: ${tx.hash}`);
         txReceipt = await tx.wait();
         console.log(`txReceipt: ${JSON.stringify(txReceipt)}`);
