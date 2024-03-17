@@ -2,6 +2,8 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { Stripe } from "stripe";
 
+const UNIT_AMOUNT_STD = 5; // 1ポイントあたりの価格（単位：円）
+
 const stripeClient = new Stripe(process.env.STRIPE_SK!);
 
 export default async function handler(
@@ -19,7 +21,7 @@ export default async function handler(
     return res.status(400).send("Invalid request parameters");
 
   // todo: 購入ポイント数の価格計算
-  const unit_amount = Number(amount) * 1;
+  const unit_amount = Number(amount) * UNIT_AMOUNT_STD;
 
   // todo: signatureからウォレットアドレスを複合
   // ここのmetadataがwebhookで飛んでくるので、それでどのアドレスにいくらポイント付与するかがわかる
