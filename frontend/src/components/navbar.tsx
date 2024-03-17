@@ -161,6 +161,22 @@ const Navbar = () => {
           display={{ base: "none", md: "flex" }}
         >
           <Spacer />
+          <Box marginLeft={3} cursor="pointer">
+            <NextLink href="/purchase-points/purchase">
+              <a>
+                <Button
+                  bg="mint.subtle"
+                  color="mint.font"
+                  borderRadius={"16px"}
+                  variant="solid"
+                  size="md"
+                  mr={4}
+                >
+                  {t.PURCHASE}
+                </Button>
+              </a>
+            </NextLink>
+          </Box>
           <a
             href="https://s.c4j.jp/summit-nft"
             target="_blank"
