@@ -40,7 +40,7 @@ export default async function handler(
       },
     ],
     // todo: 購入後のリダイレクト先URLをちゃんと設定
-    success_url: "http://localhost:3000/purchase-points/payed",
+    success_url: "http://localhost:3000/purchase-points/paid",
     metadata,
   });
 
