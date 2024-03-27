@@ -27,6 +27,7 @@ async function main() {
 
   const eventManager = await deployEventManager({
     ownerAddress: owner.address,
+    forwarderAddress: forwarder.address,
     mtxPrice: 500000,
     maxMintLimit: 1000000,
     operationControllerAddress: operationController.address,

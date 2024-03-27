@@ -30,7 +30,7 @@ async function main() {
   const EventManagerFactory = await ethers.getContractFactory("EventManager");
   const deployedEventManager: any = await upgrades.deployProxy(
     EventManagerFactory,
-    [process.env.POLYGON_RELAYER_ADDRESS, 250000, 1000000],
+    [process.env.POLYGON_RELAYER_ADDRESS, forwarder.address, 250000, 1000000],
     {
       initializer: "initialize",
     }

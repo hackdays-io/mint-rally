@@ -34,6 +34,7 @@ export const deployMintNFT = async (params: {
 
 export const deployEventManager = async (params: {
   ownerAddress: string;
+  forwarderAddress: string;
   mtxPrice: number;
   maxMintLimit: number;
   operationControllerAddress: string;
@@ -58,6 +59,7 @@ export const deployEventManager = async (params: {
     eventManager,
     [
       params.ownerAddress,
+      params.forwarderAddress,
       relayerAddress,
       params.mtxPrice,
       params.maxMintLimit,
