@@ -135,8 +135,8 @@ contract EventManager is OwnableUpgradeable, ERC2771ContextUpgradeable {
 
     // Currently, reinitializer(3) was executed as constructor.
     function initialize(
-        MinimalForwarderUpgradeable _trustedForwarder,
         address _owner,
+        MinimalForwarderUpgradeable _trustedForwarder,
         address _relayerAddr,
         uint256 _mtxPrice,
         uint256 _maxMintLimit,

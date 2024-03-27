@@ -84,8 +84,8 @@ describe("EventManager", function () {
       const deployedEventManagerContract: any = await upgrades.deployProxy(
         eventManagerContractFactory,
         [
-          "0xdCb93093424447bF4FE9Df869750950922F1E30B",
           organizer.address,
+          "0xdCb93093424447bF4FE9Df869750950922F1E30B",
           relayer.address,
           250000,
           1000000,
@@ -487,8 +487,8 @@ describe("EventManager", function () {
       const deployedEventManagerContract: any = await upgrades.deployProxy(
         eventManagerContractFactory,
         [
-          "0xdCb93093424447bF4FE9Df869750950922F1E30B",
           organizer.address,
+          "0xdCb93093424447bF4FE9Df869750950922F1E30B",
           relayer.address,
           500000,
           1000000,
@@ -543,8 +543,8 @@ describe("EventManager", function () {
       const deployedEventManagerContract: any = await upgrades.deployProxy(
         eventManagerContractFactory,
         [
-          "0xdCb93093424447bF4FE9Df869750950922F1E30B",
           organizer.address,
+          "0xdCb93093424447bF4FE9Df869750950922F1E30B",
           relayer.address,
           500000,
           1000000,
@@ -619,8 +619,8 @@ describe("EventManager", function () {
       const deployedEventManagerContract: any = await upgrades.deployProxy(
         eventManagerContractFactory,
         [
-          "0xdCb93093424447bF4FE9Df869750950922F1E30B",
           organizer.address,
+          "0xdCb93093424447bF4FE9Df869750950922F1E30B",
           relayer.address,
           250000,
           1000000,
@@ -714,8 +714,8 @@ describe("EventManager", function () {
       const deployedEventManagerContract = await upgrades.deployProxy(
         eventManagerContractFactory,
         [
-          "0xdCb93093424447bF4FE9Df869750950922F1E30B",
           organizer.address,
+          "0xdCb93093424447bF4FE9Df869750950922F1E30B",
           relayer.address,
           250000,
           1000000,
@@ -789,8 +789,8 @@ describe("EventManager", function () {
       const deployedEventManagerContract: any = await upgrades.deployProxy(
         eventManagerContractFactory,
         [
-          "0xdCb93093424447bF4FE9Df869750950922F1E30B",
           organizer.address,
+          "0xdCb93093424447bF4FE9Df869750950922F1E30B",
           relayer.address,
           250000,
           1000000,

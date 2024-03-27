@@ -57,6 +57,7 @@ async function main() {
     EventManagerFactory,
     [
       process.env.MUMBAI_RELAYER_ADDRESS,
+      forwarder.address,
       250000,
       1000000,
       operationController.address,
@@ -71,7 +72,7 @@ async function main() {
   await mintNFT.setEventManagerAddr(eventManager.address);
   await eventManager.setMintNFTAddr(mintNFT.address);
 
-  const mintPoint = await deployMintPoint();
+  const mintPoint = await deployMintPoint({ forwarderAddress: forwarder.address });
 
   console.log("forwarder address:", forwarder.address);
   console.log("secretPhraseVerifier address:", secretPhraseVerifier.address);

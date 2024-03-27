@@ -80,8 +80,8 @@ describe("MTX Event", function () {
     eventManager = (await upgrades.deployProxy(
       eventManagerContractFactory,
       [
-        mintRallyForwarder.address,
         organizer.address,
+        mintRallyForwarder.address,
         relayer.address,
         250000,
         1000000,
