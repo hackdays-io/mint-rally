@@ -6,6 +6,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/metatx/MinimalForwarderUpgradeable.sol";
 import "./IMintNFT.sol";
+import "./MintPoint.sol";
 import "./IOperationController.sol";
 import "./ERC2771ContextUpgradeable.sol";
 import "hardhat/console.sol";
@@ -46,6 +47,8 @@ contract EventManager is OwnableUpgradeable, ERC2771ContextUpgradeable {
 
     // Mint nft contract address
     address private mintNFTAddr;
+    // Burn point contract address
+    address private burnPtsAddr;
     // Relayer address for meta transaction
     address private relayerAddr;
     // price for mtx per mint. required gas * margin * gas limit multipler
@@ -99,6 +102,11 @@ contract EventManager is OwnableUpgradeable, ERC2771ContextUpgradeable {
     function setMintNFTAddr(address _mintNftAddr) public onlyOwner {
         require(_mintNftAddr != address(0), "mint nft address is blank");
         mintNFTAddr = _mintNftAddr;
+    }
+
+    function setBurnPtsAddr(address _burnPtsAddr) public onlyOwner {
+        require(_burnPtsAddr != address(0), "burn point address is blank");
+        burnPtsAddr = _burnPtsAddr;
     }
 
     function setRelayerAddr(address _relayerAddr) public onlyOwner {
@@ -289,19 +297,25 @@ contract EventManager is OwnableUpgradeable, ERC2771ContextUpgradeable {
         string memory _description,
         string memory _date,
         uint256 _mintLimit,
+        uint256 _tokenId,
+        bool _usePoint,
         bool _useMtx,
         bool _nonTransferable,
         bytes32 _secretPhrase,
-        //    uint256 _points,
         IMintNFT.NFTAttribute[] memory _eventNFTAttributes
     ) external payable onlyCollaboratorAccess(_groupId) whenNotPaused {
-        require(
-            _mintLimit > 0 && _mintLimit <= maxMintLimit,
-            "mint limit is invalid"
-        );
+        require(_mintLimit > 0 && _mintLimit <= maxMintLimit, "mint limit is invalid");
 
-        if (_useMtx) {
-            uint256 depositPrice = (_mintLimit * tx.gasprice * mtxPrice);
+        if (_usePoint) {
+            MintPoint mintPoint = MintPoint(burnPtsAddr);
+            uint256 amount = _mintLimit;
+            require(
+                mintPoint.balanceOf(_msgSender(), _tokenId) >= amount,
+                "Not enough tokens to burn"
+            );
+            mintPoint.burn(_tokenId, amount);
+        } else if (_useMtx) {
+            uint256 depositPrice = _mintLimit * tx.gasprice * mtxPrice;
             require(msg.value >= depositPrice, "Not enough value");
             (bool success, ) = (relayerAddr).call{value: msg.value}("");
             require(success, "transfer failed");
@@ -310,33 +324,39 @@ contract EventManager is OwnableUpgradeable, ERC2771ContextUpgradeable {
         uint256 _newEventId = _eventRecordIds.current();
         _eventRecordIds.increment();
 
-        eventRecords.push(
-            EventRecord({
-                eventRecordId: _newEventId,
-                groupId: _groupId,
-                name: _name,
-                description: _description,
-                date: _date,
-                useMtx: _useMtx
-            })
-        );
+        _createEventRecord(_newEventId, _groupId, _name, _description, _date, _useMtx);
 
-        IMintNFT _mintNFT = IMintNFT(mintNFTAddr);
-        _mintNFT.setEventInfo(
-            _newEventId,
-            _mintLimit,
-            _secretPhrase,
-            _eventNFTAttributes
-        );
+        IMintNFT mintNFTContract = IMintNFT(mintNFTAddr);
+        mintNFTContract.setEventInfo(_newEventId, _mintLimit, _secretPhrase, _eventNFTAttributes);
 
         if (_nonTransferable) {
-            _mintNFT.changeNonTransferable(_newEventId, true);
+            mintNFTContract.changeNonTransferable(_newEventId, true);
         }
+
+        emit CreateEvent(_msgSender(), _newEventId);
+    }
+
+    function _createEventRecord(
+        uint256 _newEventId,
+        uint256 _groupId,
+        string memory _name,
+        string memory _description,
+        string memory _date,
+        bool _useMtx
+    ) internal {
+        EventRecord memory newEventRecord = EventRecord({
+            eventRecordId: _newEventId,
+            groupId: _groupId,
+            name: _name,
+            description: _description,
+            date: _date,
+            useMtx: _useMtx
+        });
+
+        eventRecords.push(newEventRecord);
 
         eventIdsByGroupId[_groupId].push(_newEventId);
         groupIdByEventId[_newEventId] = _groupId;
-
-        emit CreateEvent(_msgSender(), _newEventId);
     }
 
     function getEventRecordCount() public view returns (uint256) {

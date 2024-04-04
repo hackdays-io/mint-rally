@@ -134,6 +134,8 @@ describe("MTX Event", function () {
           "mtx event description",
           "2022-07-30",
           100,
+          0,
+          false,
           false,
           false,
           publicInputCalldata[0],
