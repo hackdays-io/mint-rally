@@ -281,6 +281,14 @@ contract MintNFT is
             isHoldingEventNFT[Hashing.hashingAddressUint256(_addr, _eventId)];
     }
 
+    function getCountOfParticipation(
+        uint256 _groupId,
+        address _address
+    ) public view returns (uint256) {
+        bytes32 groupHash = Hashing.hashingAddressUint256(_address, _groupId);
+        return countOfParticipation[groupHash];
+    }
+
     function setEventInfo(
         uint256 _eventId,
         uint256 _mintLimit,
