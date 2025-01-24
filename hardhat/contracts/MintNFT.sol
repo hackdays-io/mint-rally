@@ -75,6 +75,8 @@ contract MintNFT is
     event ResetSecretPhrase(address indexed executor, uint256 indexed eventId);
     event NonTransferable(uint256 indexed eventId, bool isNonTransferable);
     event DroppedNFTs(address indexed executor, uint256 indexed eventId);
+    event BurnByAdmin(uint256 indexed tokenId, address indexed admin);
+    event Burn(uint256 indexed tokenId, address indexed owner);
 
     modifier onlyCollaboratorAccess(uint256 _eventId) {
         IEventManager eventManager = IEventManager(eventManagerAddr);
@@ -356,8 +358,16 @@ contract MintNFT is
         return _nftAttributeRecords;
     }
 
-    function burn(uint256 tokenId) public onlyOwner {
+    function burnByAdmin(uint256 tokenId) public onlyOwner {
+        require(_exists(tokenId), "Token does not exist");
         _burn(tokenId);
+        emit BurnByAdmin(tokenId, _msgSender());
+    }
+    
+    function burn(uint256 tokenId) public {
+    require(_isApprovedOrOwner(_msgSender(), tokenId), "ERC721Burnable: caller is not owner nor approved");
+    _burn(tokenId);
+    emit Burn(tokenId, _msgSender());
     }
 
     function tokenURI(
