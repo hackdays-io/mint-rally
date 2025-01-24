@@ -39,6 +39,7 @@ async function main() {
   const deployedMintNFT: any = await upgrades.deployProxy(
     MintNFTFactory,
     [
+      "0xc5952da2d393d3421D56bd5FBCac1F8a3df40567",
       forwarder.address,
       secretPhraseVerifier.address,
       operationController.address,
@@ -54,6 +55,7 @@ async function main() {
   const deployedEventManager: any = await upgrades.deployProxy(
     EventManagerFactory,
     [
+      "0xc5952da2d393d3421D56bd5FBCac1F8a3df40567",
       process.env.MUMBAI_RELAYER_ADDRESS,
       250000,
       1000000,
