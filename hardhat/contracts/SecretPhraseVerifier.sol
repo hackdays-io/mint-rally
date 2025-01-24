@@ -225,9 +225,9 @@ contract SecretPhraseVerifier {
                 }
                 acc := inverse(acc, q)
 
-                // At this point pAux pint to the next free position we substract 1 to point to the last used
+                // At this point pAux pint to the next free position we subtract 1 to point to the last used
                 pAux := sub(pAux, 32)
-                // pIn points to the n+1 element, we substract to point to n
+                // pIn points to the n+1 element, we subtract to point to n
                 pIn := sub(pIn, 32)
                 lastPIn := pVals // We don't process the first element
                 for {
