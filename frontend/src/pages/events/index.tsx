@@ -12,6 +12,7 @@ import {
   VStack,
 } from "@chakra-ui/react";
 
+import AlertMessage from "src/components/atoms/form/AlertMessage";
 import EventCard from "../../components/atoms/events/EventCard";
 import { Event } from "types/Event";
 import { useLocale } from "../../hooks/useLocale";
@@ -23,8 +24,14 @@ import Paginate from "src/components/atoms/events/Paginate";
 const Events: NextPage = () => {
   const router = useRouter();
   const { t } = useLocale();
-  const { events, isLoading, countData, setCurrentCursor, COUNT_PER_PAGE } =
-    useEvents();
+  const {
+    events,
+    isLoading,
+    error,
+    countData,
+    setCurrentCursor,
+    COUNT_PER_PAGE,
+  } = useEvents();
   const [currentPage, setCurrentPage] = useState<number | null>(null);
 
   const pageChanged = useCallback(
@@ -73,6 +80,8 @@ const Events: NextPage = () => {
         </Flex>
         {isLoading ? (
           <Spinner></Spinner>
+        ) : error ? (
+          <AlertMessage status="error" title={t.ERROR_LOADING_EVENTS} />
         ) : (
           <VStack spacing={5} align="stretch">
             <>

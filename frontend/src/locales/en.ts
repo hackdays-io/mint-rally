@@ -194,6 +194,8 @@ export default {
   ERROR_CREATING_EVENT_GROUP:
     "An error occurred when creating your new event group",
   ERROR_MINTING_PARTICIPATION_NFT: "An error occurred when minting your NFT",
+  ERROR_LOADING_EVENTS:
+    "Could not load events. The blockchain node may be unreachable. Please try again later.",
   OWNER: "Owner",
   MINTGUIDE: guide,
 

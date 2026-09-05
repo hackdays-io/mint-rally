@@ -7,15 +7,19 @@ import {
 } from "@thirdweb-dev/react";
 import { useLocale } from "src/hooks/useLocale";
 import { useMemo } from "react";
+import { getReadonlyRpcUrls } from "./rpcProviders";
 
 export const chainId = process.env.NEXT_PUBLIC_CHAIN_ID!;
+// The thirdweb SDK reads contracts through the first entry of this list only,
+// so the entries behind it cover a missing NEXT_PUBLIC_PROVIDER_RPC rather than
+// acting as a runtime failover.
 export const activeChain =
   chainId === "80001"
-    ? { ...Mumbai, rpc: [process.env.NEXT_PUBLIC_PROVIDER_RPC!, ...Mumbai.rpc] }
+    ? { ...Mumbai, rpc: [...getReadonlyRpcUrls(), ...Mumbai.rpc] }
     : chainId === "137"
     ? {
         ...Polygon,
-        rpc: [process.env.NEXT_PUBLIC_PROVIDER_RPC!, ...Polygon.rpc],
+        rpc: [...getReadonlyRpcUrls(), ...Polygon.rpc],
       }
     : { ...Localhost, rpc: ["http://localhost:8545"], chainId: 31337 };
 
