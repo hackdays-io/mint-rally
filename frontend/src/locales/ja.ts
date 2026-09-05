@@ -194,6 +194,8 @@ export default {
   ERROR_CREATING_EVENT: "イベントを作成中にエラーが発生しました",
   ERROR_CREATING_EVENT_GROUP: "イベントグループを作成中にエラーが発生しました",
   ERROR_MINTING_PARTICIPATION_NFT: "NFTをミント中にエラーが発生しました",
+  ERROR_LOADING_EVENTS:
+    "イベントを読み込めませんでした。ブロックチェーンノードに接続できていない可能性があります。しばらくしてから再度お試しください。",
   OWNER: "所有者",
   MINTGUIDE: guide,
 

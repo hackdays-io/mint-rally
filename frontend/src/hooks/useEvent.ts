@@ -284,19 +284,26 @@ export const useEvents = (option?: UseEventOption) => {
   // read record data
   useEffect(() => {
     if (eventManagerContract === undefined || currentCursor === null) return;
+
+    let isCurrentRequest = true;
+    setError(null);
     setIsLoading(true);
     eventManagerContract
-      ?.call("getEventRecords", [COUNT_PER_PAGE, currentCursor])
+      .call("getEventRecords", [COUNT_PER_PAGE, currentCursor])
       .then((res: any) => {
-        setEventData(res);
+        if (isCurrentRequest) setEventData(res);
       })
       .catch((err: any) => {
-        setError(err);
+        if (isCurrentRequest) setError(err);
       })
       .finally(() => {
-        setIsLoading(false);
+        if (isCurrentRequest) setIsLoading(false);
       });
-  }, [currentCursor, eventManagerContract]);
+
+    return () => {
+      isCurrentRequest = false;
+    };
+  }, [currentCursor, eventManagerContract, COUNT_PER_PAGE]);
   if (option?.initialCursor !== undefined && currentCursor === null) {
     setCurrentCursor(option?.initialCursor);
   }
@@ -327,7 +334,9 @@ export const useEvents = (option?: UseEventOption) => {
   return {
     events,
     isLoading,
-    error,
+    // A failing record count leaves the list empty just as a failing record
+    // fetch does, so both errors have to reach the caller.
+    error: error ?? countError,
     countData,
     nextCursor,
     prevCursor,

@@ -5,25 +5,23 @@ import { ipfs2http } from "../../utils/ipfs2http";
 import axios from "axios";
 import { NFT } from "types/NFT";
 import { Event } from "types/Event";
-const provierRpc = process.env.NEXT_PUBLIC_PROVIDER_RPC!;
+import { getReadonlyProvider } from "./rpcProviders";
 const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_MINT_NFT_MANAGER!;
 const eventContractAddress = process.env.NEXT_PUBLIC_CONTRACT_EVENT_MANAGER!;
 
 const getMintNFTManagerContract = () => {
-  const provider = new ethers.providers.JsonRpcProvider(provierRpc);
   const _contract = new ethers.Contract(
     contractAddress,
     contract.abi,
-    provider
+    getReadonlyProvider()
   );
   return _contract;
 }
 const getEventManagerContract = () => {
-  const provider = new ethers.providers.JsonRpcProvider(provierRpc);
   const _contract = new ethers.Contract(
     eventContractAddress,
     eventContract.abi,
-    provider
+    getReadonlyProvider()
   );
   return _contract;
 }
